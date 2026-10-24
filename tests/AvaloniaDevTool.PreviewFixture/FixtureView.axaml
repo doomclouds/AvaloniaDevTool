@@ -1,0 +1,13 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:AvaloniaDevTool.PreviewFixture"
+             xmlns:referenced="clr-namespace:AvaloniaDevTool.PreviewFixture.Controls;assembly=AvaloniaDevTool.PreviewFixture.Controls"
+             x:Class="AvaloniaDevTool.PreviewFixture.FixtureView" Width="360" Height="240" Background="#203050">
+  <StackPanel Spacing="8">
+    <TextBlock Name="ProjectResourceText" Text="{DynamicResource FixtureTitle}" />
+    <TextBlock Name="SavedText" Text="First source" />
+    <local:FixtureBadge Name="CustomControl" />
+    <referenced:ReferencedBadge />
+    <TextBox Name="EditableText" Text="Original input" Width="240" />
+    <Button Name="PreviewButton" Content="Fixture button" />
+  </StackPanel>
+</UserControl>

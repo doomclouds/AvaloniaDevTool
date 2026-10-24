@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType></PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="ModelContextProtocol" Version="2.3.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.13" />
+    <ProjectReference Include="../AvaloniaDevTool.Client/AvaloniaDevTool.Client.csproj" />
+    <ProjectReference Include="../AvaloniaDevTool.Previewer/AvaloniaDevTool.Previewer.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+  <Target Name="CopyPreviewHost" AfterTargets="Build">
+    <MSBuild Projects="../AvaloniaDevTool.Previewer/AvaloniaDevTool.Previewer.csproj" Targets="GetTargetPath" Properties="Configuration=$(Configuration);TargetFramework=$(TargetFramework)">
+      <Output TaskParameter="TargetOutputs" ItemName="PreviewHostTarget" />
+    </MSBuild>
+    <PropertyGroup><PreviewHostOutput>@(PreviewHostTarget->'%(RootDir)%(Directory)')</PreviewHostOutput></PropertyGroup>
+    <ItemGroup><PreviewHostFiles Include="$(PreviewHostOutput)**/*" Exclude="$(PreviewHostOutput)**/*.pdb" /></ItemGroup>
+    <Copy SourceFiles="@(PreviewHostFiles)" DestinationFiles="@(PreviewHostFiles->'$(OutDir)previewer/%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
+  <Target Name="PublishPreviewHost" AfterTargets="Publish">
+    <ItemGroup><PublishedPreviewFiles Include="$(OutDir)previewer/**/*" /></ItemGroup>
+    <Copy SourceFiles="@(PublishedPreviewFiles)" DestinationFiles="@(PublishedPreviewFiles->'$(PublishDir)previewer/%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
+</Project>
+

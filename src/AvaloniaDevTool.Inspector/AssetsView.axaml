@@ -1,0 +1,42 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AvaloniaDevTool.Inspector.AssetsView" x:CompileBindings="False">
+  <Grid RowDefinitions="Auto,Auto,Auto,*" Margin="14">
+    <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="10">
+      <TextBox Text="{Binding AssetFilter, Mode=TwoWay}" PlaceholderText="筛选资产 URI 或程序集" AutomationProperties.AutomationId="Inspector.AssetSearch" />
+      <Button Grid.Column="1" Content="刷新" Command="{Binding RefreshInspectionCommand}" AutomationProperties.AutomationId="Inspector.RefreshAssets" />
+      <Button Grid.Column="2" Content="复制 URI" IsEnabled="{Binding CanCopyAssetUri}" Click="CopyUriClick" AutomationProperties.AutomationId="Inspector.CopyAssetUri" />
+      <Button Grid.Column="3" Content="导出原始文件" IsEnabled="{Binding CanExportAsset}" Click="ExportClick" AutomationProperties.AutomationId="Inspector.ExportAsset" />
+    </Grid>
+    <TextBlock Grid.Row="1" Text="{Binding AssetSummary}" TextWrapping="Wrap" Foreground="#66758B" FontSize="12" Margin="0,9,0,12" />
+    <StackPanel Grid.Row="2" Spacing="5" Margin="0,0,0,10">
+      <TextBlock Text="{Binding AssetExportStatus}" TextWrapping="Wrap" FontSize="12" AutomationProperties.AutomationId="Inspector.AssetExportStatus" />
+      <Grid ColumnDefinitions="*,Auto" IsVisible="{Binding IsExportingAsset}" ColumnSpacing="8">
+        <ProgressBar Minimum="0" Maximum="100" Value="{Binding AssetExportProgress}" AutomationProperties.AutomationId="Inspector.AssetExportProgress" />
+        <Button Grid.Column="1" Content="取消导出" Command="{Binding CancelAssetExportCommand}" AutomationProperties.AutomationId="Inspector.CancelAssetExport" />
+      </Grid>
+    </StackPanel>
+    <Grid Grid.Row="3" ColumnDefinitions="310,7,*">
+      <ListBox ItemsSource="{Binding FilteredAssets}" SelectedItem="{Binding SelectedAsset, Mode=TwoWay}" AutomationProperties.AutomationId="Inspector.Assets">
+        <ListBox.ItemTemplate>
+          <DataTemplate>
+            <StackPanel Margin="4" Spacing="4" ToolTip.Tip="{Binding Uri}">
+              <TextBlock Text="{Binding Uri}" TextWrapping="Wrap" FontSize="12" />
+              <TextBlock Text="{Binding AssemblyName}" Foreground="#718096" FontSize="11" />
+            </StackPanel>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+      <GridSplitter Grid.Column="1" Background="Transparent" />
+      <Grid Grid.Column="2" Background="#F5F7FB" RowDefinitions="Auto,*">
+        <TextBlock Text="{Binding AssetMetadata}" TextWrapping="Wrap" FontSize="12" Margin="10" AutomationProperties.AutomationId="Inspector.AssetMetadata" />
+        <Image Grid.Row="1" Source="{Binding AssetImage}" IsVisible="{Binding HasAssetImage}" Stretch="Uniform" Margin="12" AutomationProperties.AutomationId="Inspector.AssetImage" />
+        <TextBox Grid.Row="1" Text="{Binding AssetText, Mode=OneWay}" IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap"
+                 IsVisible="{Binding HasAssetText}" FontFamily="Consolas, monospace" BorderThickness="0" Background="Transparent"
+                 ScrollViewer.VerticalScrollBarVisibility="Auto" AutomationProperties.AutomationId="Inspector.AssetText" />
+        <ScrollViewer Grid.Row="1" IsVisible="{Binding HasAssetFont}">
+          <TextBlock Text="{Binding AssetFontSample}" FontFamily="{Binding AssetFontFamily}" FontSize="28" TextWrapping="Wrap" Margin="16" AutomationProperties.AutomationId="Inspector.AssetFontPreview" />
+        </ScrollViewer>
+      </Grid>
+    </Grid>
+  </Grid>
+</UserControl>

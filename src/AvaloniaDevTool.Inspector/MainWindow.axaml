@@ -1,0 +1,292 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="using:AvaloniaDevTool.Inspector"
+        x:Class="AvaloniaDevTool.Inspector.MainWindow"
+        x:CompileBindings="False"
+        Title="Avalonia Inspector" Width="1320" Height="860" MinWidth="1020" MinHeight="680"
+        Background="#F3F5F9" FontFamily="Segoe UI, Microsoft YaHei UI, sans-serif">
+  <Window.Styles>
+    <Style Selector="Button">
+      <Setter Property="CornerRadius" Value="7" />
+      <Setter Property="Padding" Value="14,8" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="Button.accent">
+      <Setter Property="Background" Value="#5B4CE6" />
+      <Setter Property="Foreground" Value="White" />
+      <Setter Property="BorderThickness" Value="0" />
+    </Style>
+    <Style Selector="TextBox">
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="Padding" Value="10,7" />
+    </Style>
+    <Style Selector="TextBlock.caption">
+      <Setter Property="Foreground" Value="#728096" />
+      <Setter Property="FontSize" Value="12" />
+    </Style>
+    <Style Selector="TreeView#ControlTree TreeViewItem">
+      <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+      <Setter Property="MinHeight" Value="32" />
+    </Style>
+  </Window.Styles>
+
+  <Grid RowDefinitions="Auto,Auto,*,Auto">
+    <Border Background="#172137" Padding="24,18">
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+          <Border Background="#7869F5" CornerRadius="8" Width="36" Height="36">
+            <TextBlock Text="A" Foreground="White" FontWeight="Bold" FontSize="22"
+                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Border>
+          <StackPanel>
+            <TextBlock Text="Avalonia Inspector" Foreground="White" FontSize="19" FontWeight="SemiBold" />
+            <TextBlock Text="运行时界面诊断 · 深度检查" Foreground="#B7C3D9" FontSize="12" Margin="0,3,0,0" />
+          </StackPanel>
+        </StackPanel>
+        <Border Grid.Column="1" Background="#28354F" CornerRadius="20" Padding="14,7" VerticalAlignment="Center">
+          <TextBlock Text="{Binding ConnectionBadge}" Foreground="#DCE5FF" FontSize="12" />
+        </Border>
+      </Grid>
+    </Border>
+
+    <Border Grid.Row="1" Background="White" BorderBrush="#E0E5EE" BorderThickness="0,0,0,1" Padding="24,16">
+      <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto" RowDefinitions="Auto,Auto,Auto">
+        <TextBlock Text="{Binding EndpointLabel}" VerticalAlignment="Center" Margin="0,0,14,0" FontWeight="SemiBold" />
+        <TextBox x:Name="PipeNameBox" Grid.Column="1" Text="{Binding PipeName, Mode=TwoWay}" PlaceholderText="{Binding EndpointPlaceholder}"
+                 IsEnabled="{Binding CanChangeConnection}" AutomationProperties.AutomationId="Inspector.PipeName" />
+        <Button Grid.Column="2" Content="发现应用" Command="{Binding DiscoverCommand}" Margin="10,0,0,0"
+                AutomationProperties.AutomationId="Inspector.Discover" />
+        <Button Grid.Column="3" Content="连接" Classes="accent" Command="{Binding ConnectCommand}" Margin="10,0,0,0"
+                AutomationProperties.AutomationId="Inspector.Connect" />
+        <Button Grid.Column="4" Content="断开" Command="{Binding DisconnectCommand}" Margin="10,0,0,0"
+                AutomationProperties.AutomationId="Inspector.Disconnect" />
+        <ComboBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4" ItemsSource="{Binding AvailablePipes}"
+                  SelectedItem="{Binding PipeName, Mode=TwoWay}" IsVisible="{Binding ShowDiscoveredPipes}"
+                  IsEnabled="{Binding CanChangeConnection}"
+                  HorizontalAlignment="Stretch" Margin="0,9,0,0" PlaceholderText="选择已发现的本机应用"
+                  AutomationProperties.AutomationId="Inspector.DiscoveredPipes" />
+        <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4" Text="{Binding RemoteBearerToken, Mode=TwoWay}" PasswordChar="●"
+                 IsVisible="{Binding IsRemoteEndpoint}" IsEnabled="{Binding CanChangeConnection}" MaxLength="4096"
+                 PlaceholderText="输入此连接的 Bearer 令牌；也可启动时使用 --token-env" Margin="0,9,0,0"
+                 AutomationProperties.AutomationId="Inspector.RemoteToken" />
+        <TextBlock Grid.Row="2" Grid.ColumnSpan="5" Text="{Binding BackendModeNotice}" TextWrapping="Wrap"
+                   Foreground="#66758B" FontSize="11" Margin="0,8,0,0" AutomationProperties.AutomationId="Inspector.BackendMode" />
+      </Grid>
+    </Border>
+
+    <Grid Grid.Row="2" ColumnDefinitions="350,7,*" Margin="20" IsEnabled="{Binding IsConnected}">
+      <Border Background="White" CornerRadius="12" BorderBrush="#E0E5EE" BorderThickness="1">
+        <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,*,Auto">
+          <Grid ColumnDefinitions="*,Auto" Margin="16,15,12,12">
+            <StackPanel>
+              <TextBlock Text="控件树" FontSize="17" FontWeight="SemiBold" Foreground="#1F2B42" />
+              <TextBlock Text="{Binding TreeLoadingHint}" Classes="caption" Margin="0,4,0,0" />
+            </StackPanel>
+            <Button Grid.Column="1" Content="刷新" Command="{Binding RefreshCommand}" Padding="10,6"
+                    AutomationProperties.AutomationId="Inspector.Refresh" />
+          </Grid>
+          <ComboBox Grid.Row="1" ItemsSource="{Binding TreeKinds}" SelectedIndex="{Binding SelectedTreeIndex, Mode=TwoWay}"
+                    HorizontalAlignment="Stretch" Margin="16,0,16,10"
+                    AutomationProperties.AutomationId="Inspector.TreeKind" />
+          <Grid Grid.Row="2" ColumnDefinitions="*,Auto" Margin="16,0,16,8" ColumnSpacing="5">
+            <TextBox Text="{Binding TreeSearchQuery, Mode=TwoWay}" PlaceholderText="搜索名称、类型、文本" IsEnabled="{Binding CanUseNativeTools}" AutomationProperties.AutomationId="Inspector.TreeSearch" />
+            <Button Grid.Column="1" Content="搜索" Command="{Binding SearchTreeCommand}" Padding="9,5" AutomationProperties.AutomationId="Inspector.SearchTree" />
+          </Grid>
+          <ComboBox Grid.Row="3" ItemsSource="{Binding TreeSearchResults}" SelectedItem="{Binding SelectedSearchResult, Mode=TwoWay}"
+                    IsVisible="{Binding HasTreeSearchResults}" HorizontalAlignment="Stretch" Margin="16,0,16,8" AutomationProperties.AutomationId="Inspector.TreeSearchResults">
+            <ComboBox.ItemTemplate><DataTemplate><StackPanel><TextBlock Text="{Binding Name}" /><TextBlock Text="{Binding TypeName}" FontSize="11" /></StackPanel></DataTemplate></ComboBox.ItemTemplate>
+          </ComboBox>
+          <ScrollViewer Grid.Row="4" MaxHeight="250" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" AutomationProperties.AutomationId="Inspector.TreeWorkflowScroll">
+          <StackPanel Margin="12,0,12,8" Spacing="5">
+            <WrapPanel Orientation="Horizontal">
+              <Button Content="展开一级" Command="{Binding ExpandNodeCommand}" Padding="7,4" Margin="2" AutomationProperties.AutomationId="Inspector.ExpandNode" />
+              <Button Content="递归展开" Command="{Binding ExpandSubtreeCommand}" Padding="7,4" Margin="2" AutomationProperties.AutomationId="Inspector.ExpandSubtree" />
+              <Button Content="折叠子树" Command="{Binding CollapseSubtreeCommand}" Padding="7,4" Margin="2" AutomationProperties.AutomationId="Inspector.CollapseSubtree" />
+              <Button Content="取消" Command="{Binding CancelTreeExpansionCommand}" Padding="7,4" Margin="2" AutomationProperties.AutomationId="Inspector.CancelTreeExpansion" />
+            </WrapPanel>
+            <Grid ColumnDefinitions="Auto,*,Auto,*" ColumnSpacing="5">
+              <TextBlock Text="节点" VerticalAlignment="Center" FontSize="11" />
+              <NumericUpDown Grid.Column="1" Value="{Binding ExpansionMaxNodes, Mode=TwoWay}" Minimum="1" Maximum="20000" FormatString="0" AutomationProperties.AutomationId="Inspector.ExpansionMaxNodes" />
+              <TextBlock Grid.Column="2" Text="深度" VerticalAlignment="Center" FontSize="11" />
+              <NumericUpDown Grid.Column="3" Value="{Binding ExpansionMaxDepth, Mode=TwoWay}" Minimum="0" Maximum="512" FormatString="0" AutomationProperties.AutomationId="Inspector.ExpansionMaxDepth" />
+            </Grid>
+            <Grid ColumnDefinitions="Auto,130,*" ColumnSpacing="5">
+              <TextBlock Text="每批" VerticalAlignment="Center" FontSize="11" />
+              <NumericUpDown Grid.Column="1" Value="{Binding ExpansionBatchSize, Mode=TwoWay}" Minimum="1" Maximum="256" FormatString="0" AutomationProperties.AutomationId="Inspector.ExpansionBatchSize" />
+            </Grid>
+            <CheckBox Content="包括 Merged 模板组" IsChecked="{Binding ExpansionIncludeTemplates, Mode=TwoWay}" AutomationProperties.AutomationId="Inspector.ExpansionTemplates" />
+            <TextBlock Text="{Binding TreeExpansionNotice}" Classes="caption" TextWrapping="Wrap" AutomationProperties.AutomationId="Inspector.TreeExpansionNotice" />
+            <WrapPanel>
+              <Button Content="复制 Selector" Command="{Binding CopySelectorCommand}" Padding="7,4" Margin="2" AutomationProperties.AutomationId="Inspector.CopySelector" />
+              <Button Content="复制元数据" Command="{Binding CopyElementMetadataCommand}" Padding="7,4" Margin="2" AutomationProperties.AutomationId="Inspector.CopyElementMetadata" />
+            </WrapPanel>
+            <Expander Name="TreePagingTools" Header="分页与模板导航" HorizontalAlignment="Stretch" AutomationProperties.AutomationId="Inspector.TreePagingTools">
+              <StackPanel Spacing="4">
+                <Button Content="加载更多子项" Command="{Binding LoadMoreChildrenCommand}" AutomationProperties.AutomationId="Inspector.LoadMoreChildren" />
+                <TextBlock Text="{Binding SelectedChildrenPageSummary}" Classes="caption" TextWrapping="Wrap" AutomationProperties.AutomationId="Inspector.ChildrenPageSummary" />
+                <WrapPanel>
+                  <Button Content="从模板父复制到部件" Command="{Binding CopySelectorFromTemplateParentCommand}" Padding="7,4" Margin="2" AutomationProperties.AutomationId="Inspector.CopySelectorFromTemplateParent" />
+                  <Button Content="复制模板所属控件 Selector" Command="{Binding CopyTemplateParentSelectorCommand}" Padding="7,4" Margin="2" AutomationProperties.AutomationId="Inspector.CopyTemplateParentSelector" />
+                  <Button Content="定位模板所属控件" Command="{Binding NavigateSelectorTemplateParentCommand}" Padding="7,4" Margin="2" AutomationProperties.AutomationId="Inspector.NavigateSelectorTemplateParent" />
+                </WrapPanel>
+              </StackPanel>
+            </Expander>
+          </StackPanel>
+          </ScrollViewer>
+          <TreeView x:Name="ControlTree" Grid.Row="5" ItemsSource="{Binding Roots}" SelectedItem="{Binding SelectedNode, Mode=TwoWay}"
+                    Margin="6,0" AutomationProperties.AutomationId="Inspector.Tree">
+            <TreeView.ItemTemplate>
+              <TreeDataTemplate DataType="local:TreeNodeViewModel" ItemsSource="{Binding Children}">
+                <StackPanel Orientation="Horizontal" Spacing="6" ToolTip.Tip="{Binding Description}" PointerEntered="OnTreeRowPointerEntered" PointerExited="OnTreeRowPointerExited">
+                  <TextBlock Text="{Binding TypeName}" Foreground="#33415C" />
+                  <TextBlock Text="{Binding Name}" Foreground="#6B5CE7" FontWeight="SemiBold" />
+                  <TextBlock Text="{Binding RoleLabel}" Foreground="#AA7833" FontSize="11" VerticalAlignment="Center" />
+                  <TextBlock Text="{Binding Preview}" Foreground="#8A96A8" MaxWidth="125" TextTrimming="CharacterEllipsis" />
+                </StackPanel>
+              </TreeDataTemplate>
+            </TreeView.ItemTemplate>
+          </TreeView>
+          <Border Grid.Row="6" BorderBrush="#EDF0F5" BorderThickness="0,1,0,0" Padding="14,10">
+            <TextBlock Text="{Binding TreeSummary}" Classes="caption" TextWrapping="Wrap" />
+          </Border>
+        </Grid>
+      </Border>
+
+      <GridSplitter Grid.Column="1" Width="7" Background="Transparent" />
+
+      <Border Grid.Column="2" Background="White" CornerRadius="12" BorderBrush="#E0E5EE" BorderThickness="1">
+        <Grid RowDefinitions="Auto,Auto,*">
+          <Border Padding="20,17" BorderBrush="#EDF0F5" BorderThickness="0,0,0,1">
+            <Grid ColumnDefinitions="*,Auto">
+              <StackPanel>
+                <TextBlock Text="{Binding SelectedTitle}" FontSize="19" FontWeight="SemiBold" Foreground="#1F2B42"
+                           AutomationProperties.AutomationId="Inspector.SelectedTitle" />
+                <TextBlock Text="{Binding SelectedSubtitle}" Classes="caption" Margin="0,5,0,0" TextWrapping="Wrap" />
+              </StackPanel>
+              <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="14" VerticalAlignment="Center" Margin="12,0,0,0">
+                <ToggleSwitch Content="跟随焦点" IsChecked="{Binding FollowFocusEnabled, Mode=TwoWay}" IsEnabled="{Binding CanUseNativeTools}"
+                              AutomationProperties.AutomationId="Inspector.FollowFocus" />
+              <ToggleSwitch Content="高亮" IsChecked="{Binding HighlightEnabled, Mode=TwoWay}" IsEnabled="{Binding CanUseNativeTools}"
+                              AutomationProperties.AutomationId="Inspector.Highlight" />
+                <Button Content="{Binding PickButtonText}" Classes="accent" Command="{Binding PickCommand}"
+                        AutomationProperties.AutomationId="Inspector.Pick" />
+              </StackPanel>
+            </Grid>
+          </Border>
+          <Border Grid.Row="1" IsVisible="{Binding IsSyntheticSelection}" Background="#FFF8E9" Padding="16,12" AutomationProperties.AutomationId="Inspector.SyntheticSelection">
+            <StackPanel Spacing="8">
+              <TextBlock Text="{Binding SyntheticSelectionNotice}" Foreground="#8C6629" TextWrapping="Wrap" />
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <Button Content="跳转模板所属控件" Command="{Binding NavigateTemplateOwnerCommand}" AutomationProperties.AutomationId="Inspector.TemplateOwner" />
+                <Button Content="跳转实际内容" Command="{Binding NavigateSlotContentCommand}" AutomationProperties.AutomationId="Inspector.SlotContent" />
+              </StackPanel>
+            </StackPanel>
+          </Border>
+          <TabControl x:Name="InspectionTabs" Grid.Row="2" SelectedIndex="{Binding InspectionTabIndex, Mode=TwoWay}" AutomationProperties.AutomationId="Inspector.Tabs">
+            <TabControl.Styles>
+              <Style Selector="TabItem">
+                <Setter Property="FontSize" Value="14" />
+              </Style>
+            </TabControl.Styles>
+            <TabItem Header="属性">
+              <Grid RowDefinitions="Auto,Auto,*">
+          <Grid Grid.Row="0" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto" Margin="20,14,20,12">
+            <TextBox Text="{Binding PropertyFilter, Mode=TwoWay}" PlaceholderText="搜索属性、类型或声明者"
+                     AutomationProperties.AutomationId="Inspector.PropertySearch" />
+            <TextBlock Grid.Column="1" Text="{Binding PropertyCountText}" Classes="caption"
+                       VerticalAlignment="Center" Margin="16,0,0,0" />
+            <WrapPanel Grid.Row="1" Grid.ColumnSpan="2" Margin="0,8,0,0">
+              <ComboBox ItemsSource="{Binding PropertyCategories}" SelectedItem="{Binding PropertyCategory, Mode=TwoWay}"
+                        MinWidth="150" Margin="0,0,8,4" AutomationProperties.AutomationId="Inspector.PropertyCategory" />
+              <ComboBox ItemsSource="{Binding PropertySortOptions}" SelectedIndex="{Binding PropertySortIndex, Mode=TwoWay}"
+                        MinWidth="135" Margin="0,0,8,4" AutomationProperties.AutomationId="Inspector.PropertySort" />
+              <CheckBox Content="显示 CLR 属性（执行 getter）" IsChecked="{Binding IncludeClrProperties, Mode=TwoWay}"
+                        IsEnabled="{Binding CanUseNativeTools}" ToolTip.Tip="显式读取公共 CLR getter；只读，不调用 CLR setter。"
+                        Margin="0,0,8,4" AutomationProperties.AutomationId="Inspector.IncludeClrProperties" />
+              <CheckBox Content="仅相关附加属性" IsChecked="{Binding ContextualProperties, Mode=TwoWay}"
+                        IsEnabled="{Binding CanUseNativeTools}" Margin="0,0,0,4"
+                        ToolTip.Tip="按直接视觉父布局筛选 Grid／Canvas／DockPanel／RelativePanel 的已知附加属性；未知用途保留，关闭后查看全部。"
+                        AutomationProperties.AutomationId="Inspector.ContextualProperties" />
+            </WrapPanel>
+          </Grid>
+          <Grid Grid.Row="1" ColumnDefinitions="2*,3*,Auto" Margin="21,0,21,7">
+            <TextBlock Text="属性 / 值来源" Classes="caption" />
+            <TextBlock Grid.Column="1" Text="当前值 / 编辑值" Classes="caption" />
+            <TextBlock Grid.Column="2" Text="操作" Classes="caption" Width="110" />
+          </Grid>
+          <ListBox x:Name="PropertyList" Grid.Row="2" ItemsSource="{Binding FilteredProperties}" Margin="8,0,8,8"
+                   SelectedItem="{Binding SelectedProperty, Mode=TwoWay}"
+                   BorderThickness="0" Background="Transparent" SelectionMode="Single"
+                   AutomationProperties.AutomationId="Inspector.Properties">
+            <ListBox.ItemContainerTheme>
+              <ControlTheme TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="Padding" Value="12,8" />
+                <Setter Property="IsVisible" Value="{Binding IsVisibleInGroup}" />
+              </ControlTheme>
+            </ListBox.ItemContainerTheme>
+            <ListBox.ItemTemplate>
+              <DataTemplate DataType="local:PropertyRowViewModel">
+                <Grid ColumnDefinitions="2*,3*,Auto" RowDefinitions="Auto,Auto,Auto" MinHeight="{Binding RowMinimumHeight}">
+                  <ToggleButton Grid.ColumnSpan="3" Content="{Binding Group.Title}" IsChecked="{Binding Group.IsExpanded, Mode=TwoWay}"
+                                IsVisible="{Binding ShowCategoryHeader}" HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Left" Margin="0,0,0,6"
+                                AutomationProperties.AutomationId="Inspector.PropertyGroup" />
+                  <StackPanel Grid.Row="1" IsVisible="{Binding IsGroupExpanded}" VerticalAlignment="Center" Margin="0,0,10,0" ToolTip.Tip="{Binding DeclaringType}">
+                    <TextBlock Text="{Binding Name}" Foreground="#2B3850" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding Category}" FontSize="11" Foreground="#6D7685" />
+                    <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,3,0,0">
+                      <TextBlock Text="{Binding Source}" Foreground="#8172CA" FontSize="11" />
+                      <TextBlock Text="{Binding MemberKind}" Foreground="#8C97A8" FontSize="11" />
+                      <TextBlock Text="待应用" IsVisible="{Binding IsDirty}" Foreground="#BC7419" FontSize="11" />
+                      <TextBlock Text="只读" IsVisible="{Binding IsReadOnly}" Foreground="#8C97A8" FontSize="11" />
+                      <TextBlock Text="{Binding TypeName}" Foreground="#8C97A8" FontSize="11"
+                                 MaxWidth="140" TextTrimming="CharacterEllipsis" />
+                    </StackPanel>
+                  </StackPanel>
+                  <local:PropertyValueEditor Grid.Row="1" Grid.Column="1" IsVisible="{Binding IsGroupExpanded}" VerticalAlignment="Center" Margin="0,0,10,0" />
+                  <StackPanel Grid.Row="1" Grid.Column="2" IsVisible="{Binding IsGroupExpanded}" Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
+                    <Button Content="应用" Command="{Binding ApplyCommand}" Padding="9,6"
+                            IsVisible="{Binding CanEdit}"
+                            AutomationProperties.AutomationId="Inspector.ApplyProperty" />
+                    <Button Content="清除" Command="{Binding ClearCommand}" Padding="9,6"
+                            IsVisible="{Binding CanClear}"
+                            ToolTip.Tip="移除诊断修改，恢复原来的属性值来源"
+                            AutomationProperties.AutomationId="Inspector.ClearProperty" />
+                  </StackPanel>
+                  <TextBlock Grid.Row="2" Grid.ColumnSpan="3" Text="{Binding Error}" IsVisible="{Binding HasError}"
+                             Foreground="#B34150" FontSize="11" TextWrapping="Wrap" Margin="0,5,0,0" />
+                </Grid>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+              </Grid>
+            </TabItem>
+            <TabItem Header="样式绑定"><local:StylesView /></TabItem>
+            <TabItem Header="资源" IsEnabled="{Binding CanUseNativeTools}"><local:ResourcesView /></TabItem>
+            <TabItem Header="资产" IsEnabled="{Binding CanUseNativeTools}"><local:AssetsView /></TabItem>
+            <TabItem Header="日志事件" IsEnabled="{Binding CanUseNativeTools}"><local:ActivityView /></TabItem>
+            <TabItem Header="交互截图"><local:ExplorationView /></TabItem>
+            <TabItem Header="指标" IsEnabled="{Binding CanUseNativeTools}"><local:MetricsView /></TabItem>
+            <TabItem Header="断点" IsEnabled="{Binding CanUseNativeTools}"><local:BreakpointsView /></TabItem>
+            <TabItem Header="3D几何" IsEnabled="{Binding CanUseNativeTools}"><local:LayerSceneView /></TabItem>
+            <TabItem Header="对象" IsEnabled="{Binding CanUseNativeTools}"><local:RuntimeView /></TabItem>
+            <TabItem Header="性能" IsEnabled="{Binding CanUseNativeTools}"><local:ProfilerView /></TabItem>
+            <TabItem Header="协议" IsEnabled="{Binding IsNativeBackend}"><local:ProtocolMonitorView /></TabItem>
+          </TabControl>
+        </Grid>
+      </Border>
+    </Grid>
+
+    <Border Grid.Row="3" Background="White" BorderBrush="#E0E5EE" BorderThickness="0,1,0,0" Padding="24,12">
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock Text="{Binding Status}" Foreground="#4B5870" TextWrapping="Wrap"
+                   AutomationProperties.AutomationId="Inspector.Status" />
+        <TextBlock Grid.Column="1" Text="{Binding SessionSummary}" Classes="caption" Margin="20,0,0,0" />
+      </Grid>
+    </Border>
+  </Grid>
+</Window>
+
+
+

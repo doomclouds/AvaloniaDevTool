@@ -1,0 +1,218 @@
+{
+  "investigatedOn": "2026-10-24",
+  "baseline": "AvaloniaDevTool V1 with 24 passing tests",
+  "originalArtifactVersion": "2.2.3",
+  "publicCapabilityRows": 125,
+  "nativeCandidateRows": 16,
+  "sourcePolicy": "Official documentation describes behavior; community posts are attributed reports; native literal candidates do not establish control flow; running tools/list establishes advertised schema only.",
+  "sources": [
+    {
+      "id": "O1",
+      "title": "DevTools 产品与版本矩阵",
+      "url": "https://avaloniaui.net/devtools",
+      "kind": "official-product",
+      "date": "2026-10-24查询",
+      "note": "当前官网；不是2.2.3许可证分支的运行证明。"
+    },
+    {
+      "id": "O2",
+      "title": "Elements 详细工具说明",
+      "url": "https://docs.avaloniaui.net/tools/developer-tools/elements-tool",
+      "kind": "official-doc",
+      "date": "2026-10-06更新",
+      "note": "树、属性、绑定、3D和覆盖层。"
+    },
+    {
+      "id": "O3",
+      "title": "Settings",
+      "url": "https://docs.avaloniaui.net/tools/developer-tools/settings",
+      "kind": "official-doc",
+      "date": "2026-10-06更新",
+      "note": "持久化偏好与采样参数。"
+    },
+    {
+      "id": "O4",
+      "title": "全部快捷键",
+      "url": "https://docs.avaloniaui.net/tools/developer-tools/shortcuts",
+      "kind": "official-doc",
+      "date": "2026-10-06更新",
+      "note": "上下文命令及默认按键。"
+    },
+    {
+      "id": "O5",
+      "title": "DeveloperToolsOptions",
+      "url": "https://docs.avaloniaui.net/tools/developer-tools/options",
+      "kind": "official-doc",
+      "date": "2026-10-06更新",
+      "note": "应用接入、Runner、协议和日志源。"
+    },
+    {
+      "id": "O6",
+      "title": "Events",
+      "url": "https://docs.avaloniaui.net/tools/developer-tools/events-tool",
+      "kind": "official-doc",
+      "date": "2026-10-06更新",
+      "note": "事件监听和路由链。"
+    },
+    {
+      "id": "O7",
+      "title": "Breakpoints",
+      "url": "https://docs.avaloniaui.net/tools/developer-tools/breakpoints-tool",
+      "kind": "official-doc",
+      "date": "2026-10-06更新",
+      "note": "条件、目标、暂停与命中动作。"
+    },
+    {
+      "id": "O8",
+      "title": "Logs",
+      "url": "https://docs.avaloniaui.net/tools/developer-tools/logs-tool",
+      "kind": "official-doc",
+      "date": "2026-10-24查询",
+      "note": "日志级别、结构化参数和适配器。"
+    },
+    {
+      "id": "O9",
+      "title": "Resources",
+      "url": "https://docs.avaloniaui.net/tools/developer-tools/resources-tool",
+      "kind": "official-doc",
+      "date": "2026-10-12更新",
+      "note": "应用级资源层级、修改及范围限制。"
+    },
+    {
+      "id": "O10",
+      "title": "Assets",
+      "url": "https://docs.avaloniaui.net/tools/developer-tools/assets-tool",
+      "kind": "official-doc",
+      "date": "2026-10-05更新",
+      "note": "枚举、导出、按需预览。"
+    },
+    {
+      "id": "O11",
+      "title": "Metrics",
+      "url": "https://docs.avaloniaui.net/tools/developer-tools/metrics-tool",
+      "kind": "official-doc",
+      "date": "2026-10-05更新",
+      "note": "仪表类型、provider和版本前提。"
+    },
+    {
+      "id": "O12",
+      "title": "Profiler",
+      "url": "https://docs.avaloniaui.net/tools/developer-tools/profiler-tool",
+      "kind": "official-doc",
+      "date": "2026-10-06更新",
+      "note": "Style Matching、Activators、Resource Lookup。"
+    },
+    {
+      "id": "O13",
+      "title": "Attaching applications",
+      "url": "https://docs.avaloniaui.net/tools/developer-tools/attaching-applications",
+      "kind": "official-doc",
+      "date": "2026-10-06更新",
+      "note": "Browser、iOS、Android和WSL2。"
+    },
+    {
+      "id": "O14",
+      "title": "Attaching to previewer",
+      "url": "https://docs.avaloniaui.net/tools/developer-tools/attaching-to-the-previewer",
+      "kind": "official-doc",
+      "date": "2026-10-05更新",
+      "note": "实验预览进程接入及多窗口。"
+    },
+    {
+      "id": "O15",
+      "title": "Remote tool",
+      "url": "https://docs.avaloniaui.net/tools/developer-tools/attaching-to-the-remote-tool",
+      "kind": "official-doc",
+      "date": "2026-10-06更新",
+      "note": "HTTP监听方向、LAN和VPN。"
+    },
+    {
+      "id": "O16",
+      "title": "DevTools MCP",
+      "url": "https://docs.avaloniaui.net/tools/developer-tools/mcp",
+      "kind": "official-doc",
+      "date": "2026-10-06更新",
+      "note": "当前文档列16项工具；与2.2.3运行清单有差异。"
+    },
+    {
+      "id": "O17",
+      "title": "工具 FAQ",
+      "url": "https://docs.avaloniaui.net/tools/faq",
+      "kind": "official-doc",
+      "date": "2026-10-24查询",
+      "note": "多实例、AOT及SDK接入许可。"
+    },
+    {
+      "id": "O18",
+      "title": "Installation",
+      "url": "https://docs.avaloniaui.net/tools/developer-tools/installation",
+      "kind": "official-doc",
+      "date": "2026-10-06更新",
+      "note": "安装、启动和离线激活。"
+    },
+    {
+      "id": "O19",
+      "title": "DevTools MCP 发布文章",
+      "url": "https://avaloniaui.net/blog/avalonia-devtools-mcp-server",
+      "kind": "official-announcement",
+      "date": "2026-01-27发布",
+      "note": "发布版本2.2.0-beta2；演示不是本地复现。"
+    },
+    {
+      "id": "C1",
+      "title": "Old DevTools opening #176",
+      "url": "https://github.com/AvaloniaUI/AvaloniaPro/discussions/176",
+      "kind": "community-discussion",
+      "date": "2026-08-27",
+      "note": "作者最终确认Rider启动旧net9目录。"
+    },
+    {
+      "id": "C2",
+      "title": "Inspect tool feedback #22364",
+      "url": "https://github.com/AvaloniaUI/Avalonia/discussions/22364",
+      "kind": "community-discussion",
+      "date": "2026-10-01至2026-10-21",
+      "note": "拾取/空属性反馈；缺少可直接归因的完整复现。"
+    },
+    {
+      "id": "C3",
+      "title": "MCP license issue #23",
+      "url": "https://github.com/AvaloniaUI/AvaloniaPro/issues/23",
+      "kind": "community-issue",
+      "date": "2026-03-07至2026-05-30",
+      "note": "维护者澄清层级和后续错误信息改善。"
+    },
+    {
+      "id": "C4",
+      "title": "Theme switching report #146",
+      "url": "https://github.com/AvaloniaUI/AvaloniaPro/issues/146",
+      "kind": "community-issue",
+      "date": "2026-07-09至2026-07-16",
+      "note": "报告者后续改判不是DevTools bug。"
+    },
+    {
+      "id": "C5",
+      "title": "Hidden window discussion #20670",
+      "url": "https://github.com/AvaloniaUI/Avalonia/discussions/20670",
+      "kind": "community-discussion",
+      "date": "2026-02-08至2026-02-11",
+      "note": "旧Avalonia.Diagnostics 11.2.8，不能归给新版。"
+    },
+    {
+      "id": "C6",
+      "title": "DevTools MCP Reddit 公告",
+      "url": "https://www.reddit.com/r/AvaloniaUI/comments/1qojmi8/avalonia_devtools_mcp_server/",
+      "kind": "community-announcement",
+      "date": "2026-01-27",
+      "note": "官方作者在社区发布演示说明。"
+    },
+    {
+      "id": "C7",
+      "title": "登录与工具迁移讨论",
+      "url": "https://www.reddit.com/r/AvaloniaUI/comments/1wy68ks/wait_i_need_to_login_to_debug_the_ui/",
+      "kind": "community-discussion",
+      "date": "2026-10-05",
+      "note": "用户体验观点，不作为软件实现证明。"
+    }
+  ]
+}

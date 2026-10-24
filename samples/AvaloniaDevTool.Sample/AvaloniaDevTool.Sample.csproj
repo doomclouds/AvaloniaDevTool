@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
+    <ProjectReference Include="../../src/AvaloniaDevTool.Agent/AvaloniaDevTool.Agent.csproj" />
+    <ProjectReference Include="../../src/AvaloniaDevTool.Logging/AvaloniaDevTool.Logging.csproj" />
+    <ProjectReference Include="../../src/AvaloniaDevTool.Remote/AvaloniaDevTool.Remote.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <AvaloniaResource Include="Assets/**" />
+  </ItemGroup>
+</Project>
+

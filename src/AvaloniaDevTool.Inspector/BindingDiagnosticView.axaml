@@ -1,0 +1,25 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:AvaloniaDevTool.Inspector"
+             x:Class="AvaloniaDevTool.Inspector.BindingDiagnosticView" x:CompileBindings="False">
+  <Border Background="#F5F6FC" BorderBrush="#E0E5EE" BorderThickness="1" Padding="12" CornerRadius="6" Margin="0,0,0,10">
+    <StackPanel x:Name="BindingContent" Spacing="10">
+      <TextBlock Text="返回的原绑定" IsVisible="{Binding IsNavigationTarget}" FontSize="11" Foreground="#6653C0" AutomationProperties.AutomationId="Inspector.BindingNavigationTarget" />
+      <TextBlock Text="{Binding PropertyName}" FontWeight="SemiBold" FontSize="14" />
+      <SelectableTextBlock Text="{Binding Expression}" TextWrapping="Wrap" />
+      <ItemsControl ItemsSource="{Binding Metadata}" AutomationProperties.AutomationId="Inspector.BindingMetadata">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <Grid ColumnDefinitions="150,*,76" Margin="0,2">
+              <TextBlock Text="{Binding Name}" Foreground="#66758B" TextWrapping="Wrap" />
+              <SelectableTextBlock Grid.Column="1" Text="{Binding Value}" Margin="8,0" TextWrapping="Wrap" />
+              <TextBlock Grid.Column="2" Text="{Binding State}" Foreground="#66758B" FontSize="11" />
+            </Grid>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+      <SelectableTextBlock Text="{Binding Diagnostic}" IsVisible="{Binding HasDiagnostic}" TextWrapping="Wrap" Foreground="#B34150" />
+      <TextBlock Text="当前后端未提供结构化绑定诊断。" IsVisible="{Binding HasNoDetails}" TextWrapping="Wrap" Foreground="#856A24" />
+      <local:BindingDetailsView DataContext="{Binding Details}" IsVisible="{Binding HasDetails}" />
+    </StackPanel>
+  </Border>
+</UserControl>

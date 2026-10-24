@@ -1,0 +1,68 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:AvaloniaDevTool.Inspector"
+             x:Class="AvaloniaDevTool.Inspector.BrushEditorView"
+             x:DataType="local:BrushEditorViewModel">
+  <StackPanel Spacing="5" AutomationProperties.AutomationId="Inspector.BrushEditor">
+    <Border Background="{Binding Preview}" Height="40" BorderBrush="#929AAA" BorderThickness="1"
+            AutomationProperties.AutomationId="Inspector.BrushDraftPreview" />
+    <TextBlock Text="{Binding DraftSummary}" FontSize="11" />
+    <ComboBox ItemsSource="{Binding Kinds}" SelectedItem="{Binding Kind, Mode=TwoWay}" HorizontalAlignment="Stretch"
+              AutomationProperties.AutomationId="Inspector.BrushKind" />
+    <TextBlock Text="透明度（0–1）" FontSize="11" />
+    <NumericUpDown Value="{Binding Opacity, Mode=TwoWay}" Minimum="0" Maximum="1" Increment="0.1"
+                   AutomationProperties.AutomationId="Inspector.BrushOpacity" />
+    <TextBox Text="{Binding Color, Mode=TwoWay}" IsVisible="{Binding IsSolid}" PlaceholderText="#AARRGGBB"
+             AutomationProperties.AutomationId="Inspector.BrushSolidColor" />
+    <StackPanel IsVisible="{Binding IsGradient}" Spacing="4">
+      <TextBlock Text="扩展方式 / 色标颜色与位置（0–1）" FontSize="11" />
+      <ComboBox ItemsSource="{Binding SpreadMethods}" SelectedItem="{Binding SpreadMethod, Mode=TwoWay}" HorizontalAlignment="Stretch"
+                AutomationProperties.AutomationId="Inspector.BrushSpread" />
+      <ItemsControl ItemsSource="{Binding Stops}" AutomationProperties.AutomationId="Inspector.BrushStops">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate DataType="local:BrushStopViewModel">
+            <Grid ColumnDefinitions="20,*,90,Auto" Margin="0,2">
+              <Border Background="{Binding Swatch}" Margin="0,4,4,4" />
+              <TextBox Grid.Column="1" Text="{Binding Color, Mode=TwoWay}" PlaceholderText="#AARRGGBB"
+                       AutomationProperties.AutomationId="Inspector.BrushStopColor" />
+              <NumericUpDown Grid.Column="2" Value="{Binding Offset, Mode=TwoWay}" Minimum="0" Maximum="1" Increment="0.05"
+                             AutomationProperties.AutomationId="Inspector.BrushStopOffset" />
+              <Button Grid.Column="3" Content="删除" Command="{Binding RemoveCommand}" Padding="5"
+                      AutomationProperties.AutomationId="Inspector.BrushRemoveStop" />
+            </Grid>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+      <Button Content="添加色标" Command="{Binding AddStopCommand}" AutomationProperties.AutomationId="Inspector.BrushAddStop" />
+    </StackPanel>
+    <StackPanel IsVisible="{Binding IsLinear}" Spacing="3">
+      <TextBlock Text="起点 / 终点（相对坐标使用 %，绝对坐标使用像素）" TextWrapping="Wrap" FontSize="11" />
+      <TextBox Text="{Binding StartPoint, Mode=TwoWay}" AutomationProperties.AutomationId="Inspector.BrushStartPoint" />
+      <TextBox Text="{Binding EndPoint, Mode=TwoWay}" AutomationProperties.AutomationId="Inspector.BrushEndPoint" />
+    </StackPanel>
+    <StackPanel IsVisible="{Binding HasCenter}" Spacing="3">
+      <TextBlock Text="中心（例如 50%, 50%）" FontSize="11" />
+      <TextBox Text="{Binding Center, Mode=TwoWay}" AutomationProperties.AutomationId="Inspector.BrushCenter" />
+    </StackPanel>
+    <StackPanel IsVisible="{Binding IsRadial}" Spacing="3">
+      <TextBlock Text="焦点 / 水平半径 / 垂直半径（支持 % 或像素）" TextWrapping="Wrap" FontSize="11" />
+      <TextBox Text="{Binding GradientOrigin, Mode=TwoWay}" AutomationProperties.AutomationId="Inspector.BrushOrigin" />
+      <TextBox Text="{Binding RadiusX, Mode=TwoWay}" AutomationProperties.AutomationId="Inspector.BrushRadiusX" />
+      <TextBox Text="{Binding RadiusY, Mode=TwoWay}" AutomationProperties.AutomationId="Inspector.BrushRadiusY" />
+    </StackPanel>
+    <StackPanel IsVisible="{Binding IsConic}" Spacing="3">
+      <TextBlock Text="起始角度（度）" FontSize="11" />
+      <NumericUpDown Value="{Binding Angle, Mode=TwoWay}" Minimum="-360000" Maximum="360000"
+                     AutomationProperties.AutomationId="Inspector.BrushAngle" />
+    </StackPanel>
+    <Expander Header="变换矩阵 / 变换原点" HorizontalAlignment="Stretch">
+      <StackPanel Spacing="3">
+        <TextBox Text="{Binding Transform, Mode=TwoWay}" PlaceholderText="空值表示无变换；M11,M12,M21,M22,M31,M32"
+                 AutomationProperties.AutomationId="Inspector.BrushTransform" />
+        <TextBox Text="{Binding TransformOrigin, Mode=TwoWay}" AutomationProperties.AutomationId="Inspector.BrushTransformOrigin" />
+      </StackPanel>
+    </Expander>
+    <TextBlock Text="{Binding Validation}" Foreground="#B34150" TextWrapping="Wrap"
+               AutomationProperties.AutomationId="Inspector.BrushValidation" />
+  </StackPanel>
+</UserControl>

@@ -1,0 +1,87 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:AvaloniaDevTool.Inspector"
+             x:Class="AvaloniaDevTool.Inspector.ActivityView" x:CompileBindings="False">
+  <UserControl.Styles>
+    <Style Selector="ListBoxItem"><Setter Property="HorizontalContentAlignment" Value="Stretch" /></Style>
+  </UserControl.Styles>
+  <TabControl AutomationProperties.AutomationId="Inspector.ActivityPages">
+    <TabItem Header="日志与活动">
+  <Grid RowDefinitions="Auto,Auto,Auto,Auto,*,Auto,2*" Margin="14">
+    <WrapPanel Orientation="Horizontal">
+      <CheckBox Content="应用日志" IsChecked="{Binding CaptureLogs, Mode=TwoWay}" Margin="0,0,12,6" AutomationProperties.AutomationId="Inspector.CaptureLogs" />
+      <ComboBox ItemsSource="{Binding LogLevels}" SelectedItem="{Binding MinimumLogLevel, Mode=TwoWay}" Width="130" Margin="0,0,14,6" AutomationProperties.AutomationId="Inspector.LogLevel" />
+      <CheckBox Content="路由事件" IsChecked="{Binding CaptureEvents, Mode=TwoWay}" Margin="0,0,12,6" AutomationProperties.AutomationId="Inspector.CaptureEvents" />
+      <TextBox Text="{Binding ActivityEventName, Mode=TwoWay}" PlaceholderText="事件名，* 表示全部" Width="170" Margin="0,0,12,6" AutomationProperties.AutomationId="Inspector.EventName" />
+      <CheckBox Content="仅选中事件源" IsChecked="{Binding ActivitySelectedSourceOnly, Mode=TwoWay}" Margin="0,0,0,6" AutomationProperties.AutomationId="Inspector.EventSourceOnly" />
+    </WrapPanel>
+    <WrapPanel Grid.Row="1" Orientation="Horizontal" Margin="0,4,0,4">
+      <TextBox x:Name="LogCategoryFilter" Text="{Binding LogCategoryFilter, Mode=TwoWay}" PlaceholderText="日志类别包含" Width="150" Margin="0,0,8,4" AutomationProperties.AutomationId="Inspector.LogCategoryFilter" />
+      <TextBox x:Name="LogMessageFilter" Text="{Binding LogMessageFilter, Mode=TwoWay}" PlaceholderText="消息包含" Width="180" Margin="0,0,8,4" AutomationProperties.AutomationId="Inspector.LogMessageFilter" />
+      <TextBox x:Name="LogParameterNameFilter" Text="{Binding LogParameterNameFilter, Mode=TwoWay}" PlaceholderText="参数名包含" Width="150" Margin="0,0,8,4" AutomationProperties.AutomationId="Inspector.LogParameterNameFilter" />
+      <TextBox x:Name="LogParameterValueFilter" Text="{Binding LogParameterValueFilter, Mode=TwoWay}" PlaceholderText="参数值包含（null 可筛空值）" Width="210" Margin="0,0,8,4" AutomationProperties.AutomationId="Inspector.LogParameterValueFilter" />
+      <TextBlock Text="筛选在开始捕获时生效" VerticalAlignment="Center" FontSize="11" />
+    </WrapPanel>
+    <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8" Margin="0,4,0,8">
+      <Button x:Name="StartActivity" Content="开始捕获" Command="{Binding StartActivityCommand}" Classes="accent" AutomationProperties.AutomationId="Inspector.StartActivity" />
+      <Button Content="停止" Command="{Binding StopActivityCommand}" AutomationProperties.AutomationId="Inspector.StopActivity" />
+      <Button Content="清空" Command="{Binding ClearActivityCommand}" AutomationProperties.AutomationId="Inspector.ClearActivity" />
+      <Button Content="刷新记录" Command="{Binding RefreshInspectionCommand}" AutomationProperties.AutomationId="Inspector.RefreshActivity" />
+    </StackPanel>
+    <TextBlock Grid.Row="3" Text="{Binding ActivitySummary}" Foreground="#66758B" FontSize="12" Margin="0,0,0,9" />
+    <ListBox Grid.Row="4" x:Name="ActivityEntries" ItemsSource="{Binding ActivityEntries}" SelectedItem="{Binding SelectedActivityEntry, Mode=TwoWay}"
+             AutomationProperties.AutomationId="Inspector.ActivityEntries">
+      <ListBox.ItemTemplate>
+        <DataTemplate>
+          <Border Padding="7" BorderBrush="#E8ECF2" BorderThickness="0,0,0,1">
+            <StackPanel Spacing="5">
+              <StackPanel Orientation="Horizontal" Spacing="9">
+                <TextBlock Text="{Binding Timestamp.LocalDateTime, StringFormat='{}{0:HH:mm:ss.fff}'}" Foreground="#718096" FontSize="11" />
+                <TextBlock Text="{Binding Kind}" FontWeight="SemiBold" />
+                <TextBlock Text="{Binding Level}" Foreground="#7761BE" />
+                <TextBlock Text="{Binding Category}" Foreground="#718096" FontSize="11" />
+              </StackPanel>
+              <TextBlock Text="{Binding Message}" TextWrapping="Wrap" />
+              <StackPanel Orientation="Horizontal" Spacing="12">
+                <TextBlock Text="{Binding ObjectId, StringFormat='源对象 #{0}'}" FontSize="11" />
+                <TextBlock Text="{Binding HandlerObjectId, StringFormat='路由对象 #{0}'}" FontSize="11" />
+                <TextBlock Text="{Binding Route}" Foreground="#718096" FontSize="11" />
+                <TextBlock Text="{Binding Handled, StringFormat='Handled={0}'}" Foreground="#718096" FontSize="11" />
+              </StackPanel>
+            </StackPanel>
+          </Border>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+    <StackPanel Grid.Row="5" Spacing="5" Margin="0,8,0,6">
+      <Button x:Name="JumpToLogSource" Content="定位日志源对象" Command="{Binding JumpToLogSourceCommand}" HorizontalAlignment="Left" AutomationProperties.AutomationId="Inspector.JumpToLogSource" />
+      <TextBlock Text="{Binding SelectedLogMetadata}" TextWrapping="Wrap" FontSize="11" />
+    </StackPanel>
+    <ScrollViewer Grid.Row="6" HorizontalScrollBarVisibility="Disabled" AutomationProperties.AutomationId="Inspector.LogDetails">
+      <StackPanel Spacing="6">
+        <TextBlock Text="原始消息模板" FontWeight="SemiBold" />
+        <SelectableTextBlock x:Name="LogTemplate" Text="{Binding SelectedLogTemplate}" TextWrapping="Wrap" AutomationProperties.AutomationId="Inspector.LogTemplate" />
+        <ItemsControl x:Name="LogParameters" ItemsSource="{Binding SelectedLogParameters}" AutomationProperties.AutomationId="Inspector.LogParameters">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Grid ColumnDefinitions="140,*,110" Margin="0,3">
+                <StackPanel><TextBlock Text="{Binding Name}" FontWeight="SemiBold" /><TextBlock Text="{Binding TypeName}" FontSize="10" TextWrapping="Wrap" /></StackPanel>
+                <SelectableTextBlock Grid.Column="1" Text="{Binding Value}" TextWrapping="Wrap" />
+                <StackPanel Grid.Column="2">
+                  <TextBlock Text="{Binding State}" FontSize="11" />
+                  <TextBlock Text="值已截断" IsVisible="{Binding IsTruncated}" FontSize="10" Foreground="#A66B20" />
+                </StackPanel>
+              </Grid>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <TextBlock Text="异常链（最多 8 个节点、4 层）" FontWeight="SemiBold" />
+        <SelectableTextBlock x:Name="LogException" Text="{Binding SelectedLogException}" TextWrapping="Wrap" AutomationProperties.AutomationId="Inspector.LogException" />
+        <TextBlock Text="作用域" FontWeight="SemiBold" />
+        <SelectableTextBlock Text="{Binding SelectedLogScopes}" TextWrapping="Wrap" AutomationProperties.AutomationId="Inspector.LogScopes" />
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
+    </TabItem>
+    <TabItem Header="事件路由"><local:EventRoutesView /></TabItem>
+  </TabControl>
+</UserControl>

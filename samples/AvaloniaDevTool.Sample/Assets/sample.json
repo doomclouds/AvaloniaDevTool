@@ -1,0 +1,5 @@
+{
+  "application": "Avalonia 测试工作台",
+  "features": ["styles", "bindings", "resources", "assets", "logs", "events"],
+  "embedded": true
+}

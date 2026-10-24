@@ -1,0 +1,163 @@
+{
+  "capturedOn": "2026-10-24",
+  "product": "AvaloniaUI.DeveloperTools",
+  "version": "2.2.3",
+  "observedOperation": "MCP initialize and tools/list",
+  "claimScope": "Advertised tool schemas, not successful execution of tools/call",
+  "sourcePath": "C:\\Users\\10062\\AppData\\Local\\Temp\\avdt-native-deep-20261024\\app-tools.json",
+  "count": 15,
+  "tools": [
+    {
+      "name": "props",
+      "required": [
+        "nodeId"
+      ],
+      "parameterNames": [
+        "nodeId",
+        "propertyNames"
+      ]
+    },
+    {
+      "name": "input",
+      "required": [
+        "nodeId",
+        "inputEvent"
+      ],
+      "parameterNames": [
+        "nodeId",
+        "inputEvent",
+        "arg"
+      ]
+    },
+    {
+      "name": "ancestors",
+      "required": [
+        "nodeId"
+      ],
+      "parameterNames": [
+        "nodeId"
+      ]
+    },
+    {
+      "name": "set-prop",
+      "required": [
+        "nodeId",
+        "propertyName",
+        "value"
+      ],
+      "parameterNames": [
+        "nodeId",
+        "propertyName",
+        "value",
+        "isXamlValue"
+      ]
+    },
+    {
+      "name": "styles",
+      "required": [
+        "nodeId"
+      ],
+      "parameterNames": [
+        "nodeId",
+        "propertyNames",
+        "includeDefaults"
+      ]
+    },
+    {
+      "name": "screenshot",
+      "required": [
+        "nodeId"
+      ],
+      "parameterNames": [
+        "nodeId"
+      ]
+    },
+    {
+      "name": "assets",
+      "required": [],
+      "parameterNames": []
+    },
+    {
+      "name": "open-asset",
+      "required": [
+        "assetUrl"
+      ],
+      "parameterNames": [
+        "assetUrl"
+      ]
+    },
+    {
+      "name": "attach-to-file",
+      "required": [
+        "xamlFilePath",
+        "xamlProjectPath"
+      ],
+      "parameterNames": [
+        "xamlFilePath",
+        "xamlProjectPath",
+        "build"
+      ]
+    },
+    {
+      "name": "resources",
+      "required": [],
+      "parameterNames": [
+        "nodeId",
+        "onlySelf"
+      ]
+    },
+    {
+      "name": "action",
+      "required": [
+        "nodeId",
+        "action"
+      ],
+      "parameterNames": [
+        "nodeId",
+        "action"
+      ]
+    },
+    {
+      "name": "attach-to-app",
+      "required": [],
+      "parameterNames": [
+        "id"
+      ]
+    },
+    {
+      "name": "tree",
+      "required": [],
+      "parameterNames": [
+        "nodeId",
+        "treeKind",
+        "depth"
+      ]
+    },
+    {
+      "name": "search",
+      "required": [
+        "query"
+      ],
+      "parameterNames": [
+        "query",
+        "scopeNodeId",
+        "searchTemplates",
+        "limit"
+      ]
+    },
+    {
+      "name": "pseudo-class",
+      "required": [
+        "nodeId"
+      ],
+      "parameterNames": [
+        "nodeId",
+        "pseudoClass",
+        "isActive"
+      ]
+    }
+  ],
+  "sessionState": "Initial session with no attached target",
+  "listChangedAdvertised": true,
+  "unresolved": "Whether detach appears after attaching a target remains unverified."
+}

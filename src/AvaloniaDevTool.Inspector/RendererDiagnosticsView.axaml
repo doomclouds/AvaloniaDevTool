@@ -1,0 +1,23 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AvaloniaDevTool.Inspector.RendererDiagnosticsView" x:CompileBindings="False">
+  <StackPanel Spacing="8" AutomationProperties.AutomationId="Inspector.RendererDiagnostics">
+    <TextBlock Text="渲染诊断覆盖层" FontWeight="SemiBold" />
+    <TextBlock Text="在目标窗口显示 Avalonia 原生 FPS、失效区域、布局耗时和渲染耗时图。已有应用标记会保留；停止或断开时撤销本工具的修改。应用后续改写会报告冲突并保留其值。" TextWrapping="Wrap" FontSize="11" Foreground="#66758B" />
+    <ComboBox ItemsSource="{Binding RendererWindows}" SelectedItem="{Binding SelectedRendererWindow, Mode=TwoWay}"
+              HorizontalAlignment="Stretch" AutomationProperties.AutomationId="Inspector.RendererWindow" />
+    <WrapPanel>
+      <CheckBox Content="FPS" IsChecked="{Binding RendererFps, Mode=TwoWay}" Margin="0,0,14,0" AutomationProperties.AutomationId="Inspector.RendererFps" />
+      <CheckBox Content="失效区域" IsChecked="{Binding RendererDirtyRects, Mode=TwoWay}" Margin="0,0,14,0" AutomationProperties.AutomationId="Inspector.RendererDirtyRects" />
+      <CheckBox Content="布局耗时图" IsChecked="{Binding RendererLayoutTime, Mode=TwoWay}" Margin="0,0,14,0" AutomationProperties.AutomationId="Inspector.RendererLayoutTime" />
+      <CheckBox Content="渲染耗时图" IsChecked="{Binding RendererRenderTime, Mode=TwoWay}" AutomationProperties.AutomationId="Inspector.RendererRenderTime" />
+    </WrapPanel>
+    <CheckBox Content="全部窗口：自动应用到新窗口和弹出根" IsChecked="{Binding RendererFollowNewWindows, Mode=TwoWay}"
+              IsEnabled="{Binding CanFollowNewRendererWindows}" AutomationProperties.AutomationId="Inspector.RendererFollowNewWindows" />
+    <StackPanel Orientation="Horizontal" Spacing="7">
+      <Button Content="应用覆盖层" Command="{Binding ApplyRendererDiagnosticsCommand}" AutomationProperties.AutomationId="Inspector.ApplyRendererDiagnostics" />
+      <Button Content="停止并还原" Command="{Binding StopRendererDiagnosticsCommand}" AutomationProperties.AutomationId="Inspector.StopRendererDiagnostics" />
+      <Button Content="刷新窗口" Command="{Binding RefreshRendererDiagnosticsCommand}" AutomationProperties.AutomationId="Inspector.RefreshRendererDiagnostics" />
+    </StackPanel>
+    <TextBlock Text="{Binding RendererDiagnosticsSummary}" TextWrapping="Wrap" FontSize="11" AutomationProperties.AutomationId="Inspector.RendererDiagnosticsSummary" />
+  </StackPanel>
+</UserControl>

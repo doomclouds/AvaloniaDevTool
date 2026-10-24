@@ -1,0 +1,41 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:AvaloniaDevTool.Inspector" x:Class="AvaloniaDevTool.Inspector.CompositionView" x:CompileBindings="False">
+  <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" Margin="12">
+    <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="8">
+      <TextBlock Text="合成层自身绘制" FontSize="15" FontWeight="SemiBold" VerticalAlignment="Center" />
+      <Button Grid.Column="1" Content="采集所选子树" Command="{Binding CaptureCompositionCommand}" AutomationProperties.AutomationId="Inspector.CaptureComposition" />
+      <Button Grid.Column="2" Content="重置相机" Command="{Binding ResetLayoutCameraCommand}" AutomationProperties.AutomationId="Inspector.ResetCompositionCamera" />
+      <Button Grid.Column="3" Content="正视" Command="{Binding FrontCompositionCommand}" AutomationProperties.AutomationId="Inspector.FrontComposition" />
+    </Grid>
+    <ScrollViewer Grid.Row="1" MaxHeight="100" Margin="0,7" HorizontalScrollBarVisibility="Disabled">
+      <TextBlock Text="{Binding CompositionSummary}" TextWrapping="Wrap" Foreground="#66758B" FontSize="11" />
+    </ScrollViewer>
+    <WrapPanel Grid.Row="2">
+      <TextBlock Text="层间距" VerticalAlignment="Center" Margin="0,0,6,0" />
+      <Slider Width="130" Minimum="0" Maximum="80" Value="{Binding LayerSpacing, Mode=TwoWay}" AutomationProperties.AutomationId="Inspector.CompositionSpacing" Margin="0,0,12,0" />
+      <CheckBox Content="边框" IsChecked="{Binding CompositionBorders, Mode=TwoWay}" Margin="0,0,12,0" AutomationProperties.AutomationId="Inspector.CompositionBorders" />
+      <CheckBox Content="渐变底色" IsChecked="{Binding CompositionGradients, Mode=TwoWay}" Margin="0,0,12,0" AutomationProperties.AutomationId="Inspector.CompositionGradients" />
+      <TextBlock Text="深度" VerticalAlignment="Center" Margin="0,0,6,0" />
+      <NumericUpDown Width="80" ShowButtonSpinner="False" Minimum="0" Maximum="64" Value="{Binding CompositionMinDepth, Mode=TwoWay}" AutomationProperties.AutomationId="Inspector.CompositionMinDepth" />
+      <TextBlock Text="至" VerticalAlignment="Center" Margin="5,0" />
+      <NumericUpDown Width="80" ShowButtonSpinner="False" Minimum="0" Maximum="64" Value="{Binding CompositionMaxDepth, Mode=TwoWay}" AutomationProperties.AutomationId="Inspector.CompositionMaxDepth" />
+    </WrapPanel>
+    <Grid Grid.Row="3" ColumnDefinitions="2*,8,*" Margin="0,8,0,0">
+      <local:CompositionSceneControl Scene="{Binding CapturedCompositionScene}" LayerSpacing="{Binding LayerSpacing}"
+        ShowBorders="{Binding CompositionBorders}" ShowGradients="{Binding CompositionGradients}"
+        MinimumDepth="{Binding CompositionMinDepth}" MaximumDepth="{Binding CompositionMaxDepth}"
+        SelectedCaptureId="{Binding SelectedCompositionCaptureId, Mode=TwoWay}" ResetVersion="{Binding LayoutResetVersion}"
+        FrontVersion="{Binding CompositionFrontVersion}"
+        AutomationProperties.AutomationId="Inspector.CompositionScene" />
+      <GridSplitter Grid.Column="1" Width="8" Background="Transparent" />
+      <ListBox Grid.Column="2" ItemsSource="{Binding CompositionLayers}" SelectedItem="{Binding SelectedCompositionLayer, Mode=TwoWay}" AutomationProperties.AutomationId="Inspector.CompositionLayers">
+        <ListBox.ItemTemplate><DataTemplate><StackPanel Margin="4" Spacing="4">
+          <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextWrapping="Wrap" />
+          <TextBlock Text="{Binding Name}" Foreground="#7761BE" />
+          <TextBlock Text="{Binding Details}" FontSize="11" TextWrapping="Wrap" />
+        </StackPanel></DataTemplate></ListBox.ItemTemplate>
+      </ListBox>
+    </Grid>
+    <TextBlock Grid.Row="4" Text="左拖旋转 · 右拖或 Shift+左拖平移 · 滚轮缩放 · 点击选择。各层为原始自身绘制，效果、遮罩、缓存及分组透明度等限制见采集说明。" FontSize="11" Foreground="#856A24" TextWrapping="Wrap" Margin="0,7,0,0" />
+  </Grid>
+</UserControl>

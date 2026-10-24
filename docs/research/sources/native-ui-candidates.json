@@ -1,0 +1,324 @@
+{
+  "capturedOn": "2026-10-24",
+  "artifact": {
+    "path": "C:\\Users\\10062\\.dotnet\\tools\\.store\\avaloniaui.developertools\\2.2.3\\avaloniaui.developertools.windows\\2.2.3\\tools\\net6.0\\any\\tool-win-x64\\AvaloniaUI.DeveloperTools.exe",
+    "sha256": "76a88bb2fd68d40a7b663a0f710c8bc18dc85bf9a2f732dc6f2f84c6ac0f9f08"
+  },
+  "method": "Literal declaration candidates from native bytes; generated binding name shape, not parsed native metadata or executed handlers",
+  "coverage": "Selected literal declarations only; not parsed managed metadata, decompilation, or proof of executable behavior.",
+  "sourcePath": "C:\\Users\\10062\\AppData\\Local\\Temp\\avdt-native-deep-20261024\\compiled-binding-candidates.json",
+  "bindings": [
+    {
+      "offset": 24249489,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.AppViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "CompactMode",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24251436,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.Assets.AssetsNavToolbarViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "IsListView",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24256562,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.Debugging.DebuggerViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "ResetBreakpointCommand",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24257163,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.Elements.ElementsContentCompositionViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "Layers",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24257408,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.Elements.ElementsContentCompositionViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "RefreshCommand",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24258693,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.Elements.ElementsLayoutViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "MarginHighlighted",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24259291,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.Elements.ElementsLayoutViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "BorderHighlighted",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24259898,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.Elements.ElementsLayoutViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "PaddingHighlighted",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24260501,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.Elements.ElementsLayoutViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "ContentHighlighted",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24264826,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.Elements.ElementsNodeControlViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "CopySelectorFromTemplateParentCommand",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24266317,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.Elements.ElementsNodeControlViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "FreezePopups",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24273030,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.Elements.BindingExpressionViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "ResourceKey",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24273262,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.Elements.BindingExpressionViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "IsSourceNotAttachedTreeNode",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24273525,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.Elements.BindingExpressionViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "IsSourceAttachedTreeNode",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24273767,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.Elements.BindingExpressionViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "UpdateSourceTrigger",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24274013,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.Elements.BindingExpressionViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "TargetNullValue",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24274135,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.Elements.BindingExpressionViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "StringFormat",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24274370,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.Elements.BindingExpressionViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "ConverterParameter",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24274495,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.Elements.BindingExpressionViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "ConverterCulture",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24279725,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.Events.RoutedEventsViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "EnableDefaultCommand",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24279845,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.Events.RoutedEventsViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "DisableAllCommand",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24280196,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.Events.RoutedEventsViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "ClearCommand",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24282794,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.Logging.LogsViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "ClearCommand",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24284335,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.Performance.PerformanceMetricsToolViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "EnableDefaultCommand",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24286504,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.Performance.PerformanceMeterGraphViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "ClearCommand",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24286988,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.Performance.PerformanceMeterGraphViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "Sync",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24287106,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.Profiler.ProfilerToolViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "Recording",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24288802,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.Protocol.ProtocolMonitorRequestViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "RequestArguments",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24288930,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.Protocol.ProtocolMonitorRequestViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "Response",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24289050,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.Protocol.ProtocolMonitorToolViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "Recording",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24289286,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.Protocol.ProtocolMonitorToolViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "ClearCommand",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24292195,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.Settings.SettingsMcpPageViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "EditorTargets",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24292939,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.Settings.McpEditorTarget",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "InstallCommand",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24293160,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.Settings.SettingsMcpPageViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "GenerateAndSaveMcpbCommand",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24297797,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.UpdateViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "HasNewUpdate",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24302521,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.UpdateViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "ChangelogMarkdown",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24302729,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.UpdateViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "OpenReleasePageCommand",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24302838,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.WelcomeViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "InstallLibrarySnippet",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    },
+    {
+      "offset": 24303159,
+      "owner": "AvaloniaUI.DeveloperTools.ViewModels.WelcomeViewModel",
+      "assembly": "AvaloniaUI.DeveloperTools",
+      "property": "AvailableClients",
+      "accessor": "Getter",
+      "encoding": "ascii"
+    }
+  ]
+}

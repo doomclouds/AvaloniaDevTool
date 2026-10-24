@@ -1,0 +1,45 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="AvaloniaDevTool.Inspector.EventRoutesView" x:CompileBindings="False">
+  <Grid RowDefinitions="Auto,Auto,*" Margin="10" IsEnabled="{Binding CanUseNativeTools}">
+    <WrapPanel>
+      <Button x:Name="RefreshEventCatalog" Content="刷新目录与路由" Command="{Binding RefreshEventRoutesCommand}" Margin="0,0,8,6" AutomationProperties.AutomationId="Inspector.RefreshEventCatalog" />
+      <Button x:Name="StartEventRoutes" Content="按选择开始捕获" Command="{Binding StartEventRoutesCommand}" Margin="0,0,8,6" AutomationProperties.AutomationId="Inspector.StartEventRoutes" />
+      <Button Content="停止" Command="{Binding StopActivityCommand}" Margin="0,0,8,6" />
+      <Button Content="清空" Command="{Binding ClearEventRoutesCommand}" Margin="0,0,8,6" />
+      <Button Content="默认六组" Command="{Binding DefaultEventGroupsCommand}" Margin="0,0,8,6" />
+      <Button x:Name="SaveEventDefaults" Content="保存为默认" Command="{Binding SaveEventDefaultsCommand}" Margin="0,0,8,6" AutomationProperties.AutomationId="Inspector.SaveEventDefaults" />
+      <CheckBox Content="仅选中事件源" IsChecked="{Binding ActivitySelectedSourceOnly, Mode=TwoWay}" Margin="0,0,8,6" />
+    </WrapPanel>
+    <StackPanel Grid.Row="1" Spacing="3" Margin="0,3,0,8">
+      <TextBlock Text="{Binding EventRoutesSummary}" TextWrapping="Wrap" FontSize="11" />
+      <TextBlock Text="{Binding EventDefaultsSummary}" TextWrapping="Wrap" FontSize="11" />
+      <TextBlock Text="{Binding MissingEventDefaultsSummary}" TextWrapping="Wrap" FontSize="11" Foreground="#A66B20" />
+      <TextBlock Text="当前选项仅在开始捕获时应用；修改后请停止并重新开始。" FontSize="11" />
+    </StackPanel>
+    <Grid Grid.Row="2" ColumnDefinitions="280,6,*">
+      <Grid RowDefinitions="Auto,Auto,Auto,*">
+        <TextBlock Text="真实注册事件目录（分组与单项取并集）" FontWeight="SemiBold" TextWrapping="Wrap" />
+        <ItemsControl Grid.Row="1" ItemsSource="{Binding EventGroupChoices}" Margin="0,6">
+          <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate><DataTemplate><CheckBox Content="{Binding Label}" IsChecked="{Binding IsSelected, Mode=TwoWay}" Margin="0,0,10,0" /></DataTemplate></ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <TextBox Grid.Row="2" x:Name="EventCatalogFilter" Text="{Binding EventCatalogFilter, Mode=TwoWay}" PlaceholderText="筛选 owner / 名称 / 策略" Margin="0,0,0,6" />
+        <ListBox Grid.Row="3" x:Name="EventCatalog" ItemsSource="{Binding FilteredEventCatalog}" AutomationProperties.AutomationId="Inspector.EventCatalog">
+          <ListBox.ItemTemplate><DataTemplate><CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}"><TextBlock Text="{Binding Description}" TextWrapping="Wrap" FontSize="11" /></CheckBox></DataTemplate></ListBox.ItemTemplate>
+        </ListBox>
+      </Grid>
+      <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" />
+      <Grid Grid.Column="2" RowDefinitions="*,Auto,Auto,2*,Auto" Margin="8,0,0,0">
+        <ListBox x:Name="EventRoutes" ItemsSource="{Binding EventRoutes}" SelectedItem="{Binding SelectedEventRoute, Mode=TwoWay}" AutomationProperties.AutomationId="Inspector.EventRoutes">
+          <ListBox.ItemTemplate><DataTemplate><StackPanel Margin="4" Spacing="3"><StackPanel Orientation="Horizontal" Spacing="8"><TextBlock Text="{Binding RouteId, StringFormat='#{0}'}" /><TextBlock Text="{Binding EventName}" /><TextBlock Text="{Binding State}" /></StackPanel><TextBlock Text="{Binding SourceName}" FontSize="11" /></StackPanel></DataTemplate></ListBox.ItemTemplate>
+        </ListBox>
+        <TextBlock Grid.Row="1" Text="{Binding SelectedEventRouteSummary}" TextWrapping="Wrap" FontSize="11" Margin="0,6" />
+        <Button Grid.Row="2" x:Name="JumpToEventSource" Content="定位源对象" Command="{Binding JumpToEventSourceCommand}" HorizontalAlignment="Left" Margin="0,0,0,6" AutomationProperties.AutomationId="Inspector.JumpToEventSource" />
+        <ListBox Grid.Row="3" x:Name="EventRouteNodes" ItemsSource="{Binding SelectedEventRouteNodes}" SelectedItem="{Binding SelectedEventRouteNode, Mode=TwoWay}" AutomationProperties.AutomationId="Inspector.EventRouteNodes">
+          <ListBox.ItemTemplate><DataTemplate><StackPanel Margin="4" Spacing="3"><StackPanel Orientation="Horizontal" Spacing="8"><TextBlock Text="{Binding Index, StringFormat='[{0}]'}" /><TextBlock Text="{Binding Strategy}" /><TextBlock Text="{Binding ReceiverObjectId, StringFormat='#{0}'}" /><TextBlock Text="{Binding ReceiverName}" /></StackPanel><TextBlock Text="{Binding ReceiverType}" FontSize="10" TextWrapping="Wrap" /><TextBlock Text="{Binding HandledObserved, StringFormat='观察到 Handled={0}'}" FontSize="11" /><TextBlock Text="相邻观察间 Handled 已变化" IsVisible="{Binding HandledChangedSincePreviousObservation}" Foreground="#A66B20" FontSize="11" /><TextBlock Text="接收对象已失效" IsVisible="{Binding ReceiverExpired}" Foreground="#A66B20" FontSize="11" /></StackPanel></DataTemplate></ListBox.ItemTemplate>
+        </ListBox>
+        <Button Grid.Row="4" x:Name="JumpToEventNode" Content="定位选中路由节点" Command="{Binding JumpToEventNodeCommand}" HorizontalAlignment="Left" Margin="0,6,0,0" AutomationProperties.AutomationId="Inspector.JumpToEventNode" />
+      </Grid>
+    </Grid>
+  </Grid>
+</UserControl>
