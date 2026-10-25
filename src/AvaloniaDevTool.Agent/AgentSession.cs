@@ -81,7 +81,8 @@ internal sealed partial class AgentSession : IDisposable
         ObjectDisposedException.ThrowIf(_disposed, this);
         return method switch
         {
-            Methods.SessionInfo => _info,
+            Methods.SessionInfo => _info with { ContentGeneration = _options.ContentGenerationProvider?.Invoke() ?? 0 },
+            PreviewMethods.ContentGeneration => _options.ContentGenerationProvider?.Invoke() ?? 0,
             Methods.TreeRoots => GetRoots(ProtocolJson.Read<TreeRootsRequest>(parameters).Kind),
             Methods.TreeChildren => GetChildren(ProtocolJson.Read<TreeChildrenRequest>(parameters)),
             TreePagingMethods.Children => GetChildrenPage(ProtocolJson.Read<TreeChildrenPageRequest>(parameters)),
@@ -93,6 +94,8 @@ internal sealed partial class AgentSession : IDisposable
             Methods.PropertiesGet => GetProperties(ProtocolJson.Read<PropertiesRequest>(parameters)),
             PropertyPresentationMethods.Preview => GetPropertyPreview(ProtocolJson.Read<PropertyPreviewRequest>(parameters)),
             Methods.PropertiesSet => SetProperty(ProtocolJson.Read<SetPropertyRequest>(parameters)),
+            OfficialPropertyMethods.Set => SetOfficialProperty(ProtocolJson.Read<OfficialSetPropertyRequest>(parameters)),
+            OfficialPropertyMethods.Styles => GetOfficialStyles(ProtocolJson.Read<OfficialStylesRequest>(parameters)),
             BrushMethods.Set => SetBrush(ProtocolJson.Read<SetBrushRequest>(parameters)),
             Methods.PropertiesClear => ClearProperty(ProtocolJson.Read<ClearPropertyRequest>(parameters)),
             Methods.Highlight => SetHighlight(ProtocolJson.Read<HighlightRequest>(parameters).ObjectId),
@@ -146,6 +149,12 @@ internal sealed partial class AgentSession : IDisposable
             RuntimeInspectionMethods.Members => _runtime.GetMembers(ProtocolJson.Read<RuntimeMembersRequest>(parameters)),
             RuntimeInspectionMethods.Items => _runtime.GetItems(ProtocolJson.Read<RuntimeItemsRequest>(parameters)),
             InputMethods.Send => _input.Send(ProtocolJson.Read<InputRequest>(parameters)),
+            InputMethods.Click => _input.Click(ProtocolJson.Read<ClickInputRequest>(parameters)),
+            InputMethods.Chord => _input.Chord(ProtocolJson.Read<KeyChordRequest>(parameters)),
+            InputMethods.Drag => _input.Drag(ProtocolJson.Read<DragInputRequest>(parameters)),
+            InputMethods.TextSelection => _input.SelectText(ProtocolJson.Read<TextSelectionRequest>(parameters)),
+            InputMethods.SelectItem => _input.SelectItem(ProtocolJson.Read<SelectItemRequest>(parameters)),
+            InputMethods.ControlAction => _input.PerformAction(ProtocolJson.Read<ControlActionRequest>(parameters)),
             _ => HandleExploration(method, parameters)
         };
     }
@@ -236,6 +245,9 @@ internal sealed partial class AgentSession : IDisposable
         var result = new List<PropertyInfoDto>();
         var registered = RegisteredProperties(target).ToArray();
         var clrProperties = PropertyPresentationAdapter.PublicProperties(target.GetType()).ToArray();
+        var wrapped = clrProperties.GroupBy(member => member.Name, StringComparer.Ordinal)
+            .Select(group => PropertyPresentationAdapter.WrapperProperty(group.First(), registered))
+            .OfType<AvaloniaProperty>().ToHashSet();
         foreach (var property in registered)
         {
             var context = ContextualProperties.Describe(target, property);
@@ -258,12 +270,12 @@ internal sealed partial class AgentSession : IDisposable
                     property.PropertyType.FullName ?? property.PropertyType.Name,
                     PropertyPresentationAdapter.Format(diagnostic.Value),
                     hasOverride ? "DiagnosticOverride" : diagnostic.Priority.ToString(),
-                    readOnly || !canEdit, canEdit, hasOverride, Presentation: presentation));
+                    readOnly || !canEdit, canEdit, hasOverride, Presentation: presentation, HasClrWrapper: wrapped.Contains(property)));
             }
             catch (Exception ex)
             {
                 result.Add(new PropertyInfoDto(propertyId, property.Name, property.OwnerType.Name,
-                    property.PropertyType.Name, null, "Unavailable", true, false, false, PropertyErrors.Describe(ex)));
+                    property.PropertyType.Name, null, "Unavailable", true, false, false, PropertyErrors.Describe(ex), HasClrWrapper: wrapped.Contains(property)));
             }
         }
         foreach (var property in clrProperties.Where(property => request.IncludeClr && !PropertyPresentationAdapter.IsBackingWrapper(property, registered)))
@@ -291,7 +303,7 @@ internal sealed partial class AgentSession : IDisposable
     }
 
     private AvaloniaObject GetAvaloniaObject(long id) =>
-        _objects.Get(id) as AvaloniaObject ??
+        (id == 0 ? _application : _objects.Get(id)) as AvaloniaObject ??
             throw new RpcException("unsupported_object", "The selected object has no Avalonia properties.");
 
     private AvaloniaProperty GetProperty(AvaloniaObject target, string id)

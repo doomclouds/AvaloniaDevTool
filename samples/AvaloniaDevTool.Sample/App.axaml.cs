@@ -32,16 +32,15 @@ public sealed partial class App : Application
             _agent = DiagnosticsAgent.Attach(this, new DiagnosticsAgentOptions
             {
                 PipeName = Program.PipeName,
-                InspectorExecutablePath = SampleInspectorLocator.Find(),
                 ApplicationName = "Avalonia 测试工作台",
                 LogSources = [SampleDiagnostics.Provider, SampleDiagnostics.CustomSource]
             });
             if (Program.EnableRemote) _ = StartRemoteAsync(_agent, mainWindow);
-            mainWindow.ViewModel.AgentStatus = "Debug · 等待 Inspector 连接";
+            mainWindow.ViewModel.AgentStatus = "Debug · 等待诊断客户端连接";
             var statusTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(500) };
             statusTimer.Tick += (_, _) => mainWindow.ViewModel.AgentStatus = _agent.IsConnected
-                ? "Debug · Inspector 已连接"
-                : "Debug · 等待 Inspector 连接";
+                ? "Debug · 诊断客户端已连接"
+                : "Debug · 等待诊断客户端连接";
             statusTimer.Start();
             desktop.Exit += (_, _) =>
             {

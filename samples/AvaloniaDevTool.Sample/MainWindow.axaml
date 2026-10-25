@@ -82,7 +82,7 @@
     <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" Padding="26,24">
       <StackPanel Spacing="20">
         <Border Background="#EAF0FF" CornerRadius="9" Padding="17,13">
-          <TextBlock Text="使用方式：启动 Inspector → 粘贴上方管道名并连接 → 展开 Visual / Logical 树；点击拾取后，直接点选这里的控件。"
+          <TextBlock Text="使用方式：让 MCP 客户端连接当前应用，再查询 Visual / Logical 树、读取或修改目标控件属性。上方管道名可用于底层诊断连接。"
                      Foreground="#354B93" TextWrapping="Wrap" LineHeight="21" />
         </Border>
 
@@ -118,7 +118,7 @@
           <Border Grid.Column="1" Classes="card">
             <StackPanel Spacing="15">
               <TextBlock Classes="section" Text="02 / 绑定与本地修改" />
-              <TextBlock Classes="help" Text="在检查器中修改下方 BoundText 的 Text，再更新绑定源，观察值和来源。清除诊断修改后，应重新显示绑定源的值。" />
+              <TextBlock Classes="help" Text="通过诊断客户端修改下方 BoundText 的 Text，再更新绑定源，观察值和来源。清除诊断修改后，应重新显示绑定源的值。" />
               <Border Background="#F1F4FF" BorderBrush="#D6DFFF" BorderThickness="1" CornerRadius="8" Padding="18">
                 <TextBlock Name="BoundText" Text="{Binding BoundMessage}" TextWrapping="Wrap"
                            FontSize="18" FontWeight="SemiBold" Foreground="#435DE7"
@@ -193,7 +193,7 @@
           <Border Classes="card">
             <StackPanel Spacing="14">
               <TextBlock Classes="section" Text="05 / 样式、绑定与资源" />
-              <TextBlock Classes="help" Text="拾取样式按钮后切到样式 / 绑定。切换 class 会改变命中样式；资源面板可编辑 SampleAccentBrush 与 SampleResourceText。" />
+              <TextBlock Classes="help" Text="查询样式按钮的样式与绑定信息。切换 class 会改变命中样式；通过资源诊断接口可编辑 SampleAccentBrush 与 SampleResourceText。" />
               <Button Name="StyleTarget" Content="样式与 DynamicResource 目标" Classes="diagnosticTarget emphasized"
                       HorizontalAlignment="Left" AutomationProperties.AutomationId="Sample.StyleTarget" />
               <Button Content="切换 emphasized class" Click="ToggleClassClick" HorizontalAlignment="Left" AutomationProperties.AutomationId="Sample.ToggleClass" />
@@ -208,13 +208,13 @@
           <Border Grid.Column="1" Classes="card">
             <StackPanel Spacing="14">
               <TextBlock Classes="section" Text="06 / 日志、事件与资产" />
-              <TextBlock Classes="help" Text="日志 / 事件面板开始捕获后，点下面按钮。事件名 Click 可观察路由，* 会捕获全部已注册事件。" />
+              <TextBlock Classes="help" Text="通过诊断接口开始日志 / 事件捕获后，点下面按钮。事件名 Click 可观察路由，* 会捕获全部已注册事件。" />
               <WrapPanel>
                 <Button Content="发送 Warning" Click="EmitWarningClick" Margin="0,0,8,8" AutomationProperties.AutomationId="Sample.EmitWarning" />
                 <Button Content="发送 Information" Click="EmitInformationClick" Margin="0,0,8,8" AutomationProperties.AutomationId="Sample.EmitInformation" />
                 <Button Content="后台发送 30 条" Click="EmitBackgroundClick" Margin="0,0,8,8" AutomationProperties.AutomationId="Sample.EmitBackground" />
               </WrapPanel>
-              <TextBlock Classes="help" Text="资产面板筛选 AvaloniaDevTool.Sample，可预览 Assets/sample.json、sample.svg 的文本及 sample.png 的图片。单项预览限制为 1 MiB。" />
+              <TextBlock Classes="help" Text="查询 AvaloniaDevTool.Sample 的资产，可读取 Assets/sample.json、sample.svg 的文本及 sample.png 的图片。单项预览限制为 1 MiB。" />
               <Image Source="/Assets/sample.png" Width="256" Height="128" Stretch="Fill" HorizontalAlignment="Left" AutomationProperties.AutomationId="Sample.AssetPreview" />
             </StackPanel>
           </Border>
@@ -222,16 +222,16 @@
         <Border Classes="card">
           <StackPanel Spacing="13">
             <TextBlock Classes="section" Text="07 / Meter 指标与保留窗口统计" />
-            <TextBlock Classes="help" Text="在指标面板使用 Meter 名称 AvaloniaDevTool.Sample 并开始采集，再点击按钮。Counter 记录原始 +1，Histogram 记录 12、18、27、40、95、15 ms 六个合成样本，ObservableGauge 持续给出队列深度。" />
+            <TextBlock Classes="help" Text="通过诊断接口使用 Meter 名称 AvaloniaDevTool.Sample 开始采集，再点击按钮。Counter 记录原始 +1，Histogram 记录 12、18、27、40、95、15 ms 六个合成样本，ObservableGauge 持续给出队列深度。" />
             <Button Content="生成一组测试指标" Click="RecordMetricsClick" HorizontalAlignment="Left" Classes="primary" AutomationProperties.AutomationId="Sample.RecordMetrics" />
-            <TextBlock Classes="help" Text="面板的 min / max / mean / p50 / p95 仅代表当前保留样本窗口，不能当作应用全生命周期统计。" />
+            <TextBlock Classes="help" Text="采集结果的 min / max / mean / p50 / p95 仅代表当前保留样本窗口，不能当作应用全生命周期统计。" />
             <Separator />
             <TextBlock Classes="section" Text="08 / 样式与资源性能" />
-            <TextBlock Classes="help" Text="在性能面板开始采集后点击下方按钮，将实际创建并移除一个控件、切换样式类并查找已有和缺失资源。耗时来自框架活动，单位为微秒。" />
+            <TextBlock Classes="help" Text="通过性能诊断接口开始采集后点击下方按钮，将实际创建并移除一个控件、切换样式类并查找已有和缺失资源。耗时来自框架活动，单位为微秒。" />
             <Button Content="生成样式与资源活动" Click="GenerateProfilerActivitiesClick" HorizontalAlignment="Left" Classes="primary" AutomationProperties.AutomationId="Sample.GenerateProfilerActivities" />
             <Separator />
             <TextBlock Classes="section" Text="09 / 结构化日志与嵌套资源" />
-            <TextBlock Classes="help" Text="日志页开始采集后点击按钮，按 Count=7 筛选并查看原始模板、scope、EventId、异常链和来源。资源页选择本窗口，勾选 Include Nested、筛选 DemoResource，可翻阅 125 个条目并比较重复键的实际 owner。" />
+            <TextBlock Classes="help" Text="开始日志采集后点击按钮，按 Count=7 筛选并读取原始模板、scope、EventId、异常链和来源。查询本窗口资源时包含嵌套字典、筛选 DemoResource，可分页读取 125 个条目并比较重复键的实际 owner。" />
             <Button Content="发送结构化日志" Click="EmitStructuredLogsClick" HorizontalAlignment="Left" Classes="primary" AutomationProperties.AutomationId="Sample.EmitStructuredLogs" />
             <Separator />
             <TextBlock Classes="section" Text="10 / 回环 WebSocket 诊断" />
@@ -240,7 +240,7 @@
             <Button Content="复制本次连接令牌" Click="CopyRemoteTokenClick" IsEnabled="{Binding RemoteReady}" HorizontalAlignment="Left" AutomationProperties.AutomationId="Sample.CopyRemoteToken" />
             <Separator />
             <TextBlock Classes="section" Text="11 / 盒模型与渲染诊断" />
-            <TextBlock Classes="help" Text="拾取下方区域，在“交互截图 / 高亮与测量”开启 Margin、Padding、信息、标尺与引导线。橙色在边界外，绿色从边框内开始；旋转后分区应随控件变换。渲染诊断页使用 Avalonia 自身 FPS 与失效区域开关。" />
+            <TextBlock Classes="help" Text="选择下方区域，通过高亮与测量诊断接口开启 Margin、Padding、信息、标尺与引导线。橙色在边界外，绿色从边框内开始；旋转后分区应随控件变换。渲染诊断使用 Avalonia 自身 FPS 与失效区域开关。" />
             <Button Content="旋转 / 复位盒模型" Click="ToggleBoxModelTransformClick" HorizontalAlignment="Left" AutomationProperties.AutomationId="Sample.ToggleBoxModelTransform" />
             <Border Name="BoxModelTarget" Width="360" Height="130" HorizontalAlignment="Left"
                     Margin="24,12,36,18" Padding="22,14,16,10" BorderThickness="3" BorderBrush="#435DE7" Background="#EAF0FF"

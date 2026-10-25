@@ -20,6 +20,7 @@ public sealed class PreviewSession : INotifyPropertyChanged, IDisposable
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
+    public event Action<long>? ContentReloaded;
     public string FilePath => _loader.FilePath;
     public bool WatchEnabled => _watcher is not null;
     public Control? Content { get; private set; }
@@ -62,6 +63,7 @@ public sealed class PreviewSession : INotifyPropertyChanged, IDisposable
             LastSuccessfulLoad = DateTimeOffset.UtcNow;
             Status = $"已加载 {Path.GetFileName(FilePath)} · 第 {SuccessfulLoads} 次 · {(WatchEnabled ? "自动监视开启" : "手动重载")}";
             RaiseState();
+            ContentReloaded?.Invoke(SuccessfulLoads);
             return true;
         }
         catch (PreviewDocumentException exception)

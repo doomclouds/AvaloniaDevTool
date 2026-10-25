@@ -1,22 +1,24 @@
 # MCP 与命令行
 
-本项目通过官方 C# MCP SDK 提供独立 stdio 服务器，复用现有 Client 和 Agent，不依赖原版 DeveloperTools 或其账户状态。SDK 固定为 ModelContextProtocol 2.3.0；标准输出只承载 MCP，运行日志输出到标准错误。
+本项目使用 ModelContextProtocol 2.3.0 提供独立 stdio 服务，连接自研 Agent SDK；不依赖原版 DeveloperTools 的运行进程或账户。默认 `agent` profile 提供 44 项工具：canonical 16、框架交互/截图 9、Windows native 8、文件弹窗 8、同连接原始采集 3。显式 `official` 保留 canonical 16 项兼容入口，显式 `extended` 保留旧 62 项诊断扩展。extended 与 canonical 是独立契约，不是兼容超集。
 
 ## 启动
 
-先在另一个终端启动已接入 Agent 的目标应用。构建后启动服务器：
+先构建并运行接入 Agent 的目标。客户端直接启动构建产物：
 
 ```powershell
-dotnet run --project src/AvaloniaDevTool.Cli -- mcp
+dotnet src/AvaloniaDevTool.Cli/bin/Debug/net10.0/AvaloniaDevTool.Cli.dll mcp
 ```
 
-可指定首次调用时自动附加的管道：
+可指定初次读取时自动附加的目标管道：
 
 ```powershell
-dotnet run --project src/AvaloniaDevTool.Cli -- mcp --pipe avalonia-devtool-demo
+dotnet src/AvaloniaDevTool.Cli/bin/Debug/net10.0/AvaloniaDevTool.Cli.dll mcp --pipe avalonia-devtool-demo
 ```
 
-生产调用应直接运行已构建的程序集，避免 dotnet run 的构建输出干扰 stdio。客户端启动参数示例：
+等价的显式默认值为 `--profile agent`。启动选项只接受 `--pipe NAME` 和 `--profile agent|official|extended`，每项一次且需要非空值。标准输出只承载协议，运行日志写入标准错误；构建应在客户端启动前完成。
+
+MCP 客户端进程配置示例：
 
 ```json
 {
@@ -28,89 +30,125 @@ dotnet run --project src/AvaloniaDevTool.Cli -- mcp --pipe avalonia-devtool-demo
 }
 ```
 
-此示例只描述 MCP 进程启动方式，不会自动改动任何客户端配置。
+路径应换为实际构建产物。示例不自动修改任何客户端配置。
 
-## 会话与能力
+## 默认 agent 工具
 
-1. 客户端按 MCP 标准执行 initialize 与 tools/list。
-2. Windows 可以调用 apps 查找本工具的管道；也可从目标界面复制名称。
-3. 调用 attach-to-app，参数 pipeName 为明确的目标管道。
-4. 使用 tree、search、props 等工具取得对象和完整属性 ID。
-5. 调用 detach 结束会话，释放诊断覆盖、资源修改、伪类修改、监听和覆盖层。
-
-当前 Agent 的连接仍是单客户端。MCP 与 GUI 检查器需要分别连接；切换前先在另一端断开。同一 MCP 服务器可以通过 attach-to-app 切换应用，不会沿用旧会话对象 ID。跨客户端共享目标、远程 HTTP 以及移动平台尚未实现。
-
-## 工具
-
-| 工具 | 行为 |
+| 组 | 数量与工具 |
 | --- | --- |
-| apps / attach-to-app / detach | 本机发现、显式附加、会话释放 |
-| attach-to-remote | 使用 MCP 进程中的专用环境凭据附加 Native ws／wss 端点 |
-| attach-to-file | 使用已构建应用／控件库和项目上下文创建受管理的预览进程，支持 x:Class、App 资源和文件监视 |
-| tree / ancestors / search | 有界快照、根到对象父链、折叠子树搜索 |
-| tree-children / template-parent-selector | 真实直接子项分页和游标；模板所属控件 selector 辅助查询，部件全路径仍由 element-selector 返回 |
-| element-selector / element-metadata / tree-release | 生成并验证真实 Avalonia selector、复制对象元数据、释放展开分支观察 |
-| props / set-prop | 属性值、来源、可编辑状态、临时覆盖与清除 |
-| set-brush | 结构化 Solid／Linear／Radial／Conic 草稿，复制新画刷并临时覆盖；从 props 的 presentation.brush 读取字段及允许类型 |
-| styles | 样式帧、setter、绑定表达式和验证状态 |
-| action / follow-focus | Focus、BringIntoView、可撤销 Enable/Disable、焦点跟随 |
-| overlay / overlay-set / overlay-clear | 根 DIP 盒模型、信息／标尺／引导线、配置与移除诊断高亮 |
-| renderer-diagnostics / renderer-diagnostics-set / renderer-diagnostics-stop | 查询、启用和恢复真实框架 FPS／脏矩形／布局及渲染耗时图 |
-| popup-freeze / popup-freeze-set / popup-freeze-resume | 按配置根抑制支持弹层的外部点击／失焦关闭并恢复；逐项返回不支持的自动关闭路径 |
-| input | 真实框架文本、按键、指针和滚轮路由；不注入OS/IME |
-| object / layout | 只读CLR对象和集合分页、VisualGeometry层级快照 |
-| composition | 真实合成器逐节点自身绘制 PNG、变换／层级／裁剪／透明度及明确限制 |
-| pseudo-class | 查询、切换、恢复伪类 |
-| screenshot | 元素 PNG，返回原生 MCP ImageContentBlock |
-| resources / set-resource / reset-resource | 查看资源层级、编辑已有字符串键、保留应用新值的冲突处理 |
-| resource-tree / resource-query / resource-entry | 有界 provider 树、嵌套条目分页／筛选／排序、原 owner／主题来源和弱键 ID 重读 |
-| assets / open-asset | 枚举内嵌资源、文本或图片预览 |
-| export-asset | 完整分块导出到本机绝对路径，验证长度／SHA-256，默认不覆盖 |
-| activity-start / activity-stop / activity | 日志和路由事件捕获、停止与有界历史 |
-| events-catalog / events-start / events-routes / events-status | 实际注册事件目录、精确或分组选择、关联路由及预算／过期状态 |
-| metrics-start / metrics-stop / metrics / metrics-clear | 真实时间窗的原始指标、帧聚合／P90、间隔配置与单序列或全部清空 |
-| profiler-start / profiler-stop / profiler-clear / profiler | 真实框架样式匹配、激活器求值及资源查找，微秒耗时和有界窗口统计 |
-| breakpoints / breakpoint-create / breakpoint-update / breakpoint-remove | 观察属性或事件、命中条件、启停、命中历史与释放 |
+| canonical | 16 项，完整目录见下表；agent 和显式 official 共用此合同 |
+| 框架交互/截图 | 9 项：ui-input、ui-click、ui-key-chord、ui-drag、ui-text-selection、ui-select-item、ui-control-action、ui-wait、ui-screenshot |
+| Windows native | 8 项：native-windows、native-tree、native-find、native-inspect、native-action、native-action-status、native-input、native-screenshot |
+| 真实文件弹窗 | 8 项：file-dialogs、file-dialog-inspect、file-dialog-set-paths、file-dialog-set-filter、file-dialog-accept、file-dialog-cancel、file-dialog-overwrite、file-dialog-wait |
+| 原始诊断采集 | 3 项：capture-start、capture-status、capture-stop |
 
-set-prop 的 propertyName 支持完整属性 ID；同名属性可能属于不同 owner，因此建议直接使用 props 返回的 Id。value 为 JSON null 表示清除本会话的诊断覆盖；字符串 `"null"` 仍按目标类型转换。当前不解析原版 isXamlValue 参数。
+`ui-*` 操作真实 Avalonia 控件与路由输入。native 工具通过隔离 worker 读取 UIA、执行 provider pattern、受限 OS 输入或 PNG 采集；文件工具操作真实 OS picker，不替换 StorageProvider。capture 工具复用同一个目标诊断连接。产品提供操作与原始数据，业务关联和判断由调用方负责；范围见 [当前 Agent 范围](agent-tools/architecture/current-agent-scope.md)，详细合同见 [Agent 交互](agent-tools/features/agent-interaction.md)。
 
-set-brush 接受结构化 brush：kind、opacity、stops、spreadMethod，以及对应类型的起终点／中心／焦点／半径／角度和矩阵。目标端校验类型、有限数值和色标预算，应用创建新对象，不修改应用原画刷或色标集合；set-prop 的 JSON null 清除或 detach 恢复最新底层值。Image／Drawing／shader／custom 仍只读，详见 [属性编辑](properties.md)。
+### canonical 兼容入口
 
-tree 的 depth 为0只列当前节点，-1在上限内递归，最大64层；maxNodes 为1至2000，结果明确给出 Truncated。search 另有 MaxResults 和 MaxVisited。父链通过对象实际父节点取得，不需要把整棵树搬到客户端。
+`tools/list` 是当前服务的实际输入契约。下表概括官方入口；完整必填、类型、默认、枚举、注解及证据边界见 [官方能力基准](agent-tools/research/official-capabilities.md)。
 
-tree-children 的 count 默认100、最大2000，offset 与 cursor 用于读取直接孩子；结果显式给出 totalCount、hasMore、nextCursor。游标绑定会话／父节点／树模式／真实分支观察版本，变更后应从零重读，单分支超过20000项明确返回 tree_limit。tree 也可请求页参数；这些能力由真实 stdio 测试覆盖。Inspector 对仅缺少新方法的旧 Agent 可退回旧读取并本地分页，比较已加载前缀；该模式不具备原生 cursor／事件 revision 保证。详见 [树工作流](tree-workflows.md)。
+| 工具 | 输入与本地行为 |
+| --- | --- |
+| `attach-to-app` | `id=0` 列出本地端点；使用返回的 id 附加真实应用 |
+| `attach-to-file` | 必填 `xamlFilePath,xamlProjectPath`，`build=false`；解析项目并管理独立 Previewer |
+| `detach` | 断开，释放临时诊断状态和自建预览 |
+| `tree` | `nodeId=0,treeKind,depth=10`；三种树，1 为直接一层，-1 为完整子树 |
+| `ancestors` | 必填 `nodeId`；本地返回 root 到自身的真实 Merged 父链 |
+| `search` | `query,scopeNodeId=0,searchTemplates=false,limit=-1`；类型和 x:Name 部分匹配 |
+| `props` | `nodeId,propertyNames=null`；真实注册属性、有效值、来源和名单过滤 |
+| `set-prop` | `nodeId,propertyName,value:string,isXamlValue=false`；临时覆盖、字符串特殊值和 XAML 对象 |
+| `styles` | `nodeId,propertyNames=null,includeDefaults=false`；真实样式帧、setter、绑定及可选默认值 |
+| `pseudo-class` | `nodeId,pseudoClass=null,isActive=null`；列举或修改命名伪类 |
+| `resources` | `nodeId=0,onlySelf=false`；应用或节点资源及来源 |
+| `assets` | 无参数；枚举目标程序集内嵌资产 URL |
+| `open-asset` | `assetUrl`；完整读取允许的 avares 资产，返回带 MIME 的原始字节 |
+| `screenshot` | 必填 `nodeId`；指定元素 PNG，返回 MCP image 内容块 |
+| `input` | `nodeId,inputEvent,arg=null`；Click、KeyDown、KeyUp、Text 四类框架输入 |
+| `action` | `nodeId,action`；Focus、Enable、Disable、BringIntoView |
 
-props 的 contextual、includeClr 均默认 false，保留旧行为；前者只过滤已知直接视觉父布局消费的附加属性，后者才执行公共 CLR getter。未知自定义用途保留，已知上下文位于 presentation.context。Inspector 在本地隐藏完整元数据中的非相关项，保留草稿并跟随换父；详见 [上下文属性](contextual-properties.md)。
+原版 2.2.3 归档初始目录是 15 项，没有 `detach`，但官方文档包含它且目录声明可动态变化。本项目按文档公开 16 项；这不是原版附加后目录已核实的结论。15 项的归档均无 outputSchema，原版真实返回 DTO、错误及部分边界尚未知，不宣称输出逐字段等价。
 
-popup-freeze-set 的 frozen 和可选 rootId 控制保持范围，省略 rootId 表示所有配置根及后续新根；popup-freeze-resume 释放全部自有改写。普通 Popup／标准 Flyout 支持范围已实测，ContextMenu 的 Overlay 独立关闭、ToolTip 与 transient Flyout 仍有限制，不能按返回 IsActive 推断所有弹层完全冻结。详见 [弹层保持](popup-freeze.md)。
+## 发现、附加和节点
 
-tree／ancestors／search 接受 Merged。tree 的 includeTemplates 默认 true，false 时展示模板组但停止在组边界。合成模板组与内容插槽带 Role、TemplateOwnerId／SlotContentId，不支持控件属性或输入，需导航到真实 owner／content；详见 [Merged 树](merged-tree.md)。
+客户端完成 `initialize/tools/list` 后，可按下面顺序调用：
 
-element-selector 使用实际解析与匹配验证，结果显式区分歧义、预算截断与不支持的名字；不会在截断后声称唯一。tree-release 只释放指定树分支的观察，保留对象身份和属性／断点监听，再次读取孩子会恢复观察。详见 [树工作流](tree-workflows.md)。
+```json
+{"name":"attach-to-app","arguments":{}}
+```
 
-overlay 返回的 margin／padding、旋转后的区域与设备缩放都有明确坐标空间；截图暂时隐藏诊断覆盖层。renderer-diagnostics 的开关作用于真实 TopLevel.RendererDiagnostics，停止或断开时按冲突规则恢复应用值。详见 [高亮](overlays.md) 与 [渲染诊断](renderer-diagnostics.md)。
+从返回应用列表取 `id` 再调用：
 
-events-start 默认使用六组事件，可指定注册目录中的精确事件 ID；events-routes 把各观察节点、策略结束与源／接收对象关联到同一路由。Handled 变化表示观察区间，不能归因到具体实例 handler。activity-stop 停止监听并保留有界历史。详见 [事件路由](events.md)。
+```json
+{"name":"attach-to-app","arguments":{"id":1}}
+```
 
-profiler-start 的 categories 为 StyleAttach／StyleEvaluate／ResourceLookup，可用 filter 筛选选择器或资源键。profiler 返回原始活动、窗口统计和丢弃数；资源缺失 Result 标签保持未知。停止保留窗口，清空正在运行的采集开启新代数；详见 [Profiler](profiler.md)。
+这里的 1 只是示例，必须使用本次列表实际返回值。发现 ID 属于当前 MCP 服务映射，不是承诺的操作系统 PID。本地发现覆盖本工具管道前缀以及明确配置的 `--pipe`，端点可发现不等于已经成功附加。
 
-attach-to-file 接受 filePath／assemblyPath／projectPath，可选 applicationAssemblyPath 分离启动应用与源控件库。它不执行目标 Main、不自动构建；detach 或 MCP 退出会结束本会话拥有的子进程，attach-to-app 的外部应用不会被终止。详见 [项目预览附加](preview-attach.md)。
+随后通过 `tree/search` 得到当前节点。canonical 与 ui-* 的数值身份区分连接和预览内容代际，不能跨应用或 XAML 重载复用。Merged 合成节点只提供导航，实际属性、截图和输入须使用真实元素。Agent 同时接受一个诊断连接；MCP 附加不要求 F12。
 
-composition 的图像是节点自身绘制，不包含孩子，也不是完整子树截图。4MiB RPC 帧、PNG／像素总预算和效果／mask／缓存限制均显式返回；layout 仍只描述几何。详见 [合成采集](composition-capture.md)。
+native ID 是 `native:<session>:<opaque-id>` 字符串，由 native-windows/tree/find 返回；不可与数值 nodeId 混用。native 会话核对附加目标的 PID、UTC start time、窗口 owner 归属和 runtime ID；过期窗口应重新枚举。native/file-dialog 不取得 managed call gate，所以 managed 动作进入模态等待时仍可使用同一 MCP 处理其 owned 系统弹窗。UIA `pending/dispatched` 和 native-input `Injected` 都不是业务完成证明。
 
-resource-query 的 includeNested 保留重复键的来源，不计算最终胜出值；写入使用每条 OwnerDictionaryId，resource-entry 用 KeyObjectId 重读原条目。activity-start 增加 categoryFilter／messageFilter／parameterName／parameterValue；日志保留原始模板、参数状态、异常图、scope 和 EventId。完整日志与通知各有独立字节预算和丢弃统计，见 [资源](resources.md) 与 [结构化日志](logging.md)。
+## 真实原生文件流程
 
-screenshot 仅捕获已附加且尺寸有效的控件，96 DPI，最大边2048、最多2M像素、PNG最多1 MiB。超限明确失败，不自动缩小后冒充原始截图。open-asset 只接受目标应用的 avares URI，预览正文最多1 MiB；SVG显示源文本。
+以 [AutomationSample](../samples/AvaloniaDevTool.AutomationSample/README.md) 为目标，managed 操作打开 FilesTab 和对应按钮；file-dialog-wait/inspect 获得当前 picker，set-paths 只填写并读回，accept 才确认；有覆盖 prompt 时 inspect 后显式 file-dialog-overwrite。cancel、拒绝覆盖和等待均有独立结果，过期 prompt 不复用。
 
-断点创建的 sourceObjectId 只约束实际事件源，nodeId 仍约束路由接收节点；二者可以独立或同时设置，旧 nodeId 定义保持兼容。Suspend 默认关闭，且需要目标应用已附加调试器；无调试器时服务返回明确错误，不启动即时调试对话框。
+研发脚本在选择器关闭后检查应用 DocumentEditor/DocumentPath/FileStatus，再独立读取磁盘长度、内容/hash，并重新用真实 Open 打开保存结果。选中路径不等于写入；短内容覆盖长文件核对截断，取消核对原文档和原文件未变。这些判断属于驱动脚本，文件工具持续返回 `ApplicationIoVerified=false`。
 
-metrics-start 支持 pollIntervalMs、notificationIntervalMs、historyWindowMs、frameIntervalMs、aggregateFrames，默认分别为 1000、200、60000、250、true。指标统计只覆盖真实时间窗内仍受容量限制的原始样本；绘图聚合时 Histogram 取帧均值，Counter／Gauge 取帧末原始值，不把 Counter 原始增量标为累计。metrics-clear 可传 seriesId 清单图，省略则清全部，继续采集且旧快照不能复活已清数据。详情分别见 [断点](breakpoints.md) 与 [指标](metrics.md)。
+## 属性、输入和媒体边界
 
-## 独立协议与验证
+`set-prop.value` 必须是 JSON 字符串。`"null"` 对可空/引用属性设置真正 null；`"unset"` 释放本会话覆盖并恢复底层绑定/值。JSON null 是参数错误，不代替这两个字符串。`isXamlValue=true` 使用完整 xmlns 的真实 runtime XAML loader，转换失败保留原覆盖；动态 XAML 在 Native AOT 下不可用。名称有歧义时使用 `props` 返回的 owner-qualified ID。
 
-本项目按功能目标独立实现，当前不与原版私有协议或所有参数直接兼容。框架输入、项目预览附加、Merged 模板树以及高亮／selector／渲染诊断／关联事件均有真实 stdio 链测试；完整 IDE 进程附加仍未实现。原版同一产物的实际15项初始工具声明见 [原版研究](research/native-deep-analysis.md)。
+本地 `styles.includeDefaults=true` 增加 metadata 默认值帧；`pseudo-class` 接受有无冒号，名称省略时列举，指定名称而省略 isActive 时读取现状。上述选择已有本地定义，原版默认/省略参数细节仍待对照。详见 [属性、样式与操作](agent-tools/features/properties.md)。
 
-CLI.Tests 使用真正的 SDK stdio 客户端启动服务器进程，执行 initialize、tools/list、tools/call，连接同一测试进程中的真实 Agent，验证搜索、属性覆盖、绑定恢复、样式、PNG图像以及断点命中。测试不以直接调用工具方法代替 MCP 协议交互。
+`input` 派发 Avalonia 框架事件，不是 OS 注入或 IME。`arg` 用于文字或命名 Key，当前不解释 `Ctrl+A` 这样的组合语法。`resources` 保留同名资源和来源，不计算一个伪造的唯一胜出值；`onlySelf` 是目标端范围边界。完整资产响应最多 16 MiB 原始字节，字体和任意二进制使用 blob 资源块；截图超边长、像素或 PNG 预算明确失败。详见 [输入、资源与媒体](agent-tools/features/input-media.md)。
 
-参考：[官方 C# MCP SDK](https://github.com/modelcontextprotocol/csharp-sdk)，[stdio 与工具 API](https://github.com/modelcontextprotocol/csharp-sdk/tree/main/docs/concepts)。
+## PNG 与同连接原始采集
 
+| 工具 | 参数与坐标 | 返回与预算 |
+| --- | --- | --- |
+| `ui-screenshot` | 数值 `nodeId`；可选 `x/y/width/height` 必须全部省略或全部提供，使用控件局部 DIP；`scale=1` 是输出像素/DIP | PNG image + JSON 元数据 `NodeId/Width/Height/Bounds/Scale/DpiX/DpiY/CoordinateSpace`；输出边长最多 2048、总像素最多 2,097,152、PNG 最多 1 MiB。 |
+| `native-screenshot` | native 字符串 `nodeId`；可选四元区域为节点局部物理像素；`maxPixels=8000000`，允许 1..16000000 | PNG image + JSON 元数据 `NodeId/Width/Height/ScreenBounds/CaptureMethod/Limitations/CoordinateSpace/MaximumEncodedBytes`；完整源窗口最多 16,000,000 像素、PNG 最多 16 MiB。 |
+| `capture-start` | `metrics/profiler/activity=true`；`logs=true,events=false,eventName=Click,minimumLevel=Warning`；可选 `meterNames/instrumentNames/profilerCategories`；`capacity=512,pollIntervalMs=1000` | 返回 captureId、目标连接身份、状态及原始 metrics/profiler/activity 快照；capacity 1..1024，pollIntervalMs 100..60000。 |
+| `capture-status` / `capture-stop` | 必填当前 MCP/目标连接创建的 `captureId` | 返回原始快照、Completeness 与 Issues；停止成功后冻结。旧 ID 不停止新目标或外部重启的采集，不接管已有 listener。 |
+
+ui 截图使用 Avalonia RenderTargetBitmap 渲染真实控件子树，像素尺寸向上取整，DPI 为 `96*scale`，不随桌面 DPI 隐式缩放。native 截图使用 `PrintWindow(PW_RENDERFULLCONTENT)` 的限定窗口表面，区域向外取整并必须位于当前节点和源窗口内；不激活、恢复窗口，不回退到桌面抓屏。隐藏、最小化、offscreen、过期身份或采集中移动/缩放明确失败。
+
+PrintWindow 依赖目标渲染器。未绘制请求区域会被检测并报错，但 GPU、受保护、分层或嵌入内容仍可能黑屏或不完整；颜色正常不证明完整渲染。截图只提供 PNG，不作视觉比对、基线或业务判断。参数、错误和已验证证据见 [PNG 截图](agent-tools/features/agent-interaction.md#png-截图)。
+
+capture 只输出保留样本及损失/错误，`Completeness` 描述数据采集状态，不表示业务或性能通过。Meter 原始精度/单位/值语义、样式/资源 Profiler 的未知结果、logs/events 容量信息继续保留。调用方自行建立业务关联；不另开 extended 连接抢占目标。详见 [原始诊断采集](agent-tools/features/agent-interaction.md#同连接原始诊断采集)。
+
+## XAML 文件附加
+
+```json
+{
+  "name": "attach-to-file",
+  "arguments": {
+    "xamlFilePath": "C:/Projects/MyApp/Views/MainView.axaml",
+    "xamlProjectPath": "C:/Projects/MyApp/MyApp.csproj",
+    "build": true
+  }
+}
+```
+
+路径必须是存在的绝对路径，源文件在所选项目目录内。默认/false 不主动构建；true 使用所选 TFM 实际构建，失败不伪装为附加成功。CLI 用真实 MSBuild 评估 TargetPath，不能猜测某次外部构建参数或任意输出目录。
+
+Previewer 是必要依赖，加载实际 App 资源、主题、自定义类型和 `x:Class`，不调用目标 Main。保存所选 XAML 后重载，错误保留上次成功视图；成功更新后重新 tree/search。detach、切换、取消和退出清理本会话拥有的预览，外部附加应用不被终止。框架/运行时、项目启动、多 TFM 策略和异常退出限制见 [文件预览](agent-tools/features/preview.md)。
+
+## extended 扩展
+
+```powershell
+dotnet src/AvaloniaDevTool.Cli/bin/Debug/net10.0/AvaloniaDevTool.Cli.dll mcp --profile extended
+```
+
+旧目录包含远程附加、分页和 selector、画刷编辑、资源写入与查询、资产导出、日志事件、指标、Profiler、断点、覆盖层、渲染诊断、弹层冻结、几何/合成及 CLR 读取等。它们不进入官方 16 项验收分母，工具名和参数以该 profile 的 `tools/list` 为准。
+
+尤其注意同名工具差异：旧 `attach-to-app` 接受 `pipeName`，旧 `attach-to-file` 接受显式程序集/项目路径，旧 `set-prop` 的 JSON null 表示清覆盖，树和搜索还有旧预算参数。不能把 official 调用字典直接交给 extended。保留的扩展文档已标识旧桌面基线；其中 Inspector 操作仅在 `main/fa1c623` 可用。
+
+## 验证与范围
+
+CLI 测试使用真实 SDK stdio 子进程，执行 initialize、tools/list、tools/call 并连接真实 Avalonia Agent。专项验证工具行为不等于最终统一回归，当前记录见 [测试](testing.md) 和 [实现状态](implementation-status.md)。
+
+框架 stdio、Windows native 底层、文件路径预检、真实 picker→应用 I/O、同连接 capture 和 PNG 已有对应专项证据。PNG 包括真实控件、WinForms SDK、实际 stdio MCP 的原生主窗与 CommonItemDialog/路径框区域；几何单测仅验证坐标和预算。专项通过不冒充本轮整套通过，统一结果由 [实现状态](implementation-status.md) 和 [测试说明](testing.md) 登记。
+
+native 只支持已附加本机 Windows 应用及 owned 窗口，拒绝 remote transport。用户不做 macOS/Linux 原生后端或原版授权运行等价对照；IME 候选/组合输入、系统文件/数据 DragDrop 暂不做。完整 CPU 调用栈/内存分配剖析交由其他工具；本项目不做业务断言、视觉比对/基线、性能阈值、发版门禁或 CI。原版 tools/call、动态目录及默认语义资料保留为独立研究，不列为本轮待完成项。独立 Inspector 和外部 XamlMcp 后端历史位于 `main/fa1c623`。

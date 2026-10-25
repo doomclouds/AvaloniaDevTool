@@ -1,5 +1,7 @@
 # XamlMcp 在 Avalonia 12.1.4 上的后端兼容验证
 
+> 历史研究：本文对应完整桌面产品基线 `main/fa1c623`，其中 GUI、外部后端、旧路线建议和阶段计数不作为当前分支交付范围或通过证据。保留它用于来源、许可和设计研究；当前官方 Agent/MCP 合同与原版证据边界见 [官方能力基准](../agent-tools/research/official-capabilities.md)，当前状态见 [实现状态](../implementation-status.md)。
+
 验证日期：2026 年 10 月 25 日。环境为 Windows 11 build 26200、.NET SDK 10.0.400、Debug 配置、真实 Skia headless 渲染。固定仓库提交为 `1718f946cb275a71e021de58f4caa552e04feaa8`；远端 `v1.0.0-preview.3` 的解引用提交与它一致。
 
 **结论：XamlMcp 的源码构建链和公开 NuGet 1.0.0-preview.3 二进制链都已实际连接 Avalonia 12.1.4 的独立目标进程。真实 MCP stdio → Server → token 认证 NamedPipe → Agent 路径通过 tree、props、styles、bindings、截图、输入、资产及断开重连验证。应优先评估直接 NuGet 后端适配，而不是为这些基础能力重新移植整套 SDK。**

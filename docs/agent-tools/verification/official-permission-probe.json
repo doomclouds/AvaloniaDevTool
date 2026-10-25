@@ -1,0 +1,133 @@
+{
+  "capturedUtc": "2026-10-25T08:44:16.243042+08:00",
+  "originalExecutable": "C:/Users/10062/.dotnet/tools/.store/avaloniaui.developertools/2.2.3/avaloniaui.developertools.windows/2.2.3/tools/net6.0/any/tool-win-x64/AvaloniaUI.DeveloperTools.exe",
+  "originalExecutableSha256": "76a88bb2fd68d40a7b663a0f710c8bc18dc85bf9a2f732dc6f2f84c6ac0f9f08",
+  "serverInfo": {
+    "name": "AvaloniaUI DeveloperTools",
+    "version": "2.2.3+92df9d92acf0bbe8b2ffa96370c1bf848df81d27",
+    "websiteUrl": "https://docs.avaloniaui.net/tools/developer-tools/mcp"
+  },
+  "protocolVersion": "2025-06-18",
+  "initialToolNames": [
+    "props",
+    "input",
+    "ancestors",
+    "set-prop",
+    "styles",
+    "screenshot",
+    "assets",
+    "open-asset",
+    "attach-to-file",
+    "resources",
+    "action",
+    "attach-to-app",
+    "tree",
+    "search",
+    "pseudo-class"
+  ],
+  "request": {
+    "name": "attach-to-app",
+    "arguments": {}
+  },
+  "response": {
+    "result": {
+      "content": [
+        {
+          "type": "text",
+          "text": "Your current subscription tier does not include access to this tool. Please upgrade your subscription to access all features."
+        }
+      ],
+      "isError": true
+    },
+    "id": 3,
+    "jsonrpc": "2.0"
+  },
+  "successfulToolsCallVerified": false,
+  "target": {
+    "pid": 37892,
+    "attached": false,
+    "name": "Official MCP Differential Fixture 20261025",
+    "readinessPassed": 13,
+    "readinessChecks": 13,
+    "ownedProcessExited": true
+  },
+  "cleanup": {
+    "event": "stopped",
+    "ownedPid": 16452,
+    "ownedProcessExited": true,
+    "exitCode": 0,
+    "cleanupAction": "stdin_eof",
+    "stderrLinesOmitted": 0,
+    "otherProcessesTouched": false
+  },
+  "journal": "artifacts/agent-tools-2026-10-25/official-permission-probe/protocol.sanitized.jsonl",
+  "journalSha256": "5ef095dbba396668f0201b378452f3c86be24d3b638fb1e028e30b14ee0afdc2",
+  "accountIdentityVerified": false,
+  "subscriptionTierNameVerified": false,
+  "githubLoginCompletionVerified": true,
+  "rechecks": [
+    {
+      "capturedUtc": "2026-10-25T08:49:04.046009+08:00",
+      "response": {
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "Your current subscription tier does not include access to this tool. Please upgrade your subscription to access all features."
+            }
+          ],
+          "isError": true
+        },
+        "id": 2,
+        "jsonrpc": "2.0"
+      },
+      "cleanup": {
+        "event": "stopped",
+        "ownedPid": 44484,
+        "ownedProcessExited": true,
+        "exitCode": 0,
+        "cleanupAction": "stdin_eof",
+        "stderrLinesOmitted": 0,
+        "otherProcessesTouched": false
+      },
+      "journal": "artifacts/agent-tools-2026-10-25/official-permission-probe/recheck.sanitized.jsonl",
+      "journalSha256": "e13c3de28102b6cd28ea8abd9269076c7fe7910ebede1db68cac4c9d0eda6f14",
+      "githubHost": "github.com",
+      "githubPath": "/login",
+      "githubSignInVisible": true,
+      "successfulToolsCallVerified": false
+    }
+  ],
+  "afterPortalLogin": {
+    "capturedUtc": "2026-10-25T00:50:25.0405770+00:00",
+    "response": {
+      "result": {
+        "content": [
+          {
+            "type": "text",
+            "text": "Your current subscription tier does not include access to this tool. Please upgrade your subscription to access all features."
+          }
+        ],
+        "isError": true
+      },
+      "id": 2,
+      "jsonrpc": "2.0"
+    },
+    "cleanup": {
+      "event": "stopped",
+      "ownedPid": 54180,
+      "ownedProcessExited": true,
+      "exitCode": 1,
+      "cleanupAction": "terminate_owned_pid",
+      "stderrLinesOmitted": 0,
+      "otherProcessesTouched": false
+    },
+    "journal": "artifacts/agent-tools-2026-10-25/official-permission-probe/after-portal-login.sanitized.jsonl",
+    "journalSha256": "1e44b3f9bbb80a2522bc0eb5681cddf3a57f1cba3cb0f89057ded3a54f814e41",
+    "portalHost": "portal.avaloniaui.net",
+    "portalPath": "/",
+    "portalLoginVerified": true,
+    "successfulToolsCallVerified": false,
+    "subscriptionNameFromMcpResponse": null
+  }
+}

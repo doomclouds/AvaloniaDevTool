@@ -1,5 +1,7 @@
 # 独立 XAML 源文件预览器
 
+> 范围说明：本文保留 Previewer 加载机制和旧显式程序集接口的资料；旧 MCP 参数与 Inspector 操作属于 `main/fa1c623` 桌面基线或当前 `extended` 契约。默认 official 使用 `xamlFilePath/xamlProjectPath/build`，项目评估、构建和进程清理以 [当前文件预览合同](agent-tools/features/preview.md) 为准。本文旧测试与桌面结果不是当前分支统一回归结论。
+
 `AvaloniaDevTool.Previewer` 支持已构建项目上下文和独立 classless 源文件两种运行方式。文件保存后重建预览控件；解析失败、暂时删除或不完整写入时保留上次成功内容。所有预览通过真实 Agent 暴露控件树、属性、输入和截图。
 
 优先使用 MCP [`attach-to-file`](preview-attach.md)：它明确选择构建产物、等待 ready，并拥有子进程生命周期。直接运行预览器时由启动者管理进程。

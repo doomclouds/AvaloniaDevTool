@@ -46,7 +46,7 @@ public sealed partial class MainWindow : Window
             }
 
             await clipboard.SetTextAsync(ViewModel.PipeName);
-            ViewModel.Status = "管道名称已复制。请粘贴到 Inspector 的连接输入框。";
+            ViewModel.Status = "管道名称已复制，可用于诊断客户端连接。";
         }
         catch (Exception exception)
         {
@@ -63,7 +63,7 @@ public sealed partial class MainWindow : Window
     {
         if (!StyleTarget.Classes.Remove("emphasized"))
             StyleTarget.Classes.Add("emphasized");
-        ViewModel.Status = $"样式 emphasized 当前为 {StyleTarget.Classes.Contains("emphasized")}，可刷新样式面板查看。";
+        ViewModel.Status = $"样式 emphasized 当前为 {StyleTarget.Classes.Contains("emphasized")}，可重新查询样式信息。";
     }
 
     private void ChangeResourceClick(object? sender, RoutedEventArgs e)
@@ -71,13 +71,13 @@ public sealed partial class MainWindow : Window
         _alternateResources = !_alternateResources;
         Application.Current!.Resources["SampleAccentBrush"] = Brush.Parse(_alternateResources ? "#0F8C79" : "#435DE7");
         Application.Current.Resources["SampleResourceText"] = $"应用主动更新资源 · {DateTime.Now:HH:mm:ss}";
-        ViewModel.Status = "应用已主动改写资源；若检查器曾修改同一项，恢复时应保留这个新值并报告冲突。";
+        ViewModel.Status = "应用已主动改写资源；若诊断客户端曾修改同一项，恢复时应保留这个新值并报告冲突。";
     }
 
     private void EmitWarningClick(object? sender, RoutedEventArgs e)
     {
         Logger.TryGet(LogEventLevel.Warning, "Sample.Diagnostics")?.Log(this, "Sample warning {Sequence}", ++_logSequence);
-        ViewModel.Status = "已发送一条 Warning 日志。请在日志 / 事件面板先开始捕获。";
+        ViewModel.Status = "已发送一条 Warning 日志。请先通过诊断接口开始日志 / 事件捕获。";
     }
 
     private void EmitInformationClick(object? sender, RoutedEventArgs e)
@@ -176,7 +176,7 @@ public sealed partial class MainWindow : Window
                 Children =
                 {
                     new TextBlock { Text = "独立的顶层窗口", FontSize = 24, FontWeight = FontWeight.SemiBold },
-                    new TextBlock { Text = "在检查器刷新根列表，或开启拾取后点击这个窗口。", TextWrapping = TextWrapping.Wrap },
+                    new TextBlock { Text = "通过诊断客户端重新查询根列表，或开启拾取后点击这个窗口。", TextWrapping = TextWrapping.Wrap },
                     new TextBox { Name = $"SecondaryInput{id}", Text = "第二窗口中的输入框" },
                     new CheckBox { Content = "跨窗口属性检查", IsChecked = true },
                     closeButton
@@ -186,7 +186,7 @@ public sealed partial class MainWindow : Window
         AutomationProperties.SetAutomationId(window, $"Sample.SecondaryWindow.{id}");
         closeButton.Click += (_, _) => window.Close();
         window.Show(this);
-        ViewModel.Status = $"已打开第二窗口 {id}；检查器的根列表应包含此窗口。";
+        ViewModel.Status = $"已打开第二窗口 {id}；诊断客户端查询的根列表应包含此窗口。";
     }
 }
 

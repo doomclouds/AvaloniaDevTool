@@ -1,5 +1,7 @@
 # 属性检查与编辑
 
+> 范围说明：本文保留 Agent/Client 扩展服务的协议、预算、恢复和历史验证资料。文中 Inspector 界面、操作和旧阶段结果仅适用于完整桌面基线 `main/fa1c623`，不代表当前分支 GUI 或统一回归；当前默认 official 的 16 项合同以 [官方能力基准](agent-tools/research/official-capabilities.md) 和对应功能文档为准。扩展入口须显式使用 `--profile extended`，并以该目录的 `tools/list` 确认参数。
+
 属性页默认读取 Avalonia 属性。勾选“显示 CLR 属性（执行 getter）”后，同一列表也包含公共实例 CLR 属性的实际值；这个选项默认关闭，以免仅选择控件就执行用户代码。CLR 行保持只读，独立“对象”浏览器仍保留按需读取成员、字段和集合的用途。外部只读后端不开放这个开关。
 
 ## 列表、分类和草稿

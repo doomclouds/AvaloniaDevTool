@@ -53,8 +53,10 @@ internal static class Program
             {
                 PipeName = Options.PipeName,
                 ApplicationName = "XAML Preview · " + Path.GetFileName(Options.XamlPath),
+                ContentGenerationProvider = () => session.SuccessfulLoads,
                 TopLevelProvider = () => session.Content is Window document ? [window, document] : [window]
             });
+            session.ContentReloaded += agent.NotifyContentChanged;
             control?.Report(new PreviewStartup(true, Environment.ProcessId, Options.PipeName, null));
             Dispatcher.UIThread.MainLoop(exit.Token);
             window.Close();

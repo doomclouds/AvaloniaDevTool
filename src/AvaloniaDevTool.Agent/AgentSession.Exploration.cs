@@ -5,7 +5,6 @@ using Avalonia.Controls;
 using Avalonia.Controls.Metadata;
 using Avalonia.Input;
 using Avalonia.LogicalTree;
-using Avalonia.Media.Imaging;
 using Avalonia.VisualTree;
 using AvaloniaDevTool.Protocol;
 
@@ -13,20 +12,20 @@ namespace AvaloniaDevTool.Agent;
 
 internal sealed partial class AgentSession
 {
-    private const int MaximumScreenshotEdge = 2048;
-    private const long MaximumScreenshotPixels = 2L * 1024 * 1024;
-    private const int MaximumScreenshotBytes = 1024 * 1024;
     private readonly Dictionary<(long ObjectId, string Name), PseudoClassOverride> _explorationPseudoClasses = [];
 
     private object HandleExploration(string method, JsonElement parameters) => method switch
     {
+        OfficialTreeMethods.Snapshot => GetOfficialTree(ProtocolJson.Read<OfficialTreeRequest>(parameters)),
+        OfficialTreeMethods.Ancestors => GetOfficialAncestors(ProtocolJson.Read<ObjectRequest>(parameters).ObjectId),
+        OfficialTreeMethods.Search => SearchOfficialTree(ProtocolJson.Read<OfficialTreeSearchRequest>(parameters)),
         ExplorationMethods.Ancestors => GetAncestors(ProtocolJson.Read<TreeAncestorsRequest>(parameters)),
         ExplorationMethods.Search => SearchTree(ProtocolJson.Read<TreeSearchRequest>(parameters)),
         ExplorationMethods.Action => PerformElementAction(ProtocolJson.Read<ElementActionRequest>(parameters)),
         ExplorationMethods.PseudoClasses => GetPseudoClasses(ProtocolJson.Read<ObjectRequest>(parameters).ObjectId),
         ExplorationMethods.SetPseudoClass => SetPseudoClass(ProtocolJson.Read<SetPseudoClassRequest>(parameters)),
         ExplorationMethods.ResetPseudoClass => ResetPseudoClass(ProtocolJson.Read<ResetPseudoClassRequest>(parameters)),
-        ExplorationMethods.Screenshot => CaptureElement(ProtocolJson.Read<ObjectRequest>(parameters).ObjectId),
+        ExplorationMethods.Screenshot => CaptureElement(ProtocolJson.Read<CaptureElementRequest>(parameters)),
         _ => throw new RpcException("method_not_found", $"Unknown method: {method}")
     };
 
@@ -232,42 +231,6 @@ internal sealed partial class AgentSession
             ((IPseudoClasses)target.Classes).Set(request.Name, entry.WasActive);
         _pendingProperties.Add(request.ObjectId);
         return new OperationResult();
-    }
-
-    private ElementScreenshot CaptureElement(long objectId)
-    {
-        if (_objects.Get(objectId) is not Control control)
-            throw new RpcException("unsupported_object", "Screenshots require a control.");
-        if (TopLevel.GetTopLevel(control) is not { IsVisible: true })
-            throw new RpcException("object_detached", "Screenshots require a control in a visible window.");
-        var bounds = control.Bounds;
-        if (!double.IsFinite(bounds.Width) || !double.IsFinite(bounds.Height) || bounds.Width <= 0 || bounds.Height <= 0)
-            throw new RpcException("invalid_bounds", "The control must have finite, positive arranged bounds.");
-        var width = Math.Ceiling(bounds.Width);
-        var height = Math.Ceiling(bounds.Height);
-        if (width > MaximumScreenshotEdge || height > MaximumScreenshotEdge ||
-            width * height > MaximumScreenshotPixels)
-            throw new RpcException("screenshot_limit", "A screenshot may have at most a 2048-pixel edge and 2,097,152 pixels.");
-
-        using var suspendedOverlay = _overlay.Suspend();
-        try
-        {
-            using var bitmap = new RenderTargetBitmap(new PixelSize((int)width, (int)height), new Vector(96, 96));
-            bitmap.Render(control);
-            using var stream = new MemoryStream();
-            bitmap.Save(stream, PngBitmapEncoderOptions.Default);
-            if (stream.Length > MaximumScreenshotBytes)
-                throw new RpcException("screenshot_limit", "The encoded PNG exceeds the 1 MiB screenshot limit.");
-            return new ElementScreenshot((int)width, (int)height, Convert.ToBase64String(stream.GetBuffer(), 0, (int)stream.Length));
-        }
-        catch (NotSupportedException exception)
-        {
-            throw new RpcException("unsupported_renderer", "The current renderer cannot capture this control: " + exception.Message);
-        }
-        catch (Exception exception) when (exception is not RpcException)
-        {
-            throw new RpcException("screenshot_failed", "The control could not be captured: " + exception.Message);
-        }
     }
 
     private void DisposeExploration()

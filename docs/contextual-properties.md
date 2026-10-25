@@ -1,5 +1,7 @@
 # 上下文附加属性
 
+> 范围说明：本文保留 Agent/Client 扩展服务的协议、预算、恢复和历史验证资料。文中 Inspector 界面、操作和旧阶段结果仅适用于完整桌面基线 `main/fa1c623`，不代表当前分支 GUI 或统一回归；当前默认 official 的 16 项合同以 [官方能力基准](agent-tools/research/official-capabilities.md) 和对应功能文档为准。扩展入口须显式使用 `--profile extended`，并以该目录的 `tools/list` 确认参数。
+
 Inspector 默认开启“仅相关附加属性”。已知规则仅针对直接视觉父布局实际消费的附加属性：Grid 的 Row／Column／RowSpan／ColumnSpan，Canvas 的 Left／Top／Right／Bottom，DockPanel.Dock，以及 RelativePanel 的相对定位／对齐属性。模板部件按真实视觉父布局判断，不使用 TemplatedParent 代替父布局。
 
 未知自定义附加属性、继承型配置、ToolTip、Automation、ScrollViewer 模板设置和 Grid.IsSharedSizeScope 不做猜测过滤。关闭开关可看所有注册属性；已知不适用的行会解释要求的父类型及当前父类型。过滤不修改目标值，不禁止显式设置当前布局不消费的属性。

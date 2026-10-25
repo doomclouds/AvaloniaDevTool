@@ -1,5 +1,7 @@
 # XAML 文件附加与项目预览
 
+> 范围说明：本文保留 Previewer 加载机制和旧显式程序集接口的资料；旧 MCP 参数与 Inspector 操作属于 `main/fa1c623` 桌面基线或当前 `extended` 契约。默认 official 使用 `xamlFilePath/xamlProjectPath/build`，项目评估、构建和进程清理以 [当前文件预览合同](agent-tools/features/preview.md) 为准。本文旧测试与桌面结果不是当前分支统一回归结论。
+
 MCP `attach-to-file` 会创建独立预览进程，以明确选择的**已构建源文件程序集和项目文件**加载 AXAML，并可另选启动应用程序集提供 App 资源。成功后该 MCP 会话使用现有 Agent 协议，`tree`、`props`、`input`、`screenshot` 和其他诊断工具与 `attach-to-app` 共用同一条连接。
 
 ## 调用

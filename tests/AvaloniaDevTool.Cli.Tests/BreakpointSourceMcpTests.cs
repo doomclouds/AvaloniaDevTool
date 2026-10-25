@@ -84,7 +84,7 @@ public sealed class BreakpointSourceMcpTests
         {
             Command = "dotnet", Name = "Breakpoint source MCP integration",
             Arguments = ["exec", "--runtimeconfig", Path.ChangeExtension(assembly, ".runtimeconfig.json"), "--depsfile",
-                Path.ChangeExtension(assembly, ".deps.json"), typeof(Program).Assembly.Location, "mcp"],
+                Path.ChangeExtension(assembly, ".deps.json"), typeof(Program).Assembly.Location, "mcp", "--profile", "extended"],
             ShutdownTimeout = TimeSpan.FromSeconds(5)
         }));
     }

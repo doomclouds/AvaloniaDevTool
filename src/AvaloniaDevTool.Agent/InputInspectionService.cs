@@ -5,15 +5,17 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using AvaloniaDevTool.Protocol;
+using System.Runtime.InteropServices;
 
 namespace AvaloniaDevTool.Agent;
 
 /// <summary>Delivers routed framework input with an independent, session-owned pointer.</summary>
-internal sealed class InputInspectionService : IDisposable
+internal sealed partial class InputInspectionService : IDisposable
 {
     private readonly WeakObjectRegistry _objects;
     private readonly Pointer _pointer;
     private WeakReference<Control>? _pressedTarget;
+    private WeakReference<TopLevel>? _pressedRoot;
     private MouseButton? _pressedButton;
     private bool _disposed;
 
@@ -107,8 +109,7 @@ internal sealed class InputInspectionService : IDisposable
         var point = target.TranslatePoint(local, topLevel);
         if (point is not { } position || !double.IsFinite(position.X) || !double.IsFinite(position.Y))
             throw new RpcException("unsupported_transform", "The local pointer coordinate cannot be mapped to the top-level.");
-        if (_pressedButton is not null && (!_pressedTarget!.TryGetTarget(out var pressed) || !ReferenceEquals(pressed, target)))
-            throw new RpcException("input_state", "Finish the pressed pointer sequence on the same control.");
+        ValidatePointerRoot(topLevel);
         if (request.Kind is InputKind.PointerDown or InputKind.Click && _pressedButton is not null)
             throw new RpcException("input_state", "A pointer button is already pressed.");
         if (request.Kind == InputKind.PointerUp && _pressedButton != button)
@@ -119,11 +120,11 @@ internal sealed class InputInspectionService : IDisposable
         switch (request.Kind)
         {
             case InputKind.PointerMove:
-                return Delivered(RaiseMove(target, topLevel, position, modifiers), "PointerMoved");
+                return Delivered(RaiseMove(PointerRecipient(target, topLevel), topLevel, position, modifiers), "PointerMoved");
             case InputKind.PointerDown:
                 return Delivered(RaiseDown(target, topLevel, position, modifiers, button), "PointerPressed");
             case InputKind.PointerUp:
-                return Delivered(RaiseUp(target, topLevel, position, modifiers, button), "PointerReleased");
+                return Delivered(RaiseUp(PointerRecipient(target, topLevel), topLevel, position, modifiers, button), "PointerReleased");
             case InputKind.Wheel:
                 var wheel = new PointerWheelEventArgs(target, _pointer, topLevel, position, Timestamp(),
                     Properties(modifiers, PointerUpdateKind.Other), modifiers, new Vector(request.DeltaX, request.DeltaY));
@@ -154,15 +155,16 @@ internal sealed class InputInspectionService : IDisposable
     }
 
     private PointerPressedEventArgs RaiseDown(Control target, TopLevel topLevel, Point position,
-        KeyModifiers modifiers, MouseButton button)
+        KeyModifiers modifiers, MouseButton button, int clickCount = 1)
     {
         _pressedButton = button;
         _pressedTarget = new WeakReference<Control>(target);
+        _pressedRoot = new WeakReference<TopLevel>(topLevel);
         try
         {
             _pointer.Capture(target);
             var args = new PointerPressedEventArgs(target, _pointer, topLevel, position, Timestamp(),
-                Properties(modifiers, UpdateKind(button, pressed: true)), modifiers, clickCount: 1);
+                Properties(modifiers, UpdateKind(button, pressed: true)), modifiers, clickCount);
             target.RaiseEvent(args);
             return args;
         }
@@ -196,7 +198,8 @@ internal sealed class InputInspectionService : IDisposable
         if (_pressedButton is null)
             return;
         if (_pressedTarget is null || !_pressedTarget.TryGetTarget(out var target) ||
-            !target.IsAttachedToVisualTree() || !target.IsEffectivelyEnabled || !target.IsEffectivelyVisible)
+            !target.IsAttachedToVisualTree() || !target.IsEffectivelyEnabled || !target.IsEffectivelyVisible ||
+            _pressedRoot is null || !_pressedRoot.TryGetTarget(out var root) || !ReferenceEquals(TopLevel.GetTopLevel(target), root))
             ReleasePointer();
     }
 
@@ -204,6 +207,7 @@ internal sealed class InputInspectionService : IDisposable
     {
         _pressedButton = null;
         _pressedTarget = null;
+        _pressedRoot = null;
         _pointer.Capture(null);
     }
 
@@ -217,10 +221,17 @@ internal sealed class InputInspectionService : IDisposable
             throw new RpcException("disabled_target", "The control or an ancestor is disabled.");
         if (!target.IsEffectivelyVisible)
             throw new RpcException("hidden_target", "The control or an ancestor is hidden.");
+        if (OperatingSystem.IsWindows() && TopLevel.GetTopLevel(target)?.TryGetPlatformHandle() is { HandleDescriptor: "HWND" } handle &&
+            handle.Handle != 0 && !IsWindowEnabled(handle.Handle))
+            throw new RpcException("disabled_window", "The owning native window is disabled by a modal dialog.");
         if (!double.IsFinite(target.Bounds.Width) || !double.IsFinite(target.Bounds.Height) ||
             target.Bounds.Width <= 0 || target.Bounds.Height <= 0)
             throw new RpcException("invalid_layout", "The control must have finite, positive arranged bounds.");
     }
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool IsWindowEnabled(nint window);
 
     private static void FocusForKeyboard(Control target, KeyModifiers modifiers)
     {
@@ -293,6 +304,7 @@ internal sealed class InputInspectionService : IDisposable
         _disposed = true;
         _pressedButton = null;
         _pressedTarget = null;
+        _pressedRoot = null;
         _pointer.Dispose();
     }
 }

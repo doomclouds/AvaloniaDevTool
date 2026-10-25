@@ -1,5 +1,7 @@
 # 协议监视器
 
+> 范围说明：本文的 Inspector 协议页、按钮和界面验收属于完整桌面基线 `main/fa1c623`，当前分支已移除该 GUI。保留的 RpcPeer/DiagnosticsClient trace、脱敏与缓冲行为仍有协议测试价值；它不等同默认官方 MCP 工具，也不代表可在当前分支打开旧页面。当前验证入口见 [测试说明](testing.md)。
+
 Inspector 的“协议”页录制本会话真实 Native RPC 的请求、响应和通知，包括本机管道与 WebSocket 共用的 `RpcPeer` 路径。它观察本项目的协议，不连接原版私有协议，也不是抓包器或 MCP stdio 录制器。
 
 ## 录制与关联

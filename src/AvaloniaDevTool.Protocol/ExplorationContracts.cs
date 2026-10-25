@@ -26,6 +26,9 @@ public sealed record ElementActionResult(bool Succeeded, string? Detail = null);
 public sealed record PseudoClassInfo(string Name, bool IsActive, bool IsDeclared, bool HasOverride);
 public sealed record SetPseudoClassRequest(long ObjectId, string Name, bool Enabled);
 public sealed record ResetPseudoClassRequest(long ObjectId, string Name);
-public sealed record ElementScreenshot(int Width, int Height, string PngBase64);
+public sealed record ScreenshotBounds(double X, double Y, double Width, double Height);
+public sealed record CaptureElementRequest(long ObjectId, ScreenshotBounds? Clip = null, double Scale = 1);
+public sealed record ElementScreenshot(int Width, int Height, string PngBase64,
+    ScreenshotBounds? Bounds = null, double Scale = 1, double DpiX = 96, double DpiY = 96);
 public sealed record FollowFocusRequest(bool Enabled);
 

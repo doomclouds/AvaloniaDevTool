@@ -1,5 +1,7 @@
 # 结构化绑定诊断
 
+> 范围说明：本文保留 Agent/Client 扩展服务的协议、预算、恢复和历史验证资料。文中 Inspector 界面、操作和旧阶段结果仅适用于完整桌面基线 `main/fa1c623`，不代表当前分支 GUI 或统一回归；当前默认 official 的 16 项合同以 [官方能力基准](agent-tools/research/official-capabilities.md) 和对应功能文档为准。扩展入口须显式使用 `--profile extended`，并以该目录的 `tools/list` 确认参数。
+
 样式绑定页现在按字段展示绑定证据、可展开的子表达式和异常链。`StyleSnapshot.Frames` 保持现有结构；`BindingDiagnosticInfo` 末尾新增可选 `Details`，旧服务端和旧 JSON 仍可读取。setter 的 `MatchesEffectiveValue` 继续为可空值，缺少比较证据时保持未知。
 
 ## 来源与复用选择

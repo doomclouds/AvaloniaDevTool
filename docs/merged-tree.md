@@ -1,5 +1,7 @@
 # Merged 树与模板边界
 
+> 范围说明：本文保留 Agent/Client 扩展服务的协议、预算、恢复和历史验证资料。文中 Inspector 界面、操作和旧阶段结果仅适用于完整桌面基线 `main/fa1c623`，不代表当前分支 GUI 或统一回归；当前默认 official 的 16 项合同以 [官方能力基准](agent-tools/research/official-capabilities.md) 和对应功能文档为准。扩展入口须显式使用 `--profile extended`，并以该目录的 `tools/list` 确认参数。
+
 Agent 的 `TreeKind.Merged` 保留用户内容的逻辑父子关系，同时用 `TemplateGroup` 显式包含控件模板的视觉根。模板中的 `ContentPresenter` 通过 `ContentSlot` 引用已在逻辑树里的用户控件，用户对象不会在模板分支再次出现。没有模板、尚未应用模板或没有视觉根时不生成空模板组。
 
 这是本项目独立实现的数据模型，使用现有命名管道与 JSON RPC，不声称兼容 DeveloperTools 的树 wire 协议，也没有移植其闭源实现。

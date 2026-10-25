@@ -1,6 +1,8 @@
 # Native HTTP/WebSocket 远程传输
 
-Inspector 遮罩输入／启动参数、MCP 环境凭据和 Sample 使用步骤见 [远程入口](remote-inspector.md)。
+> 范围说明：本文保留 Agent/Client 扩展服务的协议、预算、恢复和历史验证资料。文中 Inspector 界面、操作和旧阶段结果仅适用于完整桌面基线 `main/fa1c623`，不代表当前分支 GUI 或统一回归；当前默认 official 的 16 项合同以 [官方能力基准](agent-tools/research/official-capabilities.md) 和对应功能文档为准。扩展入口须显式使用 `--profile extended`，并以该目录的 `tools/list` 确认参数。
+
+当前扩展 MCP 的环境凭据入口见 [MCP](mcp.md)；旧 Inspector 遮罩输入和启动步骤可从 `fa1c623:docs/remote-inspector.md` 查看，当前分支不再提供该界面。
 
 `AvaloniaDevTool.Remote` 为现有 `DiagnosticsAgent` 增加可选的 Kestrel HTTP/WebSocket 入口。网络连接继续使用本项目的 Native RPC、DTO、弱引用对象 ID、属性临时覆盖和推送；它不是 CDP、MCP 或官方 DeveloperTools CoreRPC 的兼容实现。
 

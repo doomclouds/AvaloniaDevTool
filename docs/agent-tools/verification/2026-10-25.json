@@ -1,0 +1,303 @@
+{
+  "capturedUtc": "2026-10-25T00:26:04.0461332Z",
+  "sourceManifestSha256": "aa540f090d9114e7e44a9d63d7ea2a9d18d675c68ab7cfe3f393f9febae1acc6",
+  "builds": [
+    {
+      "exitCode": 0,
+      "projects": 17,
+      "warnings": 0,
+      "configuration": "Debug",
+      "errors": 0
+    },
+    {
+      "exitCode": 0,
+      "projects": 17,
+      "warnings": 0,
+      "configuration": "Release",
+      "errors": 0
+    }
+  ],
+  "testsConfiguration": "Debug",
+  "testExitCode": 0,
+  "total": 368.0,
+  "passed": 368.0,
+  "failed": 0.0,
+  "notExecuted": 0.0,
+  "projects": [
+    {
+      "project": "avaloniadevtool.protocol.tests",
+      "total": 26,
+      "passed": 26,
+      "failed": 0,
+      "notExecuted": 0,
+      "trx": "artifacts/agent-tools-2026-10-25/complete/10062_PALINK_2026-10-25_08_23_21_net10.0.trx",
+      "sha256": "b240837db6f483914ac1bdc5cbd6eee2c0cea0544d2b2b935f20e35759e24c5d"
+    },
+    {
+      "project": "avaloniadevtool.remote.tests",
+      "total": 11,
+      "passed": 11,
+      "failed": 0,
+      "notExecuted": 0,
+      "trx": "artifacts/agent-tools-2026-10-25/complete/10062_PALINK_2026-10-25_08_23_23_net10.0.trx",
+      "sha256": "51a1fe9539bfd1079dd7fa21a27d5e7eb7257ff7c5203920f08d229e69c7d1d1"
+    },
+    {
+      "project": "avaloniadevtool.cli.tests",
+      "total": 47,
+      "passed": 47,
+      "failed": 0,
+      "notExecuted": 0,
+      "trx": "artifacts/agent-tools-2026-10-25/complete/10062_PALINK_2026-10-25_08_23_23_net10.0[1].trx",
+      "sha256": "464a43012511164fbc1fc2ff9c5f80ff77480a1f0054cd27823043f6fea30a74"
+    },
+    {
+      "project": "avaloniadevtool.previewer.tests",
+      "total": 15,
+      "passed": 15,
+      "failed": 0,
+      "notExecuted": 0,
+      "trx": "artifacts/agent-tools-2026-10-25/complete/10062_PALINK_2026-10-25_08_23_24_net10.0.trx",
+      "sha256": "8f6d61e4ba1eab921b0607463a1d943d2739c6550c4f73135e04b11fe4587f0a"
+    },
+    {
+      "project": "avaloniadevtool.agent.tests",
+      "total": 269,
+      "passed": 269,
+      "failed": 0,
+      "notExecuted": 0,
+      "trx": "artifacts/agent-tools-2026-10-25/complete/10062_PALINK_2026-10-25_08_23_31_net10.0.trx",
+      "sha256": "5b90932c68b6f66492e52ac101e42fad98bf9139d0c651e3c970f375f6fd2629"
+    }
+  ],
+  "officialTests": [
+    {
+      "test": "AvaloniaDevTool.Cli.Tests.OfficialPreviewTests.Cancelling_a_file_switch_keeps_the_previous_preview_and_releases_only_the_candidate",
+      "outcome": "Passed"
+    },
+    {
+      "test": "AvaloniaDevTool.Cli.Tests.OfficialInputMediaMcpTests.Official_assets_return_full_verified_text_image_font_and_binary_resources",
+      "outcome": "Passed"
+    },
+    {
+      "test": "AvaloniaDevTool.Cli.Tests.OfficialInputMediaMcpTests.Official_resources_report_entry_and_text_limits_without_claiming_complete_results",
+      "outcome": "Passed"
+    },
+    {
+      "test": "AvaloniaDevTool.Cli.Tests.OfficialPropertiesMcpTests.Stdio_pseudo_class_and_actions_change_styles_focus_enablement_and_scroll_visibility",
+      "outcome": "Passed"
+    },
+    {
+      "test": "AvaloniaDevTool.Cli.Tests.OfficialPreviewTests.Windows_abrupt_owner_exit_kills_an_in_progress_build_and_its_owned_descendant",
+      "outcome": "Passed"
+    },
+    {
+      "test": "AvaloniaDevTool.Cli.Tests.OfficialPreviewTests.Abrupt_stdio_owner_exit_stops_a_preview_blocked_in_the_real_project_builder",
+      "outcome": "Passed"
+    },
+    {
+      "test": "AvaloniaDevTool.Cli.Tests.OfficialPreviewTests.Official_paths_default_false_real_project_context_live_saves_and_detach_work_over_stdio",
+      "outcome": "Passed"
+    },
+    {
+      "test": "AvaloniaDevTool.Cli.Tests.OfficialPreviewTests.Official_startup_cancellation_stops_the_candidate_and_leaves_no_attachment",
+      "outcome": "Passed"
+    },
+    {
+      "test": "AvaloniaDevTool.Cli.Tests.OfficialInputMediaMcpTests.Official_input_routes_all_four_events_and_reports_focus_disabled_and_invalid_arguments",
+      "outcome": "Passed"
+    },
+    {
+      "test": "AvaloniaDevTool.Cli.Tests.OfficialPropertiesMcpTests.Stdio_props_filter_real_values_and_set_null_unset_preserve_live_bindings",
+      "outcome": "Passed"
+    },
+    {
+      "test": "AvaloniaDevTool.Cli.Tests.OfficialConnectionTests.Incompatible_wire_version_reports_a_diagnostic_instead_of_an_attached_session",
+      "outcome": "Passed"
+    },
+    {
+      "test": "AvaloniaDevTool.Cli.Tests.OfficialConnectionTests.An_independent_application_without_the_bridge_package_reports_the_preparation_requirement",
+      "outcome": "Passed"
+    },
+    {
+      "test": "AvaloniaDevTool.Cli.Tests.OfficialTreeMcpTests.Official_search_uses_type_name_scope_template_switch_and_unlimited_default",
+      "outcome": "Passed"
+    },
+    {
+      "test": "AvaloniaDevTool.Cli.Tests.OfficialConnectionTests.A_running_window_without_agent_startup_is_not_advertised_and_reports_setup_guidance",
+      "outcome": "Passed"
+    },
+    {
+      "test": "AvaloniaDevTool.Cli.Tests.OfficialTreeMcpTests.Official_ancestors_and_tree_handles_preserve_identity_and_reject_detached_nodes",
+      "outcome": "Passed"
+    },
+    {
+      "test": "AvaloniaDevTool.Cli.Tests.OfficialConnectionTests.Declared_official_contracts_match_all_fifteen_captured_schemas_and_validate_before_binding",
+      "outcome": "Passed"
+    },
+    {
+      "test": "AvaloniaDevTool.Cli.Tests.OfficialTreeMcpTests.Official_tree_observes_roots_children_depth_and_full_subtrees_beyond_64_levels",
+      "outcome": "Passed"
+    },
+    {
+      "test": "AvaloniaDevTool.Cli.Tests.OfficialPropertiesMcpTests.Stdio_set_prop_loads_full_xmlns_object_and_rejects_invalid_xaml_without_partial_write",
+      "outcome": "Passed"
+    },
+    {
+      "test": "AvaloniaDevTool.Cli.Tests.OfficialInputMediaMcpTests.Official_screenshot_returns_target_png_dimensions_and_pixels_and_explicit_limits",
+      "outcome": "Passed"
+    },
+    {
+      "test": "AvaloniaDevTool.Cli.Tests.OfficialConnectionTests.Discovery_and_id_switching_use_two_real_processes_and_reject_previous_node_handles",
+      "outcome": "Passed"
+    },
+    {
+      "test": "AvaloniaDevTool.Cli.Tests.OfficialPropertiesMcpTests.Stdio_styles_filter_real_setters_and_include_metadata_defaults_and_template_binding",
+      "outcome": "Passed"
+    },
+    {
+      "test": "AvaloniaDevTool.Cli.Tests.OfficialPreviewTests.Windows_build_request_cancellation_stops_the_build_and_its_owned_descendant",
+      "outcome": "Passed"
+    },
+    {
+      "test": "AvaloniaDevTool.Cli.Tests.OfficialInputMediaMcpTests.Official_resources_use_real_application_node_ancestor_merged_and_theme_scopes",
+      "outcome": "Passed"
+    },
+    {
+      "test": "AvaloniaDevTool.Cli.Tests.OfficialPreviewTests.Missing_build_compile_failure_invalid_xaml_and_invalid_paths_never_create_an_attachment",
+      "outcome": "Passed"
+    },
+    {
+      "test": "AvaloniaDevTool.Cli.Tests.OfficialPreviewTests.Build_true_creates_the_selected_multitarget_output_before_attaching_and_can_switch_files",
+      "outcome": "Passed"
+    }
+  ],
+  "assemblies": [
+    {
+      "project": "AvaloniaDevTool.Agent",
+      "configuration": "debug",
+      "sha256": "b2b2ec92ae1db4d631c690bafee5e1c0ed8ca8b8dad078fb7c051fb0a9090c50"
+    },
+    {
+      "project": "AvaloniaDevTool.Cli",
+      "configuration": "debug",
+      "sha256": "51ce5eb56e4897df01c393f980372fbe025452170a4e0ec6ef036a6ba68f17a7"
+    },
+    {
+      "project": "AvaloniaDevTool.Client",
+      "configuration": "debug",
+      "sha256": "fac18ba97d721546e13e877ec1654ba6ae37f4b16e50c0f894ef8153567ac624"
+    },
+    {
+      "project": "AvaloniaDevTool.Protocol",
+      "configuration": "debug",
+      "sha256": "d9ff72722a5199e9aa14fc1b7db2324accfae40b1f2ce1ab1598858ff10baaf6"
+    },
+    {
+      "project": "AvaloniaDevTool.Previewer",
+      "configuration": "debug",
+      "sha256": "e207ef2dbd7d8d7c9bc7de205a62394eeed16d74a14d3e4e64f97bcb282a50f0"
+    },
+    {
+      "project": "AvaloniaDevTool.Agent",
+      "configuration": "release",
+      "sha256": "08efae110512f83bda9c2c710b376e962d8dafa85ca6a6a87f203184fba9faf0"
+    },
+    {
+      "project": "AvaloniaDevTool.Cli",
+      "configuration": "release",
+      "sha256": "f50358c1f2103ec43bde968cb00911d53c8a6e88f9145c0e99a1f5d8e593354e"
+    },
+    {
+      "project": "AvaloniaDevTool.Client",
+      "configuration": "release",
+      "sha256": "ee75cf5488defbf49ab893f478063650769071628d631020ac55440ee58ecb8d"
+    },
+    {
+      "project": "AvaloniaDevTool.Protocol",
+      "configuration": "release",
+      "sha256": "2912f746faa04174238efe2196542b122eb4751883c15310793954a5c01bb379"
+    },
+    {
+      "project": "AvaloniaDevTool.Previewer",
+      "configuration": "release",
+      "sha256": "5825caf413fcb43d8824fc3701e7dfb418e40575976a5b0f951bc2911e1e5d50"
+    }
+  ],
+  "originalToolsCallVerified": false,
+  "nativeFilePickerVerified": false,
+  "officialAcceptance": {
+    "partial": 0,
+    "accepted": 48,
+    "runtimeParityVerified": false,
+    "unknown": [
+      "C03",
+      "DET01",
+      "ANC01",
+      "PSEUDO03"
+    ],
+    "total": 52,
+    "unimplemented": 0
+  },
+  "testAssemblies": [
+    {
+      "project": "AvaloniaDevTool.Agent.Tests",
+      "configuration": "debug",
+      "sha256": "82dd7d9734cab596ba8089460fc862d909a5cb46ddc58bb2dd4b448a049ea83a"
+    },
+    {
+      "project": "AvaloniaDevTool.Cli.Tests",
+      "configuration": "debug",
+      "sha256": "2357c44f705c6d5dffad202f1c37355de5afb46b4f1d1dbf537640c8c7b36c78"
+    },
+    {
+      "project": "AvaloniaDevTool.Protocol.Tests",
+      "configuration": "debug",
+      "sha256": "008eab76abcc4d016c8378b0b14bc5a0efffca23f12b8e70bf1ffe84510f55c7"
+    },
+    {
+      "project": "AvaloniaDevTool.Previewer.Tests",
+      "configuration": "debug",
+      "sha256": "6a4b322e81fa9bebcd2345517154c6dd888ec02250aeb572042446b753dfe4c3"
+    },
+    {
+      "project": "AvaloniaDevTool.Remote.Tests",
+      "configuration": "debug",
+      "sha256": "d43a7c373b3f97ea65cd28da23ac037c291356aa4b3b8cc3f4f1e07423cb487a"
+    },
+    {
+      "project": "AvaloniaDevTool.Agent.Tests",
+      "configuration": "release",
+      "sha256": "2e0b3e4d7fc5da227f98c2d817a5ef6503d6ef606cdd370bf5f7af4f9ff5ac6d"
+    },
+    {
+      "project": "AvaloniaDevTool.Cli.Tests",
+      "configuration": "release",
+      "sha256": "68b87e9ce4d96d14784b71878457f83dabe116508fa0bed29a674dd821fdd4bc"
+    },
+    {
+      "project": "AvaloniaDevTool.Protocol.Tests",
+      "configuration": "release",
+      "sha256": "1d96b304b89e1a7576b55c059a3f14fd332f4031b885a0f60624a14f1bc31baa"
+    },
+    {
+      "project": "AvaloniaDevTool.Previewer.Tests",
+      "configuration": "release",
+      "sha256": "a00aebeef02fd1d84e8e45a8346994a55ae87a5b348d99562fae662daa1799f6"
+    },
+    {
+      "project": "AvaloniaDevTool.Remote.Tests",
+      "configuration": "release",
+      "sha256": "9532134bbcf4155228df15b239be25ed9b9554b5bf5bf312789664aafe03be11"
+    }
+  ],
+  "desktopSmoke": {
+    "report": "docs/agent-tools/verification/desktop.md",
+    "result": "artifacts/agent-tools-2026-10-25/desktop/result.json",
+    "sha256": "554c6234aff94d21beb6aa221a917a0c8ea6d769fc591573e1d8bb12c06f4eed",
+    "checks": 16,
+    "passed": 16,
+    "nativeFilePickerVerified": false,
+    "osInputVerified": false
+  }
+}

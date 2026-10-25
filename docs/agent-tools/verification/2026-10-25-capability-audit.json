@@ -1,0 +1,214 @@
+{
+  "capturedUtc": "2026-10-25T14:51:00.2680835Z",
+  "scope": "docs/agent-tools/architecture/current-agent-scope.md",
+  "verification": "docs/agent-tools/verification/2026-10-25-capabilities-final.json",
+  "sourceFingerprint": "56cd76d500c30328c0bb96a64f460237fb3388991c27a1026402bb5eb52e8d3f",
+  "requirements": [
+    {
+      "id": "CORE",
+      "description": "Attachment, tree, properties, resources, media and preview",
+      "status": "verified_in_declared_scope",
+      "passedCases": 26,
+      "evidence": [
+        "AvaloniaDevTool.Cli.Tests.OfficialPropertiesMcpTests.Stdio_pseudo_class_and_actions_change_styles_focus_enablement_and_scroll_visibility",
+        "AvaloniaDevTool.Cli.Tests.OfficialInputMediaMcpTests.Official_resources_report_entry_and_text_limits_without_claiming_complete_results",
+        "AvaloniaDevTool.Cli.Tests.OfficialPropertiesMcpTests.Stdio_styles_filter_real_setters_and_include_metadata_defaults_and_template_binding",
+        "AvaloniaDevTool.Cli.Tests.OfficialPreviewTests.Official_startup_cancellation_stops_the_candidate_and_leaves_no_attachment",
+        "AvaloniaDevTool.Cli.Tests.OfficialConnectionTests.An_independent_application_without_the_bridge_package_reports_the_preparation_requirement",
+        "AvaloniaDevTool.Cli.Tests.OfficialPropertiesMcpTests.Stdio_set_prop_loads_full_xmlns_object_and_rejects_invalid_xaml_without_partial_write",
+        "AvaloniaDevTool.Cli.Tests.OfficialPreviewTests.Windows_fixture_prebuild_releases_a_detached_child_holding_its_project_directory",
+        "AvaloniaDevTool.Cli.Tests.OfficialPreviewTests.Windows_abrupt_owner_exit_kills_an_in_progress_build_and_its_owned_descendant",
+        "AvaloniaDevTool.Cli.Tests.OfficialConnectionTests.A_running_window_without_agent_startup_is_not_advertised_and_reports_setup_guidance",
+        "AvaloniaDevTool.Cli.Tests.OfficialConnectionTests.Incompatible_wire_version_reports_a_diagnostic_instead_of_an_attached_session",
+        "AvaloniaDevTool.Cli.Tests.OfficialConnectionTests.Declared_official_contracts_match_all_fifteen_captured_schemas_and_validate_before_binding",
+        "AvaloniaDevTool.Cli.Tests.OfficialInputMediaMcpTests.Official_resources_use_real_application_node_ancestor_merged_and_theme_scopes",
+        "AvaloniaDevTool.Cli.Tests.OfficialPreviewTests.Cancelling_a_file_switch_keeps_the_previous_preview_and_releases_only_the_candidate",
+        "AvaloniaDevTool.Cli.Tests.OfficialConnectionTests.Discovery_and_id_switching_use_two_real_processes_and_reject_previous_node_handles",
+        "AvaloniaDevTool.Cli.Tests.OfficialPropertiesMcpTests.Stdio_props_filter_real_values_and_set_null_unset_preserve_live_bindings",
+        "AvaloniaDevTool.Cli.Tests.OfficialInputMediaMcpTests.Official_input_routes_all_four_events_and_reports_focus_disabled_and_invalid_arguments",
+        "AvaloniaDevTool.Cli.Tests.OfficialPreviewTests.Missing_build_compile_failure_invalid_xaml_and_invalid_paths_never_create_an_attachment",
+        "AvaloniaDevTool.Cli.Tests.OfficialTreeMcpTests.Official_tree_observes_roots_children_depth_and_full_subtrees_beyond_64_levels",
+        "AvaloniaDevTool.Cli.Tests.OfficialTreeMcpTests.Official_search_uses_type_name_scope_template_switch_and_unlimited_default",
+        "AvaloniaDevTool.Cli.Tests.OfficialPreviewTests.Abrupt_stdio_owner_exit_stops_a_preview_blocked_in_the_real_project_builder",
+        "AvaloniaDevTool.Cli.Tests.OfficialPreviewTests.Windows_build_request_cancellation_stops_the_build_and_its_owned_descendant",
+        "AvaloniaDevTool.Cli.Tests.OfficialInputMediaMcpTests.Official_screenshot_returns_target_png_dimensions_and_pixels_and_explicit_limits",
+        "AvaloniaDevTool.Cli.Tests.OfficialPreviewTests.Official_paths_default_false_real_project_context_live_saves_and_detach_work_over_stdio",
+        "AvaloniaDevTool.Cli.Tests.OfficialPreviewTests.Build_true_creates_the_selected_multitarget_output_before_attaching_and_can_switch_files",
+        "AvaloniaDevTool.Cli.Tests.OfficialTreeMcpTests.Official_ancestors_and_tree_handles_preserve_identity_and_reject_detached_nodes",
+        "AvaloniaDevTool.Cli.Tests.OfficialInputMediaMcpTests.Official_assets_return_full_verified_text_image_font_and_binary_resources"
+      ]
+    },
+    {
+      "id": "MANAGED_INPUT",
+      "description": "Managed interactions and refusal boundaries",
+      "status": "verified_in_declared_scope",
+      "passedCases": 26,
+      "evidence": [
+        "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Stdio_invalid_local_coordinates_fail_before_pointer_events_or_capture(x: 10, y: 61)",
+        "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Stdio_drag_handler_failure_cleans_capture_and_pressed_state_and_the_next_drag_recovers(failingEvent: \"PointerReleased\")",
+        "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Headless_stdio_context_menu_action_executes_and_removes_the_real_popup_subtree(nested: True)",
+        "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Stdio_invalid_local_coordinates_fail_before_pointer_events_or_capture(x: 181, y: 10)",
+        "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Headless_stdio_context_menu_action_executes_and_removes_the_real_popup_subtree(nested: False)",
+        "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Stdio_drag_handler_failure_cleans_capture_and_pressed_state_and_the_next_drag_recovers(failingEvent: \"PointerMoved\")",
+        "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Default_stdio_tools_list_has_exactly_the_44_independent_agent_tool_names",
+        "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Stdio_invalid_local_coordinates_fail_before_pointer_events_or_capture(x: -1, y: 10)",
+        "AvaloniaDevTool.Cli.Tests.AgentInteractionMcpTests.Stdio_wait_observes_real_properties_allows_other_interactions_and_reports_timeout_and_ambiguity",
+        "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Stdio_invalid_target_states_fail_before_any_routed_input_or_business_action(state: \"disabled-ancestor\", code: \"disabled_target\")",
+        "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Stdio_cross_root_drag_endpoints_and_waypoints_fail_without_partial_down_or_capture_then_allow_a_valid_drag",
+        "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Stdio_invalid_target_states_fail_before_any_routed_input_or_business_action(state: \"zero-layout\", code: \"invalid_layout\")",
+        "AvaloniaDevTool.Cli.Tests.AgentInteractionMcpTests.Stdio_click_delivers_double_tap_and_right_click_opens_a_real_context_menu",
+        "AvaloniaDevTool.Cli.Tests.AgentInteractionMcpTests.Stdio_interactions_reject_expired_public_nodes_after_reattaching_without_mutating_the_target",
+        "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Stdio_invalid_local_coordinates_fail_before_pointer_events_or_capture(x: 10, y: -1)",
+        "AvaloniaDevTool.Cli.Tests.AgentInteractionMcpTests.Default_stdio_profile_advertises_independent_interactions_and_native_tools_require_attachment",
+        "AvaloniaDevTool.Cli.Tests.AgentInteractionMcpTests.Stdio_chord_and_text_selection_edit_real_text_and_preserve_balanced_modifier_releases",
+        "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Stdio_readonly_and_unfocusable_targets_fail_without_text_key_or_selection_side_effects",
+        "AvaloniaDevTool.Cli.Tests.AgentInteractionMcpTests.Stdio_drag_uses_real_slider_capture_and_canonical_waypoints_to_change_value",
+        "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Headless_stdio_popup_and_flyout_actions_close_the_real_popup_tree(useFlyout: True)",
+        "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Stdio_drag_handler_failure_cleans_capture_and_pressed_state_and_the_next_drag_recovers(failingEvent: \"PointerPressed\")",
+        "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Stdio_invalid_target_states_fail_before_any_routed_input_or_business_action(state: \"hidden-ancestor\", code: \"hidden_target\")",
+        "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Stdio_invalid_local_coordinates_fail_before_pointer_events_or_capture(x: 1.7976931348623157E+308, y: 10)",
+        "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Headless_stdio_popup_and_flyout_actions_close_the_real_popup_tree(useFlyout: False)",
+        "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Stdio_invalid_target_states_fail_before_any_routed_input_or_business_action(state: \"detached\", code: \"detached_object\")",
+        "AvaloniaDevTool.Cli.Tests.AgentInteractionMcpTests.Stdio_item_and_control_actions_change_real_combo_list_tab_toggle_and_expansion_state"
+      ]
+    },
+    {
+      "id": "NATIVE_INPUT",
+      "description": "Scoped UIA/OS interaction and lifecycle",
+      "status": "verified_in_declared_scope",
+      "passedCases": 22,
+      "evidence": [
+        "AvaloniaDevTool.Cli.Tests.NativeSessionOwnershipMcpTests.Closing_the_attached_target_reaps_the_actual_worker_and_the_same_stdio_client_can_attach_again",
+        "AvaloniaDevTool.Cli.Tests.NativeSessionOwnershipMcpTests.One_stdio_session_switches_native_ownership_and_detach_reaps_the_actual_worker",
+        "AvaloniaDevTool.Cli.Tests.NativeManagedGateMcpTests.Native_tools_inspect_and_answer_an_owned_dialog_while_the_original_click_and_another_managed_call_remain_pending",
+        "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Native_action_status_tracks_controlled_real_provider_pending_completion_and_failure",
+        "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Native_patterns_owned_modals_scope_and_stale_session_ids_are_real",
+        "AvaloniaDevTool.NativeAutomation.Tests.NativeWorkerLifecycleTests.An_inflight_cancellation_or_timeout_terminates_the_os_worker_and_allows_reattach(cancel: False)",
+        "AvaloniaDevTool.NativeAutomation.Tests.NativeWorkerLifecycleTests.An_abrupt_parent_exit_reaps_its_real_worker_even_with_stdin_held_open_and_preserves_the_target",
+        "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Closed_nodes_keep_precise_error_classification_during_repeated_modal_close_races",
+        "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Native_window_minimize_maximize_and_restore_have_provider_and_os_readback",
+        "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Two_real_pickers_in_one_process_require_an_explicit_dialog_id_and_keep_mutations_isolated",
+        "AvaloniaDevTool.NativeAutomation.Tests.NativeWorkerLifecycleTests.An_inflight_cancellation_or_timeout_terminates_the_os_worker_and_allows_reattach(cancel: True)",
+        "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Native_input_waits_for_activation_when_alternating_between_scoped_windows",
+        "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Native_scroll_pattern_changes_the_real_list_top_index",
+        "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Real_os_input_uses_scoped_element_coordinates_and_unicode_with_application_readback",
+        "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Native_pointer_confirms_arrival_and_refuses_clipped_moves_before_button_injection",
+        "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Native_password_metadata_and_patterns_are_real_and_secret_values_are_redacted",
+        "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.A_worker_timeout_is_bounded_and_a_new_session_can_attach",
+        "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Native_key_chords_release_ctrl_alt_and_shift_in_real_os_state",
+        "AvaloniaDevTool.NativeAutomation.Tests.NativeWorkerLifecycleTests.Disposing_a_real_worker_session_preserves_the_target_and_allows_reattach",
+        "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Native_keyboard_input_refuses_a_third_owned_root_that_interrupts_target_focus",
+        "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Native_scope_excludes_a_real_unowned_external_fixture_process",
+        "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Native_screenshots_use_scoped_physical_pixels_current_content_and_preserve_foreground"
+      ]
+    },
+    {
+      "id": "FILE_DIALOGS",
+      "description": "Actual platform file operations and error branches",
+      "status": "verified_in_declared_scope",
+      "passedCases": 14,
+      "evidence": [
+        "AvaloniaDevTool.Cli.Tests.NativeFileDialogMcpTests.Default_stdio_tools_drive_real_native_input_and_file_dialogs_and_verify_application_io",
+        "AvaloniaDevTool.Cli.Tests.NativeFileDialogBoundaryMcpTests.Real_file_io_failures_preserve_document_and_report_error(operation: \"write\", denyAccess: False)",
+        "AvaloniaDevTool.Cli.Tests.NativeFileDialogBoundaryMcpTests.Real_file_io_failures_preserve_document_and_report_error(operation: \"write\", denyAccess: True)",
+        "AvaloniaDevTool.Cli.Tests.NativeFileDialogBoundaryMcpTests.Real_file_io_failures_preserve_document_and_report_error(operation: \"read\", denyAccess: True)",
+        "AvaloniaDevTool.Cli.Tests.NativeFileDialogMcpTests.Native_double_click_preserves_button_business_and_double_tap_gesture_at_stationary_cursor",
+        "AvaloniaDevTool.Cli.Tests.NativeFileDialogBoundaryMcpTests.Missing_picker_times_out_and_external_filename_changes_cannot_be_accepted",
+        "AvaloniaDevTool.Cli.Tests.NativeFileDialogMcpTests.Stdio_screenshots_return_real_managed_and_native_region_pixels",
+        "AvaloniaDevTool.Cli.Tests.NativeFileDialogBoundaryMcpTests.Stale_overwrite_prompt_cannot_answer_a_replacement_prompt",
+        "AvaloniaDevTool.Cli.Tests.NativeFileDialogBoundaryMcpTests.Default_extension_is_verified_by_real_saved_path_bytes_and_reopened_content",
+        "AvaloniaDevTool.Cli.Tests.NativeFileDialogMcpTests.Default_stdio_tools_drive_real_secondary_windows_popups_menus_wheel_and_drag_business_state",
+        "AvaloniaDevTool.Cli.Tests.NativeFileDialogMcpTests.Stdio_native_screenshot_captures_the_real_file_picker_and_rejects_its_closed_id",
+        "AvaloniaDevTool.Cli.Tests.NativePickerProfileTests.A_real_picker_with_a_matched_but_truncated_profile_refuses_inspection_and_path_mutation",
+        "AvaloniaDevTool.Cli.Tests.NativeFileDialogMcpTests.Ui_wait_error_preserves_current_state_and_pointer_trace_before_asserting",
+        "AvaloniaDevTool.Cli.Tests.NativeFileDialogBoundaryMcpTests.Real_file_io_failures_preserve_document_and_report_error(operation: \"read\", denyAccess: False)"
+      ]
+    },
+    {
+      "id": "MANAGED_PNG",
+      "description": "Rendered control/local-region pixels and metadata",
+      "status": "verified_in_declared_scope",
+      "passedCases": 7,
+      "evidence": [
+        "AvaloniaDevTool.Cli.Tests.AgentScreenshotMcpTests.Stdio_screenshot_renders_a_small_region_of_a_large_control_and_reports_unsupported_rendering",
+        "AvaloniaDevTool.Cli.Tests.AgentScreenshotMcpTests.Stdio_screenshot_rejects_png_over_the_encoded_byte_budget",
+        "AvaloniaDevTool.Cli.Tests.AgentScreenshotMcpTests.Stdio_screenshot_rejects_invalid_regions_budgets_domains_and_invisible_or_detached_controls",
+        "AvaloniaDevTool.Cli.Tests.AgentScreenshotMcpTests.Stdio_screenshot_crops_real_subtree_pixels_and_reports_actual_scale_and_bounds",
+        "AvaloniaDevTool.Cli.Tests.AgentScreenshotMcpTests.Direct_screenshot_rejects_nonfinite_arguments_before_json_serialization(value: -∞)",
+        "AvaloniaDevTool.Cli.Tests.AgentScreenshotMcpTests.Direct_screenshot_rejects_nonfinite_arguments_before_json_serialization(value: NaN)",
+        "AvaloniaDevTool.Cli.Tests.AgentScreenshotMcpTests.Direct_screenshot_rejects_nonfinite_arguments_before_json_serialization(value: ∞)"
+      ]
+    },
+    {
+      "id": "NATIVE_PNG",
+      "description": "Actual window/control/common-dialog PNG",
+      "status": "verified_in_declared_scope",
+      "passedCases": 2,
+      "evidence": [
+        "AvaloniaDevTool.Cli.Tests.NativeFileDialogMcpTests.Stdio_screenshots_return_real_managed_and_native_region_pixels",
+        "AvaloniaDevTool.Cli.Tests.NativeFileDialogMcpTests.Stdio_native_screenshot_captures_the_real_file_picker_and_rejects_its_closed_id"
+      ]
+    },
+    {
+      "id": "RAW_DIAGNOSTICS",
+      "description": "Same-session raw capture, identity, loss and errors",
+      "status": "verified_in_declared_scope",
+      "passedCases": 20,
+      "evidence": [
+        "AvaloniaDevTool.Cli.Tests.AgentCaptureMcpTests.All_selected_services_are_preflighted_before_starting_or_resetting_any_capture(running: \"metrics\")",
+        "AvaloniaDevTool.Cli.Tests.AgentCaptureMcpTests.Invalid_combined_requests_do_not_partially_start_diagnostics(invalid: \"invalid-category\")",
+        "AvaloniaDevTool.Cli.Tests.AgentCaptureMcpTests.Conditional_mutation_releases_its_gate_while_the_response_task_is_pending",
+        "AvaloniaDevTool.Cli.Tests.AgentCaptureMcpTests.Externally_restarted_service_is_never_stopped_by_the_previous_capture(service: \"activity\")",
+        "AvaloniaDevTool.Cli.Tests.AgentCaptureMcpTests.Reconnect_and_target_switch_reject_old_ids_without_stopping_the_new_capture(differentTarget: True)",
+        "AvaloniaDevTool.Cli.Tests.AgentCaptureMcpTests.Stop_rpc_failure_preserves_the_running_status_and_reports_incomplete_results",
+        "AvaloniaDevTool.Cli.Tests.AgentCaptureMcpTests.Reconnect_and_target_switch_reject_old_ids_without_stopping_the_new_capture(differentTarget: False)",
+        "AvaloniaDevTool.Cli.Tests.AgentCaptureMcpTests.Partial_start_failure_rolls_back_only_the_services_started_by_this_run",
+        "AvaloniaDevTool.Cli.Tests.AgentCaptureMcpTests.Invalid_combined_requests_do_not_partially_start_diagnostics(invalid: \"invalid-log-level\")",
+        "AvaloniaDevTool.Cli.Tests.AgentCaptureMcpTests.New_runs_get_unique_ids_and_exclude_activity_retained_by_a_previous_run",
+        "AvaloniaDevTool.Cli.Tests.AgentCaptureMcpTests.Invalid_combined_requests_do_not_partially_start_diagnostics(invalid: \"no-service\")",
+        "AvaloniaDevTool.Cli.Tests.AgentCaptureMcpTests.Retained_window_loss_is_reported_with_the_original_counters",
+        "AvaloniaDevTool.Cli.Tests.AgentCaptureMcpTests.Invalid_combined_requests_do_not_partially_start_diagnostics(invalid: \"invalid-capacity\")",
+        "AvaloniaDevTool.Cli.Tests.AgentCaptureMcpTests.All_selected_services_are_preflighted_before_starting_or_resetting_any_capture(running: \"profiler\")",
+        "AvaloniaDevTool.Cli.Tests.AgentCaptureMcpTests.Externally_restarted_service_is_never_stopped_by_the_previous_capture(service: \"metrics\")",
+        "AvaloniaDevTool.Cli.Tests.AgentCaptureMcpTests.Default_stdio_capture_tools_return_raw_diagnostics_and_freeze_the_stopped_snapshot",
+        "AvaloniaDevTool.Cli.Tests.AgentCaptureMcpTests.Invalid_combined_requests_do_not_partially_start_diagnostics(invalid: \"invalid-meter-filter\")",
+        "AvaloniaDevTool.Cli.Tests.AgentCaptureMcpTests.All_selected_services_are_preflighted_before_starting_or_resetting_any_capture(running: \"activity\")",
+        "AvaloniaDevTool.Cli.Tests.AgentCaptureMcpTests.Externally_restarted_service_is_never_stopped_by_the_previous_capture(service: \"profiler\")",
+        "AvaloniaDevTool.Cli.Tests.AgentCaptureMcpTests.Conditional_mutation_rejects_a_changed_epoch_without_sending_stop"
+      ]
+    }
+  ],
+  "documentation": [
+    "docs/agent-tools/research/official-capabilities.md",
+    "docs/research/developer-tools-feature-catalog.md",
+    "docs/agent-tools/architecture/complete-ui-automation.md",
+    "docs/agent-tools/architecture/current-agent-scope.md",
+    "docs/agent-tools/features/agent-interaction.md"
+  ],
+  "exclusions": [
+    "business judgments/visual baselines/performance thresholds/CI",
+    "official licensed runtime equivalence",
+    "macOS/Linux native backends",
+    "full CPU stacks/heap allocation analysis",
+    "IME candidates and OS file/data drag-and-drop"
+  ],
+  "limitations": [
+    "Individual TRX outcomes are authoritative; raw xUnit/VSTest summary counters are retained because Explicit cases can be omitted from summary notExecuted counts.",
+    "Screenshots were validated through actual Headless rendering, native WinForms SDK capture and real stdio MCP application/common-dialog captures. Pure geometry and synthetic provider tests are separate evidence layers.",
+    "Native capture uses the scoped PrintWindow surface, never arbitrary desktop capture. Protected/GPU renderers can be unsupported or incomplete; known unpainted marker pixels are rejected.",
+    "WinEvent lifetime checks enforce observed destruction and are asynchronous, not atomic window pinning. Forced PID reuse and actual OS partial input failures remain unverified boundaries."
+  ],
+  "explicitExperiments": [
+    {
+      "name": "An_observed_exact_root_hwnd_reuse_does_not_redirect_original_native_node_ids",
+      "outcome": "NotExecuted",
+      "postFixExactReusePassed": false,
+      "preFixRedEvidence": "docs/agent-tools/verification/2026-10-25-hwnd-reuse-red.json"
+    }
+  ],
+  "laterExplicitExperiment": {
+    "evidence": "docs/agent-tools/verification/2026-10-25-hwnd-reuse-verified.json",
+    "outcome": "Passed",
+    "historicalBatchOutcomesUnchanged": true
+  }
+}

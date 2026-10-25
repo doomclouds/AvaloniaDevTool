@@ -7,10 +7,12 @@
     <PackageReference Include="Avalonia.Headless.XUnit" Version="$(AvaloniaVersion)" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
     <PackageReference Include="Avalonia.Skia" Version="$(AvaloniaVersion)" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
     <ProjectReference Include="../../src/AvaloniaDevTool.Cli/AvaloniaDevTool.Cli.csproj" />
     <ProjectReference Include="../../src/AvaloniaDevTool.Agent/AvaloniaDevTool.Agent.csproj" />
     <ProjectReference Include="../../src/AvaloniaDevTool.Remote/AvaloniaDevTool.Remote.csproj" />
     <ProjectReference Include="../AvaloniaDevTool.PreviewFixture/AvaloniaDevTool.PreviewFixture.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="../../samples/AvaloniaDevTool.AutomationSample/AvaloniaDevTool.AutomationSample.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>
   <Target Name="RecordPreviewTestBuildLocations" BeforeTargets="GetAssemblyAttributes">
     <MSBuild Projects="../../src/AvaloniaDevTool.Cli/AvaloniaDevTool.Cli.csproj" Targets="GetTargetPath" Properties="Configuration=$(Configuration);TargetFramework=$(TargetFramework)">
@@ -22,15 +24,21 @@
     <MSBuild Projects="../AvaloniaDevTool.PreviewFixture.Controls/AvaloniaDevTool.PreviewFixture.Controls.csproj" Targets="GetTargetPath" Properties="Configuration=$(Configuration);TargetFramework=$(TargetFramework)">
       <Output TaskParameter="TargetOutputs" ItemName="TestControlsTarget" />
     </MSBuild>
+    <MSBuild Projects="../../samples/AvaloniaDevTool.AutomationSample/AvaloniaDevTool.AutomationSample.csproj" Targets="GetTargetPath" Properties="Configuration=$(Configuration);TargetFramework=$(TargetFramework)">
+      <Output TaskParameter="TargetOutputs" ItemName="AutomationSampleTarget" />
+    </MSBuild>
     <ItemGroup>
       <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute"><_Parameter1>PreviewCliPath</_Parameter1><_Parameter2>@(TestCliTarget)</_Parameter2></AssemblyAttribute>
       <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute"><_Parameter1>PreviewFixturePath</_Parameter1><_Parameter2>@(TestFixtureTarget)</_Parameter2></AssemblyAttribute>
       <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute"><_Parameter1>PreviewControlsPath</_Parameter1><_Parameter2>@(TestControlsTarget)</_Parameter2></AssemblyAttribute>
       <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute"><_Parameter1>PreviewRepositoryPath</_Parameter1><_Parameter2>$(MSBuildProjectDirectory)/../..</_Parameter2></AssemblyAttribute>
+      <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute"><_Parameter1>AutomationSamplePath</_Parameter1><_Parameter2>@(AutomationSampleTarget)</_Parameter2></AssemblyAttribute>
     </ItemGroup>
   </Target>
   <ItemGroup>
     <AvaloniaResource Include="../Fixtures/asset-long-utf8.txt" Link="Assets/asset-long-utf8.txt" />
+    <AvaloniaResource Include="../Fixtures/official-pixel.png" Link="Assets/official-pixel.png" />
+    <AvaloniaResource Include="../Fixtures/official-binary.bin" Link="Assets/official-binary.bin" />
   </ItemGroup>
 </Project>
 

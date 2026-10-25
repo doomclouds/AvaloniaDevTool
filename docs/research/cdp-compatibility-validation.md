@@ -1,5 +1,7 @@
 # CDP 在 Avalonia 12.1.4 的兼容性验证
 
+> 历史研究：本文对应完整桌面产品基线 `main/fa1c623`，其中 GUI、外部后端、旧路线建议和阶段计数不作为当前分支交付范围或通过证据。保留它用于来源、许可和设计研究；当前官方 Agent/MCP 合同与原版证据边界见 [官方能力基准](../agent-tools/research/official-capabilities.md)，当前状态见 [实现状态](../implementation-status.md)。
+
 固定提交的CDP后端在.NET 10／Avalonia 12.1.4上可以编译，并已通过真实HTTP、WebSocket和Skia Headless目标验证DOM、CSS读取、高亮、真实PNG截图和输入。原版存在一处输入监听退订缺口；使用其公开清理注册接口在适配宿主补救后，选定的8项测试全部通过，无需修改上游库C#。
 
 这足以支持继续做CDP后端适配验证；不等于整个Inspector、多平台产品或全部CDP命令已经可直接替换本项目。

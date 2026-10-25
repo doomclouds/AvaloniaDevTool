@@ -1,5 +1,7 @@
 # 注册事件目录与路由观察
 
+> 范围说明：本文保留 Agent/Client 扩展服务的协议、预算、恢复和历史验证资料。文中 Inspector 界面、操作和旧阶段结果仅适用于完整桌面基线 `main/fa1c623`，不代表当前分支 GUI 或统一回归；当前默认 official 的 16 项合同以 [官方能力基准](agent-tools/research/official-capabilities.md) 和对应功能文档为准。扩展入口须显式使用 `--profile extended`，并以该目录的 `tools/list` 确认参数。
+
 Inspector 的“日志与事件 → 事件路由”子页通过目标进程的 `RoutedEventRegistry.Instance.GetAllRegistered()` 获取真实目录。目录包含事件身份、owner 类型、参数类型和 `RoutingStrategies`，不会扫描业务对象或调用业务 `ToString()`。
 
 默认选择 Pointer、Keyboard、Focus、Control、Gesture、DragDrop 六组。可取消组，改选目录中的单个事件；组与单项取并集。组按已注册事件的名称及 owner 元数据分类，不声称是 Avalonia 官方定义的分组。目录刷新与捕获计时器会接入后续注册的事件。`ActivityStartRequest.EventSelection` 提供精确 `EventIds`、`Groups` 和 `IncludeAll`；旧 `EventName` 模糊筛选仍兼容，显式 `EventSelection` 优先。未指定选择与旧筛选时启用默认六组。

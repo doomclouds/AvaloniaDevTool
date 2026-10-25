@@ -1,0 +1,93 @@
+{
+  "capturedUtc": "2026-10-25T05:31:26.8187129Z",
+  "actualExactReusePreFix": true,
+  "actualExactReusePostFixPassed": false,
+  "strictProbePolicy": "Explicit=true; budget/resource exhaustion is a failed manual experiment, never a pass",
+  "notes": [
+    "Root-only, popup, and bounded-blocker post-fix probes did not reach exact original HWND reuse.",
+    "The initial child-only stamp growth assertion failed; Microsoft permits parent-only destruction notifications. The corrected contract requires a real root event plus combined root/child validation and both public old IDs to be stale.",
+    "The corrected deterministic destroy/recreate contract passed. These manual runs are separate from the final bound regular regression."
+  ],
+  "files": [
+    {
+      "path": "artifacts/agent-tools-ui-2026-10-25/hwnd-manual-attempts/avdt-hwnd-reuse-fixed-20261025-0511/destroy-recreate.json",
+      "sha256": "28351ce1b43e3575dbdd7b6916a028858a0ab01906b1f2fe5b9253d2ed0fa7dd"
+    },
+    {
+      "path": "artifacts/agent-tools-ui-2026-10-25/hwnd-manual-attempts/avdt-hwnd-reuse-fixed-20261025-0511/hwnd-destroy-recreate-fixed.trx",
+      "sha256": "0564be9773dc9e0dbab2af048994fb54df8f89830cc29c79169d73565fc65be3"
+    },
+    {
+      "path": "artifacts/agent-tools-ui-2026-10-25/hwnd-manual-attempts/avdt-hwnd-reuse-fixed-20261025-0511/hwnd-reuse-fixed.trx",
+      "sha256": "74f30aacf1e2b14e9d3cc41bf53268c0def8822b1b5cec81679f2a757f8ee0f1"
+    },
+    {
+      "path": "artifacts/agent-tools-ui-2026-10-25/hwnd-manual-attempts/avdt-hwnd-reuse-fixed-20261025-0511/hwnd-reuse-probe.json",
+      "sha256": "cc347b83bf543f737b096db3a95a81d01e0ec4b4a7f6c76e2ae9ef59ab46c3b9"
+    },
+    {
+      "path": "artifacts/agent-tools-ui-2026-10-25/hwnd-manual-attempts/avdt-hwnd-reuse-fixed-20261025-0511/metadata.json",
+      "sha256": "285d600d32dcee886ba82a4855ba61f0b3588cd915a72d6590799e937193f6ea"
+    },
+    {
+      "path": "artifacts/agent-tools-ui-2026-10-25/hwnd-manual-attempts/avdt-hwnd-reuse-fixed-20261025-0511/sha256.json",
+      "sha256": "312f978c7a25d67a71d8a15bd19662970106abec9e8e10406c247a2cb97f37bc"
+    },
+    {
+      "path": "artifacts/agent-tools-ui-2026-10-25/hwnd-manual-attempts/avdt-hwnd-popup-results-20261025/hwnd-reuse-popup-fixed.trx",
+      "sha256": "1e1acae59a0befac5d171a287f4be58469911ef8c2018c7aebcbecdd6ae886d7"
+    },
+    {
+      "path": "artifacts/agent-tools-ui-2026-10-25/hwnd-manual-attempts/avdt-hwnd-popup-results-20261025/hwnd-reuse-probe.json",
+      "sha256": "f6e743525582cf56a94e1ffc460d2f03c1927682c73ffce19f01c3fcccaa182c"
+    },
+    {
+      "path": "artifacts/agent-tools-ui-2026-10-25/hwnd-manual-attempts/avdt-hwnd-popup-results-20261025/metadata.json",
+      "sha256": "3e0eb9aa7db8d3a8a829384614a26b757f00a3a02b563f544316cb828e11ea14"
+    },
+    {
+      "path": "artifacts/agent-tools-ui-2026-10-25/hwnd-manual-attempts/avdt-hwnd-popup-results-20261025/sha256.json",
+      "sha256": "afa1d6086dffec5a24d25c8f47c3d144d8a572fbc0eb1240ce6b28db91d3dd8b"
+    },
+    {
+      "path": "artifacts/agent-tools-ui-2026-10-25/hwnd-manual-attempts/avdt-hwnd-blockers-results-20261025/destroy-recreate.json",
+      "sha256": "88f2b01dc90bebfc21e60b2ce193587e2134dd9ec7c133b194046e128c77782b"
+    },
+    {
+      "path": "artifacts/agent-tools-ui-2026-10-25/hwnd-manual-attempts/avdt-hwnd-blockers-results-20261025/hwnd-destroy-contract-fixed.trx",
+      "sha256": "ee1e60e645ba3fb684f934d338305e0ec1baba677cafca7d8b3cd498940724e8"
+    },
+    {
+      "path": "artifacts/agent-tools-ui-2026-10-25/hwnd-manual-attempts/avdt-hwnd-blockers-results-20261025/hwnd-destroy-monitor-fixed.trx",
+      "sha256": "bbf879f80b021e63d5d2e603ddd8f3cb8b7bd73b9c0d1416e362883d6a3a2992"
+    },
+    {
+      "path": "artifacts/agent-tools-ui-2026-10-25/hwnd-manual-attempts/avdt-hwnd-blockers-results-20261025/hwnd-explicit-default-gate.trx",
+      "sha256": "1ba6c16ae2a2a8ee5605c7ce9e696c715a20571df9629bdfb745e5a70715168c"
+    },
+    {
+      "path": "artifacts/agent-tools-ui-2026-10-25/hwnd-manual-attempts/avdt-hwnd-blockers-results-20261025/hwnd-reuse-blockers-fixed.trx",
+      "sha256": "de25eee9d69821b3d4b5dc02a820de1ac33df84939551bcf164a9855ce6b58ef"
+    },
+    {
+      "path": "artifacts/agent-tools-ui-2026-10-25/hwnd-manual-attempts/avdt-hwnd-blockers-results-20261025/hwnd-reuse-probe.json",
+      "sha256": "57a84518f2a5b8a6fec1d84438c0248f2112fa0ccd393575e7abaaca45ecc103"
+    },
+    {
+      "path": "artifacts/agent-tools-ui-2026-10-25/hwnd-manual-attempts/avdt-hwnd-blockers-results-20261025/metadata.json",
+      "sha256": "8fc4c8bc5b2ae8575c150c7024b819d9f0dc331735d159fd56a7aeaba1f45672"
+    },
+    {
+      "path": "artifacts/agent-tools-ui-2026-10-25/hwnd-manual-attempts/avdt-hwnd-blockers-results-20261025/native-window-destroy-events.json",
+      "sha256": "b574b36a3a879689a943a943bb20025bd7870b59e81fef706147b8b798febb13"
+    },
+    {
+      "path": "artifacts/agent-tools-ui-2026-10-25/hwnd-manual-attempts/avdt-hwnd-blockers-results-20261025/native-window-root-then-child-validation.json",
+      "sha256": "b391169f89fd59d246aff5f0dd2f6526a745e215b8e4f4e1d88ea20e43bf28f3"
+    },
+    {
+      "path": "artifacts/agent-tools-ui-2026-10-25/hwnd-manual-attempts/avdt-hwnd-blockers-results-20261025/sha256.json",
+      "sha256": "d48ac6946295845b66ba98c17557dca64de144a0c5eee321108955e3b8615cd2"
+    }
+  ]
+}

@@ -25,7 +25,7 @@ public sealed class ContextualPropertyMcpTests
             await using var client = await McpClient.CreateAsync(new StdioClientTransport(new StdioClientTransportOptions
             {
                 Command = "dotnet", Name = "Contextual properties integration",
-                Arguments = ["exec", "--runtimeconfig", Path.ChangeExtension(assembly, ".runtimeconfig.json"), "--depsfile", Path.ChangeExtension(assembly, ".deps.json"), typeof(Program).Assembly.Location, "mcp"],
+                Arguments = ["exec", "--runtimeconfig", Path.ChangeExtension(assembly, ".runtimeconfig.json"), "--depsfile", Path.ChangeExtension(assembly, ".deps.json"), typeof(Program).Assembly.Location, "mcp", "--profile", "extended"],
                 ShutdownTimeout = TimeSpan.FromSeconds(5)
             }));
             Assert.NotEqual(true, (await client.CallToolAsync("attach-to-app", new Dictionary<string, object?> { ["pipeName"] = agent.PipeName })).IsError);

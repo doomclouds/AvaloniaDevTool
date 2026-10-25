@@ -18,7 +18,7 @@ public sealed partial class SampleViewModel : INotifyPropertyChanged
     private int _sourceRevision = 1;
     private int _dynamicCount;
     private int _validatedCount = 42;
-    private string _status = "先打开检查器并连接，再开启点击拾取，选择本窗口中的控件。";
+    private string _status = "先让诊断客户端连接，再查询或拾取本窗口中的控件。";
 #if DEBUG
     private string _agentStatus = "Debug · 正在启动诊断 Agent";
 #else
@@ -93,7 +93,7 @@ public sealed partial class SampleViewModel : INotifyPropertyChanged
     {
         _sourceRevision++;
         OnPropertyChanged(nameof(BoundMessage));
-        Status = $"绑定源已更新到第 {_sourceRevision} 次。可观察检查器中的 Text 属性和来源。";
+        Status = $"绑定源已更新到第 {_sourceRevision} 次。可重新查询 Text 属性和来源。";
     }
 
     private bool Set<T>(ref T field, T value, [CallerMemberName] string? name = null)

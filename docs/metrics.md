@@ -1,5 +1,7 @@
 # 数值指标采集
 
+> 范围说明：本文保留 Agent/Client 扩展服务的协议、预算、恢复和历史验证资料。文中 Inspector 界面、操作和旧阶段结果仅适用于完整桌面基线 `main/fa1c623`，不代表当前分支 GUI 或统一回归；当前默认 official 的 16 项合同以 [官方能力基准](agent-tools/research/official-capabilities.md) 和对应功能文档为准。扩展入口须显式使用 `--profile extended`，并以该目录的 `tools/list` 确认参数。
+
 指标服务使用 .NET `MeterListener` 采集当前应用内的原始数值测量。它与控件树和属性注册表独立；测量回调可以在应用任意线程执行，回调只写入有界数据，不读取 Avalonia 控件。
 
 本版提供采集、停止、时间窗快照、帧聚合、同步图表、单图清空和有界通知。CPU／GC数据取自目标实际发布的仪表，不由服务合成；样式／资源 Profiler 是独立服务。原版详细功能目录见 [功能目录](research/developer-tools-feature-catalog.md)。

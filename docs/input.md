@@ -1,5 +1,7 @@
 # 框架合成输入
 
+> 范围说明：本文保留 Agent/Client 扩展服务的协议、预算、恢复和历史验证资料。文中 Inspector 界面、操作和旧阶段结果仅适用于完整桌面基线 `main/fa1c623`，不代表当前分支 GUI 或统一回归；当前默认 official 的 16 项合同以 [官方能力基准](agent-tools/research/official-capabilities.md) 和对应功能文档为准。扩展入口须显式使用 `--profile extended`，并以该目录的 `tools/list` 确认参数。
+
 应用侧 `input.send` 支持 Text、KeyDown、KeyUp、PointerMove、PointerDown、PointerUp、Wheel、Click。服务直接向选中的业务 Control 派发 Avalonia 路由事件，Source 为该控件；文本与按键先请求框架焦点。它不调用 OS 全局输入、不使用系统鼠标设备，不直接设置 TextBox.Text，也不直接执行 ICommand。
 
 ## 输入语义

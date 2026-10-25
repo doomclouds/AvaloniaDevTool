@@ -20,7 +20,7 @@ public sealed partial class MainWindow
             _ = probe.FontWeight;
             var found = probe.TryFindResource("SampleWindowResource", out _);
             var missing = probe.TryFindResource("Sample.Profiler.MissingResource", out _);
-            ViewModel.Status = $"已执行真实控件样式附加、类切换及资源查找；已有资源={found}，缺失资源={missing}。请查看性能面板。";
+            ViewModel.Status = $"已执行真实控件样式附加、类切换及资源查找；已有资源={found}，缺失资源={missing}。可读取性能采集结果。";
         }
         finally { DynamicChildren.Children.Remove(probe); }
     }

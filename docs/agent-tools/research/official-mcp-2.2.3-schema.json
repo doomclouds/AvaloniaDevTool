@@ -1,0 +1,509 @@
+{
+  "capturedAt": "2026-10-24T23:06:53.322625+00:00",
+  "executable": "C:\\Users\\10062\\.dotnet\\tools\\.store\\avaloniaui.developertools\\2.2.3\\avaloniaui.developertools.windows\\2.2.3\\tools\\net6.0\\any\\tool-win-x64\\AvaloniaUI.DeveloperTools.exe",
+  "sha256": "76a88bb2fd68d40a7b663a0f710c8bc18dc85bf9a2f732dc6f2f84c6ac0f9f08",
+  "length": 55258952,
+  "ownedPid": 29332,
+  "scope": "initialize and tools/list only; no target attachment or authentication",
+  "initialize": {
+    "result": {
+      "protocolVersion": "2025-06-18",
+      "capabilities": {
+        "logging": {},
+        "tools": {
+          "listChanged": true
+        }
+      },
+      "serverInfo": {
+        "name": "AvaloniaUI DeveloperTools",
+        "version": "2.2.3+92df9d92acf0bbe8b2ffa96370c1bf848df81d27",
+        "websiteUrl": "https://docs.avaloniaui.net/tools/developer-tools/mcp"
+      },
+      "instructions": "When inspecting UI:\r\n- Use \"attach-to-app\" when the user app process is running and can be connected\r\n- Use \"attach-to-file\" when the user asks to inspect, preview, or check a specific XAML file\r\n\r\nPrefer \"attach-to-app\" unless tasked with designing or debugging XAML files in isolation.\r\nBenefit of \"attach-to-app\" is that you don't need to navigate to the specific XAML page,\r\nbut disadvantage - requires user project to work with previewer in design time, headlessly.\r\nIf connection failed, do not ask user to press F12 - it has zero effect on MCP.\r\n\r\nNode IDs from tree/search are used with other tools. Don't show NodeId values to the user.\r\nIf attached XAML was changed, invalidate node IDs by calling tree/search again.  \r\n\r\nMake sure that user project references AvaloniaUI.DiagnosticsSupport (2.2.3 or newer) package to enable DevTools support.\r\nAdditionally, `WithDeveloperTools(this AppBuilder)` or `AttachDeveloperTools(this Application)` must be called on app startup. "
+    },
+    "id": 1,
+    "jsonrpc": "2.0"
+  },
+  "toolsList": {
+    "result": {
+      "tools": [
+        {
+          "name": "props",
+          "description": "Gets property values for a node.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "nodeId": {
+                "description": "Node ID.",
+                "type": "integer"
+              },
+              "propertyNames": {
+                "description": "Names to filter. Omit for all.",
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "default": null
+              }
+            },
+            "required": [
+              "nodeId"
+            ]
+          },
+          "annotations": {
+            "destructiveHint": false,
+            "readOnlyHint": true
+          },
+          "execution": {
+            "taskSupport": "optional"
+          }
+        },
+        {
+          "name": "input",
+          "description": "Sends an input event to a UI element.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "nodeId": {
+                "description": "Node ID.",
+                "type": "integer"
+              },
+              "inputEvent": {
+                "description": "Input event to send.",
+                "type": "string",
+                "enum": [
+                  "Click",
+                  "KeyDown",
+                  "KeyUp",
+                  "Text"
+                ]
+              },
+              "arg": {
+                "description": "Text or key to send for Text/Key events.",
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              }
+            },
+            "required": [
+              "nodeId",
+              "inputEvent"
+            ]
+          },
+          "annotations": {
+            "destructiveHint": true,
+            "readOnlyHint": false
+          },
+          "execution": {
+            "taskSupport": "optional"
+          }
+        },
+        {
+          "name": "ancestors",
+          "description": "Gets parent chain from root.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "nodeId": {
+                "description": "Node ID.",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "nodeId"
+            ]
+          },
+          "annotations": {
+            "destructiveHint": false,
+            "readOnlyHint": true
+          },
+          "execution": {
+            "taskSupport": "optional"
+          }
+        },
+        {
+          "name": "set-prop",
+          "description": "Sets a property value. Use 'null' or 'unset' for special values.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "nodeId": {
+                "description": "Node ID.",
+                "type": "integer"
+              },
+              "propertyName": {
+                "description": "Property name.",
+                "type": "string"
+              },
+              "value": {
+                "description": "Value.",
+                "type": "string"
+              },
+              "isXamlValue": {
+                "description": "If value is XAML (with xmlns)",
+                "type": "boolean",
+                "default": false
+              }
+            },
+            "required": [
+              "nodeId",
+              "propertyName",
+              "value"
+            ]
+          },
+          "annotations": {
+            "destructiveHint": true,
+            "readOnlyHint": false
+          },
+          "execution": {
+            "taskSupport": "optional"
+          }
+        },
+        {
+          "name": "styles",
+          "description": "Gets applied styles and setters for a node.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "nodeId": {
+                "description": "Node ID.",
+                "type": "integer"
+              },
+              "propertyNames": {
+                "description": "Property names. Omit for all.",
+                "type": [
+                  "array",
+                  "null"
+                ],
+                "items": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "default": null
+              },
+              "includeDefaults": {
+                "description": "Include default values.",
+                "type": "boolean",
+                "default": false
+              }
+            },
+            "required": [
+              "nodeId"
+            ]
+          },
+          "annotations": {
+            "destructiveHint": false,
+            "readOnlyHint": true
+          },
+          "execution": {
+            "taskSupport": "optional"
+          }
+        },
+        {
+          "name": "screenshot",
+          "description": "Captures a PNG screenshot of a UI element.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "nodeId": {
+                "description": "The NodeId.",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "nodeId"
+            ]
+          },
+          "annotations": {
+            "destructiveHint": false,
+            "readOnlyHint": true
+          },
+          "execution": {
+            "taskSupport": "optional"
+          }
+        },
+        {
+          "name": "assets",
+          "description": "Lists embedded assets (images, fonts). Returns URLs for open-asset.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {}
+          },
+          "annotations": {
+            "destructiveHint": false,
+            "readOnlyHint": true
+          },
+          "execution": {
+            "taskSupport": "optional"
+          }
+        },
+        {
+          "name": "open-asset",
+          "description": "Downloads asset by URL from assets tool.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "assetUrl": {
+                "description": "Asset URL (avares://...).",
+                "type": "string"
+              }
+            },
+            "required": [
+              "assetUrl"
+            ]
+          },
+          "annotations": {
+            "destructiveHint": false,
+            "readOnlyHint": true
+          },
+          "execution": {
+            "taskSupport": "optional"
+          }
+        },
+        {
+          "name": "attach-to-file",
+          "description": "Connects to Avalonia previewer with specified XAML file. Prefer it over attach-to-app for previewing XAML files.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "xamlFilePath": {
+                "description": "Path to the XAML file.",
+                "type": "string"
+              },
+              "xamlProjectPath": {
+                "description": "Path to the project to associate XAML with.",
+                "type": "string"
+              },
+              "build": {
+                "description": "Build the project before launching previewer.",
+                "type": "boolean",
+                "default": false
+              }
+            },
+            "required": [
+              "xamlFilePath",
+              "xamlProjectPath"
+            ]
+          },
+          "execution": {
+            "taskSupport": "optional"
+          }
+        },
+        {
+          "name": "resources",
+          "description": "Gets resources. Optionally scoped to a node.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "nodeId": {
+                "description": "Scope node ID. Omit for Application resources.",
+                "type": "integer",
+                "default": 0
+              },
+              "onlySelf": {
+                "description": "Only resources defined on the node itself.",
+                "type": "boolean",
+                "default": false
+              }
+            }
+          },
+          "annotations": {
+            "destructiveHint": false,
+            "readOnlyHint": true
+          },
+          "execution": {
+            "taskSupport": "optional"
+          }
+        },
+        {
+          "name": "action",
+          "description": "Performs an action on a UI element.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "nodeId": {
+                "description": "The NodeId.",
+                "type": "integer"
+              },
+              "action": {
+                "description": "The action to perform on the node.",
+                "type": "string",
+                "enum": [
+                  "Focus",
+                  "Enable",
+                  "Disable",
+                  "BringIntoView"
+                ]
+              }
+            },
+            "required": [
+              "nodeId",
+              "action"
+            ]
+          },
+          "annotations": {
+            "destructiveHint": true,
+            "readOnlyHint": false
+          },
+          "execution": {
+            "taskSupport": "optional"
+          }
+        },
+        {
+          "name": "attach-to-app",
+          "description": "Connects to a running Avalonia app. Lists apps if no processId and multiple available.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "description": "App identifier. Omit to list available apps.",
+                "type": "integer",
+                "default": 0
+              }
+            }
+          },
+          "annotations": {
+            "destructiveHint": false,
+            "readOnlyHint": false
+          },
+          "execution": {
+            "taskSupport": "optional"
+          }
+        },
+        {
+          "name": "tree",
+          "description": "Gets child elements. Null nodeId returns roots.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "nodeId": {
+                "description": "Node ID. Omit for roots.",
+                "type": "integer",
+                "default": 0
+              },
+              "treeKind": {
+                "description": "Optional tree kind.",
+                "type": "string",
+                "enum": [
+                  "Logical",
+                  "Visual",
+                  "Merged"
+                ],
+                "default": 0
+              },
+              "depth": {
+                "description": "Depth. 1=direct children, -1=full subtree.",
+                "type": "integer",
+                "default": 10
+              }
+            }
+          },
+          "annotations": {
+            "destructiveHint": false,
+            "readOnlyHint": true
+          },
+          "execution": {
+            "taskSupport": "optional"
+          }
+        },
+        {
+          "name": "search",
+          "description": "Finds elements by type or x:Name.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "query": {
+                "description": "Type or x:Name (partial match).",
+                "type": "string"
+              },
+              "scopeNodeId": {
+                "description": "Scope node ID, or unset for all.",
+                "type": "integer",
+                "default": 0
+              },
+              "searchTemplates": {
+                "type": "boolean",
+                "default": false
+              },
+              "limit": {
+                "description": "Max results.",
+                "type": "integer",
+                "default": -1
+              }
+            },
+            "required": [
+              "query"
+            ]
+          },
+          "annotations": {
+            "destructiveHint": false,
+            "readOnlyHint": true
+          },
+          "execution": {
+            "taskSupport": "optional"
+          }
+        },
+        {
+          "name": "pseudo-class",
+          "description": "Sets pseudo-class. Omit pseudoClass to list available.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "nodeId": {
+                "description": "Node ID.",
+                "type": "integer"
+              },
+              "pseudoClass": {
+                "description": "Pseudo-class, examples: pointerover, pressed, focus, disabled, selected.",
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "default": null
+              },
+              "isActive": {
+                "description": "Activate or deactivate.",
+                "type": [
+                  "boolean",
+                  "null"
+                ],
+                "default": null
+              }
+            },
+            "required": [
+              "nodeId"
+            ]
+          },
+          "annotations": {
+            "destructiveHint": true,
+            "readOnlyHint": false
+          },
+          "execution": {
+            "taskSupport": "optional"
+          }
+        }
+      ]
+    },
+    "id": 2,
+    "jsonrpc": "2.0"
+  },
+  "cleanup": {
+    "ownedProcessExited": true,
+    "exitCode": 0
+  },
+  "stderr": [],
+  "stdoutLines": [
+    "{\"result\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{\"logging\":{},\"tools\":{\"listChanged\":true}},\"serverInfo\":{\"name\":\"AvaloniaUI DeveloperTools\",\"version\":\"2.2.3\\u002B92df9d92acf0bbe8b2ffa96370c1bf848df81d27\",\"websiteUrl\":\"https://docs.avaloniaui.net/tools/developer-tools/mcp\"},\"instructions\":\"When inspecting UI:\\r\\n- Use \\u0022attach-to-app\\u0022 when the user app process is running and can be connected\\r\\n- Use \\u0022attach-to-file\\u0022 when the user asks to inspect, preview, or check a specific XAML file\\r\\n\\r\\nPrefer \\u0022attach-to-app\\u0022 unless tasked with designing or debugging XAML files in isolation.\\r\\nBenefit of \\u0022attach-to-app\\u0022 is that you don\\u0027t need to navigate to the specific XAML page,\\r\\nbut disadvantage - requires user project to work with previewer in design time, headlessly.\\r\\nIf connection failed, do not ask user to press F12 - it has zero effect on MCP.\\r\\n\\r\\nNode IDs from tree/search are used with other tools. Don\\u0027t show NodeId values to the user.\\r\\nIf attached XAML was changed, invalidate node IDs by calling tree/search again.  \\r\\n\\r\\nMake sure that user project references AvaloniaUI.DiagnosticsSupport (2.2.3 or newer) package to enable DevTools support.\\r\\nAdditionally, \\u0060WithDeveloperTools(this AppBuilder)\\u0060 or \\u0060AttachDeveloperTools(this Application)\\u0060 must be called on app startup. \"},\"id\":1,\"jsonrpc\":\"2.0\"}",
+    "{\"result\":{\"tools\":[{\"name\":\"props\",\"description\":\"Gets property values for a node.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"nodeId\":{\"description\":\"Node ID.\",\"type\":\"integer\"},\"propertyNames\":{\"description\":\"Names to filter. Omit for all.\",\"type\":[\"array\",\"null\"],\"items\":{\"type\":[\"string\",\"null\"]},\"default\":null}},\"required\":[\"nodeId\"]},\"annotations\":{\"destructiveHint\":false,\"readOnlyHint\":true},\"execution\":{\"taskSupport\":\"optional\"}},{\"name\":\"input\",\"description\":\"Sends an input event to a UI element.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"nodeId\":{\"description\":\"Node ID.\",\"type\":\"integer\"},\"inputEvent\":{\"description\":\"Input event to send.\",\"type\":\"string\",\"enum\":[\"Click\",\"KeyDown\",\"KeyUp\",\"Text\"]},\"arg\":{\"description\":\"Text or key to send for Text/Key events.\",\"type\":[\"string\",\"null\"],\"default\":null}},\"required\":[\"nodeId\",\"inputEvent\"]},\"annotations\":{\"destructiveHint\":true,\"readOnlyHint\":false},\"execution\":{\"taskSupport\":\"optional\"}},{\"name\":\"ancestors\",\"description\":\"Gets parent chain from root.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"nodeId\":{\"description\":\"Node ID.\",\"type\":\"integer\"}},\"required\":[\"nodeId\"]},\"annotations\":{\"destructiveHint\":false,\"readOnlyHint\":true},\"execution\":{\"taskSupport\":\"optional\"}},{\"name\":\"set-prop\",\"description\":\"Sets a property value. Use \\u0027null\\u0027 or \\u0027unset\\u0027 for special values.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"nodeId\":{\"description\":\"Node ID.\",\"type\":\"integer\"},\"propertyName\":{\"description\":\"Property name.\",\"type\":\"string\"},\"value\":{\"description\":\"Value.\",\"type\":\"string\"},\"isXamlValue\":{\"description\":\"If value is XAML (with xmlns)\",\"type\":\"boolean\",\"default\":false}},\"required\":[\"nodeId\",\"propertyName\",\"value\"]},\"annotations\":{\"destructiveHint\":true,\"readOnlyHint\":false},\"execution\":{\"taskSupport\":\"optional\"}},{\"name\":\"styles\",\"description\":\"Gets applied styles and setters for a node.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"nodeId\":{\"description\":\"Node ID.\",\"type\":\"integer\"},\"propertyNames\":{\"description\":\"Property names. Omit for all.\",\"type\":[\"array\",\"null\"],\"items\":{\"type\":[\"string\",\"null\"]},\"default\":null},\"includeDefaults\":{\"description\":\"Include default values.\",\"type\":\"boolean\",\"default\":false}},\"required\":[\"nodeId\"]},\"annotations\":{\"destructiveHint\":false,\"readOnlyHint\":true},\"execution\":{\"taskSupport\":\"optional\"}},{\"name\":\"screenshot\",\"description\":\"Captures a PNG screenshot of a UI element.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"nodeId\":{\"description\":\"The NodeId.\",\"type\":\"integer\"}},\"required\":[\"nodeId\"]},\"annotations\":{\"destructiveHint\":false,\"readOnlyHint\":true},\"execution\":{\"taskSupport\":\"optional\"}},{\"name\":\"assets\",\"description\":\"Lists embedded assets (images, fonts). Returns URLs for open-asset.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{}},\"annotations\":{\"destructiveHint\":false,\"readOnlyHint\":true},\"execution\":{\"taskSupport\":\"optional\"}},{\"name\":\"open-asset\",\"description\":\"Downloads asset by URL from assets tool.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"assetUrl\":{\"description\":\"Asset URL (avares://...).\",\"type\":\"string\"}},\"required\":[\"assetUrl\"]},\"annotations\":{\"destructiveHint\":false,\"readOnlyHint\":true},\"execution\":{\"taskSupport\":\"optional\"}},{\"name\":\"attach-to-file\",\"description\":\"Connects to Avalonia previewer with specified XAML file. Prefer it over attach-to-app for previewing XAML files.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"xamlFilePath\":{\"description\":\"Path to the XAML file.\",\"type\":\"string\"},\"xamlProjectPath\":{\"description\":\"Path to the project to associate XAML with.\",\"type\":\"string\"},\"build\":{\"description\":\"Build the project before launching previewer.\",\"type\":\"boolean\",\"default\":false}},\"required\":[\"xamlFilePath\",\"xamlProjectPath\"]},\"execution\":{\"taskSupport\":\"optional\"}},{\"name\":\"resources\",\"description\":\"Gets resources. Optionally scoped to a node.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"nodeId\":{\"description\":\"Scope node ID. Omit for Application resources.\",\"type\":\"integer\",\"default\":0},\"onlySelf\":{\"description\":\"Only resources defined on the node itself.\",\"type\":\"boolean\",\"default\":false}}},\"annotations\":{\"destructiveHint\":false,\"readOnlyHint\":true},\"execution\":{\"taskSupport\":\"optional\"}},{\"name\":\"action\",\"description\":\"Performs an action on a UI element.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"nodeId\":{\"description\":\"The NodeId.\",\"type\":\"integer\"},\"action\":{\"description\":\"The action to perform on the node.\",\"type\":\"string\",\"enum\":[\"Focus\",\"Enable\",\"Disable\",\"BringIntoView\"]}},\"required\":[\"nodeId\",\"action\"]},\"annotations\":{\"destructiveHint\":true,\"readOnlyHint\":false},\"execution\":{\"taskSupport\":\"optional\"}},{\"name\":\"attach-to-app\",\"description\":\"Connects to a running Avalonia app. Lists apps if no processId and multiple available.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"id\":{\"description\":\"App identifier. Omit to list available apps.\",\"type\":\"integer\",\"default\":0}}},\"annotations\":{\"destructiveHint\":false,\"readOnlyHint\":false},\"execution\":{\"taskSupport\":\"optional\"}},{\"name\":\"tree\",\"description\":\"Gets child elements. Null nodeId returns roots.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"nodeId\":{\"description\":\"Node ID. Omit for roots.\",\"type\":\"integer\",\"default\":0},\"treeKind\":{\"description\":\"Optional tree kind.\",\"type\":\"string\",\"enum\":[\"Logical\",\"Visual\",\"Merged\"],\"default\":0},\"depth\":{\"description\":\"Depth. 1=direct children, -1=full subtree.\",\"type\":\"integer\",\"default\":10}}},\"annotations\":{\"destructiveHint\":false,\"readOnlyHint\":true},\"execution\":{\"taskSupport\":\"optional\"}},{\"name\":\"search\",\"description\":\"Finds elements by type or x:Name.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"query\":{\"description\":\"Type or x:Name (partial match).\",\"type\":\"string\"},\"scopeNodeId\":{\"description\":\"Scope node ID, or unset for all.\",\"type\":\"integer\",\"default\":0},\"searchTemplates\":{\"type\":\"boolean\",\"default\":false},\"limit\":{\"description\":\"Max results.\",\"type\":\"integer\",\"default\":-1}},\"required\":[\"query\"]},\"annotations\":{\"destructiveHint\":false,\"readOnlyHint\":true},\"execution\":{\"taskSupport\":\"optional\"}},{\"name\":\"pseudo-class\",\"description\":\"Sets pseudo-class. Omit pseudoClass to list available.\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"nodeId\":{\"description\":\"Node ID.\",\"type\":\"integer\"},\"pseudoClass\":{\"description\":\"Pseudo-class, examples: pointerover, pressed, focus, disabled, selected.\",\"type\":[\"string\",\"null\"],\"default\":null},\"isActive\":{\"description\":\"Activate or deactivate.\",\"type\":[\"boolean\",\"null\"],\"default\":null}},\"required\":[\"nodeId\"]},\"annotations\":{\"destructiveHint\":true,\"readOnlyHint\":false},\"execution\":{\"taskSupport\":\"optional\"}}]},\"id\":2,\"jsonrpc\":\"2.0\"}"
+  ]
+}

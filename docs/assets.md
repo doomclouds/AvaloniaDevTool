@@ -1,5 +1,7 @@
 # 内嵌资产检查与导出
 
+> 范围说明：本文保留 Agent/Client 扩展服务的协议、预算、恢复和历史验证资料。文中 Inspector 界面、操作和旧阶段结果仅适用于完整桌面基线 `main/fa1c623`，不代表当前分支 GUI 或统一回归；当前默认 official 的 16 项合同以 [官方能力基准](agent-tools/research/official-capabilities.md) 和对应功能文档为准。扩展入口须显式使用 `--profile extended`，并以该目录的 `tools/list` 确认参数。
+
 资产面板枚举目标进程已加载程序集的 `AvaloniaResource`，可按 URI 或程序集筛选。`复制 URI` 将当前 `avares://` 地址写入 Inspector 窗口剪贴板。`导出原始文件` 使用窗口的保存对话框选择本地路径；取消对话框不写文件。只有保存对话框的明确选择允许覆盖。不会推测或写入业务源码目录。
 
 ## 预览与元数据

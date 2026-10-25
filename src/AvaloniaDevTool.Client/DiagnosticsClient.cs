@@ -5,7 +5,7 @@ using AvaloniaDevTool.Protocol;
 namespace AvaloniaDevTool.Client;
 
 /// <summary>Owns one native diagnostics session and its notification subscriptions.</summary>
-public sealed partial class DiagnosticsClient : IInspectionBackend
+public sealed partial class DiagnosticsClient : IAsyncDisposable
 {
     private readonly SemaphoreSlim _lifecycle = new(1, 1);
     private RpcPeer? _peer;
@@ -62,6 +62,7 @@ public sealed partial class DiagnosticsClient : IInspectionBackend
                 if (info.ProtocolVersion != DiagnosticsProtocol.Version)
                     throw new RpcException("unsupported_version", $"Protocol {info.ProtocolVersion} is not supported by this client.");
                 Session = info;
+                UpdateContentGeneration(info.ContentGeneration);
                 _peer = peer;
                 RaiseConnectionChanged();
                 _ = ObserveDisconnectionAsync(peer);
@@ -96,7 +97,7 @@ public sealed partial class DiagnosticsClient : IInspectionBackend
     private Task<T> InvokeAsync<T>(string method, object? parameters, CancellationToken cancellationToken)
     {
         var peer = _peer ?? throw new RpcException("not_connected", "Connect to a diagnostic application first.");
-        return peer.InvokeAsync<T>(method, parameters, cancellationToken);
+        return InvokeDiagnosticMutation(method, () => peer.InvokeAsync<T>(method, parameters, cancellationToken));
     }
 
     public async Task DisconnectAsync()
@@ -111,6 +112,7 @@ public sealed partial class DiagnosticsClient : IInspectionBackend
         var peer = _peer;
         _peer = null;
         Session = null;
+        Interlocked.Exchange(ref _contentGeneration, 0);
         if (peer is not null)
         {
             peer.NotificationReceived -= HandleNotification;
@@ -133,6 +135,7 @@ public sealed partial class DiagnosticsClient : IInspectionBackend
 
     private void HandleNotification(string method, JsonElement payload)
     {
+        if (HandlePreviewNotification(method, payload)) return;
         if (HandleEventRouteNotification(method, payload)) return;
         if (HandleBreakpointNotification(method, payload)) return;
         switch (method)

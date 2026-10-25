@@ -1,5 +1,7 @@
 # CLR 只读对象浏览
 
+> 范围说明：本文保留 Agent/Client 扩展服务的协议、预算、恢复和历史验证资料。文中 Inspector 界面、操作和旧阶段结果仅适用于完整桌面基线 `main/fa1c623`，不代表当前分支 GUI 或统一回归；当前默认 official 的 16 项合同以 [官方能力基准](agent-tools/research/official-capabilities.md) 和对应功能文档为准。扩展入口须显式使用 `--profile extended`，并以该目录的 `tools/list` 确认参数。
+
 对象浏览把会话中的弱对象 ID 延伸到 Control.DataContext、公共 CLR 成员以及集合元素。界面或 MCP 可以逐页读取对象，再通过 ValueObjectId 按需展开嵌套值。服务不自动递归，也不提供 CLR setter；本页的只读语义表示工具不会主动写成员，不保证目标对象自己的 getter 没有副作用。
 
 ## Inspector 对象页

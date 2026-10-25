@@ -318,7 +318,7 @@ public sealed class McpIntegrationTests
             Command = "dotnet",
             Name = "AvaloniaDevTool integration",
             Arguments = ["exec", "--runtimeconfig", Path.ChangeExtension(testAssembly, ".runtimeconfig.json"),
-                "--depsfile", Path.ChangeExtension(testAssembly, ".deps.json"), typeof(Program).Assembly.Location, "mcp"],
+                "--depsfile", Path.ChangeExtension(testAssembly, ".deps.json"), typeof(Program).Assembly.Location, "mcp", "--profile", "extended"],
             ShutdownTimeout = TimeSpan.FromSeconds(5)
         });
         return McpClient.CreateAsync(transport);

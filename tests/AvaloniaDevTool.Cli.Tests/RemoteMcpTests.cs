@@ -88,7 +88,7 @@ public sealed class RemoteMcpTests
         return McpClient.CreateAsync(new StdioClientTransport(new StdioClientTransportOptions
         {
             Command = "dotnet", Name = "Remote MCP integration",
-            Arguments = ["exec", "--runtimeconfig", Path.ChangeExtension(assembly, ".runtimeconfig.json"), "--depsfile", Path.ChangeExtension(assembly, ".deps.json"), typeof(Program).Assembly.Location, "mcp"],
+            Arguments = ["exec", "--runtimeconfig", Path.ChangeExtension(assembly, ".runtimeconfig.json"), "--depsfile", Path.ChangeExtension(assembly, ".deps.json"), typeof(Program).Assembly.Location, "mcp", "--profile", "extended"],
             EnvironmentVariables = environment, ShutdownTimeout = TimeSpan.FromSeconds(5)
         }));
     }

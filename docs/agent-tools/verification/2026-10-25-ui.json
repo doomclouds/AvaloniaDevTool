@@ -1,0 +1,103 @@
+{
+  "capturedUtc": "2026-10-25T02:36:57.9172536Z",
+  "branch": "codex/agent-tools",
+  "scope": "Independent Windows agent UI and native file dialog verification",
+  "builds": [
+    {
+      "warnings": 0,
+      "projects": 22,
+      "errors": 0,
+      "configuration": "Debug",
+      "exitCode": 0
+    },
+    {
+      "warnings": 0,
+      "projects": 22,
+      "errors": 0,
+      "configuration": "Release",
+      "exitCode": 0
+    }
+  ],
+  "sourceManifestAtBuild": "docs/agent-tools/verification/source-manifest-ui.json",
+  "sourceManifestSha256": "193113a4a005c1a5494c9ecbaee15e42563c2bf2d34a3d62db9a0cd1dbc8652e",
+  "testsConfiguration": "Debug",
+  "testExitCode": 1,
+  "total": 413.0,
+  "passed": 411.0,
+  "failed": 2.0,
+  "notExecuted": 0.0,
+  "projects": [
+    {
+      "project": "avaloniadevtool.agent.tests",
+      "total": 282,
+      "passed": 282,
+      "failed": 0,
+      "notExecuted": 0,
+      "trx": "artifacts/agent-tools-ui-2026-10-25/verification-round/10062_PALINK_2026-10-25_10_29_09_net10.0.trx",
+      "sha256": "5f01bc59bd91d3e64476a18028a859adffd8d32830869d53a1af16c1bc03fb42",
+      "failures": []
+    },
+    {
+      "project": "avaloniadevtool.cli.tests",
+      "total": 58,
+      "passed": 57,
+      "failed": 1,
+      "notExecuted": 0,
+      "trx": "artifacts/agent-tools-ui-2026-10-25/verification-round/10062_PALINK_2026-10-25_10_29_36_net10.0.trx",
+      "sha256": "8bd4f080af8ac3181a2b3edda64418d3da2cf04563929070f708db50ff10af36",
+      "failures": [
+        "AvaloniaDevTool.Cli.Tests.NativeFileDialogMcpTests.Native_double_click_preserves_button_business_and_double_tap_gesture_at_stationary_cursor"
+      ]
+    },
+    {
+      "project": "avaloniadevtool.nativeautomation.tests",
+      "total": 21,
+      "passed": 20,
+      "failed": 1,
+      "notExecuted": 0,
+      "trx": "artifacts/agent-tools-ui-2026-10-25/verification-round/10062_PALINK_2026-10-25_10_33_04_net10.0.trx",
+      "sha256": "67b47bed52dc72c8874cc365f0e424942c76a82074e8c1f4ae7d1ebc6cfbfb9c",
+      "failures": [
+        "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Native_input_waits_for_activation_when_alternating_between_scoped_windows"
+      ]
+    },
+    {
+      "project": "avaloniadevtool.previewer.tests",
+      "total": 15,
+      "passed": 15,
+      "failed": 0,
+      "notExecuted": 0,
+      "trx": "artifacts/agent-tools-ui-2026-10-25/verification-round/10062_PALINK_2026-10-25_10_33_31_net10.0.trx",
+      "sha256": "b22c792b7fcedd432a40d1747d617496641fb63e4f3b2f14976b8c1fabb3eea7",
+      "failures": []
+    },
+    {
+      "project": "avaloniadevtool.protocol.tests",
+      "total": 26,
+      "passed": 26,
+      "failed": 0,
+      "notExecuted": 0,
+      "trx": "artifacts/agent-tools-ui-2026-10-25/verification-round/10062_PALINK_2026-10-25_10_33_34_net10.0.trx",
+      "sha256": "1bc90ecbe49d473bf55a179f8dc7ed5917b1a0754cfa06efc113c753001b5564",
+      "failures": []
+    },
+    {
+      "project": "avaloniadevtool.remote.tests",
+      "total": 11,
+      "passed": 11,
+      "failed": 0,
+      "notExecuted": 0,
+      "trx": "artifacts/agent-tools-ui-2026-10-25/verification-round/10062_PALINK_2026-10-25_10_33_37_net10.0.trx",
+      "sha256": "3c1f25aa226a23edfe63c280eae611a5462fa14212e547f0480ac151c42d561d",
+      "failures": []
+    }
+  ],
+  "defaultAgentToolCount": 39,
+  "officialParityComplete": false,
+  "allAcceptanceIdsComplete": false,
+  "notes": [
+    "This batch failed two stability checks. Do not report all tests passing.",
+    "Diagnostic-only source changes after this batch require their own evidence.",
+    "Original licensed MCP comparison is deferred by the user."
+  ]
+}

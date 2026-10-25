@@ -2,7 +2,6 @@ using System.IO.Pipes;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
-using Avalonia.Input;
 using AvaloniaDevTool.Protocol;
 using Xunit;
 
@@ -10,29 +9,6 @@ namespace AvaloniaDevTool.Agent.Tests;
 
 public sealed class NavigationIntegrationTests
 {
-    [AvaloniaFact]
-    public async Task Configured_launch_gesture_is_scoped_debounced_and_released()
-    {
-        var window = new Window { Content = new TextBox() };
-        window.Show();
-        var launches = new List<string>();
-        var pipeName = "avdt-launch-" + Guid.NewGuid().ToString("N");
-        var agent = DiagnosticsAgent.Attach(Application.Current!, new DiagnosticsAgentOptions
-        {
-            PipeName = pipeName, TopLevelProvider = () => [window], InspectorLauncher = launches.Add
-        });
-        try
-        {
-            window.RaiseEvent(new KeyEventArgs { RoutedEvent = InputElement.KeyDownEvent, Key = Key.F12, Source = window });
-            window.RaiseEvent(new KeyEventArgs { RoutedEvent = InputElement.KeyDownEvent, Key = Key.F12, Source = window });
-            Assert.Equal(pipeName, Assert.Single(launches));
-            await agent.DisposeAsync();
-            window.RaiseEvent(new KeyEventArgs { RoutedEvent = InputElement.KeyDownEvent, Key = Key.F12, Source = window });
-            Assert.Single(launches);
-        }
-        finally { await agent.DisposeAsync(); window.Close(); }
-    }
-
     [AvaloniaFact]
     public async Task Focus_following_selects_real_focus_and_can_be_stopped()
     {

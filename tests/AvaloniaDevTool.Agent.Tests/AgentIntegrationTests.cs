@@ -47,7 +47,7 @@ public sealed class AgentIntegrationTests
         text.Bind(TextBlock.TextProperty, new Binding(nameof(MessageModel.Text)) { Source = model });
         await using var connection = await TestConnection.CreateAsync(text);
         var nodeId = await connection.GetContentIdAsync();
-        var property = (await connection.GetPropertiesAsync(nodeId)).Single(x => x.Name == "Text");
+        var property = (await connection.GetPropertiesAsync(nodeId)).Single(x => x.Id == "Avalonia.Controls.TextBlock:Text");
         await connection.Peer.InvokeAsync<OperationResult>(Methods.PropertiesSet,
             new SetPropertyRequest(nodeId, property.Id, "Inspection override"));
         Assert.Equal("Inspection override", text.Text);
@@ -93,7 +93,7 @@ public sealed class AgentIntegrationTests
         await using var connection = await TestConnection.CreateAsync(text);
         var firstSession = await connection.Peer.InvokeAsync<SessionInfo>(Methods.SessionInfo, null);
         var nodeId = await connection.GetContentIdAsync();
-        var property = (await connection.GetPropertiesAsync(nodeId)).Single(x => x.Name == "Text");
+        var property = (await connection.GetPropertiesAsync(nodeId)).Single(x => x.Id == "Avalonia.Controls.TextBlock:Text");
         await connection.Peer.InvokeAsync<OperationResult>(Methods.PropertiesSet, new SetPropertyRequest(nodeId, property.Id, "Temporary"));
         Assert.Equal("Temporary", text.Text);
         await connection.Peer.DisposeAsync();

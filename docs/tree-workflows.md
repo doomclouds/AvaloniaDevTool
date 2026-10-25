@@ -1,5 +1,7 @@
 # 控件树工作流
 
+> 范围说明：本文保留 Agent/Client 扩展服务的协议、预算、恢复和历史验证资料。文中 Inspector 界面、操作和旧阶段结果仅适用于完整桌面基线 `main/fa1c623`，不代表当前分支 GUI 或统一回归；当前默认 official 的 16 项合同以 [官方能力基准](agent-tools/research/official-capabilities.md) 和对应功能文档为准。扩展入口须显式使用 `--profile extended`，并以该目录的 `tools/list` 确认参数。
+
 Inspector 左侧提供展开一级、递归展开、折叠子树和取消。递归展开默认最多遍历 1000 个节点、深度 32，每批 32 项让出 UI 调度；公开 `ExpandSubtreeAsync` 接受 `TreeExpansionOptions`，支持 `CancellationToken`。可通过界面设置节点、深度和是否进入 Merged 模板组。到达预算或取消会保留已加载部分，并在树区域明确显示结果。折叠后重新展开会读取当前子节点。
 
 原生直接子项使用 `tree.children-page` / `DiagnosticsClient.GetChildrenPageAsync` 真实分页，参数为 `ObjectId`、`Kind`、`Offset=0`、`Count=100`、`Cursor=null`。`Count` 必须为 1..2000，`Offset` 为 0..20000；越界报 `invalid_request`，不会自动夹取。响应包含 `Children`、实际 `Offset`、`TotalCount`、`HasMore` 和 `NextCursor`。可单独传下一页游标，游标携带起点；同时传非零 Offset 时必须与游标一致。Offset 等于总数返回空终页，大于总数返回错误。单分支超过 20,000 个直接子项返回明确的 `tree_limit`，不会伪装完整前缀。旧 `tree.children` 的参数和数组响应保持不变。

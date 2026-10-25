@@ -20,9 +20,7 @@ internal sealed class ResourceInspectionService(Application application, WeakObj
         var visited = new HashSet<IResourceProvider>(ReferenceEqualityComparer.Instance);
         var ancestors = new HashSet<IResourceProvider>(ReferenceEqualityComparer.Instance);
         _locations.Clear();
-        AddProvider(application.Resources, "Application.Resources", new("Application.Resources", "Application", null), roots);
         var stylesVisited = new HashSet<IStyle>(ReferenceEqualityComparer.Instance);
-        AddStyles(application.Styles, "Application.Styles");
         if (request.ObjectId is { } id)
         {
             if (objects.Get(id) is not StyledElement anchor)
@@ -36,8 +34,14 @@ internal sealed class ResourceInspectionService(Application application, WeakObj
                 if (((IResourceNode)current).HasResources)
                     AddProvider(current.Resources, name, new(path + ".Resources", "Element", null), roots);
                 AddStyles(current.Styles, path + ".Styles");
+                if (request.OnlySelf) break;
                 if (elementVisited.Count >= 128) { budget.Truncated = true; break; }
             }
+        }
+        if (request.ObjectId is null || !request.OnlySelf)
+        {
+            AddProvider(application.Resources, "Application.Resources", new("Application.Resources", "Application", null), roots);
+            AddStyles(application.Styles, "Application.Styles");
         }
         return new(roots, budget.Nodes, budget.Truncated, budget.Notes.ToArray());
 

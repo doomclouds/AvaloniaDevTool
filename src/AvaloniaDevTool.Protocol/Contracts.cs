@@ -34,12 +34,13 @@ public enum TreeKind { Visual, Logical, Merged }
 [JsonConverter(typeof(JsonStringEnumConverter<TreeNodeRole>))]
 public enum TreeNodeRole { Element, TemplateGroup, TemplateRoot, TemplatePart, ContentSlot }
 
-public sealed record SessionInfo(string SessionId, string ApplicationName, int ProcessId, string AvaloniaVersion, int ProtocolVersion);
+public sealed record SessionInfo(string SessionId, string ApplicationName, int ProcessId, string AvaloniaVersion, int ProtocolVersion,
+    long ContentGeneration = 0);
 public sealed record TreeNodeInfo(long Id, string TypeName, string? Name, string? Preview, bool HasChildren,
     TreeNodeRole Role = TreeNodeRole.Element, long? TemplateOwnerId = null, long? SlotContentId = null);
 public sealed record PropertyInfoDto(string Id, string Name, string DeclaringType, string TypeName,
     string? Value, string ValueSource, bool IsReadOnly, bool CanEdit, bool CanClear, string? Error = null,
-    PropertyPresentation? Presentation = null);
+    PropertyPresentation? Presentation = null, bool HasClrWrapper = false);
 public sealed record TreeRootsRequest(TreeKind Kind);
 public sealed record TreeChildrenRequest(long ObjectId, TreeKind Kind);
 public sealed record ObjectRequest(long ObjectId);

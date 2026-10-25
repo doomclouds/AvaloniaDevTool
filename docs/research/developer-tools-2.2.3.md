@@ -1,5 +1,7 @@
 # AvaloniaUI DeveloperTools 2.2.3 实现分析
 
+> 历史研究：本文对应完整桌面产品基线 `main/fa1c623`，其中 GUI、外部后端、旧路线建议和阶段计数不作为当前分支交付范围或通过证据。保留它用于来源、许可和设计研究；当前官方 Agent/MCP 合同与原版证据边界见 [官方能力基准](../agent-tools/research/official-capabilities.md)，当前状态见 [实现状态](../implementation-status.md)。
+
 2026 年 10 月 24 日使用 REA MCP 对已发布的 DeveloperTools 2.2.3 产物进行了静态分析，并使用 ILSpy 精读关键方法。主要结论是：应用内 `DiagnosticsSupport` 提供树、属性、视觉操作、资源、日志和性能服务，独立桌面工具调用这些服务并呈现结果。
 
 这里记录原版产物中的观察，以及这些观察对本项目设计的影响。本项目使用自己的 DTO 和通信协议。

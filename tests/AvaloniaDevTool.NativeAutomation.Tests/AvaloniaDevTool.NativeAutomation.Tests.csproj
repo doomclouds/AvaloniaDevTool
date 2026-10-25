@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><OutputType>Exe</OutputType><IsTestProject>true</IsTestProject><IsPackable>false</IsPackable></PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+    <PackageReference Include="xunit.v3" Version="3.2.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="4.0.1" PrivateAssets="all" />
+    <ProjectReference Include="../../src/AvaloniaDevTool.NativeAutomation/AvaloniaDevTool.NativeAutomation.csproj" />
+    <ProjectReference Include="../../src/AvaloniaDevTool.NativeAutomation.Worker/AvaloniaDevTool.NativeAutomation.Worker.csproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" Condition="'$(OS)' == 'Windows_NT'" />
+    <ProjectReference Include="../AvaloniaDevTool.NativeAutomation.Fixture/AvaloniaDevTool.NativeAutomation.Fixture.csproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" Condition="'$(OS)' == 'Windows_NT'" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="../../src/AvaloniaDevTool.NativeAutomation.Worker/NativeCoordinateSpace.cs" Link="NativeWorker/NativeCoordinateSpace.cs" />
+    <Compile Include="../../src/AvaloniaDevTool.NativeAutomation.Worker/NativeWindowLifetimeMonitor.cs" Link="NativeWorker/NativeWindowLifetimeMonitor.cs" />
+    <Compile Include="../../src/AvaloniaDevTool.NativeAutomation.Worker/NativeAutomationBackend.InputBatch.cs" Link="NativeWorker/NativeAutomationBackend.InputBatch.cs" />
+    <Compile Include="../../src/AvaloniaDevTool.NativeAutomation.Worker/NativeScreenshotGeometry.cs" Link="NativeWorker/NativeScreenshotGeometry.cs" />
+  </ItemGroup>
+  <Target Name="RecordNativeFixturePaths" BeforeTargets="GetAssemblyAttributes" Condition="'$(OS)' == 'Windows_NT'">
+    <MSBuild Projects="../../src/AvaloniaDevTool.NativeAutomation.Worker/AvaloniaDevTool.NativeAutomation.Worker.csproj;../AvaloniaDevTool.NativeAutomation.Fixture/AvaloniaDevTool.NativeAutomation.Fixture.csproj" Targets="GetTargetPath" Properties="Configuration=$(Configuration);TargetFramework=net10.0-windows7.0">
+      <Output TaskParameter="TargetOutputs" ItemName="NativeTestPaths" />
+    </MSBuild>
+    <ItemGroup>
+      <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute"><_Parameter1>NativeTestPaths</_Parameter1><_Parameter2>@(NativeTestPaths, '|')</_Parameter2></AssemblyAttribute>
+    </ItemGroup>
+  </Target>
+</Project>

@@ -219,6 +219,8 @@ public sealed class PreviewAttachTests
         };
         start.ArgumentList.Add(CliPath);
         start.ArgumentList.Add("mcp");
+        start.ArgumentList.Add("--profile");
+        start.ArgumentList.Add("extended");
         start.Environment["AVDT_PREVIEW_TEST_PID"] = pidPath;
         using var owner = Process.Start(start)!;
         var error = owner.StandardError.ReadToEndAsync(TestContext.Current.CancellationToken);
@@ -261,7 +263,7 @@ public sealed class PreviewAttachTests
     private static Task<McpClient> CreateClientAsync(Dictionary<string, string?>? environment = null) => McpClient.CreateAsync(
         new StdioClientTransport(new StdioClientTransportOptions
         {
-            Command = "dotnet", Name = "owned file preview", Arguments = [CliPath, "mcp"],
+            Command = "dotnet", Name = "owned file preview", Arguments = [CliPath, "mcp", "--profile", "extended"],
             EnvironmentVariables = environment, ShutdownTimeout = TimeSpan.FromSeconds(5)
         }));
 

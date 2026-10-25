@@ -1,5 +1,7 @@
 # 几何层级与自研 3D 视图
 
+> 范围说明：本文保留 Agent/Client 扩展服务的协议、预算、恢复和历史验证资料。文中 Inspector 界面、操作和旧阶段结果仅适用于完整桌面基线 `main/fa1c623`，不代表当前分支 GUI 或统一回归；当前默认 official 的 16 项合同以 [官方能力基准](agent-tools/research/official-capabilities.md) 和对应功能文档为准。扩展入口须显式使用 `--profile extended`，并以该目录的 `tools/list` 确认参数。
+
 图层页现有“视觉几何”和“合成图像”两个独立入口。本文说明 layout.snapshot 的 VisualGeometry 分支；真实合成器自身绘制 PNG、透视图像、裁剪、相机和资源释放见 [合成层采集](composition-capture.md)。
 
 几何采集通过 `layout.snapshot` 返回真实视觉树的边界、父子关系和二维仿射变换，供检查器把每层矩形投影到自研的层级视图。返回的 `CaptureKind` 固定为 `VisualGeometry`。该服务不读取像素、不调用控件绘制，不表示已还原原版 DeveloperTools 的 Compositor 位图或 3D 展示算法。

@@ -8,11 +8,12 @@ using ModelContextProtocol;
 
 namespace AvaloniaDevTool.Cli;
 
-public sealed class ToolSession(string? initialPipeName) : IAsyncDisposable
+public sealed partial class ToolSession(string? initialPipeName) : IAsyncDisposable
 {
     private readonly DiagnosticsClient _client = new();
     private readonly SemaphoreSlim _attachment = new(1, 1);
     private string? _initialPipe = initialPipeName;
+    private readonly string? _configuredPipe = initialPipeName;
     private OwnedPreview? _preview;
 
     public async Task<DiagnosticsClient> GetAsync(CancellationToken cancellationToken)
@@ -23,7 +24,7 @@ public sealed class ToolSession(string? initialPipeName) : IAsyncDisposable
         {
             if (!_client.IsConnected && _initialPipe is { } pipe)
             {
-                await _client.ConnectAsync(pipe, cancellationToken).ConfigureAwait(false);
+                await ConnectLocalAsync(pipe, cancellationToken).ConfigureAwait(false);
                 _initialPipe = null;
             }
             if (!_client.IsConnected)
@@ -38,7 +39,7 @@ public sealed class ToolSession(string? initialPipeName) : IAsyncDisposable
         await _attachment.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
-            await _client.ConnectAsync(pipeName, cancellationToken).ConfigureAwait(false);
+            await ConnectLocalAsync(pipeName, cancellationToken).ConfigureAwait(false);
             _initialPipe = null;
             if (_preview is { } previous && previous.PipeName != pipeName)
             {
@@ -48,6 +49,24 @@ public sealed class ToolSession(string? initialPipeName) : IAsyncDisposable
             return _client.Session!;
         }
         finally { _attachment.Release(); }
+    }
+
+    private async Task ConnectLocalAsync(string pipeName, CancellationToken cancellationToken)
+    {
+        await ReleaseNativeAsync().ConfigureAwait(false);
+        try
+        {
+            await _client.ConnectAsync(pipeName, cancellationToken).ConfigureAwait(false);
+            _transportIsRemote = false;
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            throw new McpException("connection_timeout: The diagnostics endpoint did not respond within five seconds. Ensure the target is running, references AvaloniaDevTool.Agent, and calls DiagnosticsAgent.Attach after Avalonia startup; then list applications again.");
+        }
+        catch (IOException error)
+        {
+            throw new McpException($"connection_failed: The diagnostics endpoint could not be opened. Ensure DiagnosticsAgent.Attach is running in the selected application, then list applications again. {error.Message}");
+        }
     }
 
     public async Task<PreviewAttachment> AttachFileAsync(string filePath, string assemblyPath, string projectPath,
@@ -67,7 +86,9 @@ public sealed class ToolSession(string? initialPipeName) : IAsyncDisposable
             using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             timeout.CancelAfter(TimeSpan.FromSeconds(timeoutSeconds));
             candidate = await OwnedPreview.StartAsync(filePath, assemblyPath, projectPath, headless, watch, applicationAssemblyPath, applicationType, timeout.Token).ConfigureAwait(false);
+            await ReleaseNativeAsync().ConfigureAwait(false);
             await _client.ConnectAsync(candidate.PipeName, timeout.Token).ConfigureAwait(false);
+            _transportIsRemote = false;
             var previous = _preview;
             _preview = candidate;
             candidate = null;
@@ -101,7 +122,9 @@ public sealed class ToolSession(string? initialPipeName) : IAsyncDisposable
         await _attachment.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
+            await ReleaseNativeAsync().ConfigureAwait(false);
             await _client.ConnectRemoteAsync(address, token, cancellationToken).ConfigureAwait(false);
+            _transportIsRemote = true;
             _initialPipe = null;
             var previous = _preview;
             _preview = null;
@@ -117,6 +140,7 @@ public sealed class ToolSession(string? initialPipeName) : IAsyncDisposable
         try
         {
             _initialPipe = null;
+            await ReleaseNativeAsync().ConfigureAwait(false);
             await _client.DisconnectAsync().ConfigureAwait(false);
             var preview = _preview;
             _preview = null;

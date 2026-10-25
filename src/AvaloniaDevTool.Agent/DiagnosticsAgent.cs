@@ -27,7 +27,6 @@ public sealed partial class DiagnosticsAgent : IDisposable, IAsyncDisposable
         if (string.IsNullOrWhiteSpace(options.PipeName) || options.PipeName.IndexOfAny(['/', '\\', ':']) >= 0)
             throw new ArgumentException("PipeName must be a simple local pipe name.", nameof(options));
         _serverTask = Task.Run(ListenAsync);
-        InitializeLauncher();
     }
 
     public string PipeName => _options.PipeName;
@@ -91,7 +90,6 @@ public sealed partial class DiagnosticsAgent : IDisposable, IAsyncDisposable
         if (Interlocked.Exchange(ref _disposed, 1) != 0)
             return;
         _stop.Cancel();
-        DisposeLauncher();
         _pipe?.Dispose();
         lock (_connectionSync)
             _activeStream?.Dispose();

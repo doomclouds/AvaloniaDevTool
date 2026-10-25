@@ -1,0 +1,2057 @@
+{
+  "capturedUtc": "2026-10-25T04:52:50.5267695Z",
+  "branch": "codex/agent-tools",
+  "baseline": "fa1c623a69073eab81a1e226ea05405825e76831",
+  "sourceManifest": "docs/agent-tools/verification/source-manifest-input-final.json",
+  "sourceManifestSha256": "192032b73c6f27a5c03c38743d6218e42e503c60fb2ab169adaef78809f260e5",
+  "sourceFingerprint": "3502660a0023cadbe09ef965914fd9fb03d7144d4767e85b83f53d96eda342f5",
+  "sourceFingerprintAlgorithm": "sha256 of UTF-8 newline-joined path:sha256 entries in sorted path order",
+  "sourceInputs": 322,
+  "sourceDrift": 0,
+  "builds": [
+    {
+      "exitCode": 0,
+      "configuration": "Debug",
+      "errors": 0,
+      "projects": 22,
+      "warnings": 0,
+      "binlogSha256": "6b3830baedbc99caf0733d5f013cd1e37da03401689ac78a979c075e7cf1deeb"
+    },
+    {
+      "exitCode": 0,
+      "configuration": "Release",
+      "errors": 0,
+      "projects": 22,
+      "warnings": 0,
+      "binlogSha256": "010a3e4cdf54df2ecfc5ac246cb3c4cf50bcc20050b58a757fe5d516aea20eda"
+    }
+  ],
+  "testsConfiguration": "Debug",
+  "testExitCode": 0,
+  "total": 467.0,
+  "passed": 467.0,
+  "failed": 0.0,
+  "notExecuted": 0.0,
+  "projects": [
+    {
+      "project": "avaloniadevtool.agent.tests",
+      "total": 282,
+      "passed": 282,
+      "failed": 0,
+      "notExecuted": 0,
+      "trx": "artifacts/agent-tools-ui-2026-10-25/input-final/10062_PALINK_2026-10-25_12_46_15_net10.0.trx",
+      "sha256": "9d241eeaf20374a742f07065109d50e15af1805b845208bb4e10bd5108822154",
+      "cases": [
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ContextualPropertyTests.Template_parts_use_the_actual_visual_layout_parent_instead_of_the_template_owner",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.OverlayTests.Bitmap_information_distinguishes_decoded_pixels_DPI_DIP_and_actual_source_identity",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.MetricsWindowTests.Frames_align_across_series_use_histogram_mean_and_counter_last_without_changing_raw_percentiles",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.AssetPreviewTests.Escaped_text_preview_stays_within_rpc_frame_budget",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.LayoutInspectionTests.Depth_and_node_limits_report_only_actual_omissions",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.StructuredLoggingTests.Agent_and_client_preserve_raw_template_typed_values_and_filter_before_history",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.PopupFreezeTests.Bound_configuration_remains_live_and_target_detachment_is_not_cancelled",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BindingCultureTests.Ordinary_and_compiled_bindings_use_retained_culture_for_format_and_convert_back(cultureName: \"en-US\")",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.OverlayTests.Mutable_transforms_resize_parent_offsets_and_visibility_are_refreshed_without_target_property_writes",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BindingDetailsTests.Multi_binding_keeps_child_expression_tree_and_child_failures",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.OverlayTests.Popup_uses_its_actual_presentation_root_and_topmost_surface_then_clears_when_closed",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BrushEditorRpcTests.Invalid_gradient_data_and_opaque_brushes_are_rejected_without_replacing_current_value",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.MetricsIntegrationTests.Stop_and_dispose_silence_callbacks_and_restart_creates_a_fresh_capture",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.InputInspectionTests.Pointer_pairing_and_dispose_release_only_session_capture",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.InteractionInspectionTests.Failed_drag_handler_releases_capture_and_invalid_chord_does_not_deliver_partial_input",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.CompositionInspectionTests.Hierarchical_transform_opacity_clip_and_z_order_recompose_to_normal_screenshot_pixels(opacity: 1)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.InspectionIntegrationTests.Resource_edit_updates_dynamic_resource_and_dispose_restores_original",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.StructuredLoggingTests.Snapshot_limits_parameters_templates_and_safe_exception_graphs_without_business_formatting",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.TreePagingTests.Cursors_reject_branch_changes_even_when_original_order_is_restored_and_release_discards_state",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ResourceQueryTests.Large_unicode_tree_and_entry_pages_stay_below_the_json_frame_limit",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BreakpointIntegrationTests.Logging_observer_reentrancy_does_not_create_breakpoint_feedback_loop",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.TreePagingTests.Custom_template_owner_requires_namespace_mapping_for_both_selector_entries",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.OverlayTests.Default_overlay_draws_only_bounds_and_never_changes_the_application_control",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.CompositionInspectionTests.Node_depth_pixel_byte_and_wire_budgets_report_real_omissions_and_exclude_highlight",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.InputInspectionTests.Session_pointer_does_not_replace_headless_device_capture",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.TreePagingTests.Template_parent_and_part_have_distinct_real_matching_selectors_and_merged_page_identity",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.LayoutInspectionTests.Snapshot_rejects_background_thread_access_before_reading_visual_state",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.StructuredLoggingTests.Nested_capture_wrappers_forward_to_original_sink_and_restore_after_out_of_order_stop",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.TreeWorkflowTests.BringIntoView_changes_scroll_offset_and_moves_target_into_the_viewport",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ResourceQueryTests.Pagination_filter_sort_and_budgets_are_explicit_and_bounded",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ProfilerIntegrationTests.Hierarchical_parent_activities_have_distinct_bounded_inflight_identifiers",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.InspectionIntegrationTests.Asset_preview_reads_embedded_text_and_rejects_other_uri_schemes",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.TreeWorkflowTests.Selector_uses_Avalonia_parser_and_reports_ambiguity_templates_and_unsupported_identifiers",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ResourceQueryTests.Agent_client_resource_queries_round_trip_utf8_pages_and_original_owner_edits",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BreakpointIntegrationTests.Suspension_requires_attached_debugger_and_disabled_configuration_cannot_be_enabled_without_one",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ExplorationIntegrationTests.Screenshot_rejects_empty_bounds_and_excessive_dimensions",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BindingCultureTests.Unsupported_shapes_and_custom_culture_getters_do_not_fabricate_culture",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.TreeWorkflowTests.Removing_a_root_releases_its_tree_observations_without_releasing_property_observers",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.LayoutInspectionTests.Snapshot_uses_real_scale_rotation_and_translation_in_root_coordinates",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.TreePagingTests.Direct_children_beyond_two_thousand_are_reachable_with_bounded_pages_and_stable_ids",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.CompositionInspectionTests.Empty_nodes_are_retained_and_unsupported_effects_are_explicit",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.MetricsIntegrationTests.Existing_and_new_instruments_are_filtered_and_tags_form_stable_series",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.AgentIntegrationTests.Disconnect_removes_overrides_and_new_connection_has_a_new_session",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ContextualPropertyTests.Real_layout_parents_filter_only_known_properties_and_preserve_legacy_and_unknown_members",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.OverlayTests.Non_affine_transforms_report_a_limitation_and_draw_no_fake_identity_bounds",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ProfilerIntegrationTests.Invalid_settings_preserve_capture_and_worst_case_snapshot_fits_protocol_frame",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.OverlayTests.Options_update_without_reselection_and_rulers_distinguish_root_DIP_from_device_pixels",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ExplorationIntegrationTests.Element_actions_preserve_enabled_binding_and_focus_returns_actual_result",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BindingCultureTests.Template_binding_preserves_configured_culture_without_claiming_a_format_option(cultureName: \"fr-FR\")",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.TreePagingTests.A_unique_match_on_another_style_key_never_validates_the_selected_element",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.AssetExportTests.Cancel_and_destination_error_close_readers_and_atomic_file_export_retains_old_file",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BindingCultureTests.Unconfigured_culture_stays_null_when_diagnostic_thread_culture_changes",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.MetricsIntegrationTests.Named_pipe_metrics_api_publishes_samples_and_stop_retains_a_queryable_snapshot",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.OverlayTests.Text_information_uses_actual_TextBlock_layout_without_returning_contents",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ExplorationIntegrationTests.Screenshot_rejects_png_over_body_limit_without_downscaling",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.RendererDiagnosticsTests.Framework_meter_reports_real_layout_render_and_runtime_measurements",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.EventRouteTests.Route_history_and_correlations_do_not_retain_source_receiver_or_event_args",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BindingCultureTests.Ordinary_and_compiled_bindings_use_retained_culture_for_format_and_convert_back(cultureName: \"fr-FR\")",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.RuntimeInspectionTests.Control_datacontext_and_nested_cycles_keep_stable_weak_object_ids",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.PropertyPresentationTests.Aggregate_and_deep_inner_exception_failures_have_bounded_explicit_summaries",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BindingDetailsTests.Missing_data_context_and_bad_path_have_distinct_evidence_and_live_activity",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.PopupFreezeTests.Frozen_context_menu_keeps_keyboard_escape_and_business_item_click_interactions(overlay: False)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BreakpointSourceTests.Invalid_source_definition_is_rejected_and_failed_update_keeps_old_receiver_observation",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.NavigationIntegrationTests.Focus_following_selects_real_focus_and_can_be_stopped",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.InteractionInspectionTests.Drag_path_validates_all_roots_before_pressing_and_maps_explicit_waypoints",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.OverlayTests.Margin_and_padding_have_distinct_real_pixels_outside_and_inside_the_border_box",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.MergedTreeTests.Retemplating_invalidates_old_groups_and_old_template_objects_and_notifies_expanded_owner",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.LayoutInspectionTests.Snapshot_preserves_parent_links_stable_ids_and_nested_layout_offsets",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.TreeWorkflowTests.Active_tree_observation_does_not_keep_a_detached_control_alive",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.RendererDiagnosticsTests.Synchronous_application_rewrite_is_detected_and_invalid_targets_do_not_mutate_flags",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.PopupFreezeTests.Frozen_context_menu_keeps_keyboard_escape_and_business_item_click_interactions(overlay: True)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ResourceQueryTests.Removed_local_key_is_not_recreated_by_reset_or_redirected_to_a_nested_dictionary",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.MergedTreeTests.Template_groups_preserve_user_content_once_and_slots_reference_its_logical_path",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.PopupFreezeTests.Tooltip_service_pointer_dismissal_is_reported_as_limited_and_never_resurrected(overlay: True)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.LayoutInspectionTests.Invalid_limits_expired_objects_and_unsupported_objects_fail_explicitly",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.PopupFreezeTests.Real_outside_pointer_input_is_suppressed_then_resumes_for_overlay_and_native_popups(overlay: True)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.OverlayTests.Nested_suspensions_hide_only_the_overlay_and_clear_does_not_resurrect_it",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.EventRouteTests.Unfinished_routes_expire_without_inventing_completion_and_history_expires_after_ttl",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.OverlayTests.Closing_the_initial_root_itself_clears_selection_and_releases_the_surface",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.MetricsWindowTests.Clearing_one_series_removes_its_history_frames_and_pending_without_restarting_the_other_series",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.RuntimeInspectionTests.Member_paging_reads_only_the_requested_getters",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.PropertyPresentationTests.Property_failures_do_not_execute_custom_exception_message_or_base_exception_overrides",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ExplorationIntegrationTests.Screenshot_returns_real_png_with_exact_arranged_dimensions",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ExplorationIntegrationTests.Pseudo_class_changes_are_enumerable_resettable_and_reverted_on_disconnect",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.OverlayTests.Typed_client_configures_live_overlay_while_screenshots_search_and_layout_exclude_it",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ResourceQueryTests.Inspection_metadata_and_ids_do_not_keep_unowned_dictionary_or_keys_alive",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.LoggingBudgetTests.Slow_notification_sender_stays_bounded_while_snapshots_remain_readable_and_recovers_in_order",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BreakpointSourceTests.Nested_raises_with_distinct_args_keep_each_actual_source_and_final_handled",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BindingDetailsTests.Exception_depth_count_text_and_surrogate_boundaries_are_bounded",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.RuntimeInspectionTests.Getter_errors_are_isolated_and_indexers_static_and_private_getters_are_excluded",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BreakpointIntegrationTests.Routed_event_is_counted_once_after_tunnel_and_bubble_complete",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.AgentIntegrationTests.Changing_materialized_children_invalidates_their_parent",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ProfilerIntegrationTests.Typed_client_controls_real_framework_capture_and_disconnect_disposes_its_listener",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.InspectionIntegrationTests.Invalid_binding_exposes_error_state_without_replacing_the_binding",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.PropertyPresentationTests.CLR_getter_failure_is_bounded_without_losing_the_RPC_session",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BreakpointSourceTests.Recursively_raising_same_direct_args_keeps_outer_source_snapshot_and_separate_count",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.InteractionInspectionTests.Automation_actions_invoke_toggle_and_expand_collapse_real_controls",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.AssetExportTests.Full_asset_export_crosses_preview_limit_and_preserves_bytes_hash_and_progress",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.AssetPreviewTests.Unknown_length_stream_does_not_report_preview_size_as_full_size",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.RendererDiagnosticsTests.Native_renderer_overlay_changes_actual_frame_pixels_and_stop_restores_the_frame",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.PopupFreezeTests.Named_pipe_disconnect_restores_owned_values_and_never_reopens_closed_popups",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.RuntimeInspectionTests.Failing_list_index_is_reported_without_losing_neighboring_items",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.InputInspectionTests.Invalid_names_text_limits_and_coordinates_fail_explicitly",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BindingDetailsTests.Source_registration_and_snapshot_do_not_keep_business_objects_alive",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BindingCultureTests.Two_way_text_box_source_updates_follow_real_trigger_for_ordinary_and_compiled_bindings(trigger: Default, effectiveTrigger: \"PropertyChanged\")",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.AssetExportTests.Sequential_nonseek_readers_expire_enforce_cap_and_recover_from_errors",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ResourceQueryTests.Nested_query_keeps_duplicate_keys_original_owners_themes_and_style_scopes",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.RuntimeInspectionTests.Members_are_deduplicated_by_kind_and_name_and_keep_declaring_owner",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BindingCultureTests.Template_binding_preserves_configured_culture_without_claiming_a_format_option(cultureName: \"en-US\")",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.RendererDiagnosticsTests.Named_pipe_disconnect_restores_owned_flags",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BindingDetailsTests.Resource_key_budget_never_turns_a_truncated_preview_into_a_string_identity",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.AssetPreviewTests.Text_preview_reports_total_and_preserves_complete_utf8_characters_at_boundary",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BrushEditorRpcTests.All_four_brush_kinds_round_trip_real_fields_and_create_independent_objects",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ProfilerIntegrationTests.Category_and_substring_filters_are_applied_to_final_tags",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BindingCultureTests.Optional_culture_fields_round_trip_and_legacy_wire_payload_keeps_them_missing",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.InspectionIntegrationTests.Resource_dictionary_scope_preserves_theme_and_merged_structure",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ActivityIntegrationTests.Routed_events_include_route_nodes_final_handled_state_and_source_filter",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.PopupFreezeTests.Real_outside_pointer_input_is_suppressed_then_resumes_for_overlay_and_native_popups(overlay: False)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BreakpointIntegrationTests.History_is_bounded_and_reports_discarded_retention",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.InteractionInspectionTests.Chord_selects_all_text_and_pairs_every_modifier_and_key_in_reverse_order",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BindingDetailsTests.Converter_failure_retains_inner_exception_and_does_not_invent_a_path_failure",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.MetricsIntegrationTests.Invalid_start_settings_do_not_replace_a_running_capture",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.PopupFreezeTests.Transient_flyout_move_away_is_an_explicit_limit_and_does_not_restore_a_closed_flyout(overlay: True)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.InteractionInspectionTests.Drag_moves_real_slider_thumb_across_controls_and_releases_capture",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.MetricsIntegrationTests.Notification_batches_are_bounded_and_observable_counters_keep_reported_semantics",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.RuntimeInspectionTests.Arbitrary_enumerable_is_explicitly_unsupported_without_starting_enumeration",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.OverlayTests.Clear_and_detach_allow_selected_control_to_be_collected_while_the_service_remains_alive",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BreakpointSourceTests.Collected_source_expires_a_global_receiver_breakpoint_without_retaining_source_or_history",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.InputInspectionTests.Pointer_and_wheel_preserve_local_coordinates_after_real_visual_transform",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.PopupFreezeTests.Closing_the_owner_window_closes_its_popups_and_removes_frozen_scope_without_reopening",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.PopupFreezeTests.Flyout_freezes_outside_clicks_and_context_menu_reports_its_overlay_interaction_handler_boundary(overlay: False)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.InputInspectionTests.Readonly_text_is_rejected_and_disabled_or_hidden_ancestors_block_input",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.PopupFreezeTests.Scope_includes_new_nested_popups_but_excludes_other_roots_and_application_close_never_reopens",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BreakpointIntegrationTests.Update_can_enable_disable_reset_and_replace_member_without_stale_listener",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.StructuredLoggingTests.Reentrant_previous_sink_and_notification_logging_do_not_recurse_or_fill_history",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ResourceQueryTests.Nonstring_keys_use_weak_identity_and_read_never_calls_user_tostring",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.PropertyPresentationTests.Editor_metadata_distinguishes_color_flags_and_unsupported_brushes",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.InteractionInspectionTests.Multi_click_delivers_counts_and_double_tapped_gesture",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.EventRouteTests.Clear_inside_instance_handler_cannot_resurrect_old_route_and_stop_keeps_history",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.RendererDiagnosticsTests.Window_scope_preserves_application_flags_tracks_new_roots_and_restores_removed_roots",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.CompositionInspectionTests.Typed_client_capture_crosses_real_named_pipe_and_keeps_the_UI_responsive",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.OverlayTests.Public_overlay_service_rejects_wrong_threads_expired_ids_detached_controls_and_diagnostic_controls",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.StructuredLoggingTests.Custom_source_subscription_and_capture_stop_with_disposal",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BindingDetailsTests.Validation_failure_keeps_validation_category_and_actual_exception",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.PopupFreezeTests.Tooltip_service_pointer_dismissal_is_reported_as_limited_and_never_resurrected(overlay: False)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BindingDetailsTests.Throwing_getters_and_display_are_isolated_without_losing_other_fields",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ActivityIntegrationTests.Background_log_flood_is_bounded_and_notifications_run_on_ui_thread",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ActivityIntegrationTests.Log_capture_preserves_existing_sink_and_applies_capture_level",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ExplorationIntegrationTests.Search_preserves_duplicate_names_and_ancestor_paths_identify_real_objects",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ContextualPropertyTests.Moving_the_same_control_updates_context_metadata_and_notifies_without_a_value_change",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.OverlayTests.Nested_translation_rotation_scaling_and_center_origin_align_actual_overlay_pixels",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.EventRouteTests.Real_tunnel_and_bubble_share_correlation_and_observe_handled_without_attributing_a_handler",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ActivityIntegrationTests.Invalid_settings_leave_existing_capture_running",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BindingDetailsTests.Healthy_binding_reports_effective_mode_options_and_inherited_data_context",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ProfilerIntegrationTests.Long_string_keys_and_theme_delimiters_keep_distinct_group_identities",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.InteractionInspectionTests.Text_selection_replaces_and_deletes_through_the_real_editing_pipeline",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ProfilerIntegrationTests.Real_framework_resource_groups_include_the_requested_theme_variant",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.OverlayTests.Root_cross_window_clear_detach_and_window_close_reuse_the_surface_without_retaining_targets",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.OverlayTests.Unsupported_padding_does_not_invoke_an_arbitrary_CLR_getter",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.RuntimeInspectionTests.Complex_values_and_structs_never_call_arbitrary_tostring",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.CompositionInspectionTests.Own_drawing_images_do_not_repeat_child_paints_or_ancestor_backgrounds",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.InputInspectionTests.Text_and_key_events_use_real_textbox_editing_and_modifier_behavior",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.OverlayTests.Custom_image_source_and_custom_text_layout_do_not_execute_arbitrary_getters_or_ToString",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BindingDetailsTests.Template_binding_reports_parent_property_and_retained_mode",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.TreeWorkflowTests.Expanded_branches_use_real_collection_events_and_release_stops_notifications",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.MetricsWindowTests.Expiration_and_capacity_are_independent_and_invalid_window_settings_preserve_the_capture",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BindingDetailsTests.Composite_children_and_serialized_response_stay_bounded",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ProfilerIntegrationTests.History_pending_group_and_inflight_limits_have_independent_accounting",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.PopupFreezeTests.Flyout_freezes_outside_clicks_and_context_menu_reports_its_overlay_interaction_handler_boundary(overlay: True)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.InputInspectionTests.Expired_detached_zero_sized_and_nonfocusable_targets_do_not_report_success",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.TreeWorkflowTests.Diagnostic_overlay_changes_do_not_invalidate_an_observed_layer_but_application_children_do",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.InteractionInspectionTests.Index_selection_updates_real_combo_list_and_tab_state_and_reports_actual_selected_item",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.PopupRootDiscoveryTests.Native_flyout_roots_follow_focus_and_are_removed_without_observing_unrelated_windows",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BreakpointIntegrationTests.Dispose_releases_global_subscription_and_service_can_be_collected",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BreakpointSourceTests.Reusing_args_for_sequential_raises_is_counted_synchronously_once_per_raise",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.MetricsIntegrationTests.Every_supported_numeric_type_is_captured_with_an_exact_raw_representation",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BreakpointIntegrationTests.Failed_update_preserves_previous_breakpoint_and_observation",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.MetricsIntegrationTests.Worst_case_retained_text_and_dimensions_fit_a_protocol_frame",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.InputInspectionTests.Key_events_expose_exact_source_key_and_modifiers",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BindingDetailsTests.Private_shape_can_be_disabled_and_missing_privateapi_members_degrade_per_field",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BreakpointIntegrationTests.One_shot_removes_listener_only_after_comparison_matches",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ProfilerIntegrationTests.Cross_thread_callbacks_are_batched_on_UI_thread_and_stop_clear_restart_ignore_old_spans",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.EventRouteTests.Recursively_raising_same_direct_args_keeps_inner_and_outer_correlations_separate",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.RuntimeInspectionTests.Worker_thread_requests_are_rejected_before_touching_registry",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.MergedTreeTests.Empty_templates_standalone_presenters_and_search_limits_are_explicit",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.AgentIntegrationTests.Diagnostic_override_preserves_live_binding_and_clear_reveals_latest_value",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.PropertyPresentationTests.Property_preview_draws_actual_image_and_geometry_pixels_and_rejects_stale_handles",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.RuntimeInspectionTests.Default_member_page_is_fifty_and_limit_is_one_hundred",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ActivityIntegrationTests.Event_name_filter_does_not_capture_unrelated_events",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.TreeWorkflowTests.Selector_validation_keeps_the_last_unvisited_node_in_the_truncation_budget",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.InspectionIntegrationTests.Resource_reset_preserves_a_newer_application_write",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BindingCultureTests.Two_way_text_box_source_updates_follow_real_trigger_for_ordinary_and_compiled_bindings(trigger: LostFocus, effectiveTrigger: \"LostFocus\")",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ActivityIntegrationTests.Pending_log_entries_do_not_keep_source_objects_alive",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.EventRouteTests.Route_history_has_count_byte_and_per_route_limits",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.AgentIntegrationTests.Named_pipe_session_exposes_roots_children_and_property_values",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.AssetExportTests.Disconnect_invalidates_export_tokens_and_new_session_can_export",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.OverlayTests.Ancestor_geometry_clip_and_root_viewport_clip_the_source_overlay_pixels",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BreakpointSourceTests.Source_and_receiver_are_independent_filters_and_legacy_object_id_keeps_receiver_semantics",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ExplorationIntegrationTests.Paths_reject_expired_ids_and_live_objects_detached_from_tree",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.OverlayTests.TextBox_reports_its_real_presenter_layout_and_password_skips_text_metadata",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BindingCultureTests.Multi_binding_reports_actual_format_wrapper_and_independent_child_cultures(cultureName: \"en-US\")",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BindingCultureTests.Two_way_text_box_source_updates_follow_real_trigger_for_ordinary_and_compiled_bindings(trigger: Explicit, effectiveTrigger: \"Explicit\")",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.MetricsIntegrationTests.Observable_gauges_are_polled_and_notifications_are_delivered_on_ui_thread",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.RendererDiagnosticsTests.Application_changes_release_ownership_and_are_not_overwritten_on_stop_or_dispose",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.InteractionInspectionTests.Public_client_methods_round_trip_new_contracts_and_change_real_control_state",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.LoggingBudgetTests.Maximum_scopes_and_exception_graph_share_one_encoded_text_budget_with_explicit_gaps",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.InteractionInspectionTests.Explicit_pointer_sequence_crosses_controls_with_capture_coordinates_and_respects_cross_root_rejection",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.AssetPreviewTests.Font_preview_uses_official_embedded_font_bytes_and_invalid_font_is_never_text",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.EventRouteTests.Large_real_routes_are_evicted_by_utf8_json_budget_before_count_capacity",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BindingCultureTests.Multi_binding_reports_actual_format_wrapper_and_independent_child_cultures(cultureName: \"fr-FR\")",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.PopupFreezeTests.Transient_flyout_move_away_is_an_explicit_limit_and_does_not_restore_a_closed_flyout(overlay: False)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.AgentIntegrationTests.Invalid_and_readonly_edits_return_errors_without_changing_target",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BreakpointIntegrationTests.Readonly_properties_can_be_observed_with_complete_owner_id",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.PopupFreezeTests.Application_configuration_changes_including_same_effective_value_are_preserved_on_resume_and_scope_removal",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ProfilerIntegrationTests.Concurrent_stop_and_restart_do_not_commit_stale_background_operations",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.CompositionInspectionTests.Geometry_paths_rounded_bounds_and_unavailable_stream_paths_preserve_clip_metadata",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.RuntimeInspectionTests.Value_and_error_previews_are_bounded_and_do_not_split_surrogate_pairs",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ActivityIntegrationTests.Stopping_capture_does_not_replace_a_new_application_sink",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ExplorationIntegrationTests.Search_reports_empty_results_and_explicit_work_limits",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BindingDetailsTests.Dynamic_resource_reports_actual_key_host_and_explicit_private_shape_gaps",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.InputInspectionTests.Explicit_down_and_up_share_pointer_and_finish_the_sequence",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.CompositionInspectionTests.Invalid_request_detachment_cancellation_and_session_disposal_release_capture",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.PopupFreezeTests.All_root_freeze_follows_new_roots_and_can_resume_one_root_without_affecting_another",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.PropertyPresentationTests.Property_preview_cache_does_not_root_replaced_values",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.LayoutInspectionTests.Leaf_at_exact_limits_is_not_truncated_and_diagnostic_overlay_is_excluded",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.LayoutInspectionTests.Visibility_and_declared_clipping_include_ancestors_outside_snapshot_root",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.EventRouteTests.Exact_catalog_selection_and_late_registration_are_applied_to_real_events",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.PropertyPresentationTests.Default_property_request_does_not_execute_CLR_getters",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.InputInspectionTests.Click_raises_pointer_events_and_exactly_one_business_click",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BreakpointIntegrationTests.Dispose_releases_global_routed_event_subscription",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.MergedTreeTests.Popup_content_is_reachable_once_under_its_current_presentation_root",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.AssetExportTests.Export_validates_owned_uris_and_disconnect_style_dispose_releases_streams",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.PropertyPresentationTests.Unified_properties_keep_hidden_CLR_members_and_safely_describe_opaque_values",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.TreePagingTests.Oversized_branches_fail_explicitly_instead_of_silently_returning_a_prefix",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BindingCultureTests.Two_way_text_box_source_updates_follow_real_trigger_for_ordinary_and_compiled_bindings(trigger: PropertyChanged, effectiveTrigger: \"PropertyChanged\")",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.LoggingBudgetTests.Ordinary_32_scalar_parameters_remain_complete_under_the_entry_budget",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.StructuredLoggingTests.Custom_exception_properties_are_not_executed_and_parameter_availability_remains_precise",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.LayoutInspectionTests.Detached_and_zero_sized_roots_are_rejected",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BrushEditorRpcTests.Gradient_RPC_changes_real_pixels_and_clear_restores_latest_binding_without_mutating_original",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.AgentIntegrationTests.Registry_does_not_keep_inspected_objects_alive",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.InteractionInspectionTests.Chord_releases_pressed_keys_even_when_a_handler_throws",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.PopupFreezeTests.Closed_popups_are_not_rooted_by_the_freeze_service",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.MetricsIntegrationTests.Series_instrument_and_tag_limits_are_reported_without_unbounded_growth",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.RuntimeInspectionTests.Dictionary_paging_keeps_key_previews_and_disposes_enumerator_each_request",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ProfilerIntegrationTests.Business_tag_objects_are_never_formatted_or_retained_and_text_is_bounded",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.InspectionIntegrationTests.Style_snapshot_reports_style_frames_and_live_binding_description",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.MetricsIntegrationTests.Sample_history_and_notification_backlog_have_independent_bounds",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.PropertyPresentationTests.Image_preview_failure_is_bounded_without_losing_the_RPC_session",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BindingCultureTests.Resource_expression_marks_converter_culture_not_applicable",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BreakpointIntegrationTests.Observing_target_and_recording_hits_do_not_prevent_target_collection",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.MetricsIntegrationTests.Observable_errors_and_nonfinite_samples_are_reported_without_crashing_capture",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.MetricsIntegrationTests.Tag_objects_are_not_formatted_by_invoking_application_code",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.MetricsWindowTests.Time_window_keeps_its_exact_boundary_and_stop_freezes_time_and_statistics",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BreakpointIntegrationTests.Property_breakpoints_apply_all_hit_count_comparisons_and_keep_summary",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.StructuredLoggingTests.Queued_and_historical_logs_do_not_retain_sources_arguments_or_exceptions",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.CompositionInspectionTests.Overflow_bounds_transparency_and_unmapped_compositor_nodes_are_real_content",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.AgentIntegrationTests.Attached_properties_can_be_overridden_and_reverted",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.PropertyPresentationTests.Empty_image_reports_not_available",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.AgentIntegrationTests.Picking_uses_real_pointer_input_highlights_selection_and_does_not_click_button",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.InteractionInspectionTests.Text_replacement_respects_max_length_and_preserves_the_binding_and_undo_pipeline",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.RuntimeInspectionTests.Lists_page_null_simple_complex_and_self_references",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.MergedTreeTests.Retained_synthetic_group_does_not_keep_owner_or_template_root_alive",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BreakpointSourceTests.Source_filters_support_hit_conditions_once_disable_enable_and_replacement",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.AssetPreviewTests.Png_dimensions_dpi_and_decoded_memory_are_separate_from_encoded_size",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.BreakpointSourceTests.Recursively_reusing_routed_args_counts_actual_phase_finishes_despite_inner_route_mutation",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.MetricsWindowTests.Disabling_frame_aggregation_preserves_each_raw_point_at_its_actual_timestamp",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.OverlayTests.Box_region_emphasis_draws_only_matching_real_transformed_pixels_and_restores_options",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.LoggingBudgetTests.Unicode_and_escaped_log_history_fits_real_rpc_snapshot_and_keeps_session_usable",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.OverlayTests.Negative_margin_and_overlapping_padding_are_drawn_and_reported_with_their_signed_meaning",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.StructuredLoggingTests.Real_logger_factory_maps_original_format_event_id_scope_level_and_exception",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ProfilerIntegrationTests.Late_start_captures_real_framework_style_attach_class_evaluation_and_resource_lookups",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ActivityIntegrationTests.Clear_keeps_capture_running_and_resets_buffer_and_loss_count",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.MetricsWindowTests.Configured_poll_and_notification_intervals_change_actual_observable_and_delivery_activity",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.RuntimeInspectionTests.Returned_member_snapshots_do_not_keep_removed_nested_objects_alive",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.CompositionInspectionTests.Hierarchical_transform_opacity_clip_and_z_order_recompose_to_normal_screenshot_pixels(opacity: 0.5)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.EventRouteTests.Direct_events_reused_args_and_child_reentrancy_have_distinct_finished_correlations",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.MergedTreeTests.Replacing_content_expires_old_slot_and_preserves_current_content_without_duplicate_nodes",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.OfficialResourceScopeTests.Only_self_is_a_traversal_boundary_for_local_ancestors_application_and_nested_providers",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.InteractionInspectionTests.Right_click_opens_real_context_menu_and_does_not_invoke_left_click",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.AgentIntegrationTests.Open_popup_content_is_reachable_from_visual_roots",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.LoggingBudgetTests.Concurrent_producers_and_clear_restart_keep_combined_byte_accounting_bounded",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Agent.Tests.ResourceQueryTests.Shared_custom_and_cyclic_provider_graphs_are_visible_and_stop_at_budget",
+          "outcome": "Passed"
+        }
+      ]
+    },
+    {
+      "project": "avaloniadevtool.cli.tests",
+      "total": 89,
+      "passed": 89,
+      "failed": 0,
+      "notExecuted": 0,
+      "trx": "artifacts/agent-tools-ui-2026-10-25/input-final/10062_PALINK_2026-10-25_12_46_30_net10.0.trx",
+      "sha256": "869e7d50955774421a8bd4a448f471a1e5c5a7d58644a1208504e3b6292f5d13",
+      "cases": [
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.NativeFileDialogBoundaryMcpTests.Real_file_io_failures_preserve_document_and_report_error(operation: \"write\", denyAccess: False)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.OfficialPreviewTests.Official_paths_default_false_real_project_context_live_saves_and_detach_work_over_stdio",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.OfficialPreviewTests.Windows_fixture_prebuild_releases_a_detached_child_holding_its_project_directory",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Default_stdio_tools_list_has_exactly_the_39_independent_agent_tool_names",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.AgentInteractionMcpTests.Stdio_click_delivers_double_tap_and_right_click_opens_a_real_context_menu",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Stdio_invalid_target_states_fail_before_any_routed_input_or_business_action(state: \"zero-layout\", code: \"invalid_layout\")",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Headless_stdio_context_menu_action_executes_and_removes_the_real_popup_subtree(nested: False)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Stdio_invalid_target_states_fail_before_any_routed_input_or_business_action(state: \"detached\", code: \"detached_object\")",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Stdio_cross_root_drag_endpoints_and_waypoints_fail_without_partial_down_or_capture_then_allow_a_valid_drag",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Stdio_drag_handler_failure_cleans_capture_and_pressed_state_and_the_next_drag_recovers(failingEvent: \"PointerReleased\")",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.McpIntegrationTests.Stdio_server_initializes_advertises_tools_and_explains_missing_attachment",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.OfficialConnectionTests.Incompatible_wire_version_reports_a_diagnostic_instead_of_an_attached_session",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.NativeFileDialogBoundaryMcpTests.Real_file_io_failures_preserve_document_and_report_error(operation: \"write\", denyAccess: True)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.NativeFileDialogMcpTests.Ui_wait_error_preserves_current_state_and_pointer_trace_before_asserting",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.NativeManagedGateMcpTests.Native_tools_inspect_and_answer_an_owned_dialog_while_the_original_click_and_another_managed_call_remain_pending",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.AgentInteractionMcpTests.Default_stdio_profile_advertises_independent_interactions_and_native_tools_require_attachment",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.McpIntegrationTests.Stdio_input_tools_route_text_keys_and_real_button_clicks",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.PreviewAttachTests.Stdio_attach_previews_built_classful_project_resources_custom_controls_input_pixels_and_live_saves",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.OfficialPreviewTests.Missing_build_compile_failure_invalid_xaml_and_invalid_paths_never_create_an_attachment",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.OfficialTreeMcpTests.Official_tree_observes_roots_children_depth_and_full_subtrees_beyond_64_levels",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.NativeFileDialogBoundaryMcpTests.Stale_overwrite_prompt_cannot_answer_a_replacement_prompt",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.McpIntegrationTests.Stdio_tools_inspect_edit_capture_and_detach_a_real_agent",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Stdio_invalid_local_coordinates_fail_before_pointer_events_or_capture(x: 1.7976931348623157E+308, y: 10)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.NativeFileDialogMcpTests.Native_double_click_preserves_button_business_and_double_tap_gesture_at_stationary_cursor",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.NativeSessionOwnershipMcpTests.Closing_the_attached_target_reaps_the_actual_worker_and_the_same_stdio_client_can_attach_again",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.McpIntegrationTests.Stdio_overlay_selector_renderer_and_correlated_events_use_actual_agent_services",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.NativeFileDialogMcpTests.Default_stdio_tools_drive_real_native_input_and_file_dialogs_and_verify_application_io",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Stdio_drag_handler_failure_cleans_capture_and_pressed_state_and_the_next_drag_recovers(failingEvent: \"PointerPressed\")",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.RemoteMcpTests.Stdio_remote_attach_uses_environment_credentials_and_exports_full_asset",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Stdio_drag_handler_failure_cleans_capture_and_pressed_state_and_the_next_drag_recovers(failingEvent: \"PointerMoved\")",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.BreakpointSourceMcpTests.Stdio_source_and_receiver_breakpoints_roundtrip_update_disable_count_and_remove_on_a_real_agent",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.OfficialInputMediaMcpTests.Official_screenshot_returns_target_png_dimensions_and_pixels_and_explicit_limits",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.NativeFileDialogBoundaryMcpTests.Real_file_io_failures_preserve_document_and_report_error(operation: \"read\", denyAccess: True)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.NativePickerProfileTests.A_real_picker_with_a_matched_but_truncated_profile_refuses_inspection_and_path_mutation",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Headless_stdio_popup_and_flyout_actions_close_the_real_popup_tree(useFlyout: True)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.NativeFileDialogMcpTests.Default_stdio_tools_drive_real_secondary_windows_popups_menus_wheel_and_drag_business_state",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.TreePagingMcpTests.Stdio_template_parent_selector_is_independent_from_the_matching_part_path",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.OfficialConnectionTests.An_independent_application_without_the_bridge_package_reports_the_preparation_requirement",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.NativeSessionOwnershipMcpTests.One_stdio_session_switches_native_ownership_and_detach_reaps_the_actual_worker",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.OfficialInputMediaMcpTests.Official_input_routes_all_four_events_and_reports_focus_disabled_and_invalid_arguments",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.OfficialPropertiesMcpTests.Stdio_pseudo_class_and_actions_change_styles_focus_enablement_and_scroll_visibility",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Headless_stdio_popup_and_flyout_actions_close_the_real_popup_tree(useFlyout: False)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.OfficialPropertiesMcpTests.Stdio_props_filter_real_values_and_set_null_unset_preserve_live_bindings",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Headless_stdio_context_menu_action_executes_and_removes_the_real_popup_subtree(nested: True)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.OfficialPreviewTests.Windows_build_request_cancellation_stops_the_build_and_its_owned_descendant",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.PreviewAttachTests.A_library_project_source_can_use_a_distinct_built_application_for_App_resources",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.OfficialConnectionTests.Discovery_and_id_switching_use_two_real_processes_and_reject_previous_node_handles",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.OfficialPreviewTests.Windows_abrupt_owner_exit_kills_an_in_progress_build_and_its_owned_descendant",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.AgentInteractionMcpTests.Stdio_item_and_control_actions_change_real_combo_list_tab_toggle_and_expansion_state",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.OfficialPropertiesMcpTests.Stdio_styles_filter_real_setters_and_include_metadata_defaults_and_template_binding",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.OfficialInputMediaMcpTests.Official_resources_use_real_application_node_ancestor_merged_and_theme_scopes",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.OfficialPreviewTests.Official_startup_cancellation_stops_the_candidate_and_leaves_no_attachment",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.PreviewAttachTests.Missing_build_and_absent_class_fail_clearly_and_leave_no_attachment",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.ContextualPropertyMcpTests.Stdio_props_context_filter_and_explicit_CLR_opt_in_preserve_legacy_defaults",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.RemoteMcpTests.Missing_remote_token_and_insecure_urls_fail_without_echoing_credentials",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.OfficialConnectionTests.A_running_window_without_agent_startup_is_not_advertised_and_reports_setup_guidance",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.NativeFileDialogBoundaryMcpTests.Real_file_io_failures_preserve_document_and_report_error(operation: \"read\", denyAccess: False)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.AgentInteractionMcpTests.Stdio_drag_uses_real_slider_capture_and_canonical_waypoints_to_change_value",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.OfficialPreviewTests.Cancelling_a_file_switch_keeps_the_previous_preview_and_releases_only_the_candidate",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Stdio_readonly_and_unfocusable_targets_fail_without_text_key_or_selection_side_effects",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.NativeFileDialogBoundaryMcpTests.Missing_picker_times_out_and_external_filename_changes_cannot_be_accepted",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.McpIntegrationTests.Stdio_profiler_captures_real_framework_resource_lookups_and_cleans_up",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.OfficialPreviewTests.Abrupt_stdio_owner_exit_stops_a_preview_blocked_in_the_real_project_builder",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.OfficialInputMediaMcpTests.Official_assets_return_full_verified_text_image_font_and_binary_resources",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.TreePagingMcpTests.Stdio_direct_child_pages_expose_large_branches_continuations_changes_and_recursive_truncation",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Stdio_invalid_local_coordinates_fail_before_pointer_events_or_capture(x: 10, y: -1)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.PopupFreezeMcpTests.Stdio_popup_freeze_tools_apply_read_and_resume_real_popup_state",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Stdio_invalid_local_coordinates_fail_before_pointer_events_or_capture(x: 181, y: 10)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Stdio_invalid_local_coordinates_fail_before_pointer_events_or_capture(x: -1, y: 10)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Stdio_invalid_local_coordinates_fail_before_pointer_events_or_capture(x: 10, y: 61)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.OfficialTreeMcpTests.Official_ancestors_and_tree_handles_preserve_identity_and_reject_detached_nodes",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.OfficialConnectionTests.Declared_official_contracts_match_all_fifteen_captured_schemas_and_validate_before_binding",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.PreviewAttachTests.Abrupt_owner_exit_releases_a_child_even_while_the_target_builder_is_blocked",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.NativeFileDialogBoundaryMcpTests.Default_extension_is_verified_by_real_saved_path_bytes_and_reopened_content",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.McpIntegrationTests.Stdio_extended_resources_composition_and_structured_logs_preserve_real_evidence",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.Phase7McpTests.Stdio_metrics_configuration_frames_and_clear_and_structured_brush_edit_use_actual_agent_services",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.AgentInteractionMcpTests.Stdio_wait_observes_real_properties_allows_other_interactions_and_reports_timeout_and_ambiguity",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.PreviewAttachTests.Style_and_resource_dictionary_use_the_official_design_preview_conversion",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.OfficialPreviewTests.Build_true_creates_the_selected_multitarget_output_before_attaching_and_can_switch_files",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Stdio_invalid_target_states_fail_before_any_routed_input_or_business_action(state: \"disabled-ancestor\", code: \"disabled_target\")",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.PreviewAttachTests.Startup_timeout_and_cancellation_kill_the_owned_blocked_child",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.OfficialTreeMcpTests.Official_search_uses_type_name_scope_template_switch_and_unlimited_default",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.AgentInteractionMcpTests.Stdio_chord_and_text_selection_edit_real_text_and_preserve_balanced_modifier_releases",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.OfficialPropertiesMcpTests.Stdio_set_prop_loads_full_xmlns_object_and_rejects_invalid_xaml_without_partial_write",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.AgentInteractionMcpTests.Stdio_interactions_reject_expired_public_nodes_after_reattaching_without_mutating_the_target",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.PreviewAttachTests.Window_root_uses_the_real_designer_and_mcp_shutdown_releases_its_process",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.PreviewAttachTests.Attaching_to_an_external_app_never_gives_the_session_permission_to_kill_it",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.AgentInteractionBoundaryMcpTests.Stdio_invalid_target_states_fail_before_any_routed_input_or_business_action(state: \"hidden-ancestor\", code: \"hidden_target\")",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Cli.Tests.OfficialInputMediaMcpTests.Official_resources_report_entry_and_text_limits_without_claiming_complete_results",
+          "outcome": "Passed"
+        }
+      ]
+    },
+    {
+      "project": "avaloniadevtool.nativeautomation.tests",
+      "total": 44,
+      "passed": 44,
+      "failed": 0,
+      "notExecuted": 0,
+      "trx": "artifacts/agent-tools-ui-2026-10-25/input-final/10062_PALINK_2026-10-25_12_51_05_net10.0.trx",
+      "sha256": "bb33bbbcb4ffdc5d7d0c4af0f96ead5f178cc3c9fff4e31683ce81b0a2b7a592",
+      "cases": [
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeFileDialogValidationTests.UnsupportedPathSyntaxIsRejectedBeforeAnyUiMutation(path: \"shell:Downloads\")",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeCoordinateSpaceTests.Physical_normalization_is_identical_from_unaware_system_and_per_monitor_threads_and_restores_each_context",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeFileDialogValidationTests.UnsupportedPathSyntaxIsRejectedBeforeAnyUiMutation(path: \"\\\\\\\\?\\\\C:\\\\test\\\\name.txt\")",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeFileDialogValidationTests.UnsupportedPathSyntaxIsRejectedBeforeAnyUiMutation(path: \"https://example.invalid/document.txt\")",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeFileDialogValidationTests.UnsupportedPathSyntaxIsRejectedBeforeAnyUiMutation(path: \"C:\\\\test\\\\name.\\\\file.txt\")",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Native_window_minimize_maximize_and_restore_have_provider_and_os_readback",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Native_key_chords_release_ctrl_alt_and_shift_in_real_os_state",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeFileDialogValidationTests.CancelledPreflightDoesNotCreateAFile",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeFileFilterTimingTests.A_filter_visibility_timeout_performs_no_selection_and_keeps_the_same_dialog_inspectable_and_cancellable",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeFileDialogValidationTests.WrongPathKindsAndMissingParentsFailPreflight",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeFileDialogValidationTests.UnsupportedPathSyntaxIsRejectedBeforeAnyUiMutation(path: \"C:\\\\test\\\\name.txt:stream\")",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeFileDialogValidationTests.UnsupportedPathSyntaxIsRejectedBeforeAnyUiMutation(path: \"C:\\\\test\\\\\\\"name.txt\")",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Native_password_metadata_and_patterns_are_real_and_secret_values_are_redacted",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.A_worker_timeout_is_bounded_and_a_new_session_can_attach",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeFileFilterTimingTests.A_dialog_polling_deadline_does_not_cancel_a_slow_native_request_or_destroy_the_session(waitForClosure: True)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Native_scope_excludes_a_real_unowned_external_fixture_process",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeFileFilterTimingTests.A_path_write_readback_mismatch_never_accepts_and_a_verified_retry_can_recover",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeWorkerLifecycleTests.An_inflight_cancellation_or_timeout_terminates_the_os_worker_and_allows_reattach(cancel: True)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeFileDialogValidationTests.UnsupportedPathSyntaxIsRejectedBeforeAnyUiMutation(path: \"relative.txt\")",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeFileDialogValidationTests.UnsupportedPathSyntaxIsRejectedBeforeAnyUiMutation(path: \"\\\\\\\\.\\\\NUL\")",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Two_real_pickers_in_one_process_require_an_explicit_dialog_id_and_keep_mutations_isolated",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeFileDialogValidationTests.UnsupportedPathSyntaxIsRejectedBeforeAnyUiMutation(path: \"C:\\\\test\\\\line\\nname.txt\")",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Native_scroll_pattern_changes_the_real_list_top_index",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeFileDialogValidationTests.UnsupportedPathSyntaxIsRejectedBeforeAnyUiMutation(path: \"C:\\\\test\\\\*.txt\")",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeFileFilterTimingTests.A_filter_tree_response_slower_than_the_visibility_budget_preserves_the_worker_and_dialog_identity",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeInputBatchTests.Cleanup_rejection_and_exception_preserve_the_original_error_and_attempt_every_release",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeFileDialogValidationTests.UnsupportedPathSyntaxIsRejectedBeforeAnyUiMutation(path: \"C:\\\\test\\\\CON.txt\")",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Native_patterns_owned_modals_scope_and_stale_session_ids_are_real",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeWorkerLifecycleTests.Disposing_a_real_worker_session_preserves_the_target_and_allows_reattach",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeFileDialogValidationTests.ExistingUnicodeFilesAndNewSavePathArePreservedExactly",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeInputBatchTests.Throwing_sender_preserves_its_exception_and_attempts_all_possible_releases_without_an_acknowledged_count",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeWorkerLifecycleTests.An_inflight_cancellation_or_timeout_terminates_the_os_worker_and_allows_reattach(cancel: False)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Native_pointer_confirms_arrival_and_refuses_clipped_moves_before_button_injection",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Closed_nodes_keep_precise_error_classification_during_repeated_modal_close_races",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeInputBatchTests.Successful_sender_receives_the_original_batch_once_and_returns_its_original_count",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Native_keyboard_input_refuses_a_third_owned_root_that_interrupts_target_focus",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Real_os_input_uses_scoped_element_coordinates_and_unicode_with_application_readback",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Native_input_waits_for_activation_when_alternating_between_scoped_windows",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeFileFilterTimingTests.A_dialog_polling_deadline_does_not_cancel_a_slow_native_request_or_destroy_the_session(waitForClosure: False)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeWorkerLifecycleTests.An_abrupt_parent_exit_reaps_its_real_worker_even_with_stdin_held_open_and_preserves_the_target",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Native_action_status_tracks_controlled_real_provider_pending_completion_and_failure",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeInputBatchTests.Partial_sender_counts_release_only_the_keys_and_buttons_left_down_in_each_prefix",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeFileDialogValidationTests.UnsupportedPathSyntaxIsRejectedBeforeAnyUiMutation(path: \"C:\\\\test\\\\LPT9.log\")",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.NativeAutomation.Tests.NativeFileDialogValidationTests.UnsupportedPathSyntaxIsRejectedBeforeAnyUiMutation(path: \"C:\\\\test\\\\name \\\\file.txt\")",
+          "outcome": "Passed"
+        }
+      ]
+    },
+    {
+      "project": "avaloniadevtool.previewer.tests",
+      "total": 15,
+      "passed": 15,
+      "failed": 0,
+      "notExecuted": 0,
+      "trx": "artifacts/agent-tools-ui-2026-10-25/input-final/10062_PALINK_2026-10-25_12_52_33_net10.0.trx",
+      "sha256": "8d640c803c1b7de69a6e6eb34ebb7f57fc8d07b7705f6866f41a4c43add1c261",
+      "cases": [
+        {
+          "name": "AvaloniaDevTool.Previewer.Tests.PreviewIntegrationTests.Optional_custom_assembly_uses_the_existing_default_context",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Previewer.Tests.PreviewIntegrationTests.Invalid_markup_and_unsupported_roots_keep_the_last_successful_control",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Previewer.Tests.PreviewIntegrationTests.Loader_applies_root_design_dimensions_without_mutating_global_design_mode",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Previewer.Tests.PreviewIntegrationTests.Classless_source_loads_into_a_real_control_and_renders_png",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Previewer.Tests.PreviewIntegrationTests.Command_line_requires_explicit_absolute_source_and_valid_options",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Previewer.Tests.PreviewIntegrationTests.Oversized_source_is_rejected_and_session_disposal_releases_content",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Previewer.Tests.PreviewIntegrationTests.Identical_build_copies_share_the_loaded_assembly_instead_of_loading_duplicate_types",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Previewer.Tests.PreviewIntegrationTests.Missing_watch_directory_is_a_visible_error_instead_of_a_startup_crash",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Previewer.Tests.PreviewIntegrationTests.No_watch_mode_requires_manual_reload_and_missing_source_is_recoverable",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Previewer.Tests.PreviewIntegrationTests.Watcher_recovers_from_incomplete_writes_and_deleted_files",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Previewer.Tests.PreviewIntegrationTests.Window_root_has_a_visible_host_notice_and_closing_the_document_keeps_the_host_open",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Previewer.Tests.PreviewIntegrationTests.Incompatible_avalonia_reference_is_rejected_before_loading_the_assembly",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Previewer.Tests.PreviewIntegrationTests.Preview_window_agent_exposes_reloaded_document_through_the_existing_pipe_protocol",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Previewer.Tests.PreviewIntegrationTests.Atomic_save_and_bursts_are_debounced_and_dispose_silences_pending_reload",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Previewer.Tests.PreviewIntegrationTests.Included_preview_sample_loads_resources_styles_bindings_and_design_dimensions",
+          "outcome": "Passed"
+        }
+      ]
+    },
+    {
+      "project": "avaloniadevtool.protocol.tests",
+      "total": 26,
+      "passed": 26,
+      "failed": 0,
+      "notExecuted": 0,
+      "trx": "artifacts/agent-tools-ui-2026-10-25/input-final/10062_PALINK_2026-10-25_12_52_36_net10.0.trx",
+      "sha256": "3a83ed3ee517350e3563f881e62169487886c89bc7e9f5b3c45d3991e417aef5",
+      "cases": [
+        {
+          "name": "AvaloniaDevTool.Protocol.Tests.TransportTests.RemoteErrorDoesNotCloseTheSession",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Protocol.Tests.TransportTests.InvalidFrameLengthIsRejectedBeforeAllocatingPayload(length: -1)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Protocol.Tests.TransportTests.OversizedInspectionResponseReportsAnErrorAndKeepsTheSessionUsable",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Protocol.Tests.WebSocketStreamTests.Fragments_and_separate_messages_are_read_as_one_rpc_byte_stream",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Protocol.Tests.RpcTraceTests.Actual_duplex_frames_correlate_opposite_ids_errors_notifications_and_redact_payloads",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Protocol.Tests.TransportTests.InvalidFrameLengthIsRejectedBeforeAllocatingPayload(length: 4194305)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Protocol.Tests.TransportTests.Client_disconnect_cancels_inflight_server_handler_without_waiting_for_a_reply",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Protocol.Tests.RpcTraceTests.Connection_ids_stop_and_clear_define_explicit_correlation_boundaries",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Protocol.Tests.TransportTests.DisconnectFailsPendingRequestInsteadOfLeavingItHanging",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Protocol.Tests.RpcTraceTests.Caller_cancellation_and_late_response_preserve_identity_and_do_not_poison_next_call",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Protocol.Tests.TransportTests.CancellationReleasesCallerAndLateReplyDoesNotCorruptNextRequest",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Protocol.Tests.BreakpointContractTests.Legacy_event_definition_keeps_object_id_as_receiver_and_new_source_filter_roundtrips",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Protocol.Tests.WebSocketStreamTests.Bidirectional_rpc_can_receive_an_answer_while_its_request_handler_is_pending",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Protocol.Tests.TransportTests.ClientReportsRemoteDisconnectAndCanEstablishAnotherSession",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Protocol.Tests.ProtocolJsonAotTests.GeneratedMetadataRoundTripsAnRpcEnvelopeAndNestedError",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Protocol.Tests.ProtocolJsonAotTests.EveryProtocolRecordAndItsWireCollectionsHaveGeneratedMetadata",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Protocol.Tests.RpcTraceTests.Unicode_payload_projection_and_history_are_bounded_and_valid_json",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Protocol.Tests.TransportTests.ConcurrentRequestsRetainTheirResultsAcrossFragmentedReads",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Protocol.Tests.RpcTraceTests.A_received_frame_is_not_a_success_when_typed_result_decoding_fails",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Protocol.Tests.ProtocolJsonAotTests.GeneratedMetadataPreservesWebWireFormatAndStringEnums",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Protocol.Tests.WebSocketStreamTests.Close_frame_returns_end_of_stream",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Protocol.Tests.WebSocketStreamTests.Fragmented_oversized_websocket_message_is_rejected_without_accumulating_a_message_buffer",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Protocol.Tests.TransportTests.ObserverFailureDoesNotTerminateTransport",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Protocol.Tests.TransportTests.VersionMismatchIsRejectedAndClientRemainsDisconnected",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Protocol.Tests.TransportTests.NotificationsDoNotConsumePendingResponses",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Protocol.Tests.TransportTests.InvalidFrameLengthIsRejectedBeforeAllocatingPayload(length: 0)",
+          "outcome": "Passed"
+        }
+      ]
+    },
+    {
+      "project": "avaloniadevtool.remote.tests",
+      "total": 11,
+      "passed": 11,
+      "failed": 0,
+      "notExecuted": 0,
+      "trx": "artifacts/agent-tools-ui-2026-10-25/input-final/10062_PALINK_2026-10-25_12_52_38_net10.0.trx",
+      "sha256": "b7e116606a83f17d909721b33e3962a1d7a8d2d245222b532017c1c06306e5d7",
+      "cases": [
+        {
+          "name": "AvaloniaDevTool.Remote.Tests.RemoteIntegrationTests.Caller_cancellation_stops_a_stalled_websocket_upgrade",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Remote.Tests.RemoteIntegrationTests.Weak_tokens_and_plaintext_nonloopback_listeners_are_rejected_before_listening",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Remote.Tests.RemoteIntegrationTests.Authentication_and_origin_fail_before_session_creation_and_never_expose_token",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Remote.Tests.RemoteIntegrationTests.Pipe_and_remote_share_a_single_gate_and_rejected_transport_does_not_dispose_active_session",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Remote.Tests.RemoteIntegrationTests.Text_and_invalid_rpc_frames_close_connection_then_allow_clean_reconnect(text: False)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Remote.Tests.RemoteIntegrationTests.Server_disposal_disconnects_clients_releases_session_and_closes_listener",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Remote.Tests.RemoteIntegrationTests.Text_and_invalid_rpc_frames_close_connection_then_allow_clean_reconnect(text: True)",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Remote.Tests.RemoteIntegrationTests.Real_websocket_typed_client_inspects_edits_receives_push_restores_and_reconnects",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Remote.Tests.RemoteIntegrationTests.Fragmented_binary_messages_preserve_native_rpc_framing",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Remote.Tests.RemoteIntegrationTests.Insecure_remote_addresses_credential_urls_are_rejected",
+          "outcome": "Passed"
+        },
+        {
+          "name": "AvaloniaDevTool.Remote.Tests.RemoteIntegrationTests.Untrusted_tls_certificate_is_rejected_without_an_insecure_fallback",
+          "outcome": "Passed"
+        }
+      ]
+    }
+  ],
+  "assemblies": [
+    {
+      "project": "AvaloniaDevTool.Agent",
+      "configuration": "debug",
+      "sha256": "db30b268de48b045d9489b70a93e60e14b18eac3ca705e16dca4a0393dd62c60"
+    },
+    {
+      "project": "AvaloniaDevTool.Cli",
+      "configuration": "debug",
+      "sha256": "03f94513c24b8d03a77513f39ef015b252e486549d8166ccf59ad5d5be62a9e3"
+    },
+    {
+      "project": "AvaloniaDevTool.Client",
+      "configuration": "debug",
+      "sha256": "f82e69aa465cd58ec59046fe86b1911a7a42b782b2d086c070b8a3d3da73e39d"
+    },
+    {
+      "project": "AvaloniaDevTool.Protocol",
+      "configuration": "debug",
+      "sha256": "3e2f7df01e170664d29373d6434e77bf29afd8792fd9e3b6b40d7b61b750e063"
+    },
+    {
+      "project": "AvaloniaDevTool.NativeAutomation",
+      "configuration": "debug",
+      "sha256": "f20b0678794740633db91109a01af5f0639b316ca5cf9b41893a10bb50a4cd9f"
+    },
+    {
+      "project": "AvaloniaDevTool.NativeAutomation.Worker",
+      "configuration": "debug",
+      "sha256": "3338a2a2f3b2a60679673768fe6161a9806fd8d433acb94d9820aa92871ab2a0"
+    },
+    {
+      "project": "AvaloniaDevTool.AutomationSample",
+      "configuration": "debug",
+      "sha256": "54c708bb5c46de51cc9138c9cb7c7823846482e2be9ce936ad15655a005b7020"
+    },
+    {
+      "project": "AvaloniaDevTool.Agent",
+      "configuration": "release",
+      "sha256": "1e3979d1c7dde1872fa0b219ef7d5e2800d29547dc13f202163934fe45e37a3a"
+    },
+    {
+      "project": "AvaloniaDevTool.Cli",
+      "configuration": "release",
+      "sha256": "877998304f7b3b194902665a4a41f2978fc68b2e475c00e8231df608385aae3d"
+    },
+    {
+      "project": "AvaloniaDevTool.Client",
+      "configuration": "release",
+      "sha256": "5d7984ab868b5e035826942b2985f7f1f3b3fc91afb54c2b4313e46b50dc14ec"
+    },
+    {
+      "project": "AvaloniaDevTool.Protocol",
+      "configuration": "release",
+      "sha256": "dbccbac8285e21a8d4bed7a0e5e4100fa5bc1e3d4090be285fd1f15a2b68a0f1"
+    },
+    {
+      "project": "AvaloniaDevTool.NativeAutomation",
+      "configuration": "release",
+      "sha256": "26b5d0362ba8ad7e31f29f99e065f0d2205136cfb4add3e18505ac3a521e7fef"
+    },
+    {
+      "project": "AvaloniaDevTool.NativeAutomation.Worker",
+      "configuration": "release",
+      "sha256": "19357927fe4661f42ba881f1937de1ed6ef72ca0faec346e68e8c31863fd4c2e"
+    },
+    {
+      "project": "AvaloniaDevTool.AutomationSample",
+      "configuration": "release",
+      "sha256": "2d4da1ef89ef5fdc8922f87e8adf950dc2020c1369c725001ed01d8efdd0afaf"
+    }
+  ],
+  "remainingOwnedRuntimeProcesses": [],
+  "defaultAgentToolCount": 39,
+  "allUiAcceptanceIdsComplete": false,
+  "remainingAcceptanceBoundaryIds": [
+    "NATIVE05",
+    "NATIVE10"
+  ],
+  "originalMcpRuntimeParityVerified": false,
+  "notes": [
+    "Real simultaneous common item dialogs are verified through the SDK/controller and UIA worker, not an MCP dual-dialog test.",
+    "Immediate path readback mismatch and slow polling responses use a synthetic provider process.",
+    "Partial input cleanup tests use a simulated sender. Successful-prefix interpretation is best effort; actual partial OS insertion and recovery remain unverified.",
+    "Actual PID/HWND reuse remains unverified. Native backends for macOS/Linux, IME, file/data drag-and-drop and a general release acceptance platform remain outside the implemented scope."
+  ]
+}

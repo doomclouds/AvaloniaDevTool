@@ -1,5 +1,7 @@
 # DeveloperTools 2.2.3 诊断服务深度分析
 
+> 历史研究：本文对应完整桌面产品基线 `main/fa1c623`，其中 GUI、外部后端、旧路线建议和阶段计数不作为当前分支交付范围或通过证据。保留它用于来源、许可和设计研究；当前官方 Agent/MCP 合同与原版证据边界见 [官方能力基准](../agent-tools/research/official-capabilities.md)，当前状态见 [实现状态](../implementation-status.md)。
+
 应用侧 SDK 已包含样式和值来源、绑定表达式、资源、资产、日志、路由事件、断点以及性能数据服务。自研时应把这些能力放在 Agent 内，再通过独立 DTO 暴露；桌面检查器负责展示、过滤和交互。原版某些诊断接口虽然可公开调用，仍带有 `PrivateApi` 标记或使用私有字段反射，不能当作跨版本稳定协议。
 
 本次覆盖官方 NuGet `AvaloniaUI.DiagnosticsSupport 2.2.3` 的 `lib/net10.0` 变体。下文的“观察”指 REA 元数据、CIL 调用关系及关键方法的 ILSpy 重建；没有执行该 SDK 的运行会话。桌面侧 UI 算法仍需独立证据，尤其是 Histogram 百分位、3D 展示和完整预览器流程。

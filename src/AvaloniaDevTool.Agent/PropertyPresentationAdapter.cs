@@ -21,6 +21,18 @@ internal static class PropertyPresentationAdapter
     public static string ClrId(PropertyInfo property) =>
         "clr:" + property.DeclaringType!.FullName + ":" + property.Name;
 
+    public static AvaloniaProperty? WrapperProperty(PropertyInfo property, IReadOnlyList<AvaloniaProperty> registered)
+    {
+        var field = property.DeclaringType!.GetField(property.Name + "Property",
+            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.DeclaredOnly);
+        if (field?.GetValue(null) is not AvaloniaProperty avalonia || !registered.Contains(avalonia) ||
+            avalonia.PropertyType != property.PropertyType) return null;
+        // Managed targets can verify the getter's field use. AOT retains the declared
+        // property/field metadata but has no IL method body to inspect.
+        return !System.Runtime.CompilerServices.RuntimeFeature.IsDynamicCodeSupported || IsBackingWrapper(property, registered)
+            ? avalonia : null;
+    }
+
     // Name equality alone cannot identify a wrapper: a derived CLR member may hide an Avalonia property.
     public static bool IsBackingWrapper(PropertyInfo property, IReadOnlyList<AvaloniaProperty> registered)
     {

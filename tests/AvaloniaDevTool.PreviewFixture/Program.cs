@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Headless;
 using Avalonia.Markup.Xaml;
 using Avalonia.Themes.Fluent;
 
@@ -7,12 +8,35 @@ namespace AvaloniaDevTool.PreviewFixture;
 
 public static class Program
 {
-    public static void Main() => throw new InvalidOperationException("Application Main must never execute during preview.");
+    public static void Main(string[] args)
+    {
+        if (!args.SequenceEqual(new[] { "--without-diagnostics" }))
+            throw new InvalidOperationException("Application Main must never execute during preview.");
+        AppBuilder.Configure<Application>().UseHeadless(new AvaloniaHeadlessPlatformOptions()).SetupWithoutStarting();
+        var window = new Window { Content = new TextBlock { Text = "Application without a diagnostics bridge" } };
+        window.Show();
+        Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(new
+        {
+            ready = window.IsVisible,
+            processId = Environment.ProcessId,
+            agentReferenced = typeof(Program).Assembly.GetReferencedAssemblies().Any(assembly => assembly.Name == "AvaloniaDevTool.Agent")
+        }));
+        Console.Out.Flush();
+        Console.ReadLine();
+        window.Close();
+    }
     public static AppBuilder BuildAvaloniaApp()
     {
         if (!Design.IsDesignMode) throw new InvalidOperationException("The builder requires the real designer mode flag.");
         Console.WriteLine("Target BuildAvaloniaApp stdout is deliberately noisy.");
         return AppBuilder.Configure<FixtureApp>().UsePlatformDetect();
+    }
+
+    public static void PublishPid(string path)
+    {
+        var temporary = path + ".pending";
+        File.WriteAllText(temporary, Environment.ProcessId.ToString(), System.Text.Encoding.UTF8);
+        File.Move(temporary, path, overwrite: true);
     }
 }
 
@@ -50,7 +74,7 @@ public static class BlockingStartup
     public static AppBuilder BuildAvaloniaApp()
     {
         if (Environment.GetEnvironmentVariable("AVDT_PREVIEW_TEST_PID") is { } path)
-            File.WriteAllText(path, Environment.ProcessId.ToString(), System.Text.Encoding.UTF8);
+            Program.PublishPid(path);
         Thread.Sleep(TimeSpan.FromSeconds(60));
         return Program.BuildAvaloniaApp();
     }

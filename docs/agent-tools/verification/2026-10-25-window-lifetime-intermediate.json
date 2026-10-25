@@ -1,0 +1,80 @@
+{
+  "capturedUtc": "2026-10-25T12:50:11.6297637Z",
+  "stage": "intermediate-windows-lifetime-regression",
+  "testExitCode": 1,
+  "sourceManifest": "docs/agent-tools/verification/source-manifest-window-lifetime.json",
+  "sourceFingerprint": "e377251b6a831f30425eebfd4febb0295836c381014eda952b85eac7d8017a89",
+  "total": 475.0,
+  "passed": 473.0,
+  "failed": 1.0,
+  "notExecuted": 1.0,
+  "projects": [
+    {
+      "project": "avaloniadevtool.agent.tests",
+      "total": 282,
+      "passed": 282,
+      "failed": 0,
+      "notExecuted": 0,
+      "trx": "artifacts/agent-tools-ui-2026-10-25/window-lifetime-intermediate/10062_PALINK_2026-10-25_13_28_25_net10.0.trx",
+      "sha256": "3e38f729145f80ad1085a4832aeb1f0282abd1e0701d385e46be7c469cc537c7",
+      "failures": []
+    },
+    {
+      "project": "avaloniadevtool.cli.tests",
+      "total": 89,
+      "passed": 88,
+      "failed": 1,
+      "notExecuted": 0,
+      "trx": "artifacts/agent-tools-ui-2026-10-25/window-lifetime-intermediate/10062_PALINK_2026-10-25_13_28_39_net10.0.trx",
+      "sha256": "f89ce4b9ae7bcbedda12e2175640305b71e7e52cd658f04e100214dc0fd3a524",
+      "failures": [
+        "AvaloniaDevTool.Cli.Tests.NativeFileDialogBoundaryMcpTests.Default_extension_is_verified_by_real_saved_path_bytes_and_reopened_content"
+      ]
+    },
+    {
+      "project": "avaloniadevtool.nativeautomation.tests",
+      "total": 52,
+      "passed": 51,
+      "failed": 0,
+      "notExecuted": 1,
+      "trx": "artifacts/agent-tools-ui-2026-10-25/window-lifetime-intermediate/10062_PALINK_2026-10-25_13_33_29_net10.0.trx",
+      "sha256": "fd940b5582694e98394f3a5535d5f50fe1b0b68775be6865f8151b4d8b724d76",
+      "failures": []
+    },
+    {
+      "project": "avaloniadevtool.previewer.tests",
+      "total": 15,
+      "passed": 15,
+      "failed": 0,
+      "notExecuted": 0,
+      "trx": "artifacts/agent-tools-ui-2026-10-25/window-lifetime-intermediate/10062_PALINK_2026-10-25_13_34_59_net10.0.trx",
+      "sha256": "5e368d8fe68c516326bd2edd1c731f694f0d39287b1e6fb5e32aee736c67398b",
+      "failures": []
+    },
+    {
+      "project": "avaloniadevtool.protocol.tests",
+      "total": 26,
+      "passed": 26,
+      "failed": 0,
+      "notExecuted": 0,
+      "trx": "artifacts/agent-tools-ui-2026-10-25/window-lifetime-intermediate/10062_PALINK_2026-10-25_13_35_01_net10.0.trx",
+      "sha256": "e4b0a320c6ca472786af626dc1f28c08dbbd2d2b4f1268014fe1247c189f2eed",
+      "failures": []
+    },
+    {
+      "project": "avaloniadevtool.remote.tests",
+      "total": 11,
+      "passed": 11,
+      "failed": 0,
+      "notExecuted": 0,
+      "trx": "artifacts/agent-tools-ui-2026-10-25/window-lifetime-intermediate/10062_PALINK_2026-10-25_13_35_05_net10.0.trx",
+      "sha256": "7d1314eecf14112d914b22b57a709383ff1f16148635048d62c761fd522b8bec",
+      "failures": []
+    }
+  ],
+  "notes": [
+    "Historical failed batch; not a result for the later filter fallback source.",
+    "No exact pre-run DLL hashes were captured before later builds replaced outputs.",
+    "The file-type combo was still collapsed and the worker remained alive; the private Expand completion status was not preserved in that failure."
+  ]
+}

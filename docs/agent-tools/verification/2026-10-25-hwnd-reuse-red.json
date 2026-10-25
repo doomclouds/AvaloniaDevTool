@@ -1,0 +1,285 @@
+{
+  "capturedUtc": "2026-10-25T05:16:49.2503065Z",
+  "stage": "native-hwnd-exact-reuse-red",
+  "actualExactRootReuse": true,
+  "outcome": "Failed",
+  "trxProduced": false,
+  "probe": {
+    "reuse": {
+      "status": "reused",
+      "processId": 33364,
+      "startTimeUtc": "2026-10-25T13:03:00.6352061+08:00",
+      "originalRoot": 28512516,
+      "originalEdit": 36966806,
+      "currentRoot": 28512516,
+      "currentEdit": 1644958102,
+      "rootReused": true,
+      "editReused": false,
+      "generation": 32767,
+      "editValue": "generation:32767",
+      "createdWindows": 32769,
+      "iterations": 32766,
+      "elapsedMs": 110512,
+      "distinctIndices": 1
+    },
+    "originalRootUia": {
+      "runtimeKey": "42.28512516",
+      "name": "AVDT HWND Cycle 1",
+      "value": null,
+      "error": "Microsoft.CSharp.RuntimeBinder.RuntimeBinderException: 'FlaUI.UIA3.UIA3FrameworkAutomationElement' does not contain a definition for 'Value'",
+      "hResult": -2146233088
+    },
+    "originalEditUia": {
+      "runtimeKey": "42.36966806",
+      "name": "",
+      "value": null,
+      "error": "Microsoft.CSharp.RuntimeBinder.RuntimeBinderException: 'FlaUI.UIA3.UIA3FrameworkAutomationElement' does not contain a definition for 'Value'",
+      "hResult": -2146233088
+    },
+    "oldRootUia": {
+      "runtimeKey": "42.28512516",
+      "name": "AVDT HWND Cycle 32767",
+      "value": null,
+      "error": "Microsoft.CSharp.RuntimeBinder.RuntimeBinderException: 'FlaUI.UIA3.UIA3FrameworkAutomationElement' does not contain a definition for 'Value'",
+      "hResult": -2146233088
+    },
+    "oldEditUia": {
+      "runtimeKey": null,
+      "name": null,
+      "value": null,
+      "error": "System.Runtime.InteropServices.COMException: 事件无法调用任何订户 (0x80040201)",
+      "hResult": -2147220991
+    },
+    "replacementRootUia": {
+      "runtimeKey": "42.28512516",
+      "name": "AVDT HWND Cycle 32767",
+      "value": null,
+      "error": "Microsoft.CSharp.RuntimeBinder.RuntimeBinderException: 'FlaUI.UIA3.UIA3FrameworkAutomationElement' does not contain a definition for 'Value'",
+      "hResult": -2146233088
+    },
+    "replacementEditUia": {
+      "runtimeKey": "42.1644958102",
+      "name": "",
+      "value": null,
+      "error": "Microsoft.CSharp.RuntimeBinder.RuntimeBinderException: 'FlaUI.UIA3.UIA3FrameworkAutomationElement' does not contain a definition for 'Value'",
+      "hResult": -2146233088
+    }
+  },
+  "nativeIdentities": {
+    "original": {
+      "root": {
+        "nodeId": "native:c415477ef8174f1295f6314bb74065a3:b709e8f93271411d828ef3eba6f2e35d",
+        "handle": 28512516,
+        "ownerHandle": 0,
+        "processId": 33364,
+        "title": "AVDT HWND Cycle 1",
+        "className": "Static",
+        "isModal": false,
+        "isOwned": false,
+        "isEnabled": true,
+        "isVisible": true,
+        "windowVisualState": "Normal"
+      },
+      "edit": {
+        "nodeId": "native:c415477ef8174f1295f6314bb74065a3:f5fca3cd5f414b12980f1c0ef3b7f013",
+        "parentNodeId": "native:c415477ef8174f1295f6314bb74065a3:b709e8f93271411d828ef3eba6f2e35d",
+        "depth": 1,
+        "processId": 33364,
+        "nativeWindowHandle": 36966806,
+        "automationId": "202",
+        "name": "",
+        "controlType": "Edit",
+        "className": "Edit",
+        "frameworkId": "Win32",
+        "isEnabled": true,
+        "isOffscreen": false,
+        "isPassword": false,
+        "hasKeyboardFocus": false,
+        "bounds": {
+          "x": 96,
+          "y": 142,
+          "width": 400,
+          "height": 48
+        },
+        "value": "generation:1",
+        "toggleState": null,
+        "expandCollapseState": null,
+        "isSelected": null,
+        "windowVisualState": null,
+        "supportedPatterns": [
+          "LegacyIAccessible",
+          "Text2",
+          "Text",
+          "Value"
+        ]
+      }
+    },
+    "replacement": {
+      "root": {
+        "nodeId": "native:c415477ef8174f1295f6314bb74065a3:b709e8f93271411d828ef3eba6f2e35d",
+        "handle": 28512516,
+        "ownerHandle": 0,
+        "processId": 33364,
+        "title": "AVDT HWND Cycle 32767",
+        "className": "Static",
+        "isModal": false,
+        "isOwned": false,
+        "isEnabled": true,
+        "isVisible": true,
+        "windowVisualState": "Normal"
+      },
+      "edit": {
+        "nodeId": "native:c415477ef8174f1295f6314bb74065a3:e282de82388f4031a4abc358cf2ccb4e",
+        "parentNodeId": "native:c415477ef8174f1295f6314bb74065a3:b709e8f93271411d828ef3eba6f2e35d",
+        "depth": 1,
+        "processId": 33364,
+        "nativeWindowHandle": 1644958102,
+        "automationId": "202",
+        "name": "",
+        "controlType": "Edit",
+        "className": "Edit",
+        "frameworkId": "Win32",
+        "isEnabled": true,
+        "isOffscreen": false,
+        "isPassword": false,
+        "hasKeyboardFocus": false,
+        "bounds": {
+          "x": 96,
+          "y": 142,
+          "width": 400,
+          "height": 48
+        },
+        "value": "generation:32767",
+        "toggleState": null,
+        "expandCollapseState": null,
+        "isSelected": null,
+        "windowVisualState": null,
+        "supportedPatterns": [
+          "LegacyIAccessible",
+          "Text2",
+          "Text",
+          "Value"
+        ]
+      }
+    },
+    "oldRootBefore": {
+      "nodeId": "native:c415477ef8174f1295f6314bb74065a3:b709e8f93271411d828ef3eba6f2e35d",
+      "element": {
+        "nodeId": "native:c415477ef8174f1295f6314bb74065a3:b709e8f93271411d828ef3eba6f2e35d",
+        "parentNodeId": null,
+        "depth": 0,
+        "processId": 33364,
+        "nativeWindowHandle": 28512516,
+        "automationId": "",
+        "name": "AVDT HWND Cycle 32767",
+        "controlType": "Text",
+        "className": "Static",
+        "frameworkId": "Win32",
+        "isEnabled": true,
+        "isOffscreen": false,
+        "isPassword": false,
+        "hasKeyboardFocus": false,
+        "bounds": {
+          "x": 64,
+          "y": 64,
+          "width": 480,
+          "height": 200
+        },
+        "value": null,
+        "toggleState": null,
+        "expandCollapseState": null,
+        "isSelected": null,
+        "windowVisualState": "Normal",
+        "supportedPatterns": [
+          "LegacyIAccessible",
+          "Transform",
+          "Window"
+        ]
+      },
+      "errorCode": null
+    },
+    "oldEditBefore": {
+      "nodeId": "native:c415477ef8174f1295f6314bb74065a3:f5fca3cd5f414b12980f1c0ef3b7f013",
+      "element": null,
+      "errorCode": "stale_node"
+    },
+    "oldRootAfter": {
+      "nodeId": "native:c415477ef8174f1295f6314bb74065a3:b709e8f93271411d828ef3eba6f2e35d",
+      "element": {
+        "nodeId": "native:c415477ef8174f1295f6314bb74065a3:b709e8f93271411d828ef3eba6f2e35d",
+        "parentNodeId": null,
+        "depth": 0,
+        "processId": 33364,
+        "nativeWindowHandle": 28512516,
+        "automationId": "",
+        "name": "AVDT HWND Cycle 32767",
+        "controlType": "Text",
+        "className": "Static",
+        "frameworkId": "Win32",
+        "isEnabled": true,
+        "isOffscreen": false,
+        "isPassword": false,
+        "hasKeyboardFocus": false,
+        "bounds": {
+          "x": 64,
+          "y": 64,
+          "width": 480,
+          "height": 200
+        },
+        "value": null,
+        "toggleState": null,
+        "expandCollapseState": null,
+        "isSelected": null,
+        "windowVisualState": "Normal",
+        "supportedPatterns": [
+          "LegacyIAccessible",
+          "Transform",
+          "Window"
+        ]
+      },
+      "errorCode": null
+    },
+    "oldEditAfter": {
+      "nodeId": "native:c415477ef8174f1295f6314bb74065a3:f5fca3cd5f414b12980f1c0ef3b7f013",
+      "element": null,
+      "errorCode": "stale_node"
+    }
+  },
+  "provenance": {
+    "actualExactRootReuse": true,
+    "iterations": 32766,
+    "elapsedMs": 110512,
+    "originalRoot": 28512516,
+    "replacementRoot": 28512516,
+    "runtimeKeyBeforeAndAfter": "42.28512516",
+    "oldRootProxyReadReplacementNameBeforeRediscovery": true,
+    "testOutcome": "Failed at AssertExpired(oldRootBefore)",
+    "trxProduced": false,
+    "outputProvenance": "Exact tool output recovered from the task session JSONL record for chunk 01416d",
+    "sourceSnapshot": "source-current was captured after the red run. The fixture matches the run; the test source includes subsequent Value diagnostic and stale Edit action refinements. No production backend edit was made by this agent.",
+    "command": "dotnet test tests\\AvaloniaDevTool.NativeAutomation.Tests\\AvaloniaDevTool.NativeAutomation.Tests.csproj --no-build --filter FullyQualifiedName~An_observed_exact_root_hwnd_reuse --logger console;verbosity=detailed"
+  },
+  "rawFiles": [
+    {
+      "path": "artifacts/agent-tools-ui-2026-10-25/hwnd-reuse-red/strict-red-console.txt",
+      "sha256": "952f48b1d07fae6b2583a35d79b6e7627829239cdb884f82067668f3f21bfaba"
+    },
+    {
+      "path": "artifacts/agent-tools-ui-2026-10-25/hwnd-reuse-red/hwnd-reuse-probe.json",
+      "sha256": "53a4014918dbafd0cdb682383b10451dadb6696e16a2da797599b6a2faad6623"
+    },
+    {
+      "path": "artifacts/agent-tools-ui-2026-10-25/hwnd-reuse-red/hwnd-reuse-native-identities.json",
+      "sha256": "ef4c6577e1e53e3925d8fe0757be88f3bff23a38d79ec1e4c324d1f0fb2c0be2"
+    },
+    {
+      "path": "artifacts/agent-tools-ui-2026-10-25/hwnd-reuse-red/metadata.json",
+      "sha256": "5f8816cef9db583f744c1122b9cae2da47482cea213d340e3f9885d1f9e83917"
+    }
+  ],
+  "notes": [
+    "Native node ID and saved raw UIA root proxy both observed the replacement after actual full HWND reuse.",
+    "The private Value diagnostic failed in this red run; RuntimeId and Name were captured before that failure. Public native EDIT Value reads are recorded separately.",
+    "No TRX was produced in the initial red run. The source snapshot was captured after diagnostic/test refinements and is not an exact pre-red source manifest."
+  ]
+}

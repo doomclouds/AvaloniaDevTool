@@ -12,7 +12,7 @@ public static class ResourceQueryMethods
 [JsonConverter(typeof(JsonStringEnumConverter<ResourceQuerySort>))]
 public enum ResourceQuerySort { Key, Type, Source }
 
-public sealed record ResourceTreeQueryRequest(long? ObjectId = null, int MaxNodes = 512);
+public sealed record ResourceTreeQueryRequest(long? ObjectId = null, int MaxNodes = 512, bool OnlySelf = false);
 public sealed record ResourceProviderInfo(long Id, string Name, string Scope, string? Theme, string Path,
     string TypeName, int EntryCount, bool CanEnumerate, bool IsReference, bool IsCycle,
     IReadOnlyList<ResourceProviderInfo> Children);

@@ -13,7 +13,7 @@ public sealed partial class MainWindow
         try
         {
             await clipboard.SetTextAsync(token);
-            ViewModel.Status = "本次连接令牌已复制；请粘贴到 Inspector 的遮罩输入框，令牌不放入地址。";
+            ViewModel.Status = "本次连接令牌已复制；请作为诊断客户端的独立连接参数使用，令牌不放入地址。";
         }
         catch (Exception error) { ViewModel.Status = "复制令牌失败：" + error.GetType().Name; }
     }

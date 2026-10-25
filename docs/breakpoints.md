@@ -1,5 +1,7 @@
 # 属性与事件断点
 
+> 范围说明：本文保留 Agent/Client 扩展服务的协议、预算、恢复和历史验证资料。文中 Inspector 界面、操作和旧阶段结果仅适用于完整桌面基线 `main/fa1c623`，不代表当前分支 GUI 或统一回归；当前默认 official 的 16 项合同以 [官方能力基准](agent-tools/research/official-capabilities.md) 和对应功能文档为准。扩展入口须显式使用 `--profile extended`，并以该目录的 `tools/list` 确认参数。
+
 断点服务在目标应用的会话内观察 Avalonia 属性变化或路由事件，按命中次数执行日志或暂停动作，并向检查器发送命中记录。断开会话时释放全部监听器和待发送记录；已有属性、绑定和业务事件处理保持原来的语义。
 
 默认只记录并可输出日志，`Suspend=false`。暂停使用 `Debugger.Break()`，必须已有调试器附加。创建暂停断点、启用暂停断点和实际执行暂停前均检查 `Debugger.IsAttached`，避免弹出未附加调试器的 JIT 窗口。

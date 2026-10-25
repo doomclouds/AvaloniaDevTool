@@ -1,0 +1,298 @@
+{
+  "capturedUtc": "2026-10-25T15:01:48.2314570Z",
+  "status": "Passed",
+  "total": 1,
+  "passed": 1,
+  "failed": 0,
+  "notExecuted": 0,
+  "testName": "AvaloniaDevTool.NativeAutomation.Tests.NativeHwndReuseTests.An_observed_exact_root_hwnd_reuse_does_not_redirect_original_native_node_ids",
+  "sourceManifest": "docs/agent-tools/verification/source-manifest-capabilities-final.json",
+  "sourceManifestSha256": "6d57b48d4215e9fdbfe03432001e8becd2598db0eec4a7ad8aef046f9024a4fa",
+  "sourceFingerprint": "56cd76d500c30328c0bb96a64f460237fb3388991c27a1026402bb5eb52e8d3f",
+  "sourceDrift": 0,
+  "configuration": "Debug",
+  "sourceChangesMade": false,
+  "baselineRegression": "docs/agent-tools/verification/2026-10-25-capabilities-final.json",
+  "trx": "artifacts/agent-tools-ui-2026-10-25/hwnd-explicit-20261025-2257/hwnd-explicit.trx",
+  "trxSha256": "d9881ea8e95ecfcc6cb1e1fb20484a1f8c12764caba6b9f399db5e479bfbaf9c",
+  "binaries": [
+    {
+      "assembly": "AvaloniaDevTool.NativeAutomation.Tests",
+      "sha256": "bc18b01164da7bc101658351a2f1ecad039b15647ec9887d3673d4627ab9a365"
+    },
+    {
+      "assembly": "AvaloniaDevTool.NativeAutomation.Fixture",
+      "sha256": "dbf8f0c20911bf42fbe57dfda4231d70d09fd7907eca82582b173b65dd8d0825"
+    },
+    {
+      "assembly": "AvaloniaDevTool.NativeAutomation.Worker",
+      "sha256": "d2814acfeb17b8b6e78bef33440e06e786fc244047cd70d223b78f55eba4288a"
+    },
+    {
+      "assembly": "AvaloniaDevTool.NativeAutomation",
+      "sha256": "4045e037e4cdf79ac4bc0485cf798c1f0f32bfc459b3b890e332bd8b1bcad306"
+    }
+  ],
+  "reuse": {
+    "status": "reused",
+    "processId": 15712,
+    "startTimeUtc": "2026-10-25T22:57:26.1357063+08:00",
+    "originalRoot": 593860,
+    "originalEdit": 6688108,
+    "currentRoot": 593860,
+    "currentEdit": 790284,
+    "rootReused": true,
+    "editReused": false,
+    "generation": 32767,
+    "editValue": "generation:32767",
+    "createdWindows": 32769,
+    "iterations": 32766,
+    "elapsedMs": 61173,
+    "distinctIndices": 1,
+    "originalSlotVisits": 32766,
+    "blockersRetained": 0,
+    "blockersRemaining": 0,
+    "peakOwnedWindows": 2,
+    "workingSetBytes": 46088192,
+    "kernelHandles": 370,
+    "userObjects": 7,
+    "budgetReason": null
+  },
+  "uiaDiagnostics": {
+    "reuse": {
+      "status": "reused",
+      "processId": 15712,
+      "startTimeUtc": "2026-10-25T22:57:26.1357063+08:00",
+      "originalRoot": 593860,
+      "originalEdit": 6688108,
+      "currentRoot": 593860,
+      "currentEdit": 790284,
+      "rootReused": true,
+      "editReused": false,
+      "generation": 32767,
+      "editValue": "generation:32767",
+      "createdWindows": 32769,
+      "iterations": 32766,
+      "elapsedMs": 61173,
+      "distinctIndices": 1,
+      "originalSlotVisits": 32766,
+      "blockersRetained": 0,
+      "blockersRemaining": 0,
+      "peakOwnedWindows": 2,
+      "workingSetBytes": 46088192,
+      "kernelHandles": 370,
+      "userObjects": 7,
+      "budgetReason": null
+    },
+    "originalRootUia": {
+      "runtimeKey": "42.593860",
+      "name": "AVDT HWND Cycle 1",
+      "value": null,
+      "error": null,
+      "hResult": 0
+    },
+    "originalEditUia": {
+      "runtimeKey": "42.6688108",
+      "name": "",
+      "value": "generation:1",
+      "error": null,
+      "hResult": 0
+    },
+    "oldRootUia": {
+      "runtimeKey": "42.593860",
+      "name": "AVDT HWND Cycle 32767",
+      "value": null,
+      "error": null,
+      "hResult": 0
+    },
+    "oldEditUia": {
+      "runtimeKey": null,
+      "name": null,
+      "value": null,
+      "error": "System.Runtime.InteropServices.COMException: 事件无法调用任何订户 (0x80040201)",
+      "hResult": -2147220991
+    },
+    "replacementRootUia": {
+      "runtimeKey": "42.593860",
+      "name": "AVDT HWND Cycle 32767",
+      "value": null,
+      "error": null,
+      "hResult": 0
+    },
+    "replacementEditUia": {
+      "runtimeKey": "42.790284",
+      "name": "",
+      "value": "generation:32767",
+      "error": null,
+      "hResult": 0
+    }
+  },
+  "nativeIdentities": {
+    "original": {
+      "root": {
+        "nodeId": "native:cc8c40c752d140f594184652da5a3446:0d0f04ed53574e748a0b61368fd53189",
+        "handle": 593860,
+        "ownerHandle": 0,
+        "processId": 15712,
+        "title": "AVDT HWND Cycle 1",
+        "className": "Static",
+        "isModal": false,
+        "isOwned": false,
+        "isEnabled": true,
+        "isVisible": true,
+        "windowVisualState": null
+      },
+      "edit": {
+        "nodeId": "native:cc8c40c752d140f594184652da5a3446:a5c0da9b17314413ae62cb817bf04068",
+        "parentNodeId": "native:cc8c40c752d140f594184652da5a3446:0d0f04ed53574e748a0b61368fd53189",
+        "depth": 1,
+        "processId": 15712,
+        "nativeWindowHandle": 6688108,
+        "automationId": "202",
+        "name": "",
+        "controlType": "Edit",
+        "className": "Edit",
+        "frameworkId": "Win32",
+        "isEnabled": true,
+        "isOffscreen": false,
+        "isPassword": false,
+        "hasKeyboardFocus": false,
+        "bounds": {
+          "x": 80,
+          "y": 80,
+          "width": 400,
+          "height": 48
+        },
+        "value": "generation:1",
+        "toggleState": null,
+        "expandCollapseState": null,
+        "isSelected": null,
+        "windowVisualState": null,
+        "supportedPatterns": [
+          "LegacyIAccessible",
+          "Text2",
+          "Text",
+          "Value"
+        ]
+      }
+    },
+    "replacement": {
+      "root": {
+        "nodeId": "native:cc8c40c752d140f594184652da5a3446:38fba2e5f63543c4ae8d860335c13c53",
+        "handle": 593860,
+        "ownerHandle": 0,
+        "processId": 15712,
+        "title": "AVDT HWND Cycle 32767",
+        "className": "Static",
+        "isModal": false,
+        "isOwned": false,
+        "isEnabled": true,
+        "isVisible": true,
+        "windowVisualState": null
+      },
+      "edit": {
+        "nodeId": "native:cc8c40c752d140f594184652da5a3446:e808ba9d906548e3918d3dc2af4b1cf8",
+        "parentNodeId": "native:cc8c40c752d140f594184652da5a3446:38fba2e5f63543c4ae8d860335c13c53",
+        "depth": 1,
+        "processId": 15712,
+        "nativeWindowHandle": 790284,
+        "automationId": "202",
+        "name": "",
+        "controlType": "Edit",
+        "className": "Edit",
+        "frameworkId": "Win32",
+        "isEnabled": true,
+        "isOffscreen": false,
+        "isPassword": false,
+        "hasKeyboardFocus": false,
+        "bounds": {
+          "x": 80,
+          "y": 80,
+          "width": 400,
+          "height": 48
+        },
+        "value": "generation:32767",
+        "toggleState": null,
+        "expandCollapseState": null,
+        "isSelected": null,
+        "windowVisualState": null,
+        "supportedPatterns": [
+          "LegacyIAccessible",
+          "Text2",
+          "Text",
+          "Value"
+        ]
+      }
+    },
+    "oldRootBefore": {
+      "nodeId": "native:cc8c40c752d140f594184652da5a3446:0d0f04ed53574e748a0b61368fd53189",
+      "element": null,
+      "errorCode": "stale_node"
+    },
+    "oldEditBefore": {
+      "nodeId": "native:cc8c40c752d140f594184652da5a3446:a5c0da9b17314413ae62cb817bf04068",
+      "element": null,
+      "errorCode": "stale_node"
+    },
+    "oldRootAfter": {
+      "nodeId": "native:cc8c40c752d140f594184652da5a3446:0d0f04ed53574e748a0b61368fd53189",
+      "element": null,
+      "errorCode": "stale_node"
+    },
+    "oldEditAfter": {
+      "nodeId": "native:cc8c40c752d140f594184652da5a3446:a5c0da9b17314413ae62cb817bf04068",
+      "element": null,
+      "errorCode": "stale_node"
+    },
+    "oldEditAction": {
+      "status": "rejected",
+      "errorCode": "stale_node"
+    },
+    "afterOldEditAction": {
+      "status": "state",
+      "processId": 15712,
+      "startTimeUtc": "2026-10-25T22:57:26.1357063+08:00",
+      "originalRoot": 593860,
+      "originalEdit": 6688108,
+      "currentRoot": 593860,
+      "currentEdit": 790284,
+      "rootReused": true,
+      "editReused": false,
+      "generation": 32767,
+      "editValue": "generation:32767",
+      "createdWindows": 32769,
+      "iterations": 0,
+      "elapsedMs": 0,
+      "distinctIndices": 0,
+      "originalSlotVisits": 32766,
+      "blockersRetained": 0,
+      "blockersRemaining": 0,
+      "peakOwnedWindows": 2,
+      "workingSetBytes": 46366720,
+      "kernelHandles": 375,
+      "userObjects": 7,
+      "budgetReason": null
+    }
+  },
+  "staleRootFocus": {
+    "status": "rejected",
+    "errorCode": "stale_node"
+  },
+  "remainingOwnedProcesses": [],
+  "budget": {
+    "timeMs": 180000,
+    "maxIterations": 2000000,
+    "maxBlockers": 32,
+    "maxOwnedWindows": 34,
+    "sampledWorkingSetBytes": 268435456,
+    "sampledKernelHandles": 1024,
+    "sampledUserObjects": 128,
+    "resourceSampleEveryIterations": 256
+  },
+  "limitations": [
+    "This is a separate explicit run. The prior full regression retains its original 579 passed and 1 NotExecuted outcomes.",
+    "Exact root HWND reuse occurred in the same process; the child HWND was not reused.",
+    "Old-ID SetValue and Focus were attempted after stale reads had retired those IDs. This does not independently test an action as the first request following reuse.",
+    "WinEvent delivery remains asynchronous; no atomic lifetime barrier, all-provider guarantee, actual PID reuse or OS partial-input failure is claimed."
+  ]
+}
