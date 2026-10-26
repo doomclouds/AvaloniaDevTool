@@ -20,8 +20,10 @@ public sealed class NativeFileDialogBoundaryMcpTests
 {
     private const string TextProperty = "Avalonia.Controls.TextBlock:Text";
     private static readonly UTF8Encoding Utf8 = new(false, true);
+
     private static readonly JsonSerializerOptions WireOptions = new(ProtocolJson.Options)
-    { Converters = { new JsonStringEnumConverter() } };
+        { Converters = { new JsonStringEnumConverter() } };
+
     private static CancellationToken Token => TestContext.Current.CancellationToken;
     public static bool IsInteractiveWindows => OperatingSystem.IsWindows() && Environment.UserInteractive;
 
@@ -46,17 +48,24 @@ public sealed class NativeFileDialogBoundaryMcpTests
         await File.WriteAllTextAsync(replacement, "External replacement\n", Utf8, Token);
         var picker = await OpenPicker(client, fixture, "OpenSingleButton");
         var selected = await SetPaths(client, picker.Info.DialogId, "OpenFile", requested);
-        var changed = Read<NativeActionResult>(await Call(client, "native-action", ("nodeId", selected.PathInputNodeId),
-            ("action", "SetValue"), ("value", replacement)));
+        var changed = Read<NativeActionResult>(await Call(client,
+            "native-action",
+            ("nodeId", selected.PathInputNodeId),
+            ("action", "SetValue"),
+            ("value", replacement)));
         Assert.NotEqual("failed", changed.Status);
-        var externallyChanged = Read<NativeFileDialogInfo>(await Call(client, "file-dialog-inspect", ("dialogId", picker.Info.DialogId)));
+        var externallyChanged =
+            Read<NativeFileDialogInfo>(await Call(client, "file-dialog-inspect", ("dialogId", picker.Info.DialogId)));
         Assert.Equal(replacement, externallyChanged.PathInputValue);
-        AssertError(await Call(client, "file-dialog-accept", ("dialogId", picker.Info.DialogId)), "file_dialog_selection_changed");
-        var retained = Read<NativeFileDialogInfo>(await Call(client, "file-dialog-inspect", ("dialogId", picker.Info.DialogId)));
+        AssertError(await Call(client, "file-dialog-accept", ("dialogId", picker.Info.DialogId)),
+            "file_dialog_selection_changed");
+        var retained =
+            Read<NativeFileDialogInfo>(await Call(client, "file-dialog-inspect", ("dialogId", picker.Info.DialogId)));
         Assert.Equal("Open", retained.State);
         Assert.Equal(replacement, retained.PathInputValue);
         Assert.Equal([requested], retained.RequestedPaths);
-        Assert.Contains(Read<NativeFileDialogInfo[]>(await Call(client, "file-dialogs")), item => item.DialogId == picker.Info.DialogId);
+        Assert.Contains(Read<NativeFileDialogInfo[]>(await Call(client, "file-dialogs")),
+            item => item.DialogId == picker.Info.DialogId);
         Assert.False(fixture.HasResult);
         await CancelAndClose(client, picker);
         var cancelled = await fixture.WaitResultAsync(0, "openSingle");
@@ -79,20 +88,32 @@ public sealed class NativeFileDialogBoundaryMcpTests
         await SetPaths(client, picker.Info.DialogId, "SaveFile", target);
         Read<NativeFileDialogInfo>(await Call(client, "file-dialog-accept", ("dialogId", picker.Info.DialogId)));
         var first = await WaitOverwritePrompt(client, picker.Info.DialogId, fixture.ProcessId);
-        Read<NativeFileDialogInfo>(await Call(client, "file-dialog-overwrite", ("dialogId", picker.Info.DialogId),
-            ("promptId", first.Window.NodeId), ("overwrite", false)));
+        Read<NativeFileDialogInfo>(await Call(client,
+            "file-dialog-overwrite",
+            ("dialogId", picker.Info.DialogId),
+            ("promptId", first.Window.NodeId),
+            ("overwrite", false)));
         await WaitNoPrompts(client, picker.Info.DialogId);
 
         await SetPaths(client, picker.Info.DialogId, "SaveFile", target);
         Read<NativeFileDialogInfo>(await Call(client, "file-dialog-accept", ("dialogId", picker.Info.DialogId)));
         var second = await WaitOverwritePrompt(client, picker.Info.DialogId, fixture.ProcessId);
         Assert.NotEqual(first.Window.NodeId, second.Window.NodeId);
-        var promptBefore = Read<NativeTreeResult>(await Call(client, "native-tree", ("rootNodeId", second.Window.NodeId),
-            ("maxDepth", 6), ("maxNodes", 150)));
+        var promptBefore = Read<NativeTreeResult>(await Call(client,
+            "native-tree",
+            ("rootNodeId", second.Window.NodeId),
+            ("maxDepth", 6),
+            ("maxNodes", 150)));
         Assert.False(promptBefore.Truncated);
-        AssertError(await Call(client, "file-dialog-overwrite", ("dialogId", picker.Info.DialogId),
-            ("promptId", first.Window.NodeId), ("overwrite", true)), "stale_file_dialog_prompt");
-        var after = Read<NativeFileDialogInfo>(await Call(client, "file-dialog-inspect", ("dialogId", picker.Info.DialogId)));
+        AssertError(await Call(client,
+                "file-dialog-overwrite",
+                ("dialogId", picker.Info.DialogId),
+                ("promptId", first.Window.NodeId),
+                ("overwrite", true)),
+            "stale_file_dialog_prompt");
+        var after = Read<NativeFileDialogInfo>(await Call(client,
+            "file-dialog-inspect",
+            ("dialogId", picker.Info.DialogId)));
         Assert.Equal("ConfirmationRequired", after.State);
         var retained = Assert.Single(after.Prompts);
         Assert.Equal(second.Window.NodeId, retained.Window.NodeId);
@@ -101,8 +122,11 @@ public sealed class NativeFileDialogBoundaryMcpTests
         Assert.Equal(second.NoNodeId, retained.NoNodeId);
         Assert.Equal(original, await File.ReadAllBytesAsync(target, Token));
         Assert.False(fixture.HasResult);
-        Read<NativeFileDialogInfo>(await Call(client, "file-dialog-overwrite", ("dialogId", picker.Info.DialogId),
-            ("promptId", retained.Window.NodeId), ("overwrite", false)));
+        Read<NativeFileDialogInfo>(await Call(client,
+            "file-dialog-overwrite",
+            ("dialogId", picker.Info.DialogId),
+            ("promptId", retained.Window.NodeId),
+            ("overwrite", false)));
         await WaitNoPrompts(client, picker.Info.DialogId);
         await CancelAndClose(client, picker);
         var result = await fixture.WaitResultAsync(0, "saveAs");
@@ -119,23 +143,42 @@ public sealed class NativeFileDialogBoundaryMcpTests
         await SelectFilesTab(client);
         const string content = "Default extension output 中文 😀\n";
         var editor = await FindManaged(client, "DocumentEditor");
-        Read<TextSelectionResult>(await Call(client, "ui-text-selection", ("nodeId", editor), ("replacementText", content)));
+        Read<TextSelectionResult>(await Call(client,
+            "ui-text-selection",
+            ("nodeId", editor),
+            ("replacementText", content)));
         var extensionless = Path.Combine(fixture.DirectoryPath, "默认 扩展名");
         var expected = extensionless + ".txt";
         var picker = await OpenPicker(client, fixture, "SaveAsButton");
-        var filterResponse = await Call(client, "file-dialog-set-filter", ("dialogId", picker.Info.DialogId), ("filterIndex", 1));
+        var filterResponse = await Call(client,
+            "file-dialog-set-filter",
+            ("dialogId", picker.Info.DialogId),
+            ("filterIndex", 1));
         if (filterResponse.IsError == true)
         {
             // Persist the original failure before any probe can invalidate or time out.
-            await fixture.WriteEvidenceAsync("save-filter-failure.json", new
-            { response = Text(filterResponse), filterResponse, picker = picker.Info });
-            await fixture.CaptureToolEvidenceAsync("save-filter-dialog.json", () =>
-                Call(client, "file-dialog-inspect", ("dialogId", picker.Info.DialogId)));
-            await fixture.CaptureToolEvidenceAsync("save-filter-picker-tree.json", () =>
-                Call(client, "native-tree", ("rootNodeId", picker.Info.DialogId), ("maxDepth", 20), ("maxNodes", 5000)));
-            await fixture.CaptureToolEvidenceAsync("save-filter-combo-tree.json", () =>
-                Call(client, "native-tree", ("rootNodeId", picker.Info.FilterNodeId), ("maxDepth", 20), ("maxNodes", 500)));
+            await fixture.WriteEvidenceAsync("save-filter-failure.json",
+                new
+                    { response = Text(filterResponse), filterResponse, picker = picker.Info });
+            await fixture.CaptureToolEvidenceAsync("save-filter-dialog.json",
+                () =>
+                    Call(client, "file-dialog-inspect", ("dialogId", picker.Info.DialogId)));
+            await fixture.CaptureToolEvidenceAsync("save-filter-picker-tree.json",
+                () =>
+                    Call(client,
+                        "native-tree",
+                        ("rootNodeId", picker.Info.DialogId),
+                        ("maxDepth", 20),
+                        ("maxNodes", 5000)));
+            await fixture.CaptureToolEvidenceAsync("save-filter-combo-tree.json",
+                () =>
+                    Call(client,
+                        "native-tree",
+                        ("rootNodeId", picker.Info.FilterNodeId),
+                        ("maxDepth", 20),
+                        ("maxNodes", 500)));
         }
+
         var plain = Read<NativeFileDialogInfo>(filterResponse);
         Assert.False(string.IsNullOrWhiteSpace(plain.FilterValue));
         await SetPaths(client, picker.Info.DialogId, "SaveFile", extensionless);
@@ -175,7 +218,9 @@ public sealed class NativeFileDialogBoundaryMcpTests
         var opened = await fixture.WaitResultAsync(0, "openSingle");
         await VerifyDocument(client, opened, baselineContent, baseline);
         if (operation == "write")
-            Read<TextSelectionResult>(await Call(client, "ui-text-selection", ("nodeId", await FindManaged(client, "DocumentEditor")),
+            Read<TextSelectionResult>(await Call(client,
+                "ui-text-selection",
+                ("nodeId", await FindManaged(client, "DocumentEditor")),
                 ("replacementText", "Unsaved replacement text 中文 😀\n")));
         var before = await DocumentState.ReadAsync(client);
 
@@ -186,20 +231,28 @@ public sealed class NativeFileDialogBoundaryMcpTests
         if (operation == "write")
         {
             var prompt = await WaitOverwritePrompt(client, picker.Info.DialogId, fixture.ProcessId);
-            Read<NativeFileDialogInfo>(await Call(client, "file-dialog-overwrite", ("dialogId", picker.Info.DialogId),
-                ("promptId", prompt.Window.NodeId), ("overwrite", true)));
+            Read<NativeFileDialogInfo>(await Call(client,
+                "file-dialog-overwrite",
+                ("dialogId", picker.Info.DialogId),
+                ("promptId", prompt.Window.NodeId),
+                ("overwrite", true)));
         }
+
         await WaitClosed(client, picker.Info.DialogId);
         var gate = await fixture.WaitIoGateAsync();
         Assert.Equal(operation, gate.Operation);
         Assert.Equal(target, gate.Path);
         SampleResult failed;
         // Apply the real obstruction only after the genuine picker has returned.
-        using (denyAccess ? DenyFileDataAccess(target, operation) : new FileStream(target, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+        using (denyAccess
+                   ? DenyFileDataAccess(target, operation)
+                   : new FileStream(target, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
         {
             await fixture.ReleaseIoGateAsync();
             Read<InputResult>(await picker.Click);
-            failed = await fixture.WaitResultAsync(opened.Sequence, operation == "read" ? "openSingle" : "saveAs", expectError: true);
+            failed = await fixture.WaitResultAsync(opened.Sequence,
+                operation == "read" ? "openSingle" : "saveAs",
+                expectError: true);
             Assert.Contains(denyAccess ? "UnauthorizedAccessException" : "IOException", failed.Error);
             Assert.StartsWith("Error:", failed.Status);
             Assert.False(failed.Cancelled);
@@ -209,6 +262,7 @@ public sealed class NativeFileDialogBoundaryMcpTests
             Assert.Equal(failed.Status, await ReadText(client, await FindManaged(client, "FileStatus")));
             Assert.Empty(Read<NativeFileDialogInfo[]>(await Call(client, "file-dialogs")));
         }
+
         Assert.Equal(original, await File.ReadAllBytesAsync(target, Token));
         Assert.Equal(Utf8.GetBytes(baselineContent), await File.ReadAllBytesAsync(baseline, Token));
 
@@ -222,7 +276,8 @@ public sealed class NativeFileDialogBoundaryMcpTests
 
     private static IDisposable DenyFileDataAccess(string path, string operation)
     {
-        if (!OperatingSystem.IsWindows()) throw new PlatformNotSupportedException();
+        if (!OperatingSystem.IsWindows())
+            throw new PlatformNotSupportedException();
         var resolved = Path.GetFullPath(path);
         var parent = Path.GetDirectoryName(resolved)!;
         var temporary = Path.TrimEndingDirectorySeparator(Path.GetFullPath(Path.GetTempPath()));
@@ -239,13 +294,17 @@ public sealed class NativeFileDialogBoundaryMcpTests
         using var identity = WindowsIdentity.GetCurrent();
         var sid = identity.User ?? throw new InvalidOperationException("The test process has no Windows SID.");
         restricted.AddAccessRule(new FileSystemAccessRule(sid,
-            operation == "read" ? FileSystemRights.ReadData : FileSystemRights.WriteData, AccessControlType.Deny));
+            operation == "read" ? FileSystemRights.ReadData : FileSystemRights.WriteData,
+            AccessControlType.Deny));
         file.SetAccessControl(restricted);
         try
         {
             Assert.Throws<UnauthorizedAccessException>(() =>
             {
-                using var stream = File.Open(path, FileMode.Open, operation == "read" ? FileAccess.Read : FileAccess.Write, FileShare.ReadWrite);
+                using var stream = File.Open(path,
+                    FileMode.Open,
+                    operation == "read" ? FileAccess.Read : FileAccess.Write,
+                    FileShare.ReadWrite);
             });
             return new RestoreFileAccess(() =>
             {
@@ -263,14 +322,16 @@ public sealed class NativeFileDialogBoundaryMcpTests
 
     private static void RestoreFileDacl(string path, byte[] originalDacl)
     {
-        if (!OperatingSystem.IsWindows()) throw new PlatformNotSupportedException();
+        if (!OperatingSystem.IsWindows())
+            throw new PlatformNotSupportedException();
         // A freshly loaded FileSecurity marks only the DACL as modified for Persist.
         var restored = new FileSecurity();
         restored.SetSecurityDescriptorBinaryForm(originalDacl, AccessControlSections.Access);
         var file = new FileInfo(path);
         file.SetAccessControl(restored);
         Assert.Equal(restored.GetSecurityDescriptorSddlForm(AccessControlSections.Access),
-            file.GetAccessControl(AccessControlSections.Access).GetSecurityDescriptorSddlForm(AccessControlSections.Access));
+            file.GetAccessControl(AccessControlSections.Access)
+                .GetSecurityDescriptorSddlForm(AccessControlSections.Access));
     }
 
     private sealed class RestoreFileAccess(Action restore) : IDisposable
@@ -278,27 +339,41 @@ public sealed class NativeFileDialogBoundaryMcpTests
         public void Dispose() => restore();
     }
 
-    private static Task<McpClient> CreateClientAsync(string pipe) => McpClient.CreateAsync(new StdioClientTransport(new StdioClientTransportOptions
-    {
-        Command = "dotnet", Name = "Native picker boundary stdio tests",
-        Arguments = [Metadata("PreviewCliPath"), "mcp", "--pipe", pipe], ShutdownTimeout = TimeSpan.FromSeconds(5)
-    }), cancellationToken: Token);
+    private static Task<McpClient> CreateClientAsync(string pipe) => McpClient.CreateAsync(new StdioClientTransport(
+            new StdioClientTransportOptions
+            {
+                Command = "dotnet", Name = "Native picker boundary stdio tests",
+                Arguments = [Metadata("PreviewCliPath"), "mcp", "--pipe", pipe],
+                ShutdownTimeout = TimeSpan.FromSeconds(5)
+            }),
+        cancellationToken: Token);
 
     private static string Metadata(string key) => typeof(NativeFileDialogBoundaryMcpTests).Assembly
         .GetCustomAttributes<AssemblyMetadataAttribute>().Single(item => item.Key == key).Value!;
 
-    private static async Task<CallToolResult> Call(McpClient client, string name, params (string Name, object? Value)[] values) =>
-        await client.CallToolAsync(name, values.ToDictionary(item => item.Name, item => item.Value), cancellationToken: Token)
+    private static async Task<CallToolResult> Call(McpClient client,
+        string name,
+        params (string Name, object? Value)[] values) =>
+        await client.CallToolAsync(name,
+                values.ToDictionary(item => item.Name, item => item.Value),
+                cancellationToken: Token)
             .AsTask().WaitAsync(TimeSpan.FromSeconds(20), Token);
 
     private static async Task<long> FindManaged(McpClient client, string name) => Assert.Single(
-        Read<TreeSearchResult>(await Call(client, "search", ("query", name))).Matches, node => node.Name == name).Id;
+        Read<TreeSearchResult>(await Call(client, "search", ("query", name))).Matches,
+        node => node.Name == name).Id;
 
     private static async Task<string?> ReadText(McpClient client, long id) => Assert.Single(
-        Read<PropertyInfoDto[]>(await Call(client, "props", ("nodeId", id), ("propertyNames", new[] { TextProperty })))).Value;
+            Read<PropertyInfoDto[]>(await Call(client,
+                "props",
+                ("nodeId", id),
+                ("propertyNames", new[] { TextProperty }))))
+        .Value;
 
-    private static async Task SelectFilesTab(McpClient client) => Read<ItemSelectionResult>(await Call(client, "ui-select-item",
-        ("nodeId", await FindManaged(client, "MainTabs")), ("index", 1)));
+    private static async Task SelectFilesTab(McpClient client) => Read<ItemSelectionResult>(await Call(client,
+        "ui-select-item",
+        ("nodeId", await FindManaged(client, "MainTabs")),
+        ("index", 1)));
 
     private sealed record Picker(NativeFileDialogInfo Info, Task<CallToolResult> Click);
 
@@ -311,9 +386,16 @@ public sealed class NativeFileDialogBoundaryMcpTests
         return new(info, click);
     }
 
-    private static async Task<NativeFileDialogInfo> SetPaths(McpClient client, string dialogId, string kind, params string[] paths)
+    private static async Task<NativeFileDialogInfo> SetPaths(McpClient client,
+        string dialogId,
+        string kind,
+        params string[] paths)
     {
-        var info = Read<NativeFileDialogInfo>(await Call(client, "file-dialog-set-paths", ("dialogId", dialogId), ("paths", paths), ("kind", kind)));
+        var info = Read<NativeFileDialogInfo>(await Call(client,
+            "file-dialog-set-paths",
+            ("dialogId", dialogId),
+            ("paths", paths),
+            ("kind", kind)));
         Assert.Equal(paths, info.RequestedPaths);
         Assert.False(info.ApplicationIoVerified);
         return info;
@@ -336,16 +418,24 @@ public sealed class NativeFileDialogBoundaryMcpTests
 
     private static async Task<NativeFileDialogInfo> WaitClosed(McpClient client, string dialogId)
     {
-        var info = Read<NativeFileDialogInfo>(await Call(client, "file-dialog-wait", ("dialogId", dialogId), ("timeoutMs", 10000)));
+        var info = Read<NativeFileDialogInfo>(await Call(client,
+            "file-dialog-wait",
+            ("dialogId", dialogId),
+            ("timeoutMs", 10000)));
         Assert.EndsWith("Closed", info.State);
         Assert.False(info.ApplicationIoVerified);
         Assert.Empty(info.Prompts);
         return info;
     }
 
-    private static async Task<NativeFileDialogPrompt> WaitOverwritePrompt(McpClient client, string dialogId, int processId)
+    private static async Task<NativeFileDialogPrompt> WaitOverwritePrompt(McpClient client,
+        string dialogId,
+        int processId)
     {
-        var info = Read<NativeFileDialogInfo>(await Call(client, "file-dialog-wait", ("dialogId", dialogId), ("timeoutMs", 10000)));
+        var info = Read<NativeFileDialogInfo>(await Call(client,
+            "file-dialog-wait",
+            ("dialogId", dialogId),
+            ("timeoutMs", 10000)));
         var prompt = Assert.Single(info.Prompts);
         Assert.True(prompt.ExpectedOverwrite);
         Assert.Equal(processId, prompt.Window.ProcessId);
@@ -360,9 +450,11 @@ public sealed class NativeFileDialogBoundaryMcpTests
         while (watch.Elapsed < TimeSpan.FromSeconds(10))
         {
             var info = Read<NativeFileDialogInfo>(await Call(client, "file-dialog-inspect", ("dialogId", dialogId)));
-            if (info.Prompts.Length == 0 && info.Window.IsEnabled) return;
+            if (info.Prompts.Length == 0 && info.Window.IsEnabled)
+                return;
             await Task.Delay(50, Token);
         }
+
         throw new TimeoutException("The overwrite refusal did not return to the original picker.");
     }
 
@@ -382,13 +474,17 @@ public sealed class NativeFileDialogBoundaryMcpTests
         Assert.Contains(code, Text(result));
     }
 
-    private static string Text(CallToolResult result) => string.Join("\n", result.Content.OfType<TextContentBlock>().Select(block => block.Text));
+    private static string Text(CallToolResult result) =>
+        string.Join("\n", result.Content.OfType<TextContentBlock>().Select(block => block.Text));
 
     private static T Read<T>(CallToolResult result)
     {
         Assert.False(result.IsError == true, Text(result));
-        var root = result.StructuredContent is { } content ? JsonNode.Parse(JsonSerializer.Serialize(content)) : JsonNode.Parse(Text(result));
-        if (root is JsonObject obj && obj.TryGetPropertyValue("result", out var wrapped)) root = wrapped;
+        var root = result.StructuredContent is { } content
+            ? JsonNode.Parse(JsonSerializer.Serialize(content))
+            : JsonNode.Parse(Text(result));
+        if (root is JsonObject obj && obj.TryGetPropertyValue("result", out var wrapped))
+            root = wrapped;
         return root!.Deserialize<T>(WireOptions)!;
     }
 
@@ -401,8 +497,18 @@ public sealed class NativeFileDialogBoundaryMcpTests
             await ReadText(client, await FindManaged(client, "FolderPath")));
     }
 
-    private sealed record SampleResult(long Sequence, string Action, bool Cancelled, string[] SelectedPaths,
-        string? DocumentPath, string Content, int ByteLength, string Sha256, string? Status, string? Error);
+    private sealed record SampleResult(
+        long Sequence,
+        string Action,
+        bool Cancelled,
+        string[] SelectedPaths,
+        string? DocumentPath,
+        string Content,
+        int ByteLength,
+        string Sha256,
+        string? Status,
+        string? Error);
+
     private sealed record IoGateEntry(string Operation, string Path);
 
     private sealed class SampleProcess : IAsyncDisposable
@@ -414,12 +520,18 @@ public sealed class NativeFileDialogBoundaryMcpTests
         private readonly Task<string> _errors;
         private readonly string _resultPath;
         private string GateDirectory => Path.Combine(DirectoryPath, "io-gate");
+
         private SampleProcess(Process process, string directory, string pipe)
         {
-            _process = process; _startedUtc = process.StartTime.ToUniversalTime();
-            DirectoryPath = directory; PipeName = pipe; _resultPath = Path.Combine(directory, "result.json");
-            _output = process.StandardOutput.ReadToEndAsync(); _errors = process.StandardError.ReadToEndAsync();
+            _process = process;
+            _startedUtc = process.StartTime.ToUniversalTime();
+            DirectoryPath = directory;
+            PipeName = pipe;
+            _resultPath = Path.Combine(directory, "result.json");
+            _output = process.StandardOutput.ReadToEndAsync();
+            _errors = process.StandardError.ReadToEndAsync();
         }
+
         public string DirectoryPath { get; }
         public string PipeName { get; }
         public int ProcessId => _process.Id;
@@ -436,8 +548,12 @@ public sealed class NativeFileDialogBoundaryMcpTests
                 UseShellExecute = false, CreateNoWindow = true, WindowStyle = ProcessWindowStyle.Hidden,
                 RedirectStandardOutput = true, RedirectStandardError = true
             };
-            foreach (var argument in new[] { Metadata("AutomationSamplePath"), "--pipe", pipe, "--test-root", directory,
-                "--ready-file", ready, "--result-file", Path.Combine(directory, "result.json"), "--io-gate", Path.Combine(directory, "io-gate") })
+            foreach (var argument in new[]
+                     {
+                         Metadata("AutomationSamplePath"), "--pipe", pipe, "--test-root", directory,
+                         "--ready-file", ready, "--result-file", Path.Combine(directory, "result.json"), "--io-gate",
+                         Path.Combine(directory, "io-gate")
+                     })
                 start.ArgumentList.Add(argument);
             var owned = new SampleProcess(Process.Start(start)!, directory, pipe);
             try
@@ -448,19 +564,25 @@ public sealed class NativeFileDialogBoundaryMcpTests
                     Assert.False(owned._process.HasExited, "The owned sample exited before readiness.");
                     await Task.Delay(50, Token);
                 }
+
                 Assert.True(File.Exists(ready), "The owned sample did not report readiness.");
                 var text = await File.ReadAllTextAsync(ready, Encoding.UTF8, Token);
                 Assert.Contains($"pid={owned.ProcessId}\n", text);
                 Assert.Contains($"pipe={pipe}\n", text);
                 return owned;
             }
-            catch { await owned.DisposeAsync(); throw; }
+            catch
+            {
+                await owned.DisposeAsync();
+                throw;
+            }
         }
 
         public async Task ArmIoGateAsync()
         {
             Directory.CreateDirectory(GateDirectory);
-            foreach (var name in new[] { "release", "entered.json", "arm" }) File.Delete(Path.Combine(GateDirectory, name));
+            foreach (var name in new[] { "release", "entered.json", "arm" })
+                File.Delete(Path.Combine(GateDirectory, name));
             await File.WriteAllTextAsync(Path.Combine(GateDirectory, "arm"), "armed", Utf8, Token);
         }
 
@@ -473,11 +595,14 @@ public sealed class NativeFileDialogBoundaryMcpTests
                 Assert.False(_process.HasExited, "The sample exited before reaching real file I/O.");
                 await Task.Delay(25, Token);
             }
+
             Assert.True(File.Exists(entered), "The real picker did not reach the test-only I/O gate.");
-            return JsonSerializer.Deserialize<IoGateEntry>(await File.ReadAllTextAsync(entered, Encoding.UTF8, Token), WireOptions)!;
+            return JsonSerializer.Deserialize<IoGateEntry>(await File.ReadAllTextAsync(entered, Encoding.UTF8, Token),
+                WireOptions)!;
         }
 
-        public Task ReleaseIoGateAsync() => File.WriteAllTextAsync(Path.Combine(GateDirectory, "release"), "released", Utf8, Token);
+        public Task ReleaseIoGateAsync() =>
+            File.WriteAllTextAsync(Path.Combine(GateDirectory, "release"), "released", Utf8, Token);
 
         public async Task WriteEvidenceAsync<T>(string filename, T value)
         {
@@ -490,7 +615,8 @@ public sealed class NativeFileDialogBoundaryMcpTests
             }
             finally
             {
-                if (File.Exists(temporary)) File.Delete(temporary);
+                if (File.Exists(temporary))
+                    File.Delete(temporary);
             }
         }
 
@@ -506,6 +632,7 @@ public sealed class NativeFileDialogBoundaryMcpTests
             {
                 evidence = new { error = error.ToString() };
             }
+
             await WriteEvidenceAsync(filename, evidence);
         }
 
@@ -516,19 +643,26 @@ public sealed class NativeFileDialogBoundaryMcpTests
             {
                 if (File.Exists(_resultPath))
                 {
-                    var result = JsonSerializer.Deserialize<SampleResult>(await File.ReadAllTextAsync(_resultPath, Encoding.UTF8, Token), WireOptions)!;
+                    var result =
+                        JsonSerializer.Deserialize<SampleResult>(
+                            await File.ReadAllTextAsync(_resultPath, Encoding.UTF8, Token),
+                            WireOptions)!;
                     if (result.Sequence > previousSequence)
                     {
                         await WriteEvidenceAsync($"result-{result.Sequence}.json", result);
                         Assert.Equal(previousSequence + 1, result.Sequence);
                         Assert.Equal(action, result.Action);
-                        if (expectError) Assert.NotNull(result.Error);
-                        else Assert.Null(result.Error);
+                        if (expectError)
+                            Assert.NotNull(result.Error);
+                        else
+                            Assert.Null(result.Error);
                         return result;
                     }
                 }
+
                 await Task.Delay(50, Token);
             }
+
             throw new TimeoutException($"The application did not complete {action} after sequence {previousSequence}.");
         }
 
@@ -537,14 +671,17 @@ public sealed class NativeFileDialogBoundaryMcpTests
             if (!_process.HasExited)
             {
                 if (_process.StartTime.ToUniversalTime() != _startedUtc)
-                    throw new InvalidOperationException("The owned sample process identity changed; refusing to terminate it.");
+                    throw new InvalidOperationException(
+                        "The owned sample process identity changed; refusing to terminate it.");
                 _process.Kill(entireProcessTree: true);
                 await _process.WaitForExitAsync(CancellationToken.None);
             }
+
             await Task.WhenAll(_output, _errors);
             _process.Dispose();
             var resolved = Path.GetFullPath(DirectoryPath);
-            var temporary = Path.TrimEndingDirectorySeparator(Path.GetFullPath(Path.GetTempPath())) + Path.DirectorySeparatorChar;
+            var temporary = Path.TrimEndingDirectorySeparator(Path.GetFullPath(Path.GetTempPath())) +
+                            Path.DirectorySeparatorChar;
             if (!resolved.StartsWith(temporary + Prefix, StringComparison.OrdinalIgnoreCase) ||
                 Path.GetDirectoryName(resolved) + Path.DirectorySeparatorChar != temporary)
                 throw new InvalidOperationException("Temporary cleanup escaped its owned directory.");
@@ -553,7 +690,13 @@ public sealed class NativeFileDialogBoundaryMcpTests
                 RestoreFileDacl(recovery[..^".test-original-dacl.bin".Length], await File.ReadAllBytesAsync(recovery));
                 File.Delete(recovery);
             }
-            var evidence = Path.GetFullPath(Path.Combine(Metadata("PreviewRepositoryPath"), "artifacts", "verification", "file-boundaries", "fixtures", Path.GetFileName(resolved)));
+
+            var evidence = Path.GetFullPath(Path.Combine(Metadata("PreviewRepositoryPath"),
+                "artifacts",
+                "verification",
+                "file-boundaries",
+                "fixtures",
+                Path.GetFileName(resolved)));
             Directory.CreateDirectory(evidence);
             foreach (var source in Directory.EnumerateFiles(resolved, "*", SearchOption.AllDirectories))
             {
@@ -561,6 +704,7 @@ public sealed class NativeFileDialogBoundaryMcpTests
                 Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
                 File.Copy(source, destination, overwrite: true);
             }
+
             await File.WriteAllTextAsync(Path.Combine(evidence, "stdout.txt"), await _output, Utf8);
             await File.WriteAllTextAsync(Path.Combine(evidence, "stderr.txt"), await _errors, Utf8);
             Directory.Delete(resolved, recursive: true);

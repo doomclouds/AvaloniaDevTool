@@ -14,7 +14,8 @@ public sealed class MetricsIntegrationTests
         using var meter = NewMeter();
         var existing = meter.CreateCounter<int>("jobs.started");
         using var service = new MetricsService((_, _) => { });
-        service.Start(new MetricsStartRequest(MeterNames: [meter.Name], InstrumentNames: ["jobs.*"],
+        service.Start(new MetricsStartRequest(MeterNames: [meter.Name],
+            InstrumentNames: ["jobs.*"],
             NotificationIntervalMs: 5000));
         var later = meter.CreateHistogram<double>("jobs.duration", "ms");
         var excluded = meter.CreateCounter<int>("ignored");
@@ -49,7 +50,8 @@ public sealed class MetricsIntegrationTests
         Assert.Equal(7, snapshot.Samples.Count);
         Assert.Equal(7, snapshot.Samples.Select(sample => sample.NumericType).Distinct().Count());
         Assert.Equal("9007199254740993", snapshot.Samples.Single(sample => sample.NumericType == "Int64").RawValue);
-        Assert.Equal("12345678901234567890.123456789", snapshot.Samples.Single(sample => sample.NumericType == "Decimal").RawValue);
+        Assert.Equal("12345678901234567890.123456789",
+            snapshot.Samples.Single(sample => sample.NumericType == "Decimal").RawValue);
     }
 
     [AvaloniaFact]
@@ -58,7 +60,9 @@ public sealed class MetricsIntegrationTests
         using var meter = NewMeter();
         var counter = meter.CreateCounter<int>("count");
         using var service = new MetricsService((_, _) => { });
-        service.Start(new MetricsStartRequest(MeterNames: [meter.Name], Capacity: 3, PendingCapacity: 2,
+        service.Start(new MetricsStartRequest(MeterNames: [meter.Name],
+            Capacity: 3,
+            PendingCapacity: 2,
             NotificationIntervalMs: 5000));
         for (var index = 1; index <= 5; index++)
             counter.Add(index);
@@ -84,8 +88,11 @@ public sealed class MetricsIntegrationTests
         using var meter = NewMeter();
         var counter = meter.CreateCounter<int>("count");
         using var service = new MetricsService((_, _) => { });
-        service.Start(new MetricsStartRequest(MeterNames: [meter.Name], MaxSeries: 1, MaxInstruments: 1,
-            MaxTags: 1, NotificationIntervalMs: 5000));
+        service.Start(new MetricsStartRequest(MeterNames: [meter.Name],
+            MaxSeries: 1,
+            MaxInstruments: 1,
+            MaxTags: 1,
+            NotificationIntervalMs: 5000));
         counter.Add(1, new KeyValuePair<string, object?>("region", "east"), new("unused", "value"));
         counter.Add(2, new KeyValuePair<string, object?>("region", "west"), new("unused", "value"));
         meter.CreateCounter<int>("too-many-instruments").Add(3);
@@ -105,7 +112,9 @@ public sealed class MetricsIntegrationTests
         using var meter = NewMeter();
         var gaugeValue = 17L;
         meter.CreateObservableGauge("cache.size", () => gaugeValue);
-        var notification = new TaskCompletionSource<MetricsSamplesAddedNotification>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var notification =
+            new TaskCompletionSource<MetricsSamplesAddedNotification>(
+                TaskCreationOptions.RunContinuationsAsynchronously);
         var notificationsOnUiThread = true;
         using var service = new MetricsService((method, payload) =>
         {
@@ -113,7 +122,8 @@ public sealed class MetricsIntegrationTests
             if (method == MetricsMethods.SampleAdded)
                 notification.TrySetResult((MetricsSamplesAddedNotification)payload);
         });
-        service.Start(new MetricsStartRequest(MeterNames: [meter.Name], PollIntervalMs: 100,
+        service.Start(new MetricsStartRequest(MeterNames: [meter.Name],
+            PollIntervalMs: 100,
             NotificationIntervalMs: 50));
         var received = await notification.Task.WaitAsync(TimeSpan.FromSeconds(5));
         Assert.True(notificationsOnUiThread);
@@ -138,12 +148,20 @@ public sealed class MetricsIntegrationTests
         var notifications = 0;
         var service = new MetricsService((_, _) => notifications++);
         service.Start(new MetricsStartRequest(MeterNames: [meter.Name], NotificationIntervalMs: 50));
-        await Task.Run(() => { for (var index = 0; index < 100; index++) counter.Add(1); });
+        await Task.Run(() =>
+        {
+            for (var index = 0; index < 100; index++)
+                counter.Add(1);
+        });
         var firstCapture = service.Status().CaptureId;
         service.Stop();
         var received = service.Status().ReceivedSamples;
         var previousNotifications = notifications;
-        await Task.Run(() => { for (var index = 0; index < 100; index++) counter.Add(1); });
+        await Task.Run(() =>
+        {
+            for (var index = 0; index < 100; index++)
+                counter.Add(1);
+        });
         await Task.Delay(100);
         Assert.Equal(received, service.Status().ReceivedSamples);
         Assert.Equal(previousNotifications, notifications);
@@ -166,9 +184,11 @@ public sealed class MetricsIntegrationTests
     {
         using var meter = NewMeter();
         var histogram = meter.CreateHistogram<double>("duration");
-        meter.CreateObservableGauge("broken", (Func<int>)(() => throw new InvalidOperationException("Observable failed")));
+        meter.CreateObservableGauge("broken",
+            (Func<int>)(() => throw new InvalidOperationException("Observable failed")));
         using var service = new MetricsService((_, _) => { });
-        service.Start(new MetricsStartRequest(MeterNames: [meter.Name], PollIntervalMs: 100,
+        service.Start(new MetricsStartRequest(MeterNames: [meter.Name],
+            PollIntervalMs: 100,
             NotificationIntervalMs: 5000));
         histogram.Record(double.NaN);
         histogram.Record(double.PositiveInfinity);
@@ -192,7 +212,6 @@ public sealed class MetricsIntegrationTests
         Assert.True(service.Status().IsRunning);
     }
 
-
     [AvaloniaFact]
     public async Task Notification_batches_are_bounded_and_observable_counters_keep_reported_semantics()
     {
@@ -201,15 +220,19 @@ public sealed class MetricsIntegrationTests
         meter.CreateObservableCounter("observed.total", () => 100L);
         var batches = new List<MetricsSamplesAddedNotification>();
         using var service = new MetricsService((_, payload) => batches.Add((MetricsSamplesAddedNotification)payload));
-        service.Start(new MetricsStartRequest(MeterNames: [meter.Name], PollIntervalMs: 100,
+        service.Start(new MetricsStartRequest(MeterNames: [meter.Name],
+            PollIntervalMs: 100,
             NotificationIntervalMs: 50));
         for (var index = 0; index < 130; index++)
             counter.Add(index % 2 == 0 ? 1 : -1);
         await WaitUntilAsync(() => batches.Sum(batch => batch.Samples.Count) >= 130 &&
-            service.Snapshot().Instruments.Any(instrument => instrument.Kind == "ObservableCounter"));
+                                   service.Snapshot().Instruments
+                                       .Any(instrument => instrument.Kind == "ObservableCounter"));
         Assert.All(batches, batch => Assert.InRange(batch.Samples.Count, 1, 64));
-        Assert.Equal("Delta", service.Snapshot().Instruments.Single(instrument => instrument.Name == "delta").ValueSemantics);
-        Assert.Equal("ReportedCumulative", service.Snapshot().Instruments.Single(instrument => instrument.Name == "observed.total").ValueSemantics);
+        Assert.Equal("Delta",
+            service.Snapshot().Instruments.Single(instrument => instrument.Name == "delta").ValueSemantics);
+        Assert.Equal("ReportedCumulative",
+            service.Snapshot().Instruments.Single(instrument => instrument.Name == "observed.total").ValueSemantics);
     }
 
     [AvaloniaFact]
@@ -218,20 +241,28 @@ public sealed class MetricsIntegrationTests
         using var meter = new Meter("MetricsFrame." + Guid.NewGuid().ToString("N") + new string('m', 270),
             new string('v', 200));
         var instruments = Enumerable.Range(0, 128).Select(index => meter.CreateCounter<double>(
-            "instrument-" + index + new string('n', 270), new string('u', 300), new string('d', 600))).ToArray();
+            "instrument-" + index + new string('n', 270),
+            new string('u', 300),
+            new string('d', 600))).ToArray();
         using var service = new MetricsService((_, _) => { });
-        service.Start(new MetricsStartRequest(MeterNames: ["MetricsFrame.*"], InstrumentNames: ["instrument-*"],
-            Capacity: 1024, PendingCapacity: 2048, MaxSeries: 128, MaxInstruments: 128,
-            MaxTags: 8, NotificationIntervalMs: 5000));
+        service.Start(new MetricsStartRequest(MeterNames: ["MetricsFrame.*"],
+            InstrumentNames: ["instrument-*"],
+            Capacity: 1024,
+            PendingCapacity: 2048,
+            MaxSeries: 128,
+            MaxInstruments: 128,
+            MaxTags: 8,
+            NotificationIntervalMs: 5000));
         var tags = Enumerable.Range(0, 8).Select(index => new KeyValuePair<string, object?>(
-            "key-" + index + new string('k', 100), "value-" + index + new string('x', 200))).ToArray();
+            "key-" + index + new string('k', 100),
+            "value-" + index + new string('x', 200))).ToArray();
         for (var index = 0; index < 1024; index++)
             instruments[index % instruments.Length].Add(1e100, tags);
         var snapshot = service.Snapshot();
         Assert.Equal(1024, snapshot.Samples.Count);
         Assert.Equal(128, snapshot.Series.Count);
         Assert.True(System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(snapshot, ProtocolJson.Options).Length <
-            RpcPeer.MaximumFrameBytes);
+                    RpcPeer.MaximumFrameBytes);
     }
 
     [AvaloniaFact]
@@ -248,29 +279,35 @@ public sealed class MetricsIntegrationTests
 
     private sealed class ThrowingTag
     {
-        public override string ToString() => throw new InvalidOperationException("Application code must not be called.");
+        public override string ToString() =>
+            throw new InvalidOperationException("Application code must not be called.");
     }
-
 
     [AvaloniaFact]
     public async Task Named_pipe_metrics_api_publishes_samples_and_stop_retains_a_queryable_snapshot()
     {
         using var meter = NewMeter();
         var counter = meter.CreateCounter<int>("jobs");
-        var window = new Avalonia.Controls.Window { Content = new Avalonia.Controls.TextBlock { Text = "Metrics host" } };
+        var window = new Avalonia.Controls.Window
+            { Content = new Avalonia.Controls.TextBlock { Text = "Metrics host" } };
         window.Show();
         try
         {
-            await using var agent = DiagnosticsAgent.Attach(Avalonia.Application.Current!, new DiagnosticsAgentOptions
-            {
-                PipeName = "metrics-rpc-" + Guid.NewGuid().ToString("N"),
-                TopLevelProvider = () => [window]
-            });
-            await using var pipe = new System.IO.Pipes.NamedPipeClientStream(".", agent.PipeName,
-                System.IO.Pipes.PipeDirection.InOut, System.IO.Pipes.PipeOptions.Asynchronous);
+            await using var agent = DiagnosticsAgent.Attach(Avalonia.Application.Current!,
+                new DiagnosticsAgentOptions
+                {
+                    PipeName = "metrics-rpc-" + Guid.NewGuid().ToString("N"),
+                    TopLevelProvider = () => [window]
+                });
+            await using var pipe = new System.IO.Pipes.NamedPipeClientStream(".",
+                agent.PipeName,
+                System.IO.Pipes.PipeDirection.InOut,
+                System.IO.Pipes.PipeOptions.Asynchronous);
             await pipe.ConnectAsync(CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(5));
             await using var peer = new RpcPeer(pipe);
-            var notified = new TaskCompletionSource<MetricsSamplesAddedNotification>(TaskCreationOptions.RunContinuationsAsynchronously);
+            var notified =
+                new TaskCompletionSource<MetricsSamplesAddedNotification>(TaskCreationOptions
+                    .RunContinuationsAsynchronously);
             peer.NotificationReceived += (method, payload) =>
             {
                 if (method == MetricsMethods.SampleAdded)
@@ -281,7 +318,8 @@ public sealed class MetricsIntegrationTests
                 new MetricsStartRequest(MeterNames: [meter.Name], NotificationIntervalMs: 50));
             Assert.True(started.IsRunning);
             counter.Add(9);
-            Assert.Contains((await notified.Task.WaitAsync(TimeSpan.FromSeconds(5))).Samples, sample => sample.Value == 9);
+            Assert.Contains((await notified.Task.WaitAsync(TimeSpan.FromSeconds(5))).Samples,
+                sample => sample.Value == 9);
             var status = await peer.InvokeAsync<MetricsStatusDto>(MetricsMethods.Status, null);
             Assert.Equal(started.CaptureId, status.CaptureId);
             Assert.Equal([meter.Name], status.MeterNames);
@@ -291,7 +329,10 @@ public sealed class MetricsIntegrationTests
             var snapshot = await peer.InvokeAsync<MetricsSnapshotDto>(MetricsMethods.Snapshot, null);
             Assert.Equal(9, Assert.Single(snapshot.Samples).Value);
         }
-        finally { window.Close(); }
+        finally
+        {
+            window.Close();
+        }
     }
 
     private static Meter NewMeter() => new("AvaloniaDevTool.Tests." + Guid.NewGuid().ToString("N"), "1.0");
@@ -303,4 +344,3 @@ public sealed class MetricsIntegrationTests
             await Task.Delay(10, timeout.Token);
     }
 }
-

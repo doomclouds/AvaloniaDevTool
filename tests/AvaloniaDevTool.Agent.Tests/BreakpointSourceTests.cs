@@ -28,7 +28,8 @@ public sealed class BreakpointSourceTests
             var legacyReceiver = Create(service, EventSpec() with { ObjectId = parentId });
             var onlySource = Create(service, EventSpec() with { SourceObjectId = firstId });
             var both = Create(service, EventSpec() with { ObjectId = parentId, SourceObjectId = firstId });
-            var wrongReceiver = Create(service, EventSpec() with { ObjectId = objects.GetId(outside), SourceObjectId = firstId });
+            var wrongReceiver = Create(service,
+                EventSpec() with { ObjectId = objects.GetId(outside), SourceObjectId = firstId });
             parent.AddHandler(Probe.Routed, (_, args) => args.Handled = true, RoutingStrategies.Tunnel, true);
             first.RaiseEvent(new RoutedEventArgs(Probe.Routed) { Source = second });
             second.RaiseEvent(new RoutedEventArgs(Probe.Routed));
@@ -43,7 +44,10 @@ public sealed class BreakpointSourceTests
             Assert.Equal(firstId, sourceHit.ObjectId);
             Assert.Contains("handled=True", sourceHit.Summary);
         }
-        finally { window.Close(); }
+        finally
+        {
+            window.Close();
+        }
     }
 
     [AvaloniaFact]
@@ -90,13 +94,15 @@ public sealed class BreakpointSourceTests
         Create(service, definition);
         Create(service, EventSpec(Probe.Direct));
         var nested = false;
-        outer.AddHandler(Probe.Direct, (_, args) =>
-        {
-            if (nested) return;
-            nested = true;
-            inner.RaiseEvent(args);
-            args.Handled = true;
-        });
+        outer.AddHandler(Probe.Direct,
+            (_, args) =>
+            {
+                if (nested)
+                    return;
+                nested = true;
+                inner.RaiseEvent(args);
+                args.Handled = true;
+            });
         outer.RaiseEvent(new RoutedEventArgs(Probe.Direct));
         Assert.Equal([1L, 2L], service.List().Select(item => item.HitCount));
         Assert.Equal(objects.GetId(outer), service.History().Hits[^1].ObjectId);
@@ -113,12 +119,15 @@ public sealed class BreakpointSourceTests
         Create(service, EventSpec());
         Create(service, EventSpec() with { SourceObjectId = objects.GetId(outer) });
         var nested = false;
-        outer.AddHandler(Probe.Routed, (_, args) =>
-        {
-            if (nested) return;
-            nested = true;
-            inner.RaiseEvent(args);
-        }, RoutingStrategies.Tunnel);
+        outer.AddHandler(Probe.Routed,
+            (_, args) =>
+            {
+                if (nested)
+                    return;
+                nested = true;
+                inner.RaiseEvent(args);
+            },
+            RoutingStrategies.Tunnel);
         outer.RaiseEvent(new RoutedEventArgs(Probe.Routed));
         Assert.Equal([2L, 1L], service.List().Select(item => item.HitCount));
         Assert.Equal(3, service.History().Hits.Count);
@@ -161,7 +170,12 @@ public sealed class BreakpointSourceTests
         var objects = new WeakObjectRegistry();
         using var service = new BreakpointService(objects, (_, _) => { });
         var sourceId = CreateTransientSource(objects, service);
-        for (var index = 0; index < 3; index++) { GC.Collect(); GC.WaitForPendingFinalizers(); }
+        for (var index = 0; index < 3; index++)
+        {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+        }
+
         Assert.False(objects.TryGet(sourceId, out _));
         Assert.Equal(BreakpointState.ObjectExpired, Assert.Single(service.List()).State);
         var error = Assert.Throws<RpcException>(() => service.Update(new(service.List()[0].Id,
@@ -177,10 +191,12 @@ public sealed class BreakpointSourceTests
         using var service = new BreakpointService(objects, (_, _) => { });
         var sourceId = objects.GetId(source);
         var breakpoint = Create(service, EventSpec() with { ObjectId = sourceId });
-        Assert.Equal("unsupported_object", Assert.Throws<RpcException>(() => service.Update(new(breakpoint.Id,
-            EventSpec() with { SourceObjectId = objects.GetId(new object()) }))).Code);
-        Assert.Equal("invalid_request", Assert.Throws<RpcException>(() => Create(service,
-            new(BreakpointKind.Property, "Avalonia.Controls.TextBlock:Text", SourceObjectId: sourceId))).Code);
+        Assert.Equal("unsupported_object",
+            Assert.Throws<RpcException>(() => service.Update(new(breakpoint.Id,
+                EventSpec() with { SourceObjectId = objects.GetId(new object()) }))).Code);
+        Assert.Equal("invalid_request",
+            Assert.Throws<RpcException>(() => Create(service,
+                new(BreakpointKind.Property, "Avalonia.Controls.TextBlock:Text", SourceObjectId: sourceId))).Code);
         source.RaiseEvent(new RoutedEventArgs(Probe.Routed));
         Assert.Equal(1, Assert.Single(service.List()).HitCount);
     }
@@ -200,11 +216,17 @@ public sealed class BreakpointSourceTests
         routedEvent ??= Probe.Routed;
         return new(BreakpointKind.Event, routedEvent.OwnerType.FullName + ":" + routedEvent.Name, LogMessage: false);
     }
-    private static BreakpointInfo Create(BreakpointService service, BreakpointSpec definition) => service.Create(new(definition));
+
+    private static BreakpointInfo Create(BreakpointService service, BreakpointSpec definition) =>
+        service.Create(new(definition));
 
     private sealed class Probe : Control
     {
-        public static readonly RoutedEvent<RoutedEventArgs> Routed = RoutedEvent.Register<Probe, RoutedEventArgs>("SourceProbe", RoutingStrategies.Tunnel | RoutingStrategies.Bubble);
-        public static readonly RoutedEvent<RoutedEventArgs> Direct = RoutedEvent.Register<Probe, RoutedEventArgs>("DirectSourceProbe", RoutingStrategies.Direct);
+        public static readonly RoutedEvent<RoutedEventArgs> Routed =
+            RoutedEvent.Register<Probe, RoutedEventArgs>("SourceProbe",
+                RoutingStrategies.Tunnel | RoutingStrategies.Bubble);
+
+        public static readonly RoutedEvent<RoutedEventArgs> Direct =
+            RoutedEvent.Register<Probe, RoutedEventArgs>("DirectSourceProbe", RoutingStrategies.Direct);
     }
 }

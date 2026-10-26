@@ -9,8 +9,19 @@ public sealed partial class SampleViewModel : INotifyPropertyChanged
     private readonly bool _isDesignPreview = Design.IsDesignMode;
     private string _remoteEndpoint = "未开启远程监听；可使用 --remote 启动回环 WebSocket。";
     private bool _remoteReady;
-    public string RemoteEndpoint { get => _remoteEndpoint; set => Set(ref _remoteEndpoint, value); }
-    public bool RemoteReady { get => _remoteReady; set => Set(ref _remoteReady, value); }
+
+    public string RemoteEndpoint
+    {
+        get => _remoteEndpoint;
+        set => Set(ref _remoteEndpoint, value);
+    }
+
+    public bool RemoteReady
+    {
+        get => _remoteReady;
+        set => Set(ref _remoteReady, value);
+    }
+
     private string _userName = "小陌";
     private double _progress = 64;
     private bool _isPreviewEnabled = true;
@@ -30,11 +41,13 @@ public sealed partial class SampleViewModel : INotifyPropertyChanged
     public string PipeName => _isDesignPreview ? "请使用预览宿主显示的连接管道" : Program.PipeName;
     internal bool IsDesignPreview => _isDesignPreview;
     public string ProcessLabel => $"PID {Environment.ProcessId}";
+
     public string AgentStatus
     {
         get => _isDesignPreview ? "设计预览 · 诊断由宿主提供" : _agentStatus;
         set => Set(ref _agentStatus, value);
     }
+
     public IReadOnlyList<string> Modes { get; } = ["标准模式", "紧凑模式", "演示模式"];
 
     public string UserName
@@ -68,15 +81,18 @@ public sealed partial class SampleViewModel : INotifyPropertyChanged
     }
 
     public string BoundMessage => $"绑定源第 {_sourceRevision} 次更新 · {DateTime.Now:HH:mm:ss}";
+
     public int ValidatedCount
     {
         get => _validatedCount;
         set
         {
-            if (value < 0) throw new ArgumentOutOfRangeException(nameof(value), "The value must be non-negative.");
+            if (value < 0)
+                throw new ArgumentOutOfRangeException(nameof(value), "The value must be non-negative.");
             Set(ref _validatedCount, value);
         }
     }
+
     public int DynamicCount
     {
         get => _dynamicCount;
@@ -109,4 +125,3 @@ public sealed partial class SampleViewModel : INotifyPropertyChanged
     private void OnPropertyChanged([CallerMemberName] string? name = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 }
-

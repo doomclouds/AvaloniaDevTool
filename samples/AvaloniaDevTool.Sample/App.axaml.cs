@@ -55,4 +55,3 @@ public sealed partial class App : Application
         base.OnFrameworkInitializationCompleted();
     }
 }
-

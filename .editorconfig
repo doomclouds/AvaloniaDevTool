@@ -6,7 +6,7 @@ end_of_line = lf
 insert_final_newline = true
 trim_trailing_whitespace = true
 
-[*.{cs,csproj,props,axaml}]
+[*.{cs,csproj,props,targets,slnx,axaml,xaml,xml,svg,DotSettings,ps1,psd1,py}]
 indent_style = space
 indent_size = 4
 

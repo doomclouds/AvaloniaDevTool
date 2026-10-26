@@ -16,7 +16,8 @@ public sealed class NativeFileFilterTimingTests
     private static CancellationToken Token => TestContext.Current.CancellationToken;
     public static bool IsWindows => OperatingSystem.IsWindows();
 
-    [Fact(SkipUnless = nameof(IsWindows), Skip = "The synthetic provider checks a transient truncated tree without creating windows.")]
+    [Fact(SkipUnless = nameof(IsWindows),
+        Skip = "The synthetic provider checks a transient truncated tree without creating windows.")]
     public async Task A_transient_incomplete_dialog_read_retries_the_same_identity_before_cancelling_exactly_once()
     {
         await using var worker = await TimingWorker.StartAsync(exposeOptions: false, truncatedDialogRead: 2);
@@ -42,8 +43,10 @@ public sealed class NativeFileFilterTimingTests
         Assert.Equal("Invoke", action.Action);
     }
 
-    [Fact(SkipUnless = nameof(IsWindows), Skip = "The synthetic provider exercises an acknowledged but unapplied Expand without creating windows.")]
-    public async Task A_completed_expand_that_remains_collapsed_uses_its_unique_dropdown_button_once_and_verifies_selection()
+    [Fact(SkipUnless = nameof(IsWindows),
+        Skip = "The synthetic provider exercises an acknowledged but unapplied Expand without creating windows.")]
+    public async Task
+        A_completed_expand_that_remains_collapsed_uses_its_unique_dropdown_button_once_and_verifies_selection()
     {
         await using var worker = await TimingWorker.StartAsync(exposeOptions: true, ignoreExpand: true);
         var dialogs = new NativeFileDialogController(worker.Session);
@@ -55,18 +58,22 @@ public sealed class NativeFileFilterTimingTests
         worker.AssertOsProcessRunning();
         var trace = await worker.ReadTraceAsync();
         Assert.Single(trace.Actions, item => item.Action == "Expand");
-        Assert.Single(trace.Actions, item => item.Action == "Invoke" && item.NodeId.EndsWith(":dropdown", StringComparison.Ordinal));
+        Assert.Single(trace.Actions,
+            item => item.Action == "Invoke" && item.NodeId.EndsWith(":dropdown", StringComparison.Ordinal));
         Assert.Single(trace.Actions, item => item.Action == "Select");
         Assert.Equal("CancelledDialogClosed", (await dialogs.CancelAsync(original.DialogId, Token)).State);
     }
 
-    [Theory(SkipUnless = nameof(IsWindows), Skip = "The synthetic provider exercises process/RPC timing without creating windows.")]
+    [Theory(SkipUnless = nameof(IsWindows),
+        Skip = "The synthetic provider exercises process/RPC timing without creating windows.")]
     [InlineData(false)]
     [InlineData(true)]
-    public async Task A_dialog_polling_deadline_does_not_cancel_a_slow_native_request_or_destroy_the_session(bool waitForClosure)
+    public async Task A_dialog_polling_deadline_does_not_cancel_a_slow_native_request_or_destroy_the_session(
+        bool waitForClosure)
     {
         await using var worker = await TimingWorker.StartAsync(exposeOptions: false,
-            slowWindowsRead: waitForClosure ? 2 : 1, omitSlowWindowsResult: !waitForClosure);
+            slowWindowsRead: waitForClosure ? 2 : 1,
+            omitSlowWindowsResult: !waitForClosure);
         var dialogs = new NativeFileDialogController(worker.Session);
         var original = waitForClosure ? Assert.Single(await dialogs.GetDialogsAsync(Token)) : null;
         var timer = Stopwatch.StartNew();
@@ -76,10 +83,12 @@ public sealed class NativeFileFilterTimingTests
             : dialogs.WaitForDialogAsync(timeoutMs: 100, cancellationToken: Token));
 
         Assert.Equal("file_dialog_timeout", error.Code);
-        Assert.True(timer.Elapsed >= TimeSpan.FromMilliseconds(500), "A polling deadline must let the in-flight bounded RPC finish.");
+        Assert.True(timer.Elapsed >= TimeSpan.FromMilliseconds(500),
+            "A polling deadline must let the in-flight bounded RPC finish.");
         worker.AssertOsProcessRunning();
         var current = Assert.Single(await dialogs.GetDialogsAsync(Token));
-        if (original is not null) Assert.Equal(original.DialogId, current.DialogId);
+        if (original is not null)
+            Assert.Equal(original.DialogId, current.DialogId);
         Assert.Equal("Open", (await dialogs.InspectAsync(current.DialogId, Token)).State);
         Assert.Equal("CancelledDialogClosed", (await dialogs.CancelAsync(current.DialogId, Token)).State);
         worker.AssertOsProcessRunning();
@@ -88,7 +97,8 @@ public sealed class NativeFileFilterTimingTests
         Assert.Equal(current.CancelNodeId, trace.Actions[0].NodeId);
     }
 
-    [Fact(SkipUnless = nameof(IsWindows), Skip = "The synthetic provider exercises exact path readback without creating windows.")]
+    [Fact(SkipUnless = nameof(IsWindows),
+        Skip = "The synthetic provider exercises exact path readback without creating windows.")]
     public async Task A_path_write_readback_mismatch_never_accepts_and_a_verified_retry_can_recover()
     {
         await using var worker = await TimingWorker.StartAsync(exposeOptions: false, corruptFirstPathWrite: true);
@@ -97,7 +107,9 @@ public sealed class NativeFileFilterTimingTests
         var path = Path.Combine(Path.GetTempPath(), "avdt-readback-" + Guid.NewGuid().ToString("N") + ".txt");
 
         var error = await Assert.ThrowsAsync<NativeAutomationException>(() => dialogs.SetPathsAsync(original.DialogId,
-            [path], NativeFileDialogKind.SaveFile, Token));
+            [path],
+            NativeFileDialogKind.SaveFile,
+            Token));
 
         Assert.Equal("file_dialog_readback_mismatch", error.Code);
         worker.AssertOsProcessRunning();
@@ -118,8 +130,10 @@ public sealed class NativeFileFilterTimingTests
         Assert.False(File.Exists(path));
     }
 
-    [Fact(SkipUnless = nameof(IsWindows), Skip = "The process facade requires Windows; this synthetic provider creates no windows.")]
-    public async Task A_filter_tree_response_slower_than_the_visibility_budget_preserves_the_worker_and_dialog_identity()
+    [Fact(SkipUnless = nameof(IsWindows),
+        Skip = "The process facade requires Windows; this synthetic provider creates no windows.")]
+    public async Task
+        A_filter_tree_response_slower_than_the_visibility_budget_preserves_the_worker_and_dialog_identity()
     {
         await using var worker = await TimingWorker.StartAsync(exposeOptions: true);
         var dialogs = new NativeFileDialogController(worker.Session);
@@ -128,7 +142,8 @@ public sealed class NativeFileFilterTimingTests
 
         var changed = await dialogs.SetFilterAsync(original.DialogId, filterIndex: 1, cancellationToken: Token);
 
-        Assert.True(timer.Elapsed >= TimeSpan.FromSeconds(3.3), $"The synthetic provider response returned too soon: {timer.Elapsed}.");
+        Assert.True(timer.Elapsed >= TimeSpan.FromSeconds(3.3),
+            $"The synthetic provider response returned too soon: {timer.Elapsed}.");
         Assert.Equal(original.DialogId, changed.DialogId);
         Assert.Equal("Text files (*.txt)", changed.FilterValue);
         worker.AssertOsProcessRunning();
@@ -144,8 +159,10 @@ public sealed class NativeFileFilterTimingTests
         worker.AssertOsProcessRunning();
     }
 
-    [Fact(SkipUnless = nameof(IsWindows), Skip = "The process facade requires Windows; this synthetic provider creates no windows.")]
-    public async Task A_filter_visibility_timeout_performs_no_selection_and_keeps_the_same_dialog_inspectable_and_cancellable()
+    [Fact(SkipUnless = nameof(IsWindows),
+        Skip = "The process facade requires Windows; this synthetic provider creates no windows.")]
+    public async Task
+        A_filter_visibility_timeout_performs_no_selection_and_keeps_the_same_dialog_inspectable_and_cancellable()
     {
         await using var worker = await TimingWorker.StartAsync(exposeOptions: false);
         var dialogs = new NativeFileDialogController(worker.Session);
@@ -153,7 +170,9 @@ public sealed class NativeFileFilterTimingTests
         var timer = Stopwatch.StartNew();
 
         var timeout = await Assert.ThrowsAsync<NativeAutomationException>(() => dialogs.SetFilterAsync(
-            original.DialogId, filterIndex: 1, cancellationToken: Token));
+            original.DialogId,
+            filterIndex: 1,
+            cancellationToken: Token));
 
         Assert.Equal("file_filter_timeout", timeout.Code);
         await Task.Delay(100, Token);
@@ -174,20 +193,27 @@ public sealed class NativeFileFilterTimingTests
         Assert.Single(afterCancel.Actions, item => item.Action == "Invoke" && item.NodeId == original.CancelNodeId);
     }
 
-    [Theory(SkipUnless = nameof(IsWindows), Skip = "The synthetic provider checks fallback guards without creating windows.")]
+    [Theory(SkipUnless = nameof(IsWindows),
+        Skip = "The synthetic provider checks fallback guards without creating windows.")]
     [InlineData(false, false, 1)]
     [InlineData(true, true, 1)]
     [InlineData(true, false, 2)]
     public async Task An_expanded_pending_or_ambiguous_filter_never_invokes_a_dropdown_and_remains_cancellable(
-        bool ignoreExpand, bool pendingExpand, int dropDownButtonCount)
+        bool ignoreExpand,
+        bool pendingExpand,
+        int dropDownButtonCount)
     {
-        await using var worker = await TimingWorker.StartAsync(exposeOptions: false, ignoreExpand: ignoreExpand,
-            pendingExpand: pendingExpand, dropDownButtonCount: dropDownButtonCount);
+        await using var worker = await TimingWorker.StartAsync(exposeOptions: false,
+            ignoreExpand: ignoreExpand,
+            pendingExpand: pendingExpand,
+            dropDownButtonCount: dropDownButtonCount);
         var dialogs = new NativeFileDialogController(worker.Session);
         var original = Assert.Single(await dialogs.GetDialogsAsync(Token));
 
         var error = await Assert.ThrowsAsync<NativeAutomationException>(() => dialogs.SetFilterAsync(
-            original.DialogId, filterIndex: 1, cancellationToken: Token));
+            original.DialogId,
+            filterIndex: 1,
+            cancellationToken: Token));
 
         Assert.Equal("file_filter_timeout", error.Code);
         worker.AssertOsProcessRunning();
@@ -198,51 +224,80 @@ public sealed class NativeFileFilterTimingTests
         var trace = await worker.ReadTraceAsync();
         Assert.Single(trace.Actions, item => item.Action == "Expand");
         Assert.DoesNotContain(trace.Actions, item => item.Action is "Invoke" or "Select");
-        if (pendingExpand) Assert.True(trace.ActionStatusReads > 0);
+        if (pendingExpand)
+            Assert.True(trace.ActionStatusReads > 0);
         Assert.Equal("CancelledDialogClosed", (await dialogs.CancelAsync(original.DialogId, Token)).State);
         worker.AssertOsProcessRunning();
         var afterCancel = await worker.ReadTraceAsync();
         Assert.Single(afterCancel.Actions, item => item.Action == "Invoke" && item.NodeId == original.CancelNodeId);
-        Assert.DoesNotContain(afterCancel.Actions, item => item.Action == "Select" ||
-            item.Action == "Invoke" && item.NodeId != original.CancelNodeId);
+        Assert.DoesNotContain(afterCancel.Actions,
+            item => item.Action == "Select" ||
+                    item.Action == "Invoke" && item.NodeId != original.CancelNodeId);
     }
 
     private sealed record ProcessIdentity(int ProcessId, long StartTimeUtcTicks, string ExecutablePath);
-    private sealed record ActionEntry(string NodeId, string Action);
-    private sealed record WorkerTrace(ActionEntry[] Actions, int ComboReads, bool Open, string FilterValue, int ActionStatusReads,
-        int DialogReads, int TruncatedDialogReads);
 
-    private sealed class TimingWorker(NativeAutomationSession session, ProcessIdentity identity, string directory) : IAsyncDisposable
+    private sealed record ActionEntry(string NodeId, string Action);
+
+    private sealed record WorkerTrace(
+        ActionEntry[] Actions,
+        int ComboReads,
+        bool Open,
+        string FilterValue,
+        int ActionStatusReads,
+        int DialogReads,
+        int TruncatedDialogReads);
+
+    private sealed class TimingWorker(NativeAutomationSession session, ProcessIdentity identity, string directory)
+        : IAsyncDisposable
     {
         public NativeAutomationSession Session { get; } = session;
 
-        public static async Task<TimingWorker> StartAsync(bool exposeOptions, int slowWindowsRead = 0,
-            bool omitSlowWindowsResult = false, bool corruptFirstPathWrite = false, bool ignoreExpand = false,
-            bool pendingExpand = false, int dropDownButtonCount = 0, int truncatedDialogRead = 0)
+        public static async Task<TimingWorker> StartAsync(bool exposeOptions,
+            int slowWindowsRead = 0,
+            bool omitSlowWindowsResult = false,
+            bool corruptFirstPathWrite = false,
+            bool ignoreExpand = false,
+            bool pendingExpand = false,
+            int dropDownButtonCount = 0,
+            int truncatedDialogRead = 0)
         {
-            var directory = Path.GetFullPath(Path.Combine(Path.GetTempPath(), "avdt-file-filter-timing-" + Guid.NewGuid().ToString("N")));
+            var directory = Path.GetFullPath(Path.Combine(Path.GetTempPath(),
+                "avdt-file-filter-timing-" + Guid.NewGuid().ToString("N")));
             Directory.CreateDirectory(directory);
             var source = typeof(NativeFileFilterTimingTests).Assembly.GetCustomAttributes<AssemblyMetadataAttribute>()
                 .Single(attribute => attribute.Key == "NativeTestPaths").Value!.Split('|')
                 .Single(path => Path.GetFileName(path) == "AvaloniaDevTool.NativeAutomation.Fixture.dll");
             var stem = Path.GetFileNameWithoutExtension(source);
             foreach (var suffix in new[] { ".exe", ".dll", ".runtimeconfig.json", ".deps.json" })
-                File.Copy(Path.Combine(Path.GetDirectoryName(source)!, stem + suffix), Path.Combine(directory, stem + suffix));
-            await File.WriteAllTextAsync(Path.Combine(directory, "native-file-filter-timing.json"), JsonSerializer.Serialize(new
-            {
-                controlDirectory = directory, firstComboReadDelayMs = 3300, exposeOptions,
-                slowWindowsRead, omitSlowWindowsResult, corruptFirstPathWrite, ignoreExpand, pendingExpand, dropDownButtonCount, truncatedDialogRead
-            }, JsonOptions), new UTF8Encoding(false), Token);
+                File.Copy(Path.Combine(Path.GetDirectoryName(source)!, stem + suffix),
+                    Path.Combine(directory, stem + suffix));
+            await File.WriteAllTextAsync(Path.Combine(directory, "native-file-filter-timing.json"),
+                JsonSerializer.Serialize(new
+                    {
+                        controlDirectory = directory, firstComboReadDelayMs = 3300, exposeOptions,
+                        slowWindowsRead, omitSlowWindowsResult, corruptFirstPathWrite, ignoreExpand, pendingExpand,
+                        dropDownButtonCount, truncatedDialogRead
+                    },
+                    JsonOptions),
+                new UTF8Encoding(false),
+                Token);
             NativeAutomationSession? session = null;
             try
             {
                 using var target = Process.GetCurrentProcess();
-                session = await NativeAutomationSession.AttachAsync(target.Id, target.StartTime.ToUniversalTime(), new NativeAutomationOptions
-                {
-                    WorkerPath = Path.Combine(directory, stem + ".exe"), OperationTimeout = TimeSpan.FromSeconds(10)
-                }, Token);
+                session = await NativeAutomationSession.AttachAsync(target.Id,
+                    target.StartTime.ToUniversalTime(),
+                    new NativeAutomationOptions
+                    {
+                        WorkerPath = Path.Combine(directory, stem + ".exe"), OperationTimeout = TimeSpan.FromSeconds(10)
+                    },
+                    Token);
                 var identity = JsonSerializer.Deserialize<ProcessIdentity>(await File.ReadAllTextAsync(
-                    Path.Combine(directory, "attached.json"), Encoding.UTF8, Token), JsonOptions)!;
+                        Path.Combine(directory, "attached.json"),
+                        Encoding.UTF8,
+                        Token),
+                    JsonOptions)!;
                 Assert.Equal(Path.Combine(directory, stem + ".exe"), identity.ExecutablePath, ignoreCase: true);
                 var worker = new TimingWorker(session, identity, directory);
                 worker.AssertOsProcessRunning();
@@ -250,7 +305,8 @@ public sealed class NativeFileFilterTimingTests
             }
             catch
             {
-                if (session is not null) await session.DisposeAsync();
+                if (session is not null)
+                    await session.DisposeAsync();
                 DeleteOwnedDirectory(directory);
                 throw;
             }
@@ -264,7 +320,8 @@ public sealed class NativeFileFilterTimingTests
         }
 
         public async Task<WorkerTrace> ReadTraceAsync() => JsonSerializer.Deserialize<WorkerTrace>(
-            await File.ReadAllTextAsync(Path.Combine(directory, "trace.json"), Encoding.UTF8, Token), JsonOptions)!;
+            await File.ReadAllTextAsync(Path.Combine(directory, "trace.json"), Encoding.UTF8, Token),
+            JsonOptions)!;
 
         public async ValueTask DisposeAsync()
         {
@@ -272,7 +329,8 @@ public sealed class NativeFileFilterTimingTests
             {
                 await Session.DisposeAsync();
                 var timer = Stopwatch.StartNew();
-                while (!HasOsProcessExited(identity) && timer.Elapsed < TimeSpan.FromSeconds(5)) await Task.Delay(20, CancellationToken.None);
+                while (!HasOsProcessExited(identity) && timer.Elapsed < TimeSpan.FromSeconds(5))
+                    await Task.Delay(20, CancellationToken.None);
                 if (!HasOsProcessExited(identity))
                 {
                     using var process = Process.GetProcessById(identity.ProcessId);
@@ -281,17 +339,24 @@ public sealed class NativeFileFilterTimingTests
                     using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
                     await process.WaitForExitAsync(timeout.Token);
                 }
+
                 Assert.True(HasOsProcessExited(identity), "The synthetic filter worker did not exit.");
             }
-            finally { DeleteOwnedDirectory(directory); }
+            finally
+            {
+                DeleteOwnedDirectory(directory);
+            }
         }
 
         private static void DeleteOwnedDirectory(string directory)
         {
             var resolved = Path.GetFullPath(directory);
-            var temp = Path.TrimEndingDirectorySeparator(Path.GetFullPath(Path.GetTempPath())) + Path.DirectorySeparatorChar;
+            var temp = Path.TrimEndingDirectorySeparator(Path.GetFullPath(Path.GetTempPath())) +
+                       Path.DirectorySeparatorChar;
             const string prefix = "avdt-file-filter-timing-";
-            if (!string.Equals(Path.GetDirectoryName(resolved) + Path.DirectorySeparatorChar, temp, StringComparison.OrdinalIgnoreCase) ||
+            if (!string.Equals(Path.GetDirectoryName(resolved) + Path.DirectorySeparatorChar,
+                    temp,
+                    StringComparison.OrdinalIgnoreCase) ||
                 !Path.GetFileName(resolved).StartsWith(prefix, StringComparison.Ordinal) ||
                 !Guid.TryParseExact(Path.GetFileName(resolved)[prefix.Length..], "N", out _))
                 throw new InvalidOperationException("Refusing to delete an unowned synthetic filter directory.");
@@ -306,14 +371,20 @@ public sealed class NativeFileFilterTimingTests
             using var process = Process.GetProcessById(identity.ProcessId);
             try
             {
-                if (process.HasExited) return true;
+                if (process.HasExited)
+                    return true;
                 AssertIdentity(process, identity);
                 return false;
             }
             catch (Exception error) when (error is Win32Exception or InvalidOperationException && process.HasExited)
-            { return true; }
+            {
+                return true;
+            }
         }
-        catch (ArgumentException) { return true; }
+        catch (ArgumentException)
+        {
+            return true;
+        }
     }
 
     private static void AssertIdentity(Process process, ProcessIdentity identity)
@@ -321,11 +392,15 @@ public sealed class NativeFileFilterTimingTests
         Assert.Equal(identity.StartTimeUtcTicks, process.StartTime.ToUniversalTime().Ticks);
         var length = 32768;
         var path = new StringBuilder(length);
-        if (!QueryFullProcessImageName(process.SafeHandle, 0, path, ref length)) throw new Win32Exception(Marshal.GetLastWin32Error());
+        if (!QueryFullProcessImageName(process.SafeHandle, 0, path, ref length))
+            throw new Win32Exception(Marshal.GetLastWin32Error());
         Assert.Equal(identity.ExecutablePath, Path.GetFullPath(path.ToString()), ignoreCase: true);
     }
 
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool QueryFullProcessImageName(SafeProcessHandle process, uint flags, StringBuilder path, ref int size);
+    private static extern bool QueryFullProcessImageName(SafeProcessHandle process,
+        uint flags,
+        StringBuilder path,
+        ref int size);
 }

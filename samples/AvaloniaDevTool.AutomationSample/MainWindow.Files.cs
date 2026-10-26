@@ -16,12 +16,15 @@ public sealed partial class MainWindow
     private readonly TextBlock _documentPath = Label("DocumentPath", "(untitled)");
     private readonly TextBlock _selectedFiles = Label("SelectedFiles", "(none)");
     private readonly TextBlock _folderPath = Label("FolderPath", "(none)");
+
     private readonly TextBox _editor = Identify(new TextBox
-    {
-        Text = "Initial UTF-8 document: 你好，Avalonia!\nEdit this text before saving.\n",
-        AcceptsReturn = true, TextWrapping = Avalonia.Media.TextWrapping.Wrap,
-        Height = 260, HorizontalAlignment = HorizontalAlignment.Stretch
-    }, "DocumentEditor");
+        {
+            Text = "Initial UTF-8 document: 你好，Avalonia!\nEdit this text before saving.\n",
+            AcceptsReturn = true, TextWrapping = Avalonia.Media.TextWrapping.Wrap,
+            Height = 260, HorizontalAlignment = HorizontalAlignment.Stretch
+        },
+        "DocumentEditor");
+
     private readonly List<Button> _fileButtons = [];
     private bool _fileOperation;
     private string? _currentDocumentPath;
@@ -41,21 +44,25 @@ public sealed partial class MainWindow
             Margin = new Thickness(8, 12), Spacing = 10,
             Children =
             {
-                Label("FilesInstructions", "Real OS pickers. Open reads UTF-8 into the editor; Save writes and truncates the chosen file. Cancelling keeps the document unchanged."),
+                Label("FilesInstructions",
+                    "Real OS pickers. Open reads UTF-8 into the editor; Save writes and truncates the chosen file. Cancelling keeps the document unchanged."),
                 buttons, _fileStatus,
                 Label("DocumentPathLabel", "Current document:"), _documentPath,
                 _editor,
                 Label("SelectedFilesLabel", "Opened file paths:"), _selectedFiles,
                 Label("FolderPathLabel", "Selected folder:"), _folderPath,
-                ActionButton("ResetDocumentButton", "Reset document", () =>
-                {
-                    if (_fileOperation) return;
-                    _editor.Text = "Initial UTF-8 document: 你好，Avalonia!\nEdit this text before saving.\n";
-                    _currentDocumentPath = null;
-                    _documentPath.Text = "(untitled)";
-                    _selectedFiles.Text = "(none)";
-                    _fileStatus.Text = "Document reset";
-                })
+                ActionButton("ResetDocumentButton",
+                    "Reset document",
+                    () =>
+                    {
+                        if (_fileOperation)
+                            return;
+                        _editor.Text = "Initial UTF-8 document: 你好，Avalonia!\nEdit this text before saving.\n";
+                        _currentDocumentPath = null;
+                        _documentPath.Text = "(untitled)";
+                        _selectedFiles.Text = "(none)";
+                        _fileStatus.Text = "Document reset";
+                    })
             }
         };
         return new ScrollViewer { Content = content, VerticalScrollBarVisibility = ScrollBarVisibility.Auto };
@@ -70,12 +77,14 @@ public sealed partial class MainWindow
 
     private async Task RunFileOperationAsync(string operation, Func<Task> action)
     {
-        if (_fileOperation) return;
+        if (_fileOperation)
+            return;
         _fileOperation = true;
         _operationPaths = [];
         _operationCancelled = false;
         string? operationError = null;
-        foreach (var button in _fileButtons) button.IsEnabled = false;
+        foreach (var button in _fileButtons)
+            button.IsEnabled = false;
         _editor.IsReadOnly = true;
         try
         {
@@ -96,15 +105,18 @@ public sealed partial class MainWindow
             {
                 _fileStatus.Text += $"; Result file error: {error.GetType().Name}: {error.Message}";
             }
+
             _editor.IsReadOnly = false;
-            foreach (var button in _fileButtons) button.IsEnabled = true;
+            foreach (var button in _fileButtons)
+                button.IsEnabled = true;
             _fileOperation = false;
         }
     }
 
     private async Task OpenSingleAsync()
     {
-        if (!StorageProvider.CanOpen) throw new NotSupportedException("The real platform storage provider cannot open files.");
+        if (!StorageProvider.CanOpen)
+            throw new NotSupportedException("The real platform storage provider cannot open files.");
         _fileStatus.Text = "Waiting: Open single";
         using var start = await GetStartFolderAsync();
         var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
@@ -113,7 +125,13 @@ public sealed partial class MainWindow
             SuggestedStartLocation = start,
             FileTypeFilter = [FilePickerFileTypes.TextPlain, FilePickerFileTypes.All]
         });
-        if (files.Count == 0) { _operationCancelled = true; _fileStatus.Text = "Cancelled: Open single"; return; }
+        if (files.Count == 0)
+        {
+            _operationCancelled = true;
+            _fileStatus.Text = "Cancelled: Open single";
+            return;
+        }
+
         try
         {
             _operationPaths = files.Select(GetPath).ToArray();
@@ -127,13 +145,15 @@ public sealed partial class MainWindow
         }
         finally
         {
-            foreach (var file in files) file.Dispose();
+            foreach (var file in files)
+                file.Dispose();
         }
     }
 
     private async Task OpenMultipleAsync()
     {
-        if (!StorageProvider.CanOpen) throw new NotSupportedException("The real platform storage provider cannot open files.");
+        if (!StorageProvider.CanOpen)
+            throw new NotSupportedException("The real platform storage provider cannot open files.");
         _fileStatus.Text = "Waiting: Open multiple";
         using var start = await GetStartFolderAsync();
         var files = await StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
@@ -142,13 +162,20 @@ public sealed partial class MainWindow
             SuggestedStartLocation = start,
             FileTypeFilter = [FilePickerFileTypes.TextPlain, FilePickerFileTypes.All]
         });
-        if (files.Count == 0) { _operationCancelled = true; _fileStatus.Text = "Cancelled: Open multiple"; return; }
+        if (files.Count == 0)
+        {
+            _operationCancelled = true;
+            _fileStatus.Text = "Cancelled: Open multiple";
+            return;
+        }
+
         try
         {
             _operationPaths = files.Select(GetPath).ToArray();
             // Apply the document only after every selected file has been read successfully.
             var contents = new List<string>();
-            foreach (var file in files) contents.Add(await ReadUtf8Async(file));
+            foreach (var file in files)
+                contents.Add(await ReadUtf8Async(file));
             var text = string.Join("\n--- next file ---\n", contents);
             _editor.Text = text;
             _currentDocumentPath = files.Count == 1 ? GetPath(files[0]) : null;
@@ -158,13 +185,15 @@ public sealed partial class MainWindow
         }
         finally
         {
-            foreach (var file in files) file.Dispose();
+            foreach (var file in files)
+                file.Dispose();
         }
     }
 
     private async Task OpenFolderAsync()
     {
-        if (!StorageProvider.CanPickFolder) throw new NotSupportedException("The real platform storage provider cannot select folders.");
+        if (!StorageProvider.CanPickFolder)
+            throw new NotSupportedException("The real platform storage provider cannot select folders.");
         _fileStatus.Text = "Waiting: Open folder";
         using var start = await GetStartFolderAsync();
         var folders = await StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
@@ -172,7 +201,13 @@ public sealed partial class MainWindow
             Title = "Automation sample - Open folder", AllowMultiple = false,
             SuggestedStartLocation = start
         });
-        if (folders.Count == 0) { _operationCancelled = true; _fileStatus.Text = "Cancelled: Open folder"; return; }
+        if (folders.Count == 0)
+        {
+            _operationCancelled = true;
+            _fileStatus.Text = "Cancelled: Open folder";
+            return;
+        }
+
         try
         {
             _operationPaths = folders.Select(GetPath).ToArray();
@@ -181,13 +216,15 @@ public sealed partial class MainWindow
         }
         finally
         {
-            foreach (var folder in folders) folder.Dispose();
+            foreach (var folder in folders)
+                folder.Dispose();
         }
     }
 
     private async Task SaveAsAsync()
     {
-        if (!StorageProvider.CanSave) throw new NotSupportedException("The real platform storage provider cannot save files.");
+        if (!StorageProvider.CanSave)
+            throw new NotSupportedException("The real platform storage provider cannot save files.");
         var content = _editor.Text ?? "";
         _fileStatus.Text = "Waiting: Save as";
         using var start = await GetStartFolderAsync();
@@ -195,10 +232,18 @@ public sealed partial class MainWindow
         {
             Title = "Automation sample - Save UTF-8 document", ShowOverwritePrompt = true,
             SuggestedStartLocation = start,
-            SuggestedFileName = _currentDocumentPath is null ? "saved-document.txt" : Path.GetFileName(_currentDocumentPath),
+            SuggestedFileName = _currentDocumentPath is null
+                ? "saved-document.txt"
+                : Path.GetFileName(_currentDocumentPath),
             DefaultExtension = "txt", FileTypeChoices = [FilePickerFileTypes.TextPlain, FilePickerFileTypes.All]
         });
-        if (file is null) { _operationCancelled = true; _fileStatus.Text = "Cancelled: Save as"; return; }
+        if (file is null)
+        {
+            _operationCancelled = true;
+            _fileStatus.Text = "Cancelled: Save as";
+            return;
+        }
+
         _operationPaths = [GetPath(file)];
         await WaitForFileIoGateAsync("write", GetPath(file));
 
@@ -206,13 +251,15 @@ public sealed partial class MainWindow
         await using (var stream = await file.OpenWriteAsync())
         {
             if (!stream.CanSeek)
-                throw new NotSupportedException("The selected file cannot be truncated safely because its stream is not seekable.");
+                throw new NotSupportedException(
+                    "The selected file cannot be truncated safely because its stream is not seekable.");
             var bytes = Utf8.GetBytes(content);
             stream.Position = 0;
             await stream.WriteAsync(bytes);
             stream.SetLength(bytes.Length);
             await stream.FlushAsync();
         }
+
         var savedPath = GetPath(file);
         _currentDocumentPath = savedPath;
         _documentPath.Text = savedPath;
@@ -236,7 +283,8 @@ public sealed partial class MainWindow
 
     private async Task WriteOperationResultAsync(string action, string? error)
     {
-        if (Program.ResultFile is not { } resultFile) return;
+        if (Program.ResultFile is not { } resultFile)
+            return;
         var content = _editor.Text ?? "";
         var bytes = Utf8.GetBytes(content);
         var result = new
@@ -258,12 +306,15 @@ public sealed partial class MainWindow
         var temporaryFile = Path.Combine(parent, $".{Path.GetFileName(resultFile)}.{Guid.NewGuid():N}.tmp");
         try
         {
-            await File.WriteAllTextAsync(temporaryFile, JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true }), Utf8);
+            await File.WriteAllTextAsync(temporaryFile,
+                JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true }),
+                Utf8);
             File.Move(temporaryFile, resultFile, overwrite: true);
         }
         finally
         {
-            if (File.Exists(temporaryFile)) File.Delete(temporaryFile);
+            if (File.Exists(temporaryFile))
+                File.Delete(temporaryFile);
         }
     }
 }

@@ -11,15 +11,20 @@ public sealed class ProtocolJsonAotTests
     public void EveryProtocolRecordAndItsWireCollectionsHaveGeneratedMetadata()
     {
         var records = typeof(SessionInfo).Assembly.GetExportedTypes()
-            .Where(type => type.GetProperty("EqualityContract", BindingFlags.Instance | BindingFlags.NonPublic) is not null)
+            .Where(type =>
+                type.GetProperty("EqualityContract", BindingFlags.Instance | BindingFlags.NonPublic) is not null)
             .ToArray();
         Assert.NotEmpty(records);
         foreach (var record in records)
         {
             Assert.True(ProtocolJsonContext.Default.GetTypeInfo(record) is not null, record.FullName);
-            Assert.True(ProtocolJsonContext.Default.GetTypeInfo(record.MakeArrayType()) is not null, record.FullName + "[]");
-            Assert.True(ProtocolJsonContext.Default.GetTypeInfo(typeof(List<>).MakeGenericType(record)) is not null, "List<" + record.FullName + ">");
-            Assert.True(ProtocolJsonContext.Default.GetTypeInfo(typeof(IReadOnlyList<>).MakeGenericType(record)) is not null, "IReadOnlyList<" + record.FullName + ">");
+            Assert.True(ProtocolJsonContext.Default.GetTypeInfo(record.MakeArrayType()) is not null,
+                record.FullName + "[]");
+            Assert.True(ProtocolJsonContext.Default.GetTypeInfo(typeof(List<>).MakeGenericType(record)) is not null,
+                "List<" + record.FullName + ">");
+            Assert.True(
+                ProtocolJsonContext.Default.GetTypeInfo(typeof(IReadOnlyList<>).MakeGenericType(record)) is not null,
+                "IReadOnlyList<" + record.FullName + ">");
         }
     }
 
@@ -29,7 +34,8 @@ public sealed class ProtocolJsonAotTests
         var info = ProtocolJsonContext.Default.GetTypeInfo(typeof(TreeRootsRequest))!;
         var json = JsonSerializer.Serialize(new TreeRootsRequest(TreeKind.Merged), info);
         Assert.Equal("{\"kind\":\"Merged\"}", json);
-        Assert.Equal(TreeKind.Merged, ProtocolJson.Read<TreeRootsRequest>(ProtocolJson.ToElement(new TreeRootsRequest(TreeKind.Merged))).Kind);
+        Assert.Equal(TreeKind.Merged,
+            ProtocolJson.Read<TreeRootsRequest>(ProtocolJson.ToElement(new TreeRootsRequest(TreeKind.Merged))).Kind);
     }
 
     [Fact]

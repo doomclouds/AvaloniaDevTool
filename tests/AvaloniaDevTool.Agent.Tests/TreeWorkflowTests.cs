@@ -26,7 +26,11 @@ public sealed class TreeWorkflowTests
         var node = (await target.Client.SearchTreeAsync(new("ObservedPanel", TreeKind.Visual))).Matches.Single();
         await target.Client.GetChildrenAsync(node.Id, TreeKind.Visual);
         var invalidations = 0;
-        target.Client.TreeInvalidated += change => { if (change.ParentId == node.Id) Interlocked.Increment(ref invalidations); };
+        target.Client.TreeInvalidated += change =>
+        {
+            if (change.ParentId == node.Id)
+                Interlocked.Increment(ref invalidations);
+        };
         panel.Children.Add(new TextBlock { Name = "Second" });
         await WaitUntilAsync(() => Volatile.Read(ref invalidations) > 0);
         await target.Client.ReleaseTreeAsync([node.Id], TreeKind.Visual);
@@ -42,14 +46,19 @@ public sealed class TreeWorkflowTests
     [AvaloniaFact]
     public async Task Diagnostic_overlay_changes_do_not_invalidate_an_observed_layer_but_application_children_do()
     {
-        await using var target = await Target.CreateAsync(new Border { Name = "OverlayTarget", Width = 100, Height = 50 });
+        await using var target =
+            await Target.CreateAsync(new Border { Name = "OverlayTarget", Width = 100, Height = 50 });
         var layer = Assert.IsType<AdornerLayer>(AdornerLayer.GetAdornerLayer(target.Window));
         target.Window.UpdateLayout();
         var element = (await target.Client.SearchTreeAsync(new("OverlayTarget", TreeKind.Visual))).Matches.Single();
         var layerNode = (await target.Client.SearchTreeAsync(new("AdornerLayer", TreeKind.Visual))).Matches.Single();
         await target.Client.GetChildrenAsync(layerNode.Id, TreeKind.Visual);
         var invalidations = 0;
-        target.Client.TreeInvalidated += change => { if (change.ParentId == layerNode.Id) Interlocked.Increment(ref invalidations); };
+        target.Client.TreeInvalidated += change =>
+        {
+            if (change.ParentId == layerNode.Id)
+                Interlocked.Increment(ref invalidations);
+        };
         await target.Client.HighlightAsync(element.Id);
         await target.Client.HighlightAsync(null);
         await Task.Delay(300);
@@ -80,16 +89,19 @@ public sealed class TreeWorkflowTests
     public async Task Removing_a_root_releases_its_tree_observations_without_releasing_property_observers()
     {
         var panel = new StackPanel { Name = "RemovedRootPanel" };
-        var window = new Window { Content = panel }; window.Show();
+        var window = new Window { Content = panel };
+        window.Show();
         var includeRoot = true;
         try
         {
-            await using var agent = DiagnosticsAgent.Attach(Application.Current!, new DiagnosticsAgentOptions
-            {
-                PipeName = "tree-root-lifecycle-" + Guid.NewGuid().ToString("N"),
-                TopLevelProvider = () => includeRoot ? [window] : []
-            });
-            await using var client = new DiagnosticsClient(); await client.ConnectAsync(agent.PipeName);
+            await using var agent = DiagnosticsAgent.Attach(Application.Current!,
+                new DiagnosticsAgentOptions
+                {
+                    PipeName = "tree-root-lifecycle-" + Guid.NewGuid().ToString("N"),
+                    TopLevelProvider = () => includeRoot ? [window] : []
+                });
+            await using var client = new DiagnosticsClient();
+            await client.ConnectAsync(agent.PipeName);
             var panelNode = (await client.SearchTreeAsync(new("RemovedRootPanel", TreeKind.Logical))).Matches.Single();
             await client.GetChildrenAsync(panelNode.Id, TreeKind.Logical);
             await client.GetPropertiesAsync(panelNode.Id);
@@ -98,11 +110,18 @@ public sealed class TreeWorkflowTests
             Assert.Empty(await client.GetRootsAsync(TreeKind.Logical));
             Assert.Equal(0, (await client.ReleaseTreeAsync([], TreeKind.Logical)).ObservedBranches);
             var notified = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-            client.PropertiesChanged += change => { if (change.ObjectId == panelNode.Id) notified.TrySetResult(); };
+            client.PropertiesChanged += change =>
+            {
+                if (change.ObjectId == panelNode.Id)
+                    notified.TrySetResult();
+            };
             panel.Opacity = 0.5;
             await notified.Task.WaitAsync(TimeSpan.FromSeconds(3));
         }
-        finally { window.Close(); }
+        finally
+        {
+            window.Close();
+        }
     }
 
     [AvaloniaFact]
@@ -110,7 +129,8 @@ public sealed class TreeWorkflowTests
     {
         var first = new TextBlock { Name = "StablePart", Classes = { "primary" } };
         var duplicate = new StackPanel { Children = { new TextBlock(), new TextBlock() } };
-        var templated = new Button { Name = "Owner", Template = new FuncControlTemplate<Button>((_, _) => new Border { Name = "Chrome" }) };
+        var templated = new Button
+            { Name = "Owner", Template = new FuncControlTemplate<Button>((_, _) => new Border { Name = "Chrome" }) };
         var badName = new TextBlock { Name = "unsafe.name" };
         var panel = new StackPanel { Children = { first, duplicate, templated, badName } };
         await using var target = await Target.CreateAsync(panel);
@@ -134,7 +154,8 @@ public sealed class TreeWorkflowTests
         Assert.True(templateSelector.Supported, templateSelector.Detail);
         Assert.Contains("/template/", templateSelector.Selector);
         Assert.True(templateSelector.IsUnique);
-        Assert.False((await target.Client.GetElementSelectorAsync(all.Single(node => node.Name == "unsafe.name").Id)).Supported);
+        Assert.False((await target.Client.GetElementSelectorAsync(all.Single(node => node.Name == "unsafe.name").Id))
+            .Supported);
         first.Classes.Add("unsafe.class");
         Assert.False((await target.Client.GetElementSelectorAsync(selected.Id)).Supported);
     }
@@ -143,7 +164,8 @@ public sealed class TreeWorkflowTests
     public async Task BringIntoView_changes_scroll_offset_and_moves_target_into_the_viewport()
     {
         var item = new Border { Name = "BelowViewport", Width = 50, Height = 50, Background = Brushes.Red };
-        var scroll = new ScrollViewer { Content = new StackPanel { Children = { new Border { Height = 1000 }, item } } };
+        var scroll = new ScrollViewer
+            { Content = new StackPanel { Children = { new Border { Height = 1000 }, item } } };
         await using var target = await Target.CreateAsync(scroll);
         target.Window.UpdateLayout();
         Assert.Equal(0, scroll.Offset.Y);
@@ -164,9 +186,16 @@ public sealed class TreeWorkflowTests
     [AvaloniaFact]
     public void Active_tree_observation_does_not_keep_a_detached_control_alive()
     {
-        using var session = new AgentSession(Application.Current!, new DiagnosticsAgentOptions { TopLevelProvider = () => [] });
+        using var session = new AgentSession(Application.Current!,
+            new DiagnosticsAgentOptions { TopLevelProvider = () => [] });
         var weak = ObserveDetached(session);
-        for (var index = 0; index < 3; index++) { GC.Collect(); GC.WaitForPendingFinalizers(); GC.Collect(); }
+        for (var index = 0; index < 3; index++)
+        {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+        }
+
         Assert.False(weak.IsAlive);
         GC.KeepAlive(session);
     }
@@ -175,22 +204,30 @@ public sealed class TreeWorkflowTests
     private static WeakReference ObserveDetached(AgentSession session)
     {
         var panel = new StackPanel();
-        var registry = (WeakObjectRegistry)typeof(AgentSession).GetField("_objects", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.GetValue(session)!;
+        var registry = (WeakObjectRegistry)typeof(AgentSession).GetField("_objects",
+            System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!.GetValue(session)!;
         var id = registry.GetId(panel);
-        session.Handle(TreeWorkflowMethods.Observe, System.Text.Json.JsonSerializer.SerializeToElement(new TreeObserveRequest(id, TreeKind.Visual), ProtocolJson.Options));
+        session.Handle(TreeWorkflowMethods.Observe,
+            System.Text.Json.JsonSerializer.SerializeToElement(new TreeObserveRequest(id, TreeKind.Visual),
+                ProtocolJson.Options));
         return new WeakReference(panel);
     }
 
     private static async Task WaitUntilAsync(Func<bool> predicate)
     {
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-        while (!predicate()) await Task.Delay(10, timeout.Token);
+        while (!predicate())
+            await Task.Delay(10, timeout.Token);
     }
 
-    private static int RedPixels(SKBitmap bitmap) => bitmap.Pixels.Count(color => color.Red > 230 && color.Green < 20 && color.Blue < 20);
+    private static int RedPixels(SKBitmap bitmap) =>
+        bitmap.Pixels.Count(color => color.Red > 230 && color.Green < 20 && color.Blue < 20);
+
     private static SKBitmap Capture(Window window)
     {
-        window.InvalidateVisual(); window.UpdateLayout(); Dispatcher.UIThread.RunJobs();
+        window.InvalidateVisual();
+        window.UpdateLayout();
+        Dispatcher.UIThread.RunJobs();
         AvaloniaHeadlessPlatform.ForceRenderTimerTick();
         using var frame = window.CaptureRenderedFrame();
         Assert.NotNull(frame);
@@ -203,18 +240,25 @@ public sealed class TreeWorkflowTests
     {
         public Window Window { get; } = window;
         public DiagnosticsClient Client { get; } = client;
+
         public static async Task<Target> CreateAsync(Control content)
         {
             var window = new Window { Content = content, Width = 400, Height = 300 };
-            window.Show(); window.UpdateLayout();
-            var agent = DiagnosticsAgent.Attach(Application.Current!, new DiagnosticsAgentOptions
-            { PipeName = "tree-workflow-" + Guid.NewGuid().ToString("N"), TopLevelProvider = () => [window] });
+            window.Show();
+            window.UpdateLayout();
+            var agent = DiagnosticsAgent.Attach(Application.Current!,
+                new DiagnosticsAgentOptions
+                    { PipeName = "tree-workflow-" + Guid.NewGuid().ToString("N"), TopLevelProvider = () => [window] });
             var client = new DiagnosticsClient();
             await client.ConnectAsync(agent.PipeName);
             return new(window, agent, client);
         }
-        public async ValueTask DisposeAsync() { await Client.DisposeAsync(); await agent.DisposeAsync(); Window.Close(); }
+
+        public async ValueTask DisposeAsync()
+        {
+            await Client.DisposeAsync();
+            await agent.DisposeAsync();
+            Window.Close();
+        }
     }
 }
-
-

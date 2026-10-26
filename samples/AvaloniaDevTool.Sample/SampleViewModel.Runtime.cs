@@ -24,10 +24,12 @@ public sealed class RuntimeDemoData
     {
         Child = new RuntimeDemoChild(this);
         var items = new ArrayList { null, "列表文本", Child, this };
-        for (var i = 4; i < 125; i++) items.Add($"条目 {i}");
+        for (var i = 4; i < 125; i++)
+            items.Add($"条目 {i}");
         Items = items;
         var map = new Hashtable { ["child"] = Child, ["self"] = this };
-        for (var i = 0; i < 120; i++) map[$"键 {i:000}"] = i;
+        for (var i = 0; i < 120; i++)
+            map[$"键 {i:000}"] = i;
         Map = map;
     }
 }

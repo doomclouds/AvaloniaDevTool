@@ -38,7 +38,8 @@ public sealed class EventRouteTests
             Assert.Equal(["Tunnel", "Bubble"], route.FinishedStrategies);
             var tunnel = route.Nodes.Where(item => item.Strategy == "Tunnel").ToArray();
             var bubble = route.Nodes.Where(item => item.Strategy == "Bubble").ToArray();
-            Assert.Equal(tunnel.Select(item => item.ReceiverObjectId).Reverse(), bubble.Select(item => item.ReceiverObjectId));
+            Assert.Equal(tunnel.Select(item => item.ReceiverObjectId).Reverse(),
+                bubble.Select(item => item.ReceiverObjectId));
             Assert.Contains(route.Nodes, node => node.ReceiverType == typeof(Window).FullName);
             Assert.Equal(registry.GetId(child), tunnel[^1].ReceiverObjectId);
             Assert.False(bubble[0].HandledObserved);
@@ -49,7 +50,10 @@ public sealed class EventRouteTests
             Assert.Equal(1, handledToo);
             Assert.All(service.Snapshot(), item => Assert.Equal(route.RouteId, item.EventRouteId));
         }
-        finally { window.Close(); }
+        finally
+        {
+            window.Close();
+        }
     }
 
     [AvaloniaFact]
@@ -58,10 +62,13 @@ public sealed class EventRouteTests
         var child = new EventProbe();
         using var service = new ActivityService(new WeakObjectRegistry(), (_, _) => { });
         service.Start(new(false, true, EventName: "*"));
-        child.AddHandler(EventProbe.Routed, (_, args) =>
-        {
-            if (args.Route == RoutingStrategies.Bubble) child.RaiseEvent(new RoutedEventArgs(EventProbe.Direct));
-        }, RoutingStrategies.Bubble);
+        child.AddHandler(EventProbe.Routed,
+            (_, args) =>
+            {
+                if (args.Route == RoutingStrategies.Bubble)
+                    child.RaiseEvent(new RoutedEventArgs(EventProbe.Direct));
+            },
+            RoutingStrategies.Bubble);
         var reused = new RoutedEventArgs(EventProbe.Routed);
         child.RaiseEvent(reused);
         child.RaiseEvent(reused);
@@ -69,11 +76,12 @@ public sealed class EventRouteTests
         Assert.Equal(4, routes.Count);
         Assert.Equal(4, routes.Select(item => item.RouteId).Distinct().Count());
         Assert.All(routes, item => Assert.True(item.IsFinished));
-        Assert.All(routes.Where(item => item.EventName == "DirectProbe"), item =>
-        {
-            Assert.Equal("Direct", Assert.Single(item.Nodes).Strategy);
-            Assert.Equal(["Direct"], item.FinishedStrategies);
-        });
+        Assert.All(routes.Where(item => item.EventName == "DirectProbe"),
+            item =>
+            {
+                Assert.Equal("Direct", Assert.Single(item.Nodes).Strategy);
+                Assert.Equal(["Direct"], item.FinishedStrategies);
+            });
     }
 
     [AvaloniaFact]
@@ -89,7 +97,8 @@ public sealed class EventRouteTests
         Assert.Equal("DirectProbe", Assert.Single(service.EventRoutesSnapshot()).EventName);
         service.Clear();
         service.Start(new(false, true, EventSelection: new(Groups: ["Control"])));
-        var late = RoutedEvent.Register<EventProbe, RoutedEventArgs>("LateRoute" + Guid.NewGuid().ToString("N"), RoutingStrategies.Direct);
+        var late = RoutedEvent.Register<EventProbe, RoutedEventArgs>("LateRoute" + Guid.NewGuid().ToString("N"),
+            RoutingStrategies.Direct);
         var metadata = Assert.Single(service.GetEventCatalog().Events, item => item.Name == late.Name);
         Assert.Equal("Control", metadata.Group);
         child.RaiseEvent(new RoutedEventArgs(late));
@@ -104,16 +113,23 @@ public sealed class EventRouteTests
         using var service = new ActivityService(new WeakObjectRegistry(), (_, _) => { });
         service.Start(new(false, true, EventName: "DirectProbe"));
         var nested = false;
-        child.AddHandler(EventProbe.Direct, (_, args) =>
-        {
-            if (nested) return;
-            nested = true;
-            child.RaiseEvent(args);
-        });
+        child.AddHandler(EventProbe.Direct,
+            (_, args) =>
+            {
+                if (nested)
+                    return;
+                nested = true;
+                child.RaiseEvent(args);
+            });
         child.RaiseEvent(new RoutedEventArgs(EventProbe.Direct));
         var routes = service.EventRoutesSnapshot();
         Assert.Equal(2, routes.Count);
-        Assert.All(routes, route => { Assert.True(route.IsFinished); Assert.Single(route.Nodes); });
+        Assert.All(routes,
+            route =>
+            {
+                Assert.True(route.IsFinished);
+                Assert.Single(route.Nodes);
+            });
         Assert.NotEqual(routes[0].RouteId, routes[1].RouteId);
     }
 
@@ -125,7 +141,16 @@ public sealed class EventRouteTests
         using var service = new ActivityService(new WeakObjectRegistry(), (_, _) => { });
         service.Start(new(false, true, EventName: "RouteProbe"));
         var clear = true;
-        child.AddHandler(EventProbe.Routed, (_, _) => { if (clear) { clear = false; service.Clear(); } }, RoutingStrategies.Bubble);
+        child.AddHandler(EventProbe.Routed,
+            (_, _) =>
+            {
+                if (clear)
+                {
+                    clear = false;
+                    service.Clear();
+                }
+            },
+            RoutingStrategies.Bubble);
         child.RaiseEvent(new RoutedEventArgs(EventProbe.Routed));
         Assert.Empty(service.EventRoutesSnapshot());
         child.RaiseEvent(new RoutedEventArgs(EventProbe.Routed));
@@ -143,14 +168,16 @@ public sealed class EventRouteTests
         var child = new EventProbe();
         using var service = new ActivityService(new WeakObjectRegistry(), (_, _) => { });
         service.Start(new(false, true, EventName: "RouteProbe"));
-        for (var index = 0; index < 550; index++) child.RaiseEvent(new RoutedEventArgs(EventProbe.Routed));
+        for (var index = 0; index < 550; index++)
+            child.RaiseEvent(new RoutedEventArgs(EventProbe.Routed));
         var status = service.EventRoutesStatus();
         Assert.Equal(ActivityService.EventRouteCapacity, status.BufferedCount);
         Assert.True(status.BufferedBytes <= status.ByteBudget);
         Assert.Equal(350, status.DroppedCount);
         service.Clear();
         Control root = child;
-        for (var index = 0; index < 150; index++) root = new Border { Child = root };
+        for (var index = 0; index < 150; index++)
+            root = new Border { Child = root };
         child.RaiseEvent(new RoutedEventArgs(EventProbe.Routed));
         var route = Assert.Single(service.EventRoutesSnapshot());
         Assert.Equal(ActivityService.MaximumRouteNodes, route.Nodes.Count);
@@ -166,7 +193,12 @@ public sealed class EventRouteTests
         using var service = new ActivityService(new WeakObjectRegistry(), (_, _) => { });
         service.Start(new(false, true, EventName: "RouteProbe"));
         var references = RaiseTransient(service);
-        for (var index = 0; index < 3; index++) { GC.Collect(); GC.WaitForPendingFinalizers(); }
+        for (var index = 0; index < 3; index++)
+        {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+        }
+
         Assert.All(references, reference => Assert.False(reference.IsAlive));
         var route = Assert.Single(service.EventRoutesSnapshot());
         Assert.True(route.SourceExpired);
@@ -180,7 +212,8 @@ public sealed class EventRouteTests
         var clock = new ManualTimeProvider();
         using var service = new ActivityService(new WeakObjectRegistry(), (_, _) => { }, timeProvider: clock);
         service.Start(new(false, true, EventName: "DirectProbe"));
-        child.AddHandler(EventProbe.Direct, (_, _) => throw new InvalidOperationException("Application handler failed"));
+        child.AddHandler(EventProbe.Direct,
+            (_, _) => throw new InvalidOperationException("Application handler failed"));
         Assert.Throws<InvalidOperationException>(() => child.RaiseEvent(new RoutedEventArgs(EventProbe.Direct)));
         Assert.Equal("Active", Assert.Single(service.EventRoutesSnapshot()).State);
         clock.Advance(TimeSpan.FromSeconds(ActivityService.ActiveRouteTtlSeconds + 1));
@@ -200,16 +233,19 @@ public sealed class EventRouteTests
     {
         var source = new EventProbe { Name = new string('界', 256) };
         Control root = source;
-        for (var index = 0; index < 70; index++) root = new Border { Name = new string('界', 256), Child = root };
+        for (var index = 0; index < 70; index++)
+            root = new Border { Name = new string('界', 256), Child = root };
         using var service = new ActivityService(new WeakObjectRegistry(), (_, _) => { });
         service.Start(new(false, true, EventName: "RouteProbe"));
-        for (var index = 0; index < 30; index++) source.RaiseEvent(new RoutedEventArgs(EventProbe.Routed));
+        for (var index = 0; index < 30; index++)
+            source.RaiseEvent(new RoutedEventArgs(EventProbe.Routed));
         var status = service.EventRoutesStatus();
         Assert.True(status.DroppedCount > 0);
         Assert.True(status.BufferedCount < status.Capacity);
         Assert.InRange(status.BufferedBytes, 1, status.ByteBudget);
         var snapshot = service.EventRoutesSnapshot();
-        Assert.True(JsonSerializer.SerializeToUtf8Bytes(snapshot, ProtocolJson.Options).Length <= ActivityService.EventRouteByteBudget);
+        Assert.True(JsonSerializer.SerializeToUtf8Bytes(snapshot, ProtocolJson.Options).Length <=
+                    ActivityService.EventRouteByteBudget);
         GC.KeepAlive(root);
     }
 
@@ -226,9 +262,16 @@ public sealed class EventRouteTests
 
     private sealed class EventProbe : Control
     {
-        public static readonly RoutedEvent<RoutedEventArgs> Routed = RoutedEvent.Register<EventProbe, RoutedEventArgs>("RouteProbe", RoutingStrategies.Tunnel | RoutingStrategies.Bubble);
-        public static readonly RoutedEvent<RoutedEventArgs> Direct = RoutedEvent.Register<EventProbe, RoutedEventArgs>("DirectProbe", RoutingStrategies.Direct);
-        static EventProbe() { }
+        public static readonly RoutedEvent<RoutedEventArgs> Routed =
+            RoutedEvent.Register<EventProbe, RoutedEventArgs>("RouteProbe",
+                RoutingStrategies.Tunnel | RoutingStrategies.Bubble);
+
+        public static readonly RoutedEvent<RoutedEventArgs> Direct =
+            RoutedEvent.Register<EventProbe, RoutedEventArgs>("DirectProbe", RoutingStrategies.Direct);
+
+        static EventProbe()
+        {
+        }
     }
 
     private sealed class ManualTimeProvider : TimeProvider

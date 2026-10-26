@@ -53,7 +53,9 @@ public sealed class BreakpointIntegrationTests
         var id = objects.GetId(border);
         using var service = new BreakpointService(objects, (_, _) => { });
         service.Create(new CreateBreakpointRequest(new BreakpointSpec(BreakpointKind.Property,
-            PropertyId(Control.BoundsProperty), id, LogMessage: false)));
+            PropertyId(Control.BoundsProperty),
+            id,
+            LogMessage: false)));
         border.Measure(new Size(140, 40));
         border.Arrange(new Rect(0, 0, 140, 40));
         Assert.NotEmpty(service.History().Hits);
@@ -102,7 +104,8 @@ public sealed class BreakpointIntegrationTests
         var definition = PropertySpec(id);
         var breakpoint = service.Create(new CreateBreakpointRequest(definition));
         var error = Assert.Throws<RpcException>(() => service.Update(new UpdateBreakpointRequest(
-            breakpoint.Id, definition with { MemberId = "Missing.Type:Unknown" })));
+            breakpoint.Id,
+            definition with { MemberId = "Missing.Type:Unknown" })));
         Assert.Equal("property_not_found", error.Code);
         text.Text = "still observed";
         Assert.Equal(1, Assert.Single(service.List()).HitCount);
@@ -121,31 +124,41 @@ public sealed class BreakpointIntegrationTests
             var panelId = objects.GetId(panel);
             var sourceId = objects.GetId(probe);
             var notifications = new List<BreakpointHit>();
-            using var service = new BreakpointService(objects, (method, payload) =>
-            {
-                if (method == BreakpointMethods.Hit)
-                    notifications.Add((BreakpointHit)payload);
-            });
+            using var service = new BreakpointService(objects,
+                (method, payload) =>
+                {
+                    if (method == BreakpointMethods.Hit)
+                        notifications.Add((BreakpointHit)payload);
+                });
             var member = RouteProbe.ProbeEvent.OwnerType.FullName + ":" + RouteProbe.ProbeEvent.Name;
-            service.Create(new CreateBreakpointRequest(new BreakpointSpec(BreakpointKind.Event, member,
+            service.Create(new CreateBreakpointRequest(new BreakpointSpec(BreakpointKind.Event,
+                member,
                 LogMessage: false)));
-            service.Create(new CreateBreakpointRequest(new BreakpointSpec(BreakpointKind.Event, member,
-                panelId, LogMessage: false)));
-            panel.AddHandler(RouteProbe.ProbeEvent, (_, args) => args.Handled = true,
-                RoutingStrategies.Tunnel, true);
+            service.Create(new CreateBreakpointRequest(new BreakpointSpec(BreakpointKind.Event,
+                member,
+                panelId,
+                LogMessage: false)));
+            panel.AddHandler(RouteProbe.ProbeEvent,
+                (_, args) => args.Handled = true,
+                RoutingStrategies.Tunnel,
+                true);
             probe.RaiseEvent(new RoutedEventArgs(RouteProbe.ProbeEvent) { Source = probe });
             await WaitUntilAsync(() => service.History().Hits.Count == 2 && notifications.Count == 2);
             Assert.All(service.List(), info => Assert.Equal(1, info.HitCount));
-            Assert.All(service.History().Hits, hit =>
-            {
-                Assert.Equal(sourceId, hit.ObjectId);
-                Assert.Contains("handled=True", hit.Summary);
-            });
+            Assert.All(service.History().Hits,
+                hit =>
+                {
+                    Assert.Equal(sourceId, hit.ObjectId);
+                    Assert.Contains("handled=True", hit.Summary);
+                });
             probe.RaiseEvent(new RoutedEventArgs(RouteProbe.ProbeEvent) { Source = probe });
             await WaitUntilAsync(() => service.History().Hits.Count == 4);
             Assert.All(service.List(), info => Assert.Equal(2, info.HitCount));
         }
-        finally { window.Close(); }
+        finally
+        {
+            window.Close();
+        }
     }
 
     [AvaloniaFact]
@@ -184,7 +197,8 @@ public sealed class BreakpointIntegrationTests
         var regular = service.Create(new CreateBreakpointRequest(definition));
         service.Update(new UpdateBreakpointRequest(regular.Id, definition with { Enabled = false, Suspend = true }));
         error = Assert.Throws<RpcException>(() => service.Update(new UpdateBreakpointRequest(
-            regular.Id, definition with { Enabled = true, Suspend = true })));
+            regular.Id,
+            definition with { Enabled = true, Suspend = true })));
         Assert.Equal("debugger_not_attached", error.Code);
         Assert.Equal(BreakpointState.Disabled, Assert.Single(service.List()).State);
     }
@@ -215,7 +229,8 @@ public sealed class BreakpointIntegrationTests
         Assert.False(objects.TryGet(targetId, out _));
         Assert.Equal(BreakpointState.ObjectExpired, Assert.Single(service.List()).State);
         var error = Assert.Throws<RpcException>(() => service.Update(new UpdateBreakpointRequest(
-            service.List()[0].Id, PropertySpec(targetId))));
+            service.List()[0].Id,
+            PropertySpec(targetId))));
         Assert.Equal("object_expired", error.Code);
     }
 
@@ -253,11 +268,15 @@ public sealed class BreakpointIntegrationTests
             Assert.Equal(1, sink.Count);
             Assert.Equal(1, Assert.Single(service.List()).HitCount);
         }
-        finally { Logger.Sink = previous; }
+        finally
+        {
+            Logger.Sink = previous;
+        }
     }
 
     private static BreakpointSpec PropertySpec(long objectId) =>
         new(BreakpointKind.Property, PropertyId(TextBlock.TextProperty), objectId, LogMessage: false);
+
     private static string PropertyId(AvaloniaProperty property) => property.OwnerType.FullName + ":" + property.Name;
 
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -275,7 +294,8 @@ public sealed class BreakpointIntegrationTests
     {
         var service = new BreakpointService(objects, (_, _) => { });
         service.Create(new CreateBreakpointRequest(new BreakpointSpec(BreakpointKind.Property,
-            PropertyId(TextBlock.TextProperty), LogMessage: false)));
+            PropertyId(TextBlock.TextProperty),
+            LogMessage: false)));
         service.Dispose();
         return new WeakReference<BreakpointService>(service);
     }
@@ -285,7 +305,8 @@ public sealed class BreakpointIntegrationTests
     {
         var service = new BreakpointService(objects, (_, _) => { });
         service.Create(new CreateBreakpointRequest(new BreakpointSpec(BreakpointKind.Event,
-            RouteProbe.ProbeEvent.OwnerType.FullName + ":" + RouteProbe.ProbeEvent.Name, LogMessage: false)));
+            RouteProbe.ProbeEvent.OwnerType.FullName + ":" + RouteProbe.ProbeEvent.Name,
+            LogMessage: false)));
         service.Dispose();
         return new WeakReference<BreakpointService>(service);
     }
@@ -309,20 +330,26 @@ public sealed class BreakpointIntegrationTests
     private sealed class RouteProbe : Control
     {
         public static readonly RoutedEvent<RoutedEventArgs> ProbeEvent =
-            RoutedEvent.Register<RouteProbe, RoutedEventArgs>("Probe", RoutingStrategies.Tunnel | RoutingStrategies.Bubble);
+            RoutedEvent.Register<RouteProbe, RoutedEventArgs>("Probe",
+                RoutingStrategies.Tunnel | RoutingStrategies.Bubble);
     }
 
     private sealed class ReentrantSink(Action callback) : ILogSink
     {
         public int Count { get; private set; }
         public bool IsEnabled(LogEventLevel level, string area) => area == "DevTool.Breakpoints";
+
         public void Log(LogEventLevel level, string area, object? source, string messageTemplate)
         {
             Count++;
             callback();
         }
-        public void Log(LogEventLevel level, string area, object? source, string messageTemplate, params object?[] propertyValues) =>
+
+        public void Log(LogEventLevel level,
+            string area,
+            object? source,
+            string messageTemplate,
+            params object?[] propertyValues) =>
             Log(level, area, source, messageTemplate);
     }
 }
-

@@ -1,36 +1,56 @@
 <UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d"
-             x:CompileBindings="False"
-             Name="SourcePreviewCard"
-             d:DesignWidth="720" d:DesignHeight="480">
-  <UserControl.Resources>
-    <x:String x:Key="PreviewTitle">独立 XAML 源文件预览</x:String>
-  </UserControl.Resources>
-  <UserControl.Styles>
-    <Style Selector="Button.preview-action">
-      <Setter Property="Background" Value="#5B4CE6" />
-      <Setter Property="Foreground" Value="White" />
-      <Setter Property="CornerRadius" Value="8" />
-      <Setter Property="Padding" Value="16,10" />
-    </Style>
-  </UserControl.Styles>
-  <Border Padding="30" Background="#F5F7FC">
-    <StackPanel Spacing="16">
-      <TextBlock Text="{StaticResource PreviewTitle}" FontSize="26" FontWeight="SemiBold" />
-      <TextBlock Text="保存这个 classless AXAML，预览窗口将自动重新加载；可以通过诊断客户端查询和修改下面的控件。"
-                 TextWrapping="Wrap" Foreground="#64708A" />
-      <Border Background="White" CornerRadius="12" Padding="22" BorderBrush="#DAE0EC" BorderThickness="1">
-        <StackPanel Spacing="12" DataContext="{StaticResource PreviewTitle}">
-          <TextBlock Name="PreviewBoundTitle" Text="{Binding}" FontSize="18" />
-          <TextBox Name="PreviewInput" Text="编辑源文件中的文本，再保存" />
-          <CheckBox Name="PreviewToggle" Content="源码预览支持真实控件和样式" IsChecked="True" />
-          <Button Name="PreviewButton" Classes="preview-action" Content="可通过诊断客户端拾取" />
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    x:CompileBindings="False"
+    Name="SourcePreviewCard"
+    d:DesignWidth="720"
+    d:DesignHeight="480">
+    <UserControl.Resources>
+        <x:String x:Key="PreviewTitle">独立 XAML 源文件预览</x:String>
+    </UserControl.Resources>
+    <UserControl.Styles>
+        <Style Selector="Button.preview-action">
+            <Setter Property="Background"
+                Value="#5B4CE6" />
+            <Setter Property="Foreground"
+                Value="White" />
+            <Setter Property="CornerRadius"
+                Value="8" />
+            <Setter Property="Padding"
+                Value="16,10" />
+        </Style>
+    </UserControl.Styles>
+    <Border Padding="30"
+        Background="#F5F7FC">
+        <StackPanel Spacing="16">
+            <TextBlock Text="{StaticResource PreviewTitle}"
+                FontSize="26"
+                FontWeight="SemiBold" />
+            <TextBlock Text="保存这个 classless AXAML，预览窗口将自动重新加载；可以通过诊断客户端查询和修改下面的控件。"
+                TextWrapping="Wrap"
+                Foreground="#64708A" />
+            <Border Background="White"
+                CornerRadius="12"
+                Padding="22"
+                BorderBrush="#DAE0EC"
+                BorderThickness="1">
+                <StackPanel Spacing="12"
+                    DataContext="{StaticResource PreviewTitle}">
+                    <TextBlock Name="PreviewBoundTitle"
+                        Text="{Binding}"
+                        FontSize="18" />
+                    <TextBox Name="PreviewInput"
+                        Text="编辑源文件中的文本，再保存" />
+                    <CheckBox Name="PreviewToggle"
+                        Content="源码预览支持真实控件和样式"
+                        IsChecked="True" />
+                    <Button Name="PreviewButton"
+                        Classes="preview-action"
+                        Content="可通过诊断客户端拾取" />
+                </StackPanel>
+            </Border>
         </StackPanel>
-      </Border>
-    </StackPanel>
-  </Border>
+    </Border>
 </UserControl>
-

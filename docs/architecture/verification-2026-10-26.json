@@ -1,0 +1,1924 @@
+{
+  "date": "2026-10-26",
+  "scope": "LAN HTTP MCP and domain/project layout refactoring",
+  "authentication": "none",
+  "httpProfile": "agent",
+  "toolCount": 44,
+  "builds": {
+    "Debug": {
+      "projects": 22,
+      "warnings": 0,
+      "errors": 0
+    },
+    "Release": {
+      "projects": 22,
+      "warnings": 0,
+      "errors": 0
+    }
+  },
+  "completeBatch": {
+    "projects": [
+      {
+        "project": "AvaloniaDevTool.Agent.Tests",
+        "total": 285,
+        "executed": 285,
+        "passed": 285,
+        "failed": 0,
+        "unexecutedDiscovered": 0,
+        "failedTests": [],
+        "trxSha256": "f644f05cc7b993d7f5b106f841ad29f550677e4330f9d36d44244bc5456668c7"
+      },
+      {
+        "project": "AvaloniaDevTool.Cli.Tests",
+        "total": 187,
+        "executed": 187,
+        "passed": 184,
+        "failed": 3,
+        "unexecutedDiscovered": 0,
+        "failedTests": [
+          "AvaloniaDevTool.Cli.Tests.NativeFileDialogMcpTests.Default_stdio_tools_drive_real_secondary_windows_popups_menus_wheel_and_drag_business_state",
+          "AvaloniaDevTool.Cli.Tests.NativeFileDialogMcpTests.Native_double_click_preserves_button_business_and_double_tap_gesture_at_stationary_cursor",
+          "AvaloniaDevTool.Cli.Tests.NativeFileDialogMcpTests.Default_stdio_tools_drive_real_native_input_and_file_dialogs_and_verify_application_io"
+        ],
+        "trxSha256": "7027d32123a75c48c9f0733953ae496955fcde337c238556c6f37d69603204da"
+      },
+      {
+        "project": "AvaloniaDevTool.NativeAutomation.Tests",
+        "total": 128,
+        "executed": 127,
+        "passed": 122,
+        "failed": 5,
+        "unexecutedDiscovered": 1,
+        "failedTests": [
+          "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Native_input_waits_for_activation_when_alternating_between_scoped_windows",
+          "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Native_key_chords_release_ctrl_alt_and_shift_in_real_os_state",
+          "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Native_pointer_confirms_arrival_and_refuses_clipped_moves_before_button_injection",
+          "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Native_keyboard_input_refuses_a_third_owned_root_that_interrupts_target_focus",
+          "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Real_os_input_uses_scoped_element_coordinates_and_unicode_with_application_readback"
+        ],
+        "trxSha256": "4b7eefbb7af5fa71923864b82b4e69f4c6db00d8be8cf15df280fe1c4dbf3028"
+      },
+      {
+        "project": "AvaloniaDevTool.Previewer.Tests",
+        "total": 15,
+        "executed": 15,
+        "passed": 15,
+        "failed": 0,
+        "unexecutedDiscovered": 0,
+        "failedTests": [],
+        "trxSha256": "439799109a24e95d9c1a4acf3f17b074335cdba9cd514cecaa663a7bc2704575"
+      },
+      {
+        "project": "AvaloniaDevTool.Protocol.Tests",
+        "total": 26,
+        "executed": 26,
+        "passed": 26,
+        "failed": 0,
+        "unexecutedDiscovered": 0,
+        "failedTests": [],
+        "trxSha256": "368915e2303550864b18634978a36fcee28a3b8d0fceccf4b18a74401681f921"
+      },
+      {
+        "project": "AvaloniaDevTool.Remote.Tests",
+        "total": 11,
+        "executed": 11,
+        "passed": 11,
+        "failed": 0,
+        "unexecutedDiscovered": 0,
+        "failedTests": [],
+        "trxSha256": "bf5c6f64698fdaefdcdc585cf94151ba83041f31b054ded2a58cb4d22b7bf1fb"
+      }
+    ],
+    "totals": {
+      "total": 652,
+      "executed": 651,
+      "passed": 643,
+      "failed": 8,
+      "unexecutedDiscovered": 1
+    },
+    "sourceStage": "Before the final cancellation-callback exception-path hardening in HttpMcpHost; native input code was unchanged."
+  },
+  "environmentFilteredConfirmation": {
+    "projects": [
+      {
+        "project": "AvaloniaDevTool.Agent.Tests",
+        "total": 285,
+        "executed": 285,
+        "passed": 285,
+        "failed": 0,
+        "unexecutedDiscovered": 0,
+        "failedTests": [],
+        "trxSha256": "ec171a129127405ce9f439f900618ec6018b93030d752ded5d7c5a25b5f2a557"
+      },
+      {
+        "project": "AvaloniaDevTool.Cli.Tests",
+        "total": 184,
+        "executed": 184,
+        "passed": 184,
+        "failed": 0,
+        "unexecutedDiscovered": 0,
+        "failedTests": [],
+        "trxSha256": "f5b398a6f14438f7fae3dd52d681da6e82d116b8f5a4abc63de51cab1dadd812"
+      },
+      {
+        "project": "AvaloniaDevTool.NativeAutomation.Tests",
+        "total": 123,
+        "executed": 122,
+        "passed": 122,
+        "failed": 0,
+        "unexecutedDiscovered": 1,
+        "failedTests": [],
+        "trxSha256": "10e34a75dd43f96509515cf8c6a94d8fec253126fec37f863536d7915eb88986"
+      },
+      {
+        "project": "AvaloniaDevTool.Previewer.Tests",
+        "total": 15,
+        "executed": 15,
+        "passed": 15,
+        "failed": 0,
+        "unexecutedDiscovered": 0,
+        "failedTests": [],
+        "trxSha256": "c5fba3a21f3e10f49204554dba0ffd9e94dcc31ccb2fc9ee4dc37cd46a5fc90e"
+      },
+      {
+        "project": "AvaloniaDevTool.Protocol.Tests",
+        "total": 26,
+        "executed": 26,
+        "passed": 26,
+        "failed": 0,
+        "unexecutedDiscovered": 0,
+        "failedTests": [],
+        "trxSha256": "c2dfa7b27a6560716453bd1623ef2f03a564ead58014547a651009850b268736"
+      },
+      {
+        "project": "AvaloniaDevTool.Remote.Tests",
+        "total": 11,
+        "executed": 11,
+        "passed": 11,
+        "failed": 0,
+        "unexecutedDiscovered": 0,
+        "failedTests": [],
+        "trxSha256": "5121bdbeaedfee7ea9285a6dc19768e553574f6f2cca50ba92a5b456d0f4c2bb"
+      }
+    ],
+    "totals": {
+      "total": 644,
+      "executed": 643,
+      "passed": 643,
+      "failed": 0,
+      "unexecutedDiscovered": 1
+    },
+    "sourceStage": "Final code after cancellation cleanup hardening; excludes exactly the eight independently foreground-obstructed tests."
+  },
+  "newCliAndHttpGroup": {
+    "projects": [
+      {
+        "project": "AvaloniaDevTool.Cli.Tests",
+        "total": 69,
+        "executed": 69,
+        "passed": 69,
+        "failed": 0,
+        "unexecutedDiscovered": 0,
+        "failedTests": [],
+        "trxSha256": "3ffed4f024c8b580e7172f37c961971e3e6927d88d207473c36f89cc10d20f95"
+      }
+    ],
+    "totals": {
+      "total": 69,
+      "executed": 69,
+      "passed": 69,
+      "failed": 0,
+      "unexecutedDiscovered": 0
+    },
+    "sourceStage": "Dedicated 69-test group; the same tests also passed in the final environment-filtered confirmation."
+  },
+  "excludedEnvironmentFailuresAreNotPasses": true,
+  "foregroundObstruction": {
+    "process": "PickerHost",
+    "allEightReportedSameForeground": true,
+    "independentOwnedFixtureClickAlsoRefused": true,
+    "unrelatedWindowNotClosed": true,
+    "workerCodeEquivalence": true,
+    "explanation": "Eight existing OS input cases failed while another system window covered the target. The negative safety result was preserved. A separately filtered confirmation did not run these cases.",
+    "resolvedForFocusedRerun": true,
+    "pickerExitedBeforeRerun": true,
+    "rerunGroups": [
+      {
+        "group": "foreground-retry-cli",
+        "passed": 3,
+        "failed": 0,
+        "trxSha256": "09c5ac8b9d7ae6b5d33244c9126fb1b40a0a81d7f318fbe6548b58704b091c46",
+        "tests": [
+          "AvaloniaDevTool.Cli.Tests.NativeFileDialogMcpTests.Native_double_click_preserves_button_business_and_double_tap_gesture_at_stationary_cursor",
+          "AvaloniaDevTool.Cli.Tests.NativeFileDialogMcpTests.Default_stdio_tools_drive_real_native_input_and_file_dialogs_and_verify_application_io",
+          "AvaloniaDevTool.Cli.Tests.NativeFileDialogMcpTests.Default_stdio_tools_drive_real_secondary_windows_popups_menus_wheel_and_drag_business_state"
+        ]
+      },
+      {
+        "group": "foreground-retry-native",
+        "passed": 5,
+        "failed": 0,
+        "trxSha256": "8d560f67ec9bcebefe2a8673da12e03dc2eee0dcb37138efb09a292beab889a6",
+        "tests": [
+          "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Native_key_chords_release_ctrl_alt_and_shift_in_real_os_state",
+          "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Native_pointer_confirms_arrival_and_refuses_clipped_moves_before_button_injection",
+          "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Native_input_waits_for_activation_when_alternating_between_scoped_windows",
+          "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Real_os_input_uses_scoped_element_coordinates_and_unicode_with_application_readback",
+          "AvaloniaDevTool.NativeAutomation.Tests.NativeAutomationIntegrationTests.Native_keyboard_input_refuses_a_third_owned_root_that_interrupts_target_focus"
+        ]
+      }
+    ],
+    "remainingUnpassedCasesFromThisObstruction": 0,
+    "historicalFailuresRetained": true
+  },
+  "explicitNotExecuted": "NativeHwndReuseTests.An_observed_exact_root_hwnd_reuse_does_not_redirect_original_native_node_ids",
+  "httpDesktopAcceptance": {
+    "realModalAnsweredWhileManagedCallsPending": true,
+    "utf8OpenSaveDiskBytesHashReopen": true,
+    "pngDecoded": true
+  },
+  "clientChecks": {
+    "actualCodexCliVersion": "0.164.0",
+    "actualCodexProductionToolDiscovery": 44,
+    "modelCalls": 0,
+    "userConfigChanged": false,
+    "wslClient": "Ubuntu-24.04 Python standard library",
+    "wslAdditionalSdkOrContainerInstalled": false,
+    "wslMirroredLocalhostPassed": true,
+    "windowsNonLoopbackPassed": true,
+    "wslNonLoopback": {
+      "passed": false,
+      "phase": "tools/list response body",
+      "httpStatus": 200,
+      "contentType": "text/event-stream",
+      "timeoutSeconds": 12,
+      "causeEstablished": false
+    },
+    "independentPhysicalMachinesVerified": false
+  },
+  "distribution": {
+    "rid": "win-x64",
+    "selfContained": false,
+    "payloadFilesBeforeReadme": 80,
+    "payloadBytesBeforeReadme": 40944890,
+    "previewerWorkerAndLicensesPresent": true,
+    "publishedHostSmokePassed": true,
+    "actualCodexPublishedHostToolDiscovery": 44,
+    "cliSha256": "35d63aab2fc72c575bd85edea61949a520f47c5c029ff261feb9b998d51ed71b",
+    "archive": "artifacts/releases/AvaloniaDevTool-win-x64-lan-mcp.zip",
+    "archiveBytes": 16230040,
+    "archiveSha256": "11D2BF93CB853844BAFA4163F547AFF17FE215861FB39AC06B74427CE92A442A"
+  },
+  "limitations": [
+    "Independent physical LAN machines not yet available.",
+    "WSL alternate non-loopback route body read timed out; no network settings changed.",
+    "Templated TextBox Animation override has a reproduced upstream current-value/binding limitation; no unsafe workaround applied."
+  ],
+  "sourceInputs": [
+    {
+      "path": "src/AvaloniaDevTool.Agent/AvaloniaDevTool.Agent.csproj",
+      "sha256": "5823d12dd7a32b0417276fd9c03715f71419c7b2ca695d30509cd0fb0a0e3fe3"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Assets/AgentSession.Routes.cs",
+      "sha256": "51241ed4473fa09ce76666100ee6483a9a9ff20a80065346d6d3fc44fac29a1f"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Assets/AssetExportService.cs",
+      "sha256": "0140a99c95801bfd1343fe476d96360751bf7f34f670bd6efebbecb859694325"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Assets/AssetInspectionService.cs",
+      "sha256": "b46a00c9454c30f5075a9bdaf0f3802a79cb2b98a162fe6dc2d4fd56bf7b1e4b"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Assets/AssetMetadataReader.cs",
+      "sha256": "ddb4e5b2648d9fd146d7ceffdccfb5c669563c29b745c01a837930a345a3d77d"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Diagnostics/Activity/ActivityService.cs",
+      "sha256": "d8d661309718d1d0dec70d85740c7131583c12765018cac9e1ddaf808ef9d022"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Diagnostics/Activity/ActivityService.EventRoutes.cs",
+      "sha256": "8f2b2a80dee29f3fea1fad8ca13688ecc6569cb37e68342fd15c5a4b80cb0200"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Diagnostics/Activity/AgentSession.LogNotifications.cs",
+      "sha256": "17dcfea5522098d06a011a61b3603c6be06bed61a1e8ce1aa2119f227dc077f2"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Diagnostics/Activity/AgentSession.Routes.cs",
+      "sha256": "9c944d326cb35f1515b60c27fdfb9f8d45b274ad7a8a9a37c42513b7ca4253f1"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Diagnostics/Activity/LogSnapshots.cs",
+      "sha256": "3f2a3dc2086d770f8462018efc2ae88d455303c3ea675fda64c38176c0e12fd1"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Diagnostics/Breakpoints/AgentSession.Routes.cs",
+      "sha256": "933ece23705e112f5ae33e570bf5591ddf16ef218b4afb55176e879785d63c96"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Diagnostics/Breakpoints/BreakpointService.cs",
+      "sha256": "419fbd60e11908a6a190b2fbf572887c56af4eb0e514ec641644db5908de88e2"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Diagnostics/Metrics/AgentSession.Routes.cs",
+      "sha256": "6d87f1ffc50173b4e1aa1cba1a31ca59b1ca40fcead7208583cae1be7cde5158"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Diagnostics/Metrics/MetricsService.cs",
+      "sha256": "073f84b3683d12ef65592c5b2d2f75e8f03858e5be72ebd67dd12cc2bc91feb9"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Diagnostics/Profiler/AgentSession.Routes.cs",
+      "sha256": "c03bdfc41ea3bb9ee9703d1575c5a6e07b0d5db62e8f1c7cea111550a35e3bfd"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Diagnostics/Profiler/ProfilerService.cs",
+      "sha256": "98f603cc6013eba9045a6c6d02ea7d32d52fcff430712dd92e2b5c38f133110c"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Input/AgentSession.Routes.cs",
+      "sha256": "9a252ea4f3a5bfe7b1c237496a8c841a2354665cd80ea30b3abd842fd765adc8"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Input/InputInspectionService.cs",
+      "sha256": "4bad77f7077dc7ddc1ef5fa807f7de07ba6689acc0f72640757f7d43b0222b44"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Input/InputInspectionService.Interactions.cs",
+      "sha256": "646f8056ea78f99fdf2bdeef471948cb4362fb0d689d1c8b53f4e385eb2f116b"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Layout/AgentSession.Routes.cs",
+      "sha256": "44675c53a5c9636ce62f2cdb9dab82c946910e97d93e8018b07d83b8f5a9ac72"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Layout/LayoutInspectionService.cs",
+      "sha256": "39f67e89930ca9b5a0ba0da70a319d40848cfac30d54f4c36169f8063e311829"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Overlays/AgentSession.Routes.cs",
+      "sha256": "bcbc9a4cc8d93ed06990405b0fb605f841bd4ed974abbba71e3ae7198aafc77a"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Overlays/HighlightAdorner.cs",
+      "sha256": "f8dbeb5d86bc56ef52eb6d03e4c56788f5de57a7d5ce4cf028a5cac451b5b75c"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Overlays/OverlayControlInformation.cs",
+      "sha256": "aee17c5b6395620943d1d93754096cd7f959339eb8931b64c711217fc162f5cd"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Overlays/OverlayGeometry.cs",
+      "sha256": "e692aaf347a9477adac8a0a7dc9f9c89296608826bb61de22390c9e52aebec3d"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Overlays/OverlayService.cs",
+      "sha256": "715ead017c0f2e02dd12500b23e27f867b2fd5467cfd84484494ab5620748ac7"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Popups/AgentSession.Routes.cs",
+      "sha256": "635e3c8e0144459c5c796187d7c711d5fe612e7064218b3139b557b0b1c05d96"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Popups/PopupFreezeService.cs",
+      "sha256": "e744f94e36e4ae9013af7c2d57d0efc70ccf4c6c67749f326feeb2788ce63285"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Properties/AgentSession.Brushes.cs",
+      "sha256": "37ff176693f846a4208ca0d9aac69eed5ccdff105483ec61dde82890216d7f11"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Properties/AgentSession.OfficialProperties.cs",
+      "sha256": "4d8461c49853d883fba5a94d0e910e3b18889872c842dde55ab6f23dc39a2eec"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Properties/AgentSession.Properties.cs",
+      "sha256": "222b007952e6878d58126d89f94441edefdbafc53ea6f46bee0ef689f22b8093"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Properties/AgentSession.PropertyContexts.cs",
+      "sha256": "755d8bbd6f3e328a4425456de87e54aa0d46589d797f2b9aa5dd1baab2262775"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Properties/AgentSession.PropertyEditing.cs",
+      "sha256": "b2105242a7a669d2c2bf48492a59b6dc90062b48ea0eb9871ff060ebe26f7283"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Properties/BrushValues.cs",
+      "sha256": "13ef5842b6defde47bc56cbc7c9a8879efab8a941384747b96982f21276906a1"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Properties/ContextualProperties.cs",
+      "sha256": "febe4fc792cab19cc6e0090ec2840f378f685f7bb068f7399e2036c8f4b5a0a9"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Properties/Presentation/OfficialXamlValueConverter.cs",
+      "sha256": "125eb4610e900b77cf65a0207e03b598320d345fea89b593a3bacf6052419274"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Properties/Presentation/PropertyErrors.cs",
+      "sha256": "ebc7c57c90da699e2d5b118a66965244b7ca851c955c2d475c65d775b1098ad8"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Properties/Presentation/PropertyPresentationAdapter.cs",
+      "sha256": "457b3feb249fca57df3bcf92dcea36a9329ed7dfc8dc388957b2d379a058533b"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Properties/Presentation/PropertyValues.cs",
+      "sha256": "37c194c30c2c85327a4d17bedc74b16abed4fb117a4ecc27127c707619cab284"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Rendering/AgentSession.Routes.cs",
+      "sha256": "955f0c01da212fdb39344e8a2a6d7168aa0041f49bc550ee4f163eb0e0d54427"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Rendering/AgentSession.Screenshot.cs",
+      "sha256": "50b004a6e367ae51dcc9115d48d6a9473a3503f54979541f706cc7ac6d333f33"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Rendering/CompositionInspectionService.cs",
+      "sha256": "3954b95e5a5740000c3ea64c31ada27cc1a581b2125a21e7c492496f0bc67fb0"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Rendering/RendererDiagnosticsService.cs",
+      "sha256": "b7f74d2269489c348f548ac4533934cee72d799e4395cb4db9f6865db9c36c85"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Resources/AgentSession.Routes.cs",
+      "sha256": "7f0c05ae931253902b47bf4e08f1cad8a54c658024a3285d99e6c7f94ae1bf06"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Resources/ResourceInspectionService.cs",
+      "sha256": "3d1a640fb2a94b0cbde3df906d30bf122d60bd2be8753f62b18e43a8afc9ab4d"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Runtime/AgentSession.Routes.cs",
+      "sha256": "e948665a8cea0ae460c15ba3397c80bf02e6fd4b6a48b064831891640293ae90"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Runtime/RuntimeInspectionService.cs",
+      "sha256": "3bf11457960e9e61b496be96f3b34d394c19d673628c63ee107de79f29f5d736"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Selection/AgentSession.Focus.cs",
+      "sha256": "b63593144a697b0fa98316aaf4dbab7667457438812278eb7e12667078ddd106"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Selection/AgentSession.Selection.cs",
+      "sha256": "73a34951082351e88b2e45b80e66284fa2acea6bc76946e62bcad98e1b8aa785"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Styles/AgentSession.Routes.cs",
+      "sha256": "c27b9a6c1a8f0a3971e71eb65525e2fd69416b8af00ec08df9fce02956bebab6"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Styles/BindingDetailsReader.cs",
+      "sha256": "b9bbaf0a107f37cc1af648fadbc9b786840c0439a07fe1be8fdee7a3b7311c4c"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Tree/AgentSession.Exploration.cs",
+      "sha256": "47617d77798d2a8fced190394a75f382aff701b30b6a6c10ba23ecaa70cdc0e4"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Tree/AgentSession.OfficialTree.cs",
+      "sha256": "e1ba787ac9485063dab88fa2a6c41e69734cfc6181d5d046c9c4e9d7f7c85f4f"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Tree/AgentSession.Tree.cs",
+      "sha256": "5ad6e3097d40e03990227a05c43e99217cd894ce683e94dc9aac109d0fefaf9b"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Tree/AgentSession.TreePaging.cs",
+      "sha256": "bd128496b3b1bdde39e47232db3921a46dde4a7723b8abf17e100a2a36ffc753"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Tree/AgentSession.TreeWorkflows.cs",
+      "sha256": "bfb5a50ad1792efcf647c3e526d5d67270881d5c5e2a22fd300bd2db6feac975"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Tree/ElementSelectorBuilder.cs",
+      "sha256": "64db76ff56e7366a29db18fee6b3c00ad624f510bd4b15a6e6450e8e60786b31"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Features/Tree/MergedTree.cs",
+      "sha256": "c720a476540f9e0a002bf4d8b91190c866bcc32fe0a566b29c277b39f83f9223"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Framework/Avalonia12/Avalonia12ActivityAdapter.cs",
+      "sha256": "e00a772af823286ab2b073e410b7d9fa211b73c024146a995989d2138dddbca1"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Framework/Avalonia12/Avalonia12CompositionAdapter.cs",
+      "sha256": "1ed967a26ba8915d61818ba241a2eaa2757beab9dd48e11ce2d90b2e715968af"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Framework/Avalonia12/Avalonia12DiagnosticsAdapter.cs",
+      "sha256": "4ecd0e74f2191e41e784d9b409d71d8e1077a11b9a01ae76832f3d619b715bd8"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Framework/Avalonia12/Avalonia12MetricsAdapter.cs",
+      "sha256": "3044dfc4800cdbff03e175dccdf8912aefa12b1c2e0d9673eb234a413a4fd0e0"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Hosting/DiagnosticsAgent.cs",
+      "sha256": "7050ebfd3ceb45f25e6ad644532b4ed888a10e814feb06ec316e8d9f899935df"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Hosting/DiagnosticsAgent.Preview.cs",
+      "sha256": "6958c98b457b8ca370a7ff6182eafda22efc4b2deadd836b7ab4467cf061d41b"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Hosting/DiagnosticsAgent.Transport.cs",
+      "sha256": "f560565fcd8c101760953366cfe00e764c79415a2a273c811955e26c00ea743c"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Hosting/DiagnosticsAgentOptions.cs",
+      "sha256": "d21e8a38ecbc81805cb31074e46b0118419dcbbc10edb433fa998d1b3e009bc3"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Logging/DiagnosticsLogSource.cs",
+      "sha256": "f8341cf87949ce9a10b6bf5d963075243253b28681482ed48b962eb6911de23e"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Sessions/AgentSession.Async.cs",
+      "sha256": "8fdc7206c0f9fcba21bf7033f7aecb3649ec7d91586c45f449709b2a4a2a3d9b"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Sessions/AgentSession.cs",
+      "sha256": "30142a8ae4388da3a66fa2a5a01c8504a42851b42a89c46b1100226c54020be7"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Sessions/AgentSession.Observation.cs",
+      "sha256": "29499767d40251c2f848c9d4cd151f8c26435c3074146666de32ac24f850ae97"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Sessions/AgentSession.Routing.cs",
+      "sha256": "dfe53d48e47f2aca0ec00f2af0e05caeafde071ae8acad2599d780a11c247a6e"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Sessions/Identity/WeakObjectRegistry.cs",
+      "sha256": "b4f367e7280df639b4ea5d7648235b74a01239f6766369942414e994e1b9e0bf"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Sessions/Notifications/AgentSession.Notifications.cs",
+      "sha256": "909a38f014a551cd4d1d38dcfc9da2655cb6ebaeced0d65d621264e24a8ef05a"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/Sessions/Targets/AgentSession.Roots.cs",
+      "sha256": "c94e7ff7c863c56b8a2f89129d847c2bc4fdcd65513540e237ab78cef6eef6c8"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Agent/ThirdParty/XamlMcp-LICENSE.txt",
+      "sha256": "3ddf9be5c28fe27dad143a5dc76eea25222ad1dd68934a047064e56ed2fa40c5"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/AvaloniaDevTool.Cli.csproj",
+      "sha256": "7a48416463f96f74e00e2c72e1f730690477ef5d0c70b1521a1d3170c7b88b73"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Capture/ToolSession.Capture.cs",
+      "sha256": "b4bd96b937b11618b6e43801a86c59c57694e817f9d038bea8197d17fc360560"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Catalog/McpToolCatalog.cs",
+      "sha256": "11c8cd3f21c3638daf61ace14235efa6e4b760f2f7050bde95bf06a90de7c980"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Connections/ToolSession.Discovery.cs",
+      "sha256": "3497eb3ed256c0578690faec75f0bdad72177acbfd13c17bfa6478f7ced5d856"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Contracts/AgentCaptureContracts.cs",
+      "sha256": "99d72347f62fe32777d983cb4ae1132a02240bb5f1234c221859c67ce1dab8c1"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Contracts/official-input-contracts.json",
+      "sha256": "fe8d7471d60d653e11b5dd9ca46146fdd69370057b935db40cefd65f3e0af2af"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Contracts/OfficialContracts.cs",
+      "sha256": "362a3b92df0064501df6d7954273c81b35adcf9c960227f376cd702fa736d737"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Hosting/Http/HttpMcpHost.cs",
+      "sha256": "4cc6d4e24ddc45b293bd04945206bd88acbb6529022f4c3aa57239dfb68a3412"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Hosting/Options/McpHostOptions.cs",
+      "sha256": "488b1c9637694627e1cef69466e28afb0c476f31aa344d3235299511842ff7bd"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Hosting/Program.cs",
+      "sha256": "98575b1589776b26a48142716fe0de55047d1436b096608aa83b67140a2db2ea"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Hosting/Stdio/StdioMcpHost.cs",
+      "sha256": "e1548d72b4ee65acf894c341a5915a1e989bdfe3401ab1aa7f7a456d932dea8f"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Native/ToolSession.Native.cs",
+      "sha256": "f38bc980956ff914027aa964296e4e37866a2500ceb042ad0e07941a9764fa3d"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Preview/ToolSession.ProjectPreview.cs",
+      "sha256": "057e128abba8b5ce5fa30c09bc5c4541cd17637360ad2e02d3b42e16913c49dd"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Sessions/DesktopControlLease.cs",
+      "sha256": "428bd57e5098a08ee21d84467d944bdbb253ac0a890a898d0479de16dd13785b"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Sessions/HttpToolSession.cs",
+      "sha256": "3e2f917870a9bc906d9c32a901279246e8d67f875ed23c96f840d56baa735943"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Sessions/ManagedToolContext.cs",
+      "sha256": "9485b6bbbf214f0481b9ef744baae9e897f65d9c7329348f753e38491988d9f6"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Sessions/NodeGenerationAllocator.cs",
+      "sha256": "4149ce786b8904bfb288fcf4b206bef1a286553bbf0deffdeddf5a41fa2f5593"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Sessions/ToolSession.cs",
+      "sha256": "754702870f79bebbe626356c98284060356903fbbc2281ee7af36cef067c0b58"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Sessions/ToolSession.Official.cs",
+      "sha256": "4dd088c78235bd1cf45b95f9a050df42777e68ba44699885111792b7af9eabc2"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/ThirdParty/McpSdk-2.3.0-LICENSE.txt",
+      "sha256": "7c6a686d2b34b86ad8c726e0ac4d76903b525f251d73e617f8db3879fa8f11fc"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/AgentTools.cs",
+      "sha256": "6eeff29510f1b82d6419dd0e4ab8dba365fe009e31fd22a857443bf9c02da9b5"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/Assets/InspectorTools.Assets.cs",
+      "sha256": "e16476b208711e00d6682de45b63c268853580170cf2576460651890874f54c6"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/Connection/InspectorTools.Connection.cs",
+      "sha256": "cac8802856eeb634685a7b5c5c8f87d99fdf3ed0702f583434657390acee0d36"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/Connection/InspectorTools.Remote.cs",
+      "sha256": "76f82ff50ba534284b61a20d726dde457dbb15a6acbf38c18fddc11a37a2bb01"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/Connection/OfficialTools.Connection.cs",
+      "sha256": "522d7a769ee1c4583642c81c514539a22da5f6967e95b7209455edf81bc42cbb"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/Diagnostics/Activity/InspectorTools.Activity.cs",
+      "sha256": "1115381a73b740ee8fd1d7acdfca2369998a609bc1fbc50f4926314a8a724a46"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/Diagnostics/Activity/InspectorTools.EventRoutes.cs",
+      "sha256": "bd6b6a5d847fc7cb89ca90f340358b6feba04c4dd71e2f34fcaefd6824c5e1fd"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/Diagnostics/Breakpoints/InspectorTools.Breakpoints.cs",
+      "sha256": "5fefec3d61c76ee1111a60c1f9a1657890e1ea70d6209a02051b6eb71aa26948"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/Diagnostics/Capture/AgentTools.Capture.cs",
+      "sha256": "79bd3542aa20b5a071abf5fe983fd5df22a21c606c70b33ab97777940ef14de6"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/Diagnostics/Metrics/InspectorTools.Metrics.cs",
+      "sha256": "a8c38fc31cdccfc3e1ebf66fc62f95217d83b840d9c009b504837468e11fc9db"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/Diagnostics/Profiler/InspectorTools.Profiler.cs",
+      "sha256": "47f4a49636b84a89c55ac799267b265e3ef5635c018dd554c373fd890790408c"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/FileDialogs/AgentTools.FileDialogs.cs",
+      "sha256": "840b281febf7915168284dbccfa65e3290736be3224f8223670fab35b6b174e4"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/Input/AgentTools.Interaction.cs",
+      "sha256": "f870a7e75767c579fe7017f3a68466f37c1ed5d20fd9f7aae105c3013c32679c"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/Input/AgentTools.Wait.cs",
+      "sha256": "b2ea53ede0af39142b9e76af47fb48bc6c8918ddf9c6ff3f93bf2bc891336936"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/Input/InspectorTools.Input.cs",
+      "sha256": "281fbfbfe51f1ab746ad0b179865ad35b6ab0b8f439e2f7ab3957d5c19f1cb18"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/InspectorTools.cs",
+      "sha256": "1e13af44d03347943df704b41f15f10475f4ff6f08932d1a5684d28cc1a839fa"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/Native/AgentTools.Native.cs",
+      "sha256": "d724d85864e24ada543554ebceb4fc0b74d49c527690e82c90a69722b2c83375"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/Native/AgentTools.NativeInput.cs",
+      "sha256": "6848c135bd02866aae5e1e28dd7f0c8c32bdc23d6ac4cbae8b5d44c261406519"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/Native/AgentTools.NativeScreenshot.cs",
+      "sha256": "4dc0aca7811efc7269232ca20e20c996697c56e2e9d74a435ef1caafd4acfc07"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/OfficialTools.cs",
+      "sha256": "cb44d8551a6e759668dfed497fbb933e9a5a688859ab1677f71e4f0fd9f0ade3"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/Overlays/InspectorTools.Overlay.cs",
+      "sha256": "618092303997c4b270edd8827987cf5fe235bcd287ebf2c2f41474422cdfafef"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/Popups/InspectorTools.PopupFreeze.cs",
+      "sha256": "4079555f8b8294ed63304b39d3b79ca5b1a7b3c4834207a78a8c706e1b9cdfce"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/Preview/InspectorTools.Preview.cs",
+      "sha256": "6aa3d5c94f072dc9c7eadcc207a484391299b62433cf55a39e8bfd521a3b8bd6"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/Preview/OfficialTools.Preview.cs",
+      "sha256": "381792b42922a1d078b2cbf9181213d2ea5f137abbe2731a2cc2f0054d6807d8"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/Properties/InspectorTools.Brushes.cs",
+      "sha256": "4551e17f765bb9149b0c7d1260af0b2a4ae2c8c13b62338094fedbef19cafe8d"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/Properties/InspectorTools.Properties.cs",
+      "sha256": "6463252f84deec871801c66a0693aefbb0806d1dc3fbdfbde0eb9db76d4fe701"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/Properties/ManagedPropertyQueries.cs",
+      "sha256": "5a7ff1f9cc6863108ca69be3d656ea4075d172d1646672f2af5bb8b8f9e15b85"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/Properties/OfficialTools.Properties.cs",
+      "sha256": "82c69790471e0711a85f76f587cb457910c0f9b293910410ec7b81758680fe08"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/Rendering/AgentTools.Screenshot.cs",
+      "sha256": "be5a9bf16cbe024bafc158bd5192ff8c5f6fd346811ebe30c1fff995d69dc874"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/Rendering/InspectorTools.Composition.cs",
+      "sha256": "05bed43d995876d749f00e989a0a55fe17892de62543ca63ebba194cdb5c8a6f"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/Rendering/InspectorTools.RendererDiagnostics.cs",
+      "sha256": "0d3edba4f68ff4d164a2e5c33b82b2638f0fcbf8ab5b55ea1189efad300aa4f3"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/Resources/InspectorTools.Media.cs",
+      "sha256": "18ba390445e6d55615ae0e5d820fc6dad66d8d61acad1fdf26ec852aed769870"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/Resources/InspectorTools.Resources.cs",
+      "sha256": "e4955c0edb23fa4b018df6a73522f519b6552df869317e253c28477fff6b0516"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/Resources/OfficialTools.InputMedia.cs",
+      "sha256": "49c9367fd12ef74654ed00c1627914a95cc49429bf61116d5c034e5613767608"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/Runtime/InspectorTools.Runtime.cs",
+      "sha256": "ab0feb475c2ea4ab3d54b42ee828f10996a9f76f12f2bc9fa39c25573329434f"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/Tree/InspectorTools.Tree.cs",
+      "sha256": "05a5d0203ec25c2c23dd47324e945e04f5d1a3c594d4fc2256e673d860e565e2"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/Tree/InspectorTools.TreeWorkflows.cs",
+      "sha256": "38663c9870da881c684a139b515886fdfab615039f7524ca5c84a49372b54bcd"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/Tree/ManagedTreeQueries.cs",
+      "sha256": "c6a2ea3a613ab10688d8c8770a540de12ade043b4e9c1fa8c1a961365e1c4f42"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Cli/Tools/Tree/OfficialTools.Tree.cs",
+      "sha256": "25b42c1fe8c3fc718946ea39e4d8971025116dc9821803a660e2473ae7ed1190"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Client/AvaloniaDevTool.Client.csproj",
+      "sha256": "b617c6de3abf5f1ac5fe43cf5054f2467aae29cc49378b40229744717c5ef527"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Client/Capture/DiagnosticsClient.CaptureOwnership.cs",
+      "sha256": "30a6a52b1d763c6374a1521b2cbfa6b81179cf14bca2e4fe0a640f5270c6c6bc"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Client/Connections/DiagnosticsClient.cs",
+      "sha256": "5269d0da23353673d7a76274df1cd212acc671139364576c137a0ce9797779b6"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Client/Connections/DiagnosticsClient.Remote.cs",
+      "sha256": "aeb24680ea965431235f97d6fa3f6f6658b6083c7d8d3e3602060e36e9c60863"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Client/Features/Assets/DiagnosticsClient.AssetInspection.cs",
+      "sha256": "d5331584932350d35d8e7db77bb6b3e3c99d71e395e66bda5637806c04a2803c"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Client/Features/Assets/DiagnosticsClient.Assets.cs",
+      "sha256": "e20660565402681bb97b3a44a878ac423774c709fd20206f000b6f4cb07f1e2e"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Client/Features/Diagnostics/Activity/DiagnosticsClient.Activity.cs",
+      "sha256": "7e35d3feee939308690b2b431e3fbaf90f67d614438f44fb35e7edcf95293cdb"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Client/Features/Diagnostics/Activity/DiagnosticsClient.EventRoutes.cs",
+      "sha256": "ae66438b312e58f20794928e4c30e8d64cc97d359074ef9de72435a518bb752f"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Client/Features/Diagnostics/Breakpoints/DiagnosticsClient.Breakpoints.cs",
+      "sha256": "f535bce518d5691a5ebacfcdc52ba1696bbb78529c0487a7e86895d01b4bbe8a"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Client/Features/Diagnostics/Metrics/DiagnosticsClient.Metrics.cs",
+      "sha256": "52b7364db38161985e99a5f393ffff24ac6e177c93696b592b2bd6eadaf9073a"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Client/Features/Diagnostics/Profiler/DiagnosticsClient.Profiler.cs",
+      "sha256": "520c4245c40a9ee9edaff55e4485a1ab792fdc3a65cedcb6d58329b8de6deb7a"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Client/Features/Input/DiagnosticsClient.Actions.cs",
+      "sha256": "718514c1ea8afe16e4ca4d3e82701674fc6a737e2971c579ade39c3c26cbf15f"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Client/Features/Input/DiagnosticsClient.Input.cs",
+      "sha256": "1848670687022f319ca4f6fb241b9271b72ce22d1a86b2ffab3d7a1c466c1e8b"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Client/Features/Layout/DiagnosticsClient.Layout.cs",
+      "sha256": "7042b3058aecbad6025fbf3b106545e321923c2fdbc11b4b310093ee7dea7134"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Client/Features/Overlays/DiagnosticsClient.Overlay.cs",
+      "sha256": "471c87c3faf23be679efca9b48a889690f99701249ddfeabc38ac8675089ffda"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Client/Features/Popups/DiagnosticsClient.PopupFreeze.cs",
+      "sha256": "eec2ca3466770522815278340e8b40dff1b239857f8b2beb06148a7c40f4c6b9"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Client/Features/Preview/DiagnosticsClient.Preview.cs",
+      "sha256": "7067814dc5a95af38268fed8dc5231734272c95507e9b7b555bbe6500444e189"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Client/Features/Properties/DiagnosticsClient.Brushes.cs",
+      "sha256": "baf63aa17683028c32474a0133f50dcd109320b736feafe73826887b9db4e8d9"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Client/Features/Properties/DiagnosticsClient.OfficialProperties.cs",
+      "sha256": "75cdd6d5a9911f42e2c9051c34beddf56ec2d4c2beb05ed5acd9a12e2eaf95af"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Client/Features/Properties/DiagnosticsClient.Properties.cs",
+      "sha256": "d1c21853c5e202770014a44c03a29dc134e6f61565086f43a1956d14be7fde94"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Client/Features/Rendering/DiagnosticsClient.Composition.cs",
+      "sha256": "308632f1e6d5ab5f2ca43d931bec70750a84b644a2178cfd5a9630273825c530"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Client/Features/Rendering/DiagnosticsClient.RendererDiagnostics.cs",
+      "sha256": "cd578dca1616e33d828be2a23159dfd31bbf66db637484d3925a45f7fe10f84b"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Client/Features/Rendering/DiagnosticsClient.Screenshots.cs",
+      "sha256": "c907554b60c7f865ae327e413780f27de4bcb89c3df6337216dd1a2789df294f"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Client/Features/Resources/DiagnosticsClient.Resources.cs",
+      "sha256": "0d7a1997872ac65049a72882a58d4c264271fb4b3f17203486f1618d6d8526aa"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Client/Features/Resources/DiagnosticsClient.ResourceScopes.cs",
+      "sha256": "0871dfc3c7b3c8ec95cfe49db101b742b365069ed2dfd1117fc04967dae64416"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Client/Features/Runtime/DiagnosticsClient.Runtime.cs",
+      "sha256": "8170eae98f7bdce473749e2acee59baeb718896d032aa7d5e32b732c9cfe115b"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Client/Features/Selection/DiagnosticsClient.Focus.cs",
+      "sha256": "a7fce6e591765440239a2e9f1cb51ab196f19823066ddf6fff58e7437e391394"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Client/Features/Styles/DiagnosticsClient.PseudoClasses.cs",
+      "sha256": "dafce2df4e4a00a6a010acb55b3670bc9bc79fe50a19996bcc3112501136ddee"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Client/Features/Styles/DiagnosticsClient.Styles.cs",
+      "sha256": "e951dab19ab26122a80bcf8384624ccf3c2358d321e7d4bd44d450e576768c9d"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Client/Features/Tree/DiagnosticsClient.OfficialTree.cs",
+      "sha256": "a82a5f567a2234c0db5d37399b6297c41ac1cc1df8d8ee39ffca031647658d75"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Client/Features/Tree/DiagnosticsClient.Tree.cs",
+      "sha256": "3ba33cc6a5acfb601d1591ca954d47548d5e17a0ee08c5b722ecfeaccd00ce6b"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Client/Features/Tree/DiagnosticsClient.TreePaging.cs",
+      "sha256": "583f6c3eac844b0a083b861a6cfda73cc00f35a3633b3bd58ea38a07647c19f8"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Client/Features/Tree/DiagnosticsClient.TreeWorkflows.cs",
+      "sha256": "b06c3f59d016c9b2c1be5ffa44bb76efe43d5896590cd0858f5bf483718f298a"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Logging/AvaloniaDevTool.Logging.csproj",
+      "sha256": "e1adad76767d1984290ad46a6a49ca1828c7e69068719d75f552d8b66348ff69"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Logging/Providers/DiagnosticsLoggerProvider.cs",
+      "sha256": "15b1b668170bcb7690ccd8612f066c4585f581255480e47fd50e3d1be7508561"
+    },
+    {
+      "path": "src/AvaloniaDevTool.NativeAutomation/AvaloniaDevTool.NativeAutomation.csproj",
+      "sha256": "87ff4abece5ba48d3ef6fe2e1c01e0b8ab4d49292a76f4d3cc6a118a2dc9bdb2"
+    },
+    {
+      "path": "src/AvaloniaDevTool.NativeAutomation/Contracts/NativeAutomationContracts.cs",
+      "sha256": "d57671f89b83228458b69d54acce1d5606859f40937b730be9c4484fb348d04a"
+    },
+    {
+      "path": "src/AvaloniaDevTool.NativeAutomation/Contracts/NativeFileDialogContracts.cs",
+      "sha256": "f8b0481fe0c2625a6ed6977d8223632ce504f85142c9a04580e7e6cf3ee01e74"
+    },
+    {
+      "path": "src/AvaloniaDevTool.NativeAutomation/FileDialogs/NativeFileDialogController.cs",
+      "sha256": "8723f31fe03b6a263881b8d69f2fa7b5bb89c115b8f5c323c69e35c0a71a50b3"
+    },
+    {
+      "path": "src/AvaloniaDevTool.NativeAutomation/Sessions/NativeAutomationSession.cs",
+      "sha256": "4123e714bdb261cd39806d5c2bf62a209cf808ca595decb7022133f8dd37cef5"
+    },
+    {
+      "path": "src/AvaloniaDevTool.NativeAutomation/Worker/NativeWorkerProtocol.cs",
+      "sha256": "5016e64b7202db8d80f11ea459f0d37550c904cfcbc9961946bacafbc16de7fd"
+    },
+    {
+      "path": "src/AvaloniaDevTool.NativeAutomation.Worker/AvaloniaDevTool.NativeAutomation.Worker.csproj",
+      "sha256": "fabd4cb4bfc5f9ac307cc44db39b1a78cf1d38839d98150aa2e82ee2471efa27"
+    },
+    {
+      "path": "src/AvaloniaDevTool.NativeAutomation.Worker/Capture/NativeAutomationBackend.Screenshot.cs",
+      "sha256": "e672813df803ba460ecabfa431ed7466beae6b95c9b1d10f06b8039891086d54"
+    },
+    {
+      "path": "src/AvaloniaDevTool.NativeAutomation.Worker/Capture/NativeScreenshotGeometry.cs",
+      "sha256": "60c16bb67c684ca3663121dfe3fef20d87bfadf0ca0132ad1df7d347049315d7"
+    },
+    {
+      "path": "src/AvaloniaDevTool.NativeAutomation.Worker/Coordinates/NativeCoordinateSpace.cs",
+      "sha256": "cf142f5369e032be1706741efdb8e1eba0990163e41d97ccd7ed533ff02ca714"
+    },
+    {
+      "path": "src/AvaloniaDevTool.NativeAutomation.Worker/Hosting/Program.cs",
+      "sha256": "cc23beb3c4bae9f71fcaecde214d9b9bfecacee2787fa6e74c956db7fa81213c"
+    },
+    {
+      "path": "src/AvaloniaDevTool.NativeAutomation.Worker/Identity/NativeWindowLifetimeMonitor.cs",
+      "sha256": "65291725c2bad52818b73d92faf5e113f4df5e014baaf4547ed5bf338e874cec"
+    },
+    {
+      "path": "src/AvaloniaDevTool.NativeAutomation.Worker/Input/NativeAutomationBackend.Input.cs",
+      "sha256": "65866132103e43eaffc438d92259158d9ce580971741bad8ad97f2838de3fbf4"
+    },
+    {
+      "path": "src/AvaloniaDevTool.NativeAutomation.Worker/Input/NativeAutomationBackend.InputBatch.cs",
+      "sha256": "4f294cbcc55ab99c0174e8da93d7fda7b73be700f2394abf326eee46ef43715b"
+    },
+    {
+      "path": "src/AvaloniaDevTool.NativeAutomation.Worker/Sessions/NativeAutomationBackend.cs",
+      "sha256": "8853581a82324465014f79fd58111e3260976d0f3b2d26d96d29195e455f4e4d"
+    },
+    {
+      "path": "src/AvaloniaDevTool.NativeAutomation.Worker/ThirdParty/FlaUI-LICENSE.txt",
+      "sha256": "5914c914df1029ae6f7f2682f04f6fc587e195424040933a43e6599d6cd8a529"
+    },
+    {
+      "path": "src/AvaloniaDevTool.NativeAutomation.Worker/ThirdParty/UIAutomation-Interop-LICENSE.txt",
+      "sha256": "ae507f8cb7ce8b34d9ba817d165492af4225482305a8b92c7620f5fa7b7c57a1"
+    },
+    {
+      "path": "src/AvaloniaDevTool.NativeAutomation.Worker/Windows/NativeWindows.cs",
+      "sha256": "0ef22d437201c58c7c32849315300d007e8c5b8b61bdbe5f5012c6b72123e784"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Previewer/AvaloniaDevTool.Previewer.csproj",
+      "sha256": "857421b7530baaf7e553dec5ef5949dd5dc31425c9b82649adf09cafe2220635"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Previewer/Documents/PreviewDocumentLoader.cs",
+      "sha256": "8b4b9af658fddea50f8fe87be6e3d05dcecf314d14473acd527c3798e1ed3cc3"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Previewer/Hosting/PreviewApp.cs",
+      "sha256": "16d4e0a991ae306ad819442285d3caeacd1f3de70490353ee086ae4162133df5"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Previewer/Hosting/PreviewOptions.cs",
+      "sha256": "4f86b2d35d601798a4d3461d94b6119659f0a728a181fd68983bd4ca4db8f962"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Previewer/Hosting/Program.cs",
+      "sha256": "01f53eeca4d0b5647e9fe17438281559be41cf5421bd38aaba116df6ac42cd7e"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Previewer/Presentation/PreviewWindow.cs",
+      "sha256": "1c2a8f4cda39d5a940caedb34fb8175d9f0991d9b6333232a634791935f41e99"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Previewer/Projects/PreviewAssemblyScope.cs",
+      "sha256": "3b732f49af514e3b8828e8f78ff5b6669c4927ba08de1adb6c9ca5f3986ab681"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Previewer/Sessions/PreviewSession.cs",
+      "sha256": "d929e5c8b02936c1c01d82434ae936c4f69876e3a8ebb1cdcb4e389d1e099e58"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Previewer/Watching/PreviewFileWatcher.cs",
+      "sha256": "ba51790490024a66a4661dd6f2864837c14e941f328afc6daf6d34c213f7b71a"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Protocol/AvaloniaDevTool.Protocol.csproj",
+      "sha256": "5aa7bdbedd70f6ab97c9902e476da542d1c27d2fb12fa647840f5046fda25816"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Protocol/Contracts/Assets/AssetExportContracts.cs",
+      "sha256": "8ec5795b4c8b00ea5bddbbf03ff4100237d2649b65305f5a199d457e3c539e1b"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Protocol/Contracts/Diagnostics/Activity/ActivityContracts.cs",
+      "sha256": "6296dd0e6e299503d0b0ecaf9df003d6aa3144e5c3b31edcd0670288e43d6cac"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Protocol/Contracts/Diagnostics/Activity/EventRouteContracts.cs",
+      "sha256": "0bacba7adda62048ac79df44204e8067ddf8b9c53abdfa8cbf4cca3cefa9660c"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Protocol/Contracts/Diagnostics/Activity/LogContracts.cs",
+      "sha256": "8349c6eb5c0ad674887329f43adef955e346d67f52be4d46cd5677824a0224d1"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Protocol/Contracts/Diagnostics/Breakpoints/BreakpointContracts.cs",
+      "sha256": "61070c5081536ea116ff825c69e85a9a851ddae9e76191502aeb5a1a99b8765d"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Protocol/Contracts/Diagnostics/Metrics/MetricsContracts.cs",
+      "sha256": "f29e9cc57e371ea6672dc61592866c935dc60da66fafd32700ea387dfa52e303"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Protocol/Contracts/Diagnostics/Profiler/ProfilerContracts.cs",
+      "sha256": "03f65e768a5efeb15b6b9f1bdd5eb9a722084fd30ab0a571f3beb2d2f742124f"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Protocol/Contracts/Input/InputContracts.cs",
+      "sha256": "b9ea8c8eb301635cf49b28a23f62306248bd694cb87ab7bc8c66ace41dbbe431"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Protocol/Contracts/Layout/LayoutContracts.cs",
+      "sha256": "b538cf70032025beb4c5026f24b2f18b4cf9fb24f6f60bbb75e23070a6252de3"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Protocol/Contracts/Overlays/OverlayContracts.cs",
+      "sha256": "bbf6c53ad0efd7428ded4b18e102ccb796ad38e5cf987a80c2a9b895d9bcc790"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Protocol/Contracts/Popups/PopupFreezeContracts.cs",
+      "sha256": "2f71c5b93cfa6c45d3e4c21c7f0510715510c68cc2665d1d7db7d75e0132ccdd"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Protocol/Contracts/Preview/PreviewContracts.cs",
+      "sha256": "5ded9deea5eefca3cf742a525c4f418f5a049f3e919cc01acc92b41187ef07be"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Protocol/Contracts/Properties/BrushContracts.cs",
+      "sha256": "43d8b529083f8bb0aa2b3ca47da54de020e8eb7efe1b442035537beeadbec30b"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Protocol/Contracts/Properties/OfficialPropertyContracts.cs",
+      "sha256": "726000a6ab3c2f4aa446ec9ca3e2cf8387aa67cb2dd3deb41eeb2d984aedd764"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Protocol/Contracts/Properties/PropertyContracts.cs",
+      "sha256": "290d84fbb9959f806982df7e3e613a4837c7f24b345f4e32f1686106b3e78532"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Protocol/Contracts/Properties/PropertyPresentationContracts.cs",
+      "sha256": "a28da486a72e5a8346ef7e494d272698aaaa44eeeeb9aa189f0155949badd8cf"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Protocol/Contracts/Rendering/CompositionContracts.cs",
+      "sha256": "98be439b0018f3b09479cff9bbd618ab23eb683d829c0d46e3c2b500ffbdbb43"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Protocol/Contracts/Rendering/RendererDiagnosticsContracts.cs",
+      "sha256": "56027b4737ba78ecf92c8830f7534813e5c56aa613b4280f0815ba49d4190499"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Protocol/Contracts/Resources/InspectionContracts.cs",
+      "sha256": "506838b0a70f21be6531df9dce2f1e851904f74642da7a764f8794eae3061c54"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Protocol/Contracts/Resources/ResourceQueryContracts.cs",
+      "sha256": "453a323b4b87c16b66ab8811db1158cd48abdb9cfc1a7c6ee6753ccce10dbd6d"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Protocol/Contracts/Runtime/RuntimeInspectionContracts.cs",
+      "sha256": "d785b1fc80c811122d449fb86713fa3ccfe9eed61c4e2c1aa18980094c2f0886"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Protocol/Contracts/Selection/SelectionContracts.cs",
+      "sha256": "f92592065ea8508e7fb6f22d01d76c53f34583f5be5fbc753be396d02c46a968"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Protocol/Contracts/Session/SessionContracts.cs",
+      "sha256": "6b14515af38dce20d9401fb6b9f76a0e83e5c507b6542d4deb77f10003460c28"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Protocol/Contracts/Styles/BindingDetailsContracts.cs",
+      "sha256": "d1c351d513d90094c6be38aeae91240c6603d4ec6abc9eb2920d275777bca242"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Protocol/Contracts/Tree/ExplorationContracts.cs",
+      "sha256": "3f547fc3cbb65cee68c68472454f03ef8fd15b9518155bf8463f94731b1624df"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Protocol/Contracts/Tree/OfficialTreeContracts.cs",
+      "sha256": "bd22f126bd6ea7c7e954dc5bc3552b817b1bd9efc03e517c5b4f901ef2de07c7"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Protocol/Contracts/Tree/TreeContracts.cs",
+      "sha256": "7d392b491527e034cd6e036e9ad3bd1d259aa4a7f398423c7d5db6ac8433f6a3"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Protocol/Contracts/Tree/TreePagingContracts.cs",
+      "sha256": "08f6905ec70c394f648318f62781de8ff2a638567c8324b9ce5c273a9d48a640"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Protocol/Contracts/Tree/TreeWorkflowContracts.cs",
+      "sha256": "e27816cd5c6cf8671e58cd03615b61dcac670b0f60d5ca6e81bd0f716d35f912"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Protocol/Serialization/ProtocolJson.cs",
+      "sha256": "82231a3df636d2965c926c8406068f61aba9d62eaf78f088edefc18b62a7ffdb"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Protocol/Serialization/ProtocolJsonContext.cs",
+      "sha256": "d630e9cf25916a228c9d8906c8394c67f37da44e5b4708d95b0f2b8d3234db36"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Protocol/Tracing/RpcTrace.cs",
+      "sha256": "bf7a24de1666491f190345cc184dc7d8b449bc9b8c96cf5334f6a04da149f31c"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Protocol/Transport/RpcException.cs",
+      "sha256": "84ec9fe18704abc30f74c6c88d5d6e287853d212c22b7bcb1f718487287be8f9"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Protocol/Transport/RpcPeer.cs",
+      "sha256": "a8eec1c1ab65288ac0eaf74acae9d1a6ca0ef6e97b51772365d032db2bd8468f"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Protocol/Transport/WebSockets/RpcWebSocketStream.cs",
+      "sha256": "24ec37a1c43b2da4b2ce8a18e4a7746fc6d537b3809c02ef4dabab849c6a95c7"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Remote/AvaloniaDevTool.Remote.csproj",
+      "sha256": "6f29117760bef1d174f869c6858225592cc131bae4713a217d158ac68894d5a9"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Remote/Configuration/DiagnosticsRemoteServerOptions.cs",
+      "sha256": "e94265c48bf91741378c761b37d22b2fe5e25821162933c5c4cedec0f07c60f1"
+    },
+    {
+      "path": "src/AvaloniaDevTool.Remote/Hosting/DiagnosticsRemoteServer.cs",
+      "sha256": "12e70455ed0db7c6e356cf128d480f63efdaf1905876206d246c992c2451228f"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/ActivityIntegrationTests.cs",
+      "sha256": "6d43b75090f492a5dc2e6402560b021a2099346bd18f9a67aca0d04a1e4c491c"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/AgentIntegrationTests.cs",
+      "sha256": "96630e1cff73d7f5ad9d6dfb1337cce6a93186c6f1155dfbb1e552c460a61e25"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/AgentSessionRoutingTests.cs",
+      "sha256": "2ce72fdd68c4b3afb247d1f3fb6d58aaa4117f93a247aaa126a3958b0c32037d"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/AssetExportTests.cs",
+      "sha256": "76e24b39d40f45bb349fb95d4faea8aa6d60fb449c5719d0a2ef53a7deacb65d"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/AssetPreviewTests.cs",
+      "sha256": "e768338ab86f23469f3018e13da4a4a53a1e54e6b1a37c6072b1a155f76acf9f"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/Assets/inspection-probe.txt",
+      "sha256": "474d2ed83b7a535bdeca3d61e5e964f09c232bd20fd08b7a570131e6c81644bc"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/AvaloniaDevTool.Agent.Tests.csproj",
+      "sha256": "1b94f2ff5e2d4705bd819919307885eaa66d7943aa89a20e67b49e5d7458b0f4"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/BindingCultureTests.cs",
+      "sha256": "81550e789fbd4fcec2afbe720fc3f347903011982950bcf1b515ca31ad7725f3"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/BindingDetailsTests.cs",
+      "sha256": "ea4be40bd034bf36f85dac081c187dfc21e9b76730218da9708e3016b5c9045d"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/BreakpointIntegrationTests.cs",
+      "sha256": "e1d4391b482e6b6a5e245dba2a3be22ac79299d732f7c837ab41f4d6f5f876ce"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/BreakpointSourceTests.cs",
+      "sha256": "0c2b98668023c664a4a10382c1dbe1fe950567b35c16c10a15bb4cf33e1c9d0d"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/BrushEditorRpcTests.cs",
+      "sha256": "e3c16a2d45ab6dbb2da7174447dc5efe84dcd94c60c9df3134547c4373274802"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/CompositionInspectionTests.cs",
+      "sha256": "59e32a7e29abff495d1826e850c3c98e2bae0cbdd4576ad788cad2ff852845df"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/ContextualPropertyTests.cs",
+      "sha256": "46f1c20feeebc3a7a005f36e6ce0423500195ecb3e79a54c68f325664230f435"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/EventRouteTests.cs",
+      "sha256": "65f5c3db7a8a2c143bb283fbaaf5f2f97995837924bfb540ee035af188cb04b2"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/ExplorationIntegrationTests.cs",
+      "sha256": "142a22d9358f4ed05d4b02c4c388104913384694cabb6961a23a7079f3a73f1f"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/InputInspectionTests.cs",
+      "sha256": "bc4f40dbd2a2d5cd78eeb5b9dd8525a81774ffe038759f3f475af45fc3abb2d5"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/InspectionIntegrationTests.cs",
+      "sha256": "27e21ed8c4f50cc3b0d55332a26333ab027bbc6976aea5472fad4461cc8ae9e7"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/InteractionInspectionTests.cs",
+      "sha256": "6791e73956d0abdb3434498c669f91cfed2104ccb020806d4d48e6e95941a598"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/LayoutInspectionTests.cs",
+      "sha256": "9b57fa9247ae00a3d26558f2082fcae1844ab130e548013f38a7fb80dbe71647"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/LoggingBudgetTests.cs",
+      "sha256": "7b47bde5be4179a08beb9c773e3a56bd774c0570907d5f5c8783b7f2e4f961a3"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/MergedTreeTests.cs",
+      "sha256": "3fc73de4861589344ecf49ac6772b1acbe80a38e4a97afe7522acf57f6a675e1"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/MetricsIntegrationTests.cs",
+      "sha256": "0dbfef7d24131759e862e4fa2d97404b02f2f7335de0cdacedbf94313f341a8c"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/MetricsWindowTests.cs",
+      "sha256": "f398750e3cf44758dd2b928608acd59c3744bfbcaa2d4396eb2985cad7e9791a"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/NavigationIntegrationTests.cs",
+      "sha256": "63aa774b47822471d501f01d9985840393d3c1697893096f3c1bd3115db9ce87"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/OfficialResourceScopeTests.cs",
+      "sha256": "4dafe572009677d1020b2d3ec8fd46ed40a740f3dc50bf6a52bd6cd2e7919a8e"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/OverlayTests.cs",
+      "sha256": "3f4f549e66ca23e7533a3e7baca7181dd23169369e82c4a44c5374cbe6815f33"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/PopupFreezeTests.cs",
+      "sha256": "8a0626601d31bb39a1ef8782d090ebf9f89be9f0e45537ac6bee8c85f659dd6a"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/PopupRootDiscoveryTests.cs",
+      "sha256": "401f562a4622a9cf37e3da690e0be26c0b56ea1833782ae74fac577cd763ce9f"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/ProfilerIntegrationTests.cs",
+      "sha256": "ffa037e04c648814b47e6316d6cd4764019fad6d23de622b01cabeb492470acd"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/PropertyPresentationTests.cs",
+      "sha256": "4c0fc6da03c3cd5a45a361d920299ef2c2fe99805a29361dd76fea4ec949d2da"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/RendererDiagnosticsTests.cs",
+      "sha256": "88be3d9c8a75ef3e955efb89055085e2fea111a1c269aae539b229aebc8d33b4"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/ResourceQueryTests.cs",
+      "sha256": "c96f0a8be05c6b7f330b7f6b602401729d60289df0cf95fd4c1b6c17c7eefdcc"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/RuntimeInspectionTests.cs",
+      "sha256": "a153db876168be013acc128529571d7daa95edc4e8b8e2f90cf564d5b0abe78b"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/StructuredLoggingTests.cs",
+      "sha256": "274fa829fd1b5fc981e3c0f890689cba4330bf6a516bf3fa88aafa63beaaa5f5"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/TestApplication.cs",
+      "sha256": "ccef4ae9f8e40df0d7366d037d642683c8d62b37c6093828bc1301bee8a9ff0e"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/TreePagingTests.cs",
+      "sha256": "fb08d9ecf7751d3cc76e7e4ad926fc6b770cb7d09f8cbbc8f948018a9265a553"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Agent.Tests/TreeWorkflowTests.cs",
+      "sha256": "947f44ff46edc786cc46d50f1bfd6ee01e1c74dc441b251bdc59296fecf19a25"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.AotSmoke/AvaloniaDevTool.AotSmoke.csproj",
+      "sha256": "8abede153ae75e3389b07b31777a48ecc16d437cebb5be4fea1389512b2622eb"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.AotSmoke/Program.cs",
+      "sha256": "1108feb964338261790ec9da49bb0c77323a7ccafa506f7d00a626a9bf6c2f7e"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Cli.Tests/AgentCaptureMcpTests.cs",
+      "sha256": "1ec77c92b2efb44e1f6a00631c2d3bd3031ddc57291425cfda6495ae318d2a88"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Cli.Tests/AgentInteractionBoundaryMcpTests.cs",
+      "sha256": "3489d2e6b2397bf1320c034c928d47127c8bbfb2bd5fdc13f78c6c8e0d3b756b"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Cli.Tests/AgentInteractionMcpTests.cs",
+      "sha256": "ba5bb916f8bbdcb9116548923df636edd8875507dc9864d00507fa086e3bb6e8"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Cli.Tests/AgentScreenshotMcpTests.cs",
+      "sha256": "5f05e0630717851c7353e21a457fc161b88fa79572ede7f31ff7947e68566659"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Cli.Tests/AvaloniaDevTool.Cli.Tests.csproj",
+      "sha256": "ba63a5bf6d860b0043f0db6a1897ab1d0bbc56a375a61a6755da8a3b7ad07bb4"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Cli.Tests/BreakpointSourceMcpTests.cs",
+      "sha256": "33abc850f138c3e73f383a280d147e8cc2a83054364007dd41bcfa75b8d3ee33"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Cli.Tests/ContextualPropertyMcpTests.cs",
+      "sha256": "2f62db10752b8e2b4d769bb20b4c79e8bfc195edf5dfebe35897cb17d428a912"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Cli.Tests/HttpCaptureMcpTests.cs",
+      "sha256": "2e3c723107136a227089e829d631e48120a11c47dcf21bc1d21bd2096b5da820"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Cli.Tests/HttpMcpIntegrationTests.cs",
+      "sha256": "1052afb982bfd0fb1b98db49cad9a9de3e22ad27916702c88ab72836c5d17280"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Cli.Tests/HttpNativeMcpTests.cs",
+      "sha256": "fe24932c7f46f392da540cff01f7dc168ff2b0f1786bd69d51b23dc382fb904e"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Cli.Tests/HttpPreviewMcpTests.cs",
+      "sha256": "fb256b603af0037c8c5ad9874efed230066fa1e2adb35ea984cd9759b482e2b5"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Cli.Tests/HttpSessionLifetimeTests.cs",
+      "sha256": "7efda0dea918e3e771ec30b6c31b22da83347397735e1d58ff5083e7c3572a6a"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Cli.Tests/ManagedToolContextTests.cs",
+      "sha256": "7ba60fef00a21a8772a5433458a90639d464f4a8d197656b65d903361e19cbf1"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Cli.Tests/McpHostOptionsTests.cs",
+      "sha256": "55449e963ef51d5e128e1dbbf9f882d076953e503e63e65a840e6a0349cb16b5"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Cli.Tests/McpIntegrationTests.cs",
+      "sha256": "0f484fe5a3ccd26ed0c9c2a5a8abfd996284fb2b0fc1906b26a6683babbbb26e"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Cli.Tests/NativeFileDialogBoundaryMcpTests.cs",
+      "sha256": "2a163f19cd590b00b5363560413477a771e634c81fadd882d3d8d11f0157785b"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Cli.Tests/NativeFileDialogMcpTests.cs",
+      "sha256": "8ce0c814ea7ba7c6d8d88b9629ef06ed24a614461670e07419fe276af049864a"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Cli.Tests/NativeManagedGateMcpTests.cs",
+      "sha256": "c790f4ff2ca13d2daeb0f5aa1d2357dd8001daef4eb7a075b8c62f0d490b5831"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Cli.Tests/NativePickerProfileTests.cs",
+      "sha256": "72728420028053d2caf118807df4d474a768abdbbb8ecf88bf29576a1fc5723a"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Cli.Tests/NativeScreenshotMcpTests.cs",
+      "sha256": "b1d81636b4fca551409bf8c1a4f28f98d87b355a68330c65987e3e37a8420e37"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Cli.Tests/NativeSessionOwnershipMcpTests.cs",
+      "sha256": "166fc33a95c0848816e013b475fce6b74be870163641f336ace2d34555943e20"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Cli.Tests/OfficialConnectionTests.cs",
+      "sha256": "ea4412f3158398f7cabe9b2409fe52bc5a913508b59d6f88efcbc592da6dd0a6"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Cli.Tests/OfficialInputMediaMcpTests.cs",
+      "sha256": "7f6c3ba171548cd3fcc99b668d8dd1567998ac14e504e1413f6c0c17ba97a0c5"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Cli.Tests/OfficialPreviewTests.cs",
+      "sha256": "6a5d8d8c58692fdaf5dafc61f59b2202e06e7aa94b768f2957924eb29cb2ec2b"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Cli.Tests/OfficialPropertiesMcpTests.cs",
+      "sha256": "a0d91b351bac85490f184b82d0b11dbbec9ae1ca0c442446541e1cb9b42ccccb"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Cli.Tests/OfficialTreeMcpTests.cs",
+      "sha256": "b5439860e75d53ba8d6911b32e297097ac02227b3a1ac6c497a8e3aefecd7f2b"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Cli.Tests/Phase7McpTests.cs",
+      "sha256": "a343373bf71e9f8f8468b717f85c2f2b67d236ba6503cb19643f35fbc6054ed8"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Cli.Tests/PopupFreezeMcpTests.cs",
+      "sha256": "57818b1a1e0f390f6a57297ce00cd3d800cfb256196ce85a00aa95c7dc95c211"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Cli.Tests/PreviewAttachTests.cs",
+      "sha256": "72c5481db877a98c9a519d1e08e7c7de5eec00e8c5071db8472544094deb0178"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Cli.Tests/RemoteMcpTests.cs",
+      "sha256": "faffbe0d32303e6dbe759f6502a814b220094d5203349ca2040d4f0299e84baf"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Cli.Tests/TestApplication.cs",
+      "sha256": "b5e8bca7a50581988cc66ff6a3e2e4c1c872c30edf4edd6736eaebf0b6de626f"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Cli.Tests/TreePagingMcpTests.cs",
+      "sha256": "aa5b8b1ed0fa953a8860a64d013cfb6d2f4edfc3e14b3eacac07877b9559b7f1"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.NativeAutomation.Fixture/AvaloniaDevTool.NativeAutomation.Fixture.csproj",
+      "sha256": "da37b72f2c56e0d0006ba264f27109640cb0ba3319d8b68190bbf32d7d7eee66"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.NativeAutomation.Fixture/NativeFileFilterTimingFixture.cs",
+      "sha256": "6a6c3fb0b114a7527af3a6b3d4ca15d18df9a6754a8ad153d4ecfd5a68649259"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.NativeAutomation.Fixture/NativeHwndReuseFixture.cs",
+      "sha256": "47528f6eaf62174a21e3eaa1a98af5ea5f7a4a9f341593b0ad6c3974e329acb9"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.NativeAutomation.Fixture/NativeLifecycleFixture.cs",
+      "sha256": "f40a28e3febfdd912054fd5cdb257c532c21bebcd1c00f30f67d3a32c87b4446"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.NativeAutomation.Fixture/NativeMultiPickerFixture.cs",
+      "sha256": "76ae83c9550cef76e88a1539e3259ab774c498ccd105aaa2e9f5cd232808a0e1"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.NativeAutomation.Fixture/NativePatternFixtureControls.cs",
+      "sha256": "4ec971d90e1112fe5fd392578dce9c4e35608d2b5af2da86d0c498e9c212a3fa"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.NativeAutomation.Fixture/Program.cs",
+      "sha256": "0ed01ba1f0be5f2f0107034b1eb7f5feb625019613e3ff2254e607ab0b0b3946"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.NativeAutomation.Tests/AvaloniaDevTool.NativeAutomation.Tests.csproj",
+      "sha256": "b79743efc8fdb6c7a1226ed93965fb5995ca20bd33a725e73a99c5b2a56cf720"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.NativeAutomation.Tests/NativeAutomationIntegrationTests.cs",
+      "sha256": "e58926a1f0f23e57c4640a0a673df275bfc051b474856fba97724fec1400634f"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.NativeAutomation.Tests/NativeCoordinateSpaceTests.cs",
+      "sha256": "fd9ddf3b2f9bc160a0feca101f11baf2528140452fb626bd7a8633f24a0bccbc"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.NativeAutomation.Tests/NativeFileDialogAmbiguityTests.cs",
+      "sha256": "417848cccfeba767c373b80d4039a78498090e4b286d83346710f870fa8f368d"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.NativeAutomation.Tests/NativeFileDialogValidationTests.cs",
+      "sha256": "3030bd9be0b8f1dffa126c0bfda222a15af53dab70857e5b90356d0638901c34"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.NativeAutomation.Tests/NativeFileFilterTimingTests.cs",
+      "sha256": "c5250aebc2df8eec4d2f1ba2a549ab9f41322880334ed9116cb1d8e3c2ded650"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.NativeAutomation.Tests/NativeHwndReuseTests.cs",
+      "sha256": "87589cda02e776927aa90e05ede7b10d351c75f0fa5c7bfd1350e4e1d467bf99"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.NativeAutomation.Tests/NativeInputBatchTests.cs",
+      "sha256": "b002ee453f1878a303c72406134963e3c259e123ec5e73796e5546a870b2b5fe"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.NativeAutomation.Tests/NativePatternCoverageTests.cs",
+      "sha256": "998579cb79f698cc48bb6facd68ee5eefe8855791ccdec5636bb156452cd3724"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.NativeAutomation.Tests/NativePointerClipTests.cs",
+      "sha256": "3c6e2f22c92511a21448219d463718e38436b3c743e65dc9923fd7c4fd05a306"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.NativeAutomation.Tests/NativeScreenshotGeometryTests.cs",
+      "sha256": "0dabb5b2308a2247fd979a2bbec282a3e7af1c32e3eb279572739b352892cfef"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.NativeAutomation.Tests/NativeScreenshotIntegrationTests.cs",
+      "sha256": "e355e8385d2c4ac3a25b1f06ea68b08ec5bd8fec78e692d6ac01fa5d49ab36b1"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.NativeAutomation.Tests/NativeWindowLifetimeMonitorTests.cs",
+      "sha256": "0ab44f7dd5219c3f13007fbbb51cca8aa80ab90c4ccbb3024a0f9f2e842f8117"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.NativeAutomation.Tests/NativeWorkerLifecycleTests.cs",
+      "sha256": "5d860f1e83fe347f6e6504033b319a840d64bd191c8e592b0b90f7e1ca896d16"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Previewer.Tests/AvaloniaDevTool.Previewer.Tests.csproj",
+      "sha256": "79e91f7661036c0d2c8d020d3d1154aff8fcad35fecdb0a214fb82f0d9b18220"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Previewer.Tests/PreviewIntegrationTests.cs",
+      "sha256": "f0d0f85a939320f6f6aac521018bf3825f914b761cc0a56e0cfc889cf6b7b269"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Previewer.Tests/TestApplication.cs",
+      "sha256": "cba93b8befe006f63887c511ea2f237a7d022dbaa1ac922abad24cb045387cda"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.PreviewFixture/AvaloniaDevTool.PreviewFixture.csproj",
+      "sha256": "d402fbf011582954521d6d7b10dd53fd339ab8b24c6a671d6efa4ab035a95a57"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.PreviewFixture/FixtureView.axaml",
+      "sha256": "0f4b9f6fa1b4eec923859e912e86c66a5f34f8bdd64062e615eacf452bbdfe3f"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.PreviewFixture/FixtureWindow.axaml",
+      "sha256": "b41809670adfa1eaf0f06c23a8c3276682709437336aa04fd43b51f48c2f729b"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.PreviewFixture/Program.cs",
+      "sha256": "acecd5e3817337e33cd52d6eeced3cb9a227d70cc6d5b3904bc3c44dce4f8f01"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.PreviewFixture.Controls/AvaloniaDevTool.PreviewFixture.Controls.csproj",
+      "sha256": "14a1980aa23526066188c94aa2f42582453b2e6bc3f916cf683b1e1625c692d4"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.PreviewFixture.Controls/ReferencedBadge.cs",
+      "sha256": "5e5396160aa8e495bb864c26bca635c78da7595d178148f906f543830d4dc22f"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.PreviewFixture.Controls/ReferencedView.axaml",
+      "sha256": "c838a9744de610f195d248853a55bcf96dacee486e7f7641c69c1798c93674e1"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Protocol.Tests/AvaloniaDevTool.Protocol.Tests.csproj",
+      "sha256": "8cb12ad6d49c55cce3f242e6b78712a87579f37a9e077cbbf43ae322a2c6176f"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Protocol.Tests/BreakpointContractTests.cs",
+      "sha256": "1d331b6b2ef4268e3745bd7333abd9ec15a178dcc27ac62c073134a686eb397d"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Protocol.Tests/ProtocolJsonAotTests.cs",
+      "sha256": "0b8435e1efd55b5dfc5f86b9d4102e5347befa59b01beb1d736191cea9263759"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Protocol.Tests/RpcTraceTests.cs",
+      "sha256": "09675f2c987e605f298bd9f23a8b6b7a09f2e593d46e1932bab4bf5e4dcb7d40"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Protocol.Tests/TransportTests.cs",
+      "sha256": "4f22015c6393bc02f30493be0b2345c43d63d80a0b4471caa8b4149a6ee72a28"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Protocol.Tests/WebSocketStreamTests.cs",
+      "sha256": "9d3632a24828fb877e405d911708a1772abce70712ba15b52dc3f6c7393af302"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Remote.Tests/AvaloniaDevTool.Remote.Tests.csproj",
+      "sha256": "a88a96384d22a5126a014ac27e50414bbf7f668f8f4e63da5054ee2fa0dac224"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Remote.Tests/RemoteIntegrationTests.cs",
+      "sha256": "111e39bf371d60fa143d5b44a6934fcf058b8f4c452ef72b60f1d386cd4ea5ba"
+    },
+    {
+      "path": "tests/AvaloniaDevTool.Remote.Tests/TestApplication.cs",
+      "sha256": "503d2886dcd29dca7d3dcbd45f88ebf94ec0998e45ba1ff340687086e0be3a17"
+    },
+    {
+      "path": "tests/Fixtures/asset-long-utf8.txt",
+      "sha256": "8c096a0f94b83d514dff9927b35bc7a12397dbdded34dbf26ec7504ea4c6234c"
+    },
+    {
+      "path": "tests/Fixtures/official-binary.bin",
+      "sha256": "360c613535eced6601588f59a0a464d00a537d63b8b7364b92c1267b56541ca0"
+    },
+    {
+      "path": "tests/Fixtures/official-pixel.png",
+      "sha256": "d28c139bba718d60154960eaca75535a5cc5b59fe2153e998a29251e8e5f4667"
+    },
+    {
+      "path": "tests/scripts/Test-McpHttp.py",
+      "sha256": "7664a7790097869cc2652239b3af6fef1c54ec7f1e3d3a567899c15d76a13ea9"
+    },
+    {
+      "path": "samples/AvaloniaDevTool.AotSample/AvaloniaDevTool.AotSample.csproj",
+      "sha256": "a0e51b2dea8e05e0feb3b0e9e5f180a12bc7bdd461ca8012a7b6b1b98dd4d212"
+    },
+    {
+      "path": "samples/AvaloniaDevTool.AotSample/Program.cs",
+      "sha256": "6566fa1e85511e4a3024fde15dc7188a0e35eca975373dc24f2120663e61be5d"
+    },
+    {
+      "path": "samples/AvaloniaDevTool.AutomationSample/AvaloniaDevTool.AutomationSample.csproj",
+      "sha256": "7101ac777e5129ff5e730e2866fc8f346b5a346081efe1820f6365a441def3fe"
+    },
+    {
+      "path": "samples/AvaloniaDevTool.AutomationSample/MainWindow.cs",
+      "sha256": "7a5b009afbc49a67a718576521df6f82119c465f0b6b170d49b38455e6acffc7"
+    },
+    {
+      "path": "samples/AvaloniaDevTool.AutomationSample/MainWindow.FileIoGate.cs",
+      "sha256": "016239975c3778ddf210bd1bfe3f74a1fe6f189001e2b748474c27f3f3292e99"
+    },
+    {
+      "path": "samples/AvaloniaDevTool.AutomationSample/MainWindow.Files.cs",
+      "sha256": "d6f3829689b6b039a7551e03dd0a277ae807a66b3a587b0f406c7a496cb49eac"
+    },
+    {
+      "path": "samples/AvaloniaDevTool.AutomationSample/MainWindow.ManagedGate.cs",
+      "sha256": "638de2446c9c04e987aa37d35472485a34749b8d3864471eb35a17108becb950"
+    },
+    {
+      "path": "samples/AvaloniaDevTool.AutomationSample/Program.cs",
+      "sha256": "75b36564e454ad60c6d2d5cd31149f52ad231f2760f05186ac775b3c6e3aefcc"
+    },
+    {
+      "path": "samples/AvaloniaDevTool.Sample/App.axaml",
+      "sha256": "e3c8b7c2644751def2d3f47c88b5e8b00f60aa967319dfb14371dfc539e2f2c2"
+    },
+    {
+      "path": "samples/AvaloniaDevTool.Sample/App.axaml.cs",
+      "sha256": "cb0ced046401d127a758972375435b3436c83621625374ded018b72d5fda564b"
+    },
+    {
+      "path": "samples/AvaloniaDevTool.Sample/App.Remote.cs",
+      "sha256": "2e756b6cc63221f89aa6b61c2a8b8edad9c2f8e5834b8f5d269373740657f1a4"
+    },
+    {
+      "path": "samples/AvaloniaDevTool.Sample/Assets/sample.json",
+      "sha256": "8c440bd9185f7879f0a289e6c192b81c9b9fad0135e22f2614b34eae59eb1d03"
+    },
+    {
+      "path": "samples/AvaloniaDevTool.Sample/Assets/sample.png",
+      "sha256": "aa3a3c02070ba4b7a388182c21340153add7192417e7ae223f4d8046d776a1fd"
+    },
+    {
+      "path": "samples/AvaloniaDevTool.Sample/AvaloniaDevTool.Sample.csproj",
+      "sha256": "82062761a7dfb4ae468f7aaf0b4742f22cfe2c382b005cddbb945d137b5b52f2"
+    },
+    {
+      "path": "samples/AvaloniaDevTool.Sample/MainWindow.axaml",
+      "sha256": "84f6df46b859d12227e794b59c0e4ab20fec4f22030dafd7739348d0e66d5ac0"
+    },
+    {
+      "path": "samples/AvaloniaDevTool.Sample/MainWindow.axaml.cs",
+      "sha256": "57b49830d1db7fca44a18c583686c95c03841935fe882d0b31a2e33803075468"
+    },
+    {
+      "path": "samples/AvaloniaDevTool.Sample/MainWindow.Culture.cs",
+      "sha256": "23c1f2b6520d165242ba6659bdcc7688d8971eca6e533375427c63cac29433f7"
+    },
+    {
+      "path": "samples/AvaloniaDevTool.Sample/MainWindow.Diagnostics.cs",
+      "sha256": "6ab2fbb83ac643985c1cf695f0054bd5ff9140553857c3d5f1fddd1f8392490b"
+    },
+    {
+      "path": "samples/AvaloniaDevTool.Sample/MainWindow.Overlay.cs",
+      "sha256": "d5ebeec789c2c5dcd18869ab51ab91a86add092e29ca42da53efdeb2590a54d1"
+    },
+    {
+      "path": "samples/AvaloniaDevTool.Sample/MainWindow.Profiler.cs",
+      "sha256": "cb508277244ad852cc138a4abca610e9d0bc08977c66de920a56d4e0465bc415"
+    },
+    {
+      "path": "samples/AvaloniaDevTool.Sample/MainWindow.Remote.cs",
+      "sha256": "d618e18d6cc139f03cfdfc2f1916dd5fc081cfe5f53b917836599287b81d1bbb"
+    },
+    {
+      "path": "samples/AvaloniaDevTool.Sample/Previews/PreviewCard.axaml",
+      "sha256": "681057421edbb6f9d1cdcf354bab9494b3a4c0cce88d8686215a1dacf6b3eb38"
+    },
+    {
+      "path": "samples/AvaloniaDevTool.Sample/Program.cs",
+      "sha256": "cfaa04850522515064492672e6b3987b574e888c6d31427bedbf664bbf43f760"
+    },
+    {
+      "path": "samples/AvaloniaDevTool.Sample/SampleDiagnostics.cs",
+      "sha256": "2fa13cd073d95d7ffd6a172085f33a252323419b4b71f7a15860beb86fe9dfd2"
+    },
+    {
+      "path": "samples/AvaloniaDevTool.Sample/SampleMetrics.cs",
+      "sha256": "3d012d11f0d488f6981628d9b10e4eb7853e73465877b4e2b522e97254096df7"
+    },
+    {
+      "path": "samples/AvaloniaDevTool.Sample/SampleViewModel.cs",
+      "sha256": "e5a619230efce58baccac540c66162050ad57f4a63f44acd20887e944c5a041c"
+    },
+    {
+      "path": "samples/AvaloniaDevTool.Sample/SampleViewModel.Runtime.cs",
+      "sha256": "68aa0a29b69acdce2cde3aa64cff512cd8949c93e629933b38d31f592b67eca2"
+    },
+    {
+      "path": "Directory.Build.props",
+      "sha256": "ccf6f7d53a38d226da6bb8027cb73c61a3cbd87bd338ffc2c99155a4482e7da4"
+    },
+    {
+      "path": "global.json",
+      "sha256": "20c93ca7812d0a9825eef71217156f95ab2f4fe5aadfeb22ebc1c24b630018d3"
+    },
+    {
+      "path": "AvaloniaDevTool.slnx",
+      "sha256": "3e6e5bcce09f8677045da93222b88f281489b7db431e44d1b1f6070e7c3c9163"
+    }
+  ],
+  "cleanup": {
+    "status": "partially cleaned by independently approved project-native dotnet clean; untracked residual cleanup remains blocked",
+    "rawTrxAndBuildOutputsRetained": true,
+    "temporaryBuildRoot": "%TEMP%/AvaloniaDevTool-lan-development",
+    "otherOwnedTemporaryDirectories": [
+      "%TEMP%/AvaloniaDevTool-native-screenshot-29656",
+      "%TEMP%/AvaloniaDevTool-native-screenshot-37440",
+      "%TEMP%/AvaloniaDevTool-architecture-review"
+    ],
+    "ownedFailureEvidenceFilesRetained": 2,
+    "workspaceWorkingData": "artifacts/lan-mcp",
+    "rejectedActions": [
+      "Recursive removal after absolute-path/reparse-point verification.",
+      "Reviewed per-file removal and empty-directory cleanup.",
+      "Single explicit owned 320-byte test JSON removal."
+    ],
+    "statedReviewReason": "blocked by policy (no more specific reason returned)",
+    "alternativeDeletionMechanismsNotUsed": true,
+    "testApplicationHostWorkerProcessesRemaining": 0,
+    "deliveryArchiveIntentionallyRetained": true,
+    "globalCachesOrUserDataNotDeleted": true,
+    "nativeClean": {
+      "configurations": [
+        "solution Debug",
+        "solution Release",
+        "CLI Release/win-x64"
+      ],
+      "exitCodes": [
+        0,
+        0,
+        0
+      ],
+      "scope": "SDK CoreClean declared MSBuild outputs under the original artifacts root only; no custom Clean targets or FileWrites injection.",
+      "previousBulkDeletionDenialsNotOverridden": true,
+      "manifestTrackedFilesBefore": 3889,
+      "manifestTrackedLogicalBytesBefore": 10935358736,
+      "remainingRootFiles": 676,
+      "remainingRootBytes": 640867064
+    },
+    "logicalTemporaryBytesBeforeNativeClean": 11576938823,
+    "remainingBuildRootBytes": 640867064,
+    "documentationPreviewServerStopped": true,
+    "offlineArchitectureFilesRetained": true,
+    "blockedAudit": {
+      "consecutiveGoalTurns": 3,
+      "previousTurnClassification": "progress: four direct HTTP capability tests and native MSBuild cleanup",
+      "currentResidualRevalidated": true,
+      "remainingFiles": 674,
+      "remainingBytes": 640849941,
+      "ownedTestProcessesRemaining": 0,
+      "documentationPreviewListenerRemaining": 0,
+      "newAuthorizationOrPolicyChange": false,
+      "furtherDeniedDeletionAttemptsMade": false,
+      "nextAction": "Manual removal of the explicitly recorded task-owned residuals, or an external execution-policy change."
+    },
+    "resumedAudit": {
+      "turn": 3,
+      "freshAfterPreviouslyBlocked": true,
+      "newExternalEvidence": "PickerHost exited; the eight previous foreground-obstructed tests passed on focused rerun.",
+      "cleanupPolicyStateChanged": false,
+      "guardianApprovalStillEnabled": true,
+      "previousDeniedDeletionNotRetried": true,
+      "nativeDebugCleanExitCode": 0,
+      "testProcessesRemaining": 0,
+      "residualRevalidated": {
+        "remainingFiles": 676,
+        "remainingBytes": 640867064,
+        "sourceDrift": [],
+        "archiveHashMatches": true,
+        "resolvedInputRerunPassed": 8,
+        "newCleanupAuthorizationOrPolicyChange": false
+      },
+      "noDeniedDeletionRetried": true,
+      "finalBlockedAudit": {
+        "recordedAtUtc": "2026-10-25T23:53:42.218498+00:00",
+        "originalResidualFiles": 676,
+        "originalResidualBytes": 640867064,
+        "newUserFormattingRequestCompleted": true,
+        "formattingVerification": "formatting-2026-10-26.json",
+        "oldSourceHashesRetainedAsHistoricalSnapshot": true,
+        "currentFormattingInputsVerified": 400,
+        "sameArbitraryDeletionBlockPersists": true,
+        "newRoundBuildRemovalReviewReason": "blocked by policy",
+        "alternativeRemovalMechanismAttempted": false,
+        "remainingWork": "Only generated-data cleanup remains blocked; implementation, validation, packaging, documentation and requested formatting are complete."
+      }
+    }
+  },
+  "baselineCommit": "d496226e3224a3860a42ff266b660cb6d5ea698b",
+  "documentationChecks": {
+    "localSourceAndDocumentLinks": 334,
+    "mermaidSourceDiagrams": 13,
+    "desktopViewport": 1280,
+    "narrowViewport": 320,
+    "allFourViewsWithoutHorizontalOverflow": true,
+    "keyboardHomeEnd": true,
+    "browserWarningsOrErrors": 0,
+    "sourceInputHashesVerified": 379,
+    "finalFormatting": "Removed an extra blank line at Program.cs EOF after validation; no executable statement changed."
+  },
+  "completionAuditSupplement": {
+    "reason": "Direct HTTP evidence for the explicitly named Previewer and capture paths.",
+    "passed": 4,
+    "failed": 0,
+    "trxSha256": "692ab310e95a358ad6ddc4d892832c4b54c5ba88d4805f16365b1394c14986dd",
+    "tests": [
+      "AvaloniaDevTool.Cli.Tests.HttpCaptureMcpTests.Http_session_delete_releases_running_capture_and_old_ids_cannot_read_or_stop_the_next_sessions_capture",
+      "AvaloniaDevTool.Cli.Tests.HttpPreviewMcpTests.Http_preview_loads_real_project_resources_reloads_nodes_and_reclaims_children_on_detach_and_delete",
+      "AvaloniaDevTool.Cli.Tests.HttpCaptureMcpTests.Http_capture_reports_real_retention_loss_with_original_counters_and_raw_samples",
+      "AvaloniaDevTool.Cli.Tests.HttpCaptureMcpTests.Http_capture_returns_real_metrics_profiler_and_activity_then_freezes_the_stopped_result"
+    ],
+    "checks": [
+      "HTTP real-project preview resources/custom controls/linked assembly/PNG/reload/stale IDs/detach/DELETE child cleanup.",
+      "HTTP real metrics/profiler/activity, raw precision and identities, stop freezing.",
+      "HTTP real retention loss counters.",
+      "DELETE running capture, reattach, old capture IDs rejected and new capture continues."
+    ],
+    "productionCodeChanged": false,
+    "cliTestProjectDebugReleaseWarnings": 0,
+    "cliTestProjectDebugReleaseErrors": 0
+  }
+}

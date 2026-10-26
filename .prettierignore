@@ -1,0 +1,9 @@
+artifacts/
+.codegraph/
+**/bin/
+**/obj/
+**/node_modules/
+**/*.md
+docs/**/*.json
+tests/Fixtures/
+tests/**/Fixtures/

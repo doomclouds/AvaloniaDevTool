@@ -38,7 +38,9 @@ public sealed class OverlayTests
         Assert.Equal(320, fixture.Service.Adorner.Bounds.Width);
         Assert.Equal(240, fixture.Service.Adorner.Bounds.Height);
         Assert.True(fixture.Service.Adorner.IsEffectivelyVisible,
-            string.Join("; ", fixture.Service.Adorner.GetSelfAndVisualAncestors().Select(visual => $"{visual.GetType().Name}: {visual.IsVisible}/{visual.Opacity}/{visual.Bounds}")));
+            string.Join("; ",
+                fixture.Service.Adorner.GetSelfAndVisualAncestors().Select(visual =>
+                    $"{visual.GetType().Name}: {visual.IsVisible}/{visual.Opacity}/{visual.Bounds}")));
         Assert.Contains(pixels.Pixels, pixel => pixel.Blue > pixel.Red + 30 && pixel.Blue > pixel.Green + 20);
         AssertBlue(Pixel(pixels, target, fixture.Window, new Point(40, 0)));
         Assert.Equal(SKColors.White, Pixel(pixels, target, fixture.Window, new Point(-5, 20)));
@@ -75,14 +77,18 @@ public sealed class OverlayTests
     public void Text_information_uses_actual_TextBlock_layout_without_returning_contents()
     {
         const string content = "private text that wraps across multiple lines for actual layout";
-        var target = new TextBlock { Width = 110, Text = content, FontSize = 17, TextWrapping = TextWrapping.Wrap,
-            TextTrimming = TextTrimming.WordEllipsis, MaxLines = 3, LetterSpacing = 1.25 };
+        var target = new TextBlock
+        {
+            Width = 110, Text = content, FontSize = 17, TextWrapping = TextWrapping.Wrap,
+            TextTrimming = TextTrimming.WordEllipsis, MaxLines = 3, LetterSpacing = 1.25
+        };
         using var fixture = new Fixture(target);
         var snapshot = fixture.Service.Configure(new(new OverlayOptions(ShowInfo: true), fixture.Id));
         var info = Assert.IsType<OverlayControlInfo>(snapshot.Info!.ControlInfo);
         Assert.Equal("TextBlock", info.Kind);
         Assert.Contains(info.Fields, field => field.Name == "TextLength" && field.Value == content.Length.ToString());
-        Assert.Contains(info.Fields, field => field.Name == "LineCount" && field.Value == target.TextLayout.TextLines.Count.ToString());
+        Assert.Contains(info.Fields,
+            field => field.Name == "LineCount" && field.Value == target.TextLayout.TextLines.Count.ToString());
         Assert.Contains(info.Fields, field => field.Name == "FontSizeDip" && field.Value == "17");
         Assert.Contains(info.Fields, field => field.Name == "Trimming" && field.Value == "WordEllipsis");
         Assert.All(info.Fields, field => Assert.InRange(field.Value.Length, 0, 120));
@@ -94,15 +100,19 @@ public sealed class OverlayTests
     public void TextBox_reports_its_real_presenter_layout_and_password_skips_text_metadata()
     {
         const string secret = "Secret password never returned";
-        var target = new TextBox { Width = 110, Height = 80, Text = secret, FontSize = 16, TextWrapping = TextWrapping.Wrap };
+        var target = new TextBox
+            { Width = 110, Height = 80, Text = secret, FontSize = 16, TextWrapping = TextWrapping.Wrap };
         using var fixture = new Fixture(target);
         var normal = fixture.Service.Configure(new(new OverlayOptions(ShowInfo: true), fixture.Id)).Info!.ControlInfo!;
-        Assert.Contains(normal.Fields, field => field.Name == "LayoutSource" && field.Value == "PART_TextPresenter.TextLayout");
+        Assert.Contains(normal.Fields,
+            field => field.Name == "LayoutSource" && field.Value == "PART_TextPresenter.TextLayout");
         Assert.Contains(normal.Fields, field => field.Name == "LineCount" && int.Parse(field.Value) >= 1);
         target.PasswordChar = '*';
         var password = fixture.Service.Snapshot(new()).Info!;
-        Assert.Contains(password.ControlInfo!.Fields, field => field.Name == "TextLength" && field.Value == "unknown" && field.Status == "redacted_password");
-        Assert.Contains(password.ControlInfo.Fields, field => field.Name == "Layout" && field.Status == "redacted_password");
+        Assert.Contains(password.ControlInfo!.Fields,
+            field => field.Name == "TextLength" && field.Value == "unknown" && field.Status == "redacted_password");
+        Assert.Contains(password.ControlInfo.Fields,
+            field => field.Name == "Layout" && field.Status == "redacted_password");
         Assert.DoesNotContain(password.ControlInfo.Fields, field => field.Name == "LineCount");
         Assert.DoesNotContain(secret, password.Text);
         Assert.DoesNotContain(new string('*', secret.Length), password.Text);
@@ -111,13 +121,17 @@ public sealed class OverlayTests
     [AvaloniaFact]
     public void Bitmap_information_distinguishes_decoded_pixels_DPI_DIP_and_actual_source_identity()
     {
-        using var source = new WriteableBitmap(new PixelSize(90, 60), new Vector(144, 120), PixelFormat.Bgra8888, AlphaFormat.Premul);
+        using var source = new WriteableBitmap(new PixelSize(90, 60),
+            new Vector(144, 120),
+            PixelFormat.Bgra8888,
+            AlphaFormat.Premul);
         var target = new Image { Source = source, Width = 120, Height = 100, Stretch = Stretch.UniformToFill };
         using var fixture = new Fixture(target);
         fixture.Window.SetRenderScaling(2);
         var info = fixture.Service.Configure(new(new OverlayOptions(ShowInfo: true), fixture.Id)).Info!.ControlInfo!;
         Assert.Equal("Image", info.Kind);
-        Assert.Contains(info.Fields, field => field.Name == "SourceObjectId" && field.Value == fixture.Registry.GetId(source).ToString());
+        Assert.Contains(info.Fields,
+            field => field.Name == "SourceObjectId" && field.Value == fixture.Registry.GetId(source).ToString());
         Assert.Contains(info.Fields, field => field.Name == "PixelSize" && field.Value == "90 × 60 px");
         Assert.Contains(info.Fields, field => field.Name == "Dpi" && field.Value == "144 × 120 dpi");
         Assert.Contains(info.Fields, field => field.Name == "SourceSizeDip" && field.Value == "60 × 48 DIP");
@@ -135,25 +149,32 @@ public sealed class OverlayTests
         var custom = new CustomTextBlock { Text = "test" };
         var textInfo = OverlayControlInformation.Capture(custom, null)!;
         Assert.False(custom.LayoutRead);
-        Assert.Contains(textInfo.Fields, field => field.Name == "Layout" && field.Status == "unmeasured_or_custom_layout");
+        Assert.Contains(textInfo.Fields,
+            field => field.Name == "Layout" && field.Status == "unmeasured_or_custom_layout");
     }
 
     [AvaloniaFact]
     public void Box_region_emphasis_draws_only_matching_real_transformed_pixels_and_restores_options()
     {
-        var target = new Border { Width = 100, Height = 80, Margin = new Thickness(10), Padding = new Thickness(12),
+        var target = new Border
+        {
+            Width = 100, Height = 80, Margin = new Thickness(10), Padding = new Thickness(12),
             BorderThickness = new Thickness(6), Background = Brushes.White, BorderBrush = Brushes.White,
-            RenderTransformOrigin = RelativePoint.Center, RenderTransform = new RotateTransform(12) };
+            RenderTransformOrigin = RelativePoint.Center, RenderTransform = new RotateTransform(12)
+        };
         using var fixture = new Fixture(target);
         fixture.Window.SetRenderScaling(1.5);
-        var preferences = new OverlayOptions(ShowMargin: true, ShowPadding: true, ShowRulers: true, ShowGuidelines: true);
-        fixture.Service.Configure(new(preferences with { EmphasizedRegion = "Margin", EmphasizedSide = "Left" }, fixture.Id));
+        var preferences =
+            new OverlayOptions(ShowMargin: true, ShowPadding: true, ShowRulers: true, ShowGuidelines: true);
+        fixture.Service.Configure(new(preferences with { EmphasizedRegion = "Margin", EmphasizedSide = "Left" },
+            fixture.Id));
         using (var pixels = fixture.Pixels())
         {
             AssertOrange(Pixel(pixels, target, fixture.Window, new Point(-5, 40)));
             Assert.Equal(SKColors.White, Pixel(pixels, target, fixture.Window, new Point(105, 40)));
             Assert.Equal(SKColors.White, Pixel(pixels, target, fixture.Window, new Point(50, 40)));
         }
+
         fixture.Service.Configure(new(preferences with { EmphasizedRegion = "Border", EmphasizedSide = "Left" }));
         using (var pixels = fixture.Pixels())
         {
@@ -162,18 +183,22 @@ public sealed class OverlayTests
             Assert.Equal(SKColors.White, Pixel(pixels, target, fixture.Window, new Point(97, 40)));
             Assert.Equal(SKColors.White, Pixel(pixels, target, fixture.Window, new Point(12, 40)));
         }
+
         fixture.Service.Configure(new(preferences with { EmphasizedRegion = "Padding", EmphasizedSide = "Left" }));
         using (var pixels = fixture.Pixels())
         {
             AssertGreen(Pixel(pixels, target, fixture.Window, new Point(12, 40)));
             Assert.Equal(SKColors.White, Pixel(pixels, target, fixture.Window, new Point(88, 40)));
         }
+
         var snapshot = fixture.Service.Configure(new(preferences with { EmphasizedRegion = "Content" }));
         Assert.Equal(new OverlayRect(18, 18, 64, 44), snapshot.ContentLocalRect);
-        using (var pixels = fixture.Pixels()) AssertBlue(Pixel(pixels, target, fixture.Window, new Point(50, 40)));
+        using (var pixels = fixture.Pixels())
+            AssertBlue(Pixel(pixels, target, fixture.Window, new Point(50, 40)));
         var restored = fixture.Service.Configure(new(preferences));
         Assert.Null(restored.Options.EmphasizedRegion);
-        using (var pixels = fixture.Pixels()) AssertOrange(Pixel(pixels, target, fixture.Window, new Point(-5, 40)));
+        using (var pixels = fixture.Pixels())
+            AssertOrange(Pixel(pixels, target, fixture.Window, new Point(-5, 40)));
         Assert.False(fixture.Service.Adorner!.IsHitTestVisible);
         Assert.Equal(new Thickness(10), target.Margin);
         Assert.Equal(new Thickness(6), target.BorderThickness);
@@ -249,13 +274,17 @@ public sealed class OverlayTests
             Assert.True(negative.Red > negative.Green + 30 && negative.Blue > negative.Green);
             Assert.Equal(SKColors.White, Pixel(pixels, target, fixture.Window, new Point(-5, 25)));
         }
+
         fixture.Service.Configure(new(new OverlayOptions(ShowBounds: false, ShowPadding: true)));
         using (var pixels = fixture.Pixels())
             AssertGreen(Pixel(pixels, target, fixture.Window, new Point(40, 25)));
         var snapshot = fixture.Service.Snapshot(new());
-        Assert.Contains(snapshot.Regions, region => region.Kind == "Margin" && region.Side == "Left" && region.Thickness == -12 && region.IsOverlap);
-        Assert.Contains(snapshot.Limitations, reason => reason.StartsWith("negative_margin:", StringComparison.Ordinal));
-        Assert.Contains(snapshot.Limitations, reason => reason.StartsWith("padding_overlap:", StringComparison.Ordinal));
+        Assert.Contains(snapshot.Regions,
+            region => region.Kind == "Margin" && region.Side == "Left" && region.Thickness == -12 && region.IsOverlap);
+        Assert.Contains(snapshot.Limitations,
+            reason => reason.StartsWith("negative_margin:", StringComparison.Ordinal));
+        Assert.Contains(snapshot.Limitations,
+            reason => reason.StartsWith("padding_overlap:", StringComparison.Ordinal));
     }
 
     [AvaloniaFact]
@@ -267,7 +296,8 @@ public sealed class OverlayTests
         var adorner = fixture.Service.Adorner;
         fixture.Window.SetRenderScaling(1.5);
         fixture.Window.UpdateLayout();
-        var snapshot = fixture.Service.Configure(new(new OverlayOptions(ShowInfo: true, ShowRulers: true, ShowGuidelines: true)));
+        var snapshot =
+            fixture.Service.Configure(new(new OverlayOptions(ShowInfo: true, ShowRulers: true, ShowGuidelines: true)));
         Assert.Same(adorner, fixture.Service.Adorner);
         Assert.Equal(1.5, snapshot.RenderScaling);
         Assert.Equal("RootDips", snapshot.CoordinateSpace);
@@ -275,7 +305,9 @@ public sealed class OverlayTests
         Assert.Equal(240, snapshot.RootViewport.Height);
         Assert.Equal(2, snapshot.Rulers.Count);
         Assert.All(snapshot.Rulers, ruler => Assert.Equal(ruler.LengthDip * 1.5, ruler.LengthPixels, 8));
-        Assert.Contains(snapshot.Rulers, ruler => ruler.Label!.Contains("DIP /", StringComparison.Ordinal) && ruler.Label.Contains("px", StringComparison.Ordinal));
+        Assert.Contains(snapshot.Rulers,
+            ruler => ruler.Label!.Contains("DIP /", StringComparison.Ordinal) &&
+                     ruler.Label.Contains("px", StringComparison.Ordinal));
         Assert.NotEmpty(snapshot.Guidelines);
         Assert.Contains(snapshot.Guidelines, line => line.Start.X == 0 && line.End.X == snapshot.RootViewport.Width);
         Assert.Contains(snapshot.Guidelines, line => line.Start.Y == 0 && line.End.Y == snapshot.RootViewport.Height);
@@ -319,7 +351,8 @@ public sealed class OverlayTests
         var snapshot = fixture.Service.Snapshot(new());
         Assert.Null(snapshot.Bounds);
         Assert.False(snapshot.IsVisible);
-        Assert.Contains(snapshot.Limitations, reason => reason.StartsWith("unsupported_transform:", StringComparison.Ordinal));
+        Assert.Contains(snapshot.Limitations,
+            reason => reason.StartsWith("unsupported_transform:", StringComparison.Ordinal));
     }
 
     [AvaloniaFact]
@@ -330,10 +363,12 @@ public sealed class OverlayTests
         var snapshot = fixture.Service.Configure(new(new OverlayOptions(ShowPadding: true), fixture.Id));
         Assert.Null(snapshot.Padding);
         Assert.False(target.WasRead);
-        Assert.Contains(snapshot.Limitations, reason => reason.StartsWith("padding_unavailable:", StringComparison.Ordinal));
+        Assert.Contains(snapshot.Limitations,
+            reason => reason.StartsWith("padding_unavailable:", StringComparison.Ordinal));
         var direct = new MisleadingRegisteredThickness { Width = 80, Height = 60 };
         using var directFixture = new Fixture(direct);
-        var directSnapshot = directFixture.Service.Configure(new(new OverlayOptions(ShowPadding: true), directFixture.Id));
+        var directSnapshot =
+            directFixture.Service.Configure(new(new OverlayOptions(ShowPadding: true), directFixture.Id));
         Assert.Null(directSnapshot.Padding);
         Assert.Null(directSnapshot.Border);
         Assert.False(direct.WasRead);
@@ -377,6 +412,7 @@ public sealed class OverlayTests
             GC.WaitForPendingFinalizers();
             GC.Collect();
         }
+
         Assert.False(weak.IsAlive);
         Assert.Null(fixture.Service.CurrentTarget);
         GC.KeepAlive(fixture.Service);
@@ -397,8 +433,10 @@ public sealed class OverlayTests
             Assert.Equal(SKColors.White, Pixel(pixels, target, fixture.Window, new Point(40, 0)));
             Assert.True(target.IsVisible);
         }
+
         Assert.True(fixture.Service.Adorner!.IsVisible);
-        using (fixture.Service.Suspend()) fixture.Service.Clear();
+        using (fixture.Service.Suspend())
+            fixture.Service.Clear();
         Assert.False(fixture.Service.Adorner.IsVisible);
         Assert.Null(AdornerLayer.GetAdornedElement(fixture.Service.Adorner));
     }
@@ -419,12 +457,15 @@ public sealed class OverlayTests
         Assert.True(fixture.Service.Show(target));
         var snapshot = fixture.Service.Snapshot(new());
         Assert.Equal(fixture.Registry.GetId(root), snapshot.RootObjectId);
-        Assert.Contains(OverlayService.GetLayer(target, root)!.Children, child => ReferenceEquals(child, fixture.Service.Adorner));
+        Assert.Contains(OverlayService.GetLayer(target, root)!.Children,
+            child => ReferenceEquals(child, fixture.Service.Adorner));
         root.UpdateLayout();
         var updated = fixture.Service.Snapshot(new());
         Assert.True(updated.IsVisible, string.Join("; ", updated.Limitations));
         Assert.True(fixture.Service.Adorner!.Bounds.Width > 0,
-            string.Join("; ", fixture.Service.Adorner.GetSelfAndVisualAncestors().Select(visual => $"{visual.GetType().Name}: {visual.Bounds}/{visual.IsVisible}/{visual.ClipToBounds}")));
+            string.Join("; ",
+                fixture.Service.Adorner.GetSelfAndVisualAncestors().Select(visual =>
+                    $"{visual.GetType().Name}: {visual.Bounds}/{visual.IsVisible}/{visual.ClipToBounds}")));
         using var previous = root.CaptureRenderedFrame();
         Dispatcher.UIThread.RunJobs();
         using var frame = root.CaptureRenderedFrame();
@@ -437,10 +478,12 @@ public sealed class OverlayTests
             Assert.Contains(pixels.Pixels, pixel => pixel.Blue > pixel.Red + 30 && pixel.Blue > pixel.Green + 20);
             Assert.True(point.X >= 0 && point.X < pixels.Width && point.Y >= 0 && point.Y < pixels.Height,
                 $"Point: {point}; root: {root.Bounds}; target: {target.Bounds}");
-            var pixel = pixels.GetPixel((int)Math.Round(point.X * root.RenderScaling), (int)Math.Round(point.Y * root.RenderScaling));
+            var pixel = pixels.GetPixel((int)Math.Round(point.X * root.RenderScaling),
+                (int)Math.Round(point.Y * root.RenderScaling));
             Assert.True(pixel.Blue > pixel.Red + 30 && pixel.Blue > pixel.Green + 20,
                 $"Point {point} scale {root.RenderScaling} pixel {pixel}; initial {snapshot.Bounds} updated {updated.Bounds}; targetBounds {target.Bounds}; clips {string.Join(';', updated.ClipOutlines!)}");
         }
+
         popup.IsOpen = false;
         Assert.Null(fixture.Service.CurrentTarget);
         Assert.False(fixture.Service.Snapshot(new()).IsActive);
@@ -465,24 +508,31 @@ public sealed class OverlayTests
     {
         var target = new Border { Name = "ClientOverlaySubject", Width = 80, Height = 60, Background = Brushes.White };
         using var fixture = new Fixture(target);
-        await using var agent = DiagnosticsAgent.Attach(Application.Current!, new DiagnosticsAgentOptions
-        {
-            PipeName = "overlay-tests-" + Guid.NewGuid().ToString("N"),
-            ApplicationName = "Overlay tests", TopLevelProvider = () => [fixture.Window]
-        });
+        await using var agent = DiagnosticsAgent.Attach(Application.Current!,
+            new DiagnosticsAgentOptions
+            {
+                PipeName = "overlay-tests-" + Guid.NewGuid().ToString("N"),
+                ApplicationName = "Overlay tests", TopLevelProvider = () => [fixture.Window]
+            });
         await using var client = new DiagnosticsClient();
         await client.ConnectAsync(agent.PipeName);
         var root = Assert.Single(await client.GetRootsAsync(TreeKind.Visual));
-        var selected = Assert.Single((await client.SearchTreeAsync(new("ClientOverlaySubject", TreeKind.Visual))).Matches);
+        var selected =
+            Assert.Single((await client.SearchTreeAsync(new("ClientOverlaySubject", TreeKind.Visual))).Matches);
         var before = await client.CaptureElementAsync(root.Id);
-        var configured = await client.ConfigureOverlayAsync(new OverlayOptions(ShowMargin: true, ShowPadding: true,
-            ShowInfo: true, ShowRulers: true, ShowGuidelines: true), selected.Id);
+        var configured = await client.ConfigureOverlayAsync(new OverlayOptions(ShowMargin: true,
+                ShowPadding: true,
+                ShowInfo: true,
+                ShowRulers: true,
+                ShowGuidelines: true),
+            selected.Id);
         Assert.Equal(selected.Id, configured.ObjectId);
         Assert.Equal("ClientOverlaySubject", configured.Info!.Name);
         Assert.True((await client.GetOverlaySnapshotAsync()).Options.ShowRulers);
         Assert.Empty((await client.SearchTreeAsync(new("HighlightAdorner", TreeKind.Visual))).Matches);
         var layout = await client.GetLayoutSnapshotAsync(root.Id);
-        Assert.DoesNotContain(layout.Layers, layer => layer.TypeName.Contains(nameof(HighlightAdorner), StringComparison.Ordinal));
+        Assert.DoesNotContain(layout.Layers,
+            layer => layer.TypeName.Contains(nameof(HighlightAdorner), StringComparison.Ordinal));
         var after = await client.CaptureElementAsync(root.Id);
         Assert.Equal(before.PngBase64, after.PngBase64);
         Assert.True((await client.GetOverlaySnapshotAsync()).IsActive);
@@ -491,15 +541,21 @@ public sealed class OverlayTests
     }
 
     [AvaloniaFact]
-    public async Task Public_overlay_service_rejects_wrong_threads_expired_ids_detached_controls_and_diagnostic_controls()
+    public async Task
+        Public_overlay_service_rejects_wrong_threads_expired_ids_detached_controls_and_diagnostic_controls()
     {
         using var fixture = new Fixture(new Border { Width = 80, Height = 60 });
-        Assert.Equal("object_expired", Assert.Throws<RpcException>(() => fixture.Service.Snapshot(new(long.MaxValue))).Code);
+        Assert.Equal("object_expired",
+            Assert.Throws<RpcException>(() => fixture.Service.Snapshot(new(long.MaxValue))).Code);
         var detached = new Border();
-        Assert.Equal("detached_object", Assert.Throws<RpcException>(() => fixture.Service.Configure(new(new(), fixture.Registry.GetId(detached)))).Code);
+        Assert.Equal("detached_object",
+            Assert.Throws<RpcException>(() => fixture.Service.Configure(new(new(), fixture.Registry.GetId(detached))))
+                .Code);
         fixture.Service.Show((Control)fixture.Host.Children[0]);
         Assert.True(OverlayService.IsDiagnosticVisual(fixture.Service.Adorner));
-        Assert.Equal("unsupported_object", Assert.Throws<RpcException>(() => fixture.Service.Snapshot(new(fixture.Registry.GetId(fixture.Service.Adorner!)))).Code);
+        Assert.Equal("unsupported_object",
+            Assert.Throws<RpcException>(() =>
+                fixture.Service.Snapshot(new(fixture.Registry.GetId(fixture.Service.Adorner!)))).Code);
         await Task.Run(() => Assert.Throws<InvalidOperationException>(() => fixture.Service.Snapshot(new())));
     }
 
@@ -522,41 +578,86 @@ public sealed class OverlayTests
     private static SKColor Pixel(SKBitmap pixels, Visual target, Window window, Point point)
     {
         var root = target.TranslatePoint(point, window)!.Value;
-        return pixels.GetPixel((int)Math.Round(root.X * window.RenderScaling), (int)Math.Round(root.Y * window.RenderScaling));
+        return pixels.GetPixel((int)Math.Round(root.X * window.RenderScaling),
+            (int)Math.Round(root.Y * window.RenderScaling));
     }
+
     private static bool IsOrangeRed(SKColor color) => color.Red > 200 && color.Green < 160 && color.Blue < 100;
-    private static void AssertBlue(SKColor color) => Assert.True(color.Blue > color.Red + 30 && color.Blue > color.Green + 20, color.ToString());
-    private static void AssertOrange(SKColor color) => Assert.True(color.Red > color.Green + 20 && color.Green > color.Blue + 20, color.ToString());
-    private static void AssertGreen(SKColor color) => Assert.True(color.Green > color.Red + 15 && color.Green > color.Blue + 15, color.ToString());
+
+    private static void AssertBlue(SKColor color) =>
+        Assert.True(color.Blue > color.Red + 30 && color.Blue > color.Green + 20, color.ToString());
+
+    private static void AssertOrange(SKColor color) =>
+        Assert.True(color.Red > color.Green + 20 && color.Green > color.Blue + 20, color.ToString());
+
+    private static void AssertGreen(SKColor color) =>
+        Assert.True(color.Green > color.Red + 15 && color.Green > color.Blue + 15, color.ToString());
 
     private sealed class MisleadingPadding : Control
     {
         public bool WasRead { get; private set; }
-        public Thickness Padding { get { WasRead = true; throw new InvalidOperationException("Must not invoke arbitrary getters."); } }
+
+        public Thickness Padding
+        {
+            get
+            {
+                WasRead = true;
+                throw new InvalidOperationException("Must not invoke arbitrary getters.");
+            }
+        }
     }
 
     private sealed class MisleadingRegisteredThickness : Control
     {
         public static readonly DirectProperty<MisleadingRegisteredThickness, Thickness> PaddingProperty =
-            AvaloniaProperty.RegisterDirect<MisleadingRegisteredThickness, Thickness>("Padding", control => control.Read());
+            AvaloniaProperty.RegisterDirect<MisleadingRegisteredThickness, Thickness>("Padding",
+                control => control.Read());
+
         public static readonly DirectProperty<MisleadingRegisteredThickness, Thickness> BorderThicknessProperty =
-            AvaloniaProperty.RegisterDirect<MisleadingRegisteredThickness, Thickness>("BorderThickness", control => control.Read());
+            AvaloniaProperty.RegisterDirect<MisleadingRegisteredThickness, Thickness>("BorderThickness",
+                control => control.Read());
+
         public bool WasRead { get; private set; }
-        private Thickness Read() { WasRead = true; throw new InvalidOperationException("Unsafe direct property getter"); }
+
+        private Thickness Read()
+        {
+            WasRead = true;
+            throw new InvalidOperationException("Unsafe direct property getter");
+        }
     }
 
     private sealed class UnsafeImage : IImage
     {
         public bool WasRead { get; private set; }
-        public Size Size { get { WasRead = true; throw new InvalidOperationException("Unsafe image getter"); } }
-        public void Draw(DrawingContext context, Rect sourceRect, Rect destRect) => throw new InvalidOperationException();
-        public override string ToString() { WasRead = true; throw new InvalidOperationException("Unsafe ToString"); }
+
+        public Size Size
+        {
+            get
+            {
+                WasRead = true;
+                throw new InvalidOperationException("Unsafe image getter");
+            }
+        }
+
+        public void Draw(DrawingContext context, Rect sourceRect, Rect destRect) =>
+            throw new InvalidOperationException();
+
+        public override string ToString()
+        {
+            WasRead = true;
+            throw new InvalidOperationException("Unsafe ToString");
+        }
     }
+
     private sealed class CustomTextBlock : TextBlock
     {
         public bool LayoutRead { get; private set; }
+
         protected override TextLayout CreateTextLayout(string? text)
-        { LayoutRead = true; throw new InvalidOperationException("Unsafe custom layout"); }
+        {
+            LayoutRead = true;
+            throw new InvalidOperationException("Unsafe custom layout");
+        }
     }
 
     private sealed class Fixture : IDisposable
@@ -574,11 +675,13 @@ public sealed class OverlayTests
             Window.UpdateLayout();
             using var frame = Window.CaptureRenderedFrame();
         }
+
         public WeakObjectRegistry Registry { get; }
         public OverlayService Service { get; }
         public Canvas Host { get; }
         public Window Window { get; }
         public long Id { get; }
+
         public SKBitmap Pixels()
         {
             Window.UpdateLayout();
@@ -590,6 +693,11 @@ public sealed class OverlayTests
             frame.Save(memory, new PngBitmapEncoderOptions());
             return SKBitmap.Decode(memory.ToArray());
         }
-        public void Dispose() { Service.Dispose(); Window.Close(); }
+
+        public void Dispose()
+        {
+            Service.Dispose();
+            Window.Close();
+        }
     }
 }

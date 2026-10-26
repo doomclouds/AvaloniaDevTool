@@ -19,8 +19,11 @@ public sealed class OfficialResourceScopeTests
         child.Resources[key] = "child";
         child.Resources.MergedDictionaries.Add(new ResourceDictionary { ["MergedChild"] = 42 });
         child.Resources.ThemeDictionaries[ThemeVariant.Dark] = new ResourceDictionary { ["DarkChild"] = 43 };
-        var style = new Style(); style.Resources["SelfStyle"] = 44; child.Styles.Add(style);
-        var parent = new Border { Child = child }; parent.Resources[key] = "parent";
+        var style = new Style();
+        style.Resources["SelfStyle"] = 44;
+        child.Styles.Add(style);
+        var parent = new Border { Child = child };
+        parent.Resources[key] = "parent";
         var objects = new WeakObjectRegistry();
         using var service = new ResourceInspectionService(application, objects);
         try
@@ -34,12 +37,16 @@ public sealed class OfficialResourceScopeTests
             var local = Assert.Single(onlySelf.Roots, node => node.Scope == "Element");
             var entries = service.QueryEntries(new(local.Id, IncludeNested: true));
             Assert.Contains(entries.Entries, entry => entry.StringKey == "MergedChild" && entry.Value == "42");
-            Assert.Contains(entries.Entries, entry => entry.StringKey == "DarkChild" && entry.Theme == "Dark" && entry.Value == "43");
+            Assert.Contains(entries.Entries,
+                entry => entry.StringKey == "DarkChild" && entry.Theme == "Dark" && entry.Value == "43");
             Assert.Contains(onlySelf.Roots, node => node.Scope == "Style");
             var app = service.GetTree(new(OnlySelf: true));
             Assert.Equal(new[] { "app" }, Values(app));
         }
-        finally { application.Resources.Remove(key); }
+        finally
+        {
+            application.Resources.Remove(key);
+        }
 
         string?[] Values(ResourceTreeSnapshot tree) => tree.Roots.Where(node => node.CanEnumerate)
             .SelectMany(node => service.QueryEntries(new(node.Id)).Entries)

@@ -18,7 +18,8 @@ internal static class NativeLifecycleFixture
         var arguments = Environment.GetCommandLineArgs().Skip(1).ToArray();
         var configurationPath = Path.Combine(AppContext.BaseDirectory, ConfigurationFile);
         if (arguments.FirstOrDefault()?.StartsWith("--native-lifecycle-", StringComparison.Ordinal) != true &&
-            !File.Exists(configurationPath)) return;
+            !File.Exists(configurationPath))
+            return;
 
         try
         {
@@ -29,8 +30,11 @@ internal static class NativeLifecycleFixture
                 WriteLine(Identity(Process.GetCurrentProcess()));
                 Thread.Sleep(Timeout.Infinite);
             }
-            else if (arguments.FirstOrDefault() == "--native-lifecycle-host") RunHost(arguments);
-            else RunBlockingWorker(configurationPath);
+            else if (arguments.FirstOrDefault() == "--native-lifecycle-host")
+                RunHost(arguments);
+            else
+                RunBlockingWorker(configurationPath);
+
             Environment.Exit(0);
         }
         catch (Exception exception)
@@ -42,10 +46,14 @@ internal static class NativeLifecycleFixture
 
     private static void RunBlockingWorker(string configurationPath)
     {
-        var configuration = JsonSerializer.Deserialize<WorkerConfiguration>(File.ReadAllText(configurationPath, Encoding.UTF8), JsonOptions)
+        var configuration =
+            JsonSerializer.Deserialize<WorkerConfiguration>(File.ReadAllText(configurationPath, Encoding.UTF8),
+                JsonOptions)
             ?? throw new InvalidOperationException("A lifecycle worker configuration is required.");
         var directory = Path.GetFullPath(configuration.ControlDirectory);
-        if (!string.Equals(directory, Path.TrimEndingDirectorySeparator(AppContext.BaseDirectory), StringComparison.OrdinalIgnoreCase))
+        if (!string.Equals(directory,
+                Path.TrimEndingDirectorySeparator(AppContext.BaseDirectory),
+                StringComparison.OrdinalIgnoreCase))
             throw new InvalidOperationException("Lifecycle control files must stay inside the worker's directory.");
 
         while (Console.ReadLine() is { } line)
@@ -60,7 +68,8 @@ internal static class NativeLifecycleFixture
             }
             else
             {
-                WriteState(Path.Combine(directory, "blocked.json"), new { command, process = Identity(Process.GetCurrentProcess()) });
+                WriteState(Path.Combine(directory, "blocked.json"),
+                    new { command, process = Identity(Process.GetCurrentProcess()) });
                 // The facade must terminate a provider that never returns from an in-flight request.
                 Thread.Sleep(Timeout.Infinite);
             }
@@ -69,7 +78,8 @@ internal static class NativeLifecycleFixture
 
     private static void RunHost(string[] arguments)
     {
-        if (arguments.Length != 6) throw new ArgumentException("The lifecycle host requires worker, target, and owner identities.");
+        if (arguments.Length != 6)
+            throw new ArgumentException("The lifecycle host requires worker, target, and owner identities.");
         var workerPath = Path.GetFullPath(arguments[1]);
         var targetId = int.Parse(arguments[2], CultureInfo.InvariantCulture);
         var targetTicks = long.Parse(arguments[3], CultureInfo.InvariantCulture);
@@ -88,18 +98,20 @@ internal static class NativeLifecycleFixture
         }) ?? throw new InvalidOperationException("The lifecycle worker could not start.");
         _ = worker.StandardError.ReadToEndAsync();
         worker.StandardInput.WriteLine(JsonSerializer.Serialize(new
-        {
-            id = 1, command = "attach", payload = new
             {
-                target = new { processId = targetId, startTimeUtc = new DateTimeOffset(targetTicks, TimeSpan.Zero) },
-                sessionId = Guid.NewGuid().ToString("N"), parentProcessId = current.Id,
-                parentStartTimeUtc = current.StartTime.ToUniversalTime()
-            }
-        }, JsonOptions));
+                id = 1, command = "attach", payload = new
+                {
+                    target = new
+                        { processId = targetId, startTimeUtc = new DateTimeOffset(targetTicks, TimeSpan.Zero) },
+                    sessionId = Guid.NewGuid().ToString("N"), parentProcessId = current.Id,
+                    parentStartTimeUtc = current.StartTime.ToUniversalTime()
+                }
+            },
+            JsonOptions));
         worker.StandardInput.Flush();
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(15));
         var line = worker.StandardOutput.ReadLineAsync(timeout.Token).AsTask().GetAwaiter().GetResult()
-            ?? throw new InvalidOperationException("The real worker exited before attaching.");
+                   ?? throw new InvalidOperationException("The real worker exited before attaching.");
         using var response = JsonDocument.Parse(line);
         if (!response.RootElement.GetProperty("success").GetBoolean())
             throw new InvalidOperationException($"The real worker refused attach: {line}");
@@ -118,7 +130,8 @@ internal static class NativeLifecycleFixture
     }
 
     private static ProcessIdentity Identity(Process process) => new(process.Id,
-        process.StartTime.ToUniversalTime().Ticks, Path.GetFullPath(process.MainModule!.FileName!));
+        process.StartTime.ToUniversalTime().Ticks,
+        Path.GetFullPath(process.MainModule!.FileName!));
 
     private static void WriteLine(object value)
     {
@@ -134,10 +147,16 @@ internal static class NativeLifecycleFixture
     }
 
     private sealed record WorkerConfiguration(string ControlDirectory);
+
     private sealed record ProcessIdentity(int ProcessId, long StartTimeUtcTicks, string ExecutablePath);
 
     [DllImport("kernel32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool DuplicateHandle(nint sourceProcess, SafeHandle sourceHandle, nint targetProcess,
-        out nint targetHandle, uint desiredAccess, [MarshalAs(UnmanagedType.Bool)] bool inheritHandle, uint options);
+    private static extern bool DuplicateHandle(nint sourceProcess,
+        SafeHandle sourceHandle,
+        nint targetProcess,
+        out nint targetHandle,
+        uint desiredAccess,
+        [MarshalAs(UnmanagedType.Bool)] bool inheritHandle,
+        uint options);
 }

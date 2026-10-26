@@ -8,7 +8,8 @@ public sealed class NativeWindowLifetimeMonitorTests
     [Fact]
     public void Native_source_installs_and_disposes_a_process_hook_without_creating_a_window()
     {
-        if (!OperatingSystem.IsWindows()) return;
+        if (!OperatingSystem.IsWindows())
+            return;
         using var monitor = new NativeWindowLifetimeMonitor(Environment.ProcessId);
     }
 
@@ -66,9 +67,12 @@ public sealed class NativeWindowLifetimeMonitorTests
         using var monitor = new NativeWindowLifetimeMonitor(events);
         var original = monitor.Capture(42, 100);
         events.InstallFailure = new InvalidOperationException("Hook installation failed.");
-        Assert.Equal("lifetime_monitor_unavailable", Assert.Throws<NativeAutomationException>(() => monitor.Capture(43, 200)).Code);
-        Assert.Equal("lifetime_monitor_unavailable", Assert.Throws<NativeAutomationException>(() => monitor.Validate(original)).Code);
-        Assert.Equal("lifetime_monitor_unavailable", Assert.Throws<NativeAutomationException>(() => monitor.Capture(42, 100)).Code);
+        Assert.Equal("lifetime_monitor_unavailable",
+            Assert.Throws<NativeAutomationException>(() => monitor.Capture(43, 200)).Code);
+        Assert.Equal("lifetime_monitor_unavailable",
+            Assert.Throws<NativeAutomationException>(() => monitor.Validate(original)).Code);
+        Assert.Equal("lifetime_monitor_unavailable",
+            Assert.Throws<NativeAutomationException>(() => monitor.Capture(42, 100)).Code);
     }
 
     [Fact]
@@ -78,10 +82,12 @@ public sealed class NativeWindowLifetimeMonitorTests
         using var monitor = new NativeWindowLifetimeMonitor(events);
         var original = monitor.Capture(42, 100);
         events.Fail(new InvalidOperationException("Message pump stopped."));
-        Assert.Equal("lifetime_monitor_unavailable", Assert.Throws<NativeAutomationException>(() => monitor.Validate(original)).Code);
+        Assert.Equal("lifetime_monitor_unavailable",
+            Assert.Throws<NativeAutomationException>(() => monitor.Validate(original)).Code);
         monitor.Dispose();
         Assert.True(events.Disposed);
-        Assert.Equal("lifetime_monitor_unavailable", Assert.Throws<NativeAutomationException>(() => monitor.Capture(42, 100)).Code);
+        Assert.Equal("lifetime_monitor_unavailable",
+            Assert.Throws<NativeAutomationException>(() => monitor.Capture(42, 100)).Code);
     }
 
     private sealed class TestEvents : INativeWindowLifetimeEventSource
@@ -91,12 +97,20 @@ public sealed class NativeWindowLifetimeMonitorTests
         internal List<int> ProcessRequests { get; } = [];
         internal Exception? InstallFailure { get; set; }
         internal bool Disposed { get; private set; }
-        public void Start(Action<nint> destroyed, Action<Exception> failed) { _destroyed = destroyed; _failed = failed; }
+
+        public void Start(Action<nint> destroyed, Action<Exception> failed)
+        {
+            _destroyed = destroyed;
+            _failed = failed;
+        }
+
         public void EnsureProcess(int processId)
         {
             ProcessRequests.Add(processId);
-            if (InstallFailure is not null) throw InstallFailure;
+            if (InstallFailure is not null)
+                throw InstallFailure;
         }
+
         internal void Destroy(nint handle) => _destroyed!(handle);
         internal void Fail(Exception exception) => _failed!(exception);
         public void Dispose() => Disposed = true;

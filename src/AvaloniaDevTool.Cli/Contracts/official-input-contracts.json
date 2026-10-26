@@ -7,22 +7,14 @@
           "type": "integer"
         },
         "propertyNames": {
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": ["array", "null"],
           "items": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": ["string", "null"]
           },
           "default": null
         }
       },
-      "required": [
-        "nodeId"
-      ]
+      "required": ["nodeId"]
     },
     "annotations": {
       "destructiveHint": false,
@@ -41,25 +33,14 @@
         },
         "inputEvent": {
           "type": "string",
-          "enum": [
-            "Click",
-            "KeyDown",
-            "KeyUp",
-            "Text"
-          ]
+          "enum": ["Click", "KeyDown", "KeyUp", "Text"]
         },
         "arg": {
-          "type": [
-            "string",
-            "null"
-          ],
+          "type": ["string", "null"],
           "default": null
         }
       },
-      "required": [
-        "nodeId",
-        "inputEvent"
-      ]
+      "required": ["nodeId", "inputEvent"]
     },
     "annotations": {
       "destructiveHint": true,
@@ -77,9 +58,7 @@
           "type": "integer"
         }
       },
-      "required": [
-        "nodeId"
-      ]
+      "required": ["nodeId"]
     },
     "annotations": {
       "destructiveHint": false,
@@ -107,11 +86,7 @@
           "default": false
         }
       },
-      "required": [
-        "nodeId",
-        "propertyName",
-        "value"
-      ]
+      "required": ["nodeId", "propertyName", "value"]
     },
     "annotations": {
       "destructiveHint": true,
@@ -129,15 +104,9 @@
           "type": "integer"
         },
         "propertyNames": {
-          "type": [
-            "array",
-            "null"
-          ],
+          "type": ["array", "null"],
           "items": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": ["string", "null"]
           },
           "default": null
         },
@@ -146,9 +115,7 @@
           "default": false
         }
       },
-      "required": [
-        "nodeId"
-      ]
+      "required": ["nodeId"]
     },
     "annotations": {
       "destructiveHint": false,
@@ -166,9 +133,7 @@
           "type": "integer"
         }
       },
-      "required": [
-        "nodeId"
-      ]
+      "required": ["nodeId"]
     },
     "annotations": {
       "destructiveHint": false,
@@ -199,9 +164,7 @@
           "type": "string"
         }
       },
-      "required": [
-        "assetUrl"
-      ]
+      "required": ["assetUrl"]
     },
     "annotations": {
       "destructiveHint": false,
@@ -226,10 +189,7 @@
           "default": false
         }
       },
-      "required": [
-        "xamlFilePath",
-        "xamlProjectPath"
-      ]
+      "required": ["xamlFilePath", "xamlProjectPath"]
     },
     "annotations": null,
     "execution": {
@@ -267,18 +227,10 @@
         },
         "action": {
           "type": "string",
-          "enum": [
-            "Focus",
-            "Enable",
-            "Disable",
-            "BringIntoView"
-          ]
+          "enum": ["Focus", "Enable", "Disable", "BringIntoView"]
         }
       },
-      "required": [
-        "nodeId",
-        "action"
-      ]
+      "required": ["nodeId", "action"]
     },
     "annotations": {
       "destructiveHint": true,
@@ -316,11 +268,7 @@
         },
         "treeKind": {
           "type": "string",
-          "enum": [
-            "Logical",
-            "Visual",
-            "Merged"
-          ],
+          "enum": ["Logical", "Visual", "Merged"],
           "default": 0
         },
         "depth": {
@@ -357,9 +305,7 @@
           "default": -1
         }
       },
-      "required": [
-        "query"
-      ]
+      "required": ["query"]
     },
     "annotations": {
       "destructiveHint": false,
@@ -377,23 +323,15 @@
           "type": "integer"
         },
         "pseudoClass": {
-          "type": [
-            "string",
-            "null"
-          ],
+          "type": ["string", "null"],
           "default": null
         },
         "isActive": {
-          "type": [
-            "boolean",
-            "null"
-          ],
+          "type": ["boolean", "null"],
           "default": null
         }
       },
-      "required": [
-        "nodeId"
-      ]
+      "required": ["nodeId"]
     },
     "annotations": {
       "destructiveHint": true,

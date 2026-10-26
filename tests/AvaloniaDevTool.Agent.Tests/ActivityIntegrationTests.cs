@@ -23,7 +23,12 @@ public sealed class ActivityIntegrationTests
             using var service = new ActivityService(new WeakObjectRegistry(), (_, _) => { });
             service.Start(new ActivityStartRequest(MinimumLogLevel: "Warning"));
             Logger.Sink!.Log(LogEventLevel.Information, "Activity.Test", this, "Information {Count}", 1);
-            Logger.Sink!.Log(LogEventLevel.Warning, "Activity.Test", this, "Retry {Attempt} at {Duration:0.0} {{literal}}", 3, 1.26);
+            Logger.Sink!.Log(LogEventLevel.Warning,
+                "Activity.Test",
+                this,
+                "Retry {Attempt} at {Duration:0.0} {{literal}}",
+                3,
+                1.26);
             var entries = service.Snapshot().Where(entry => entry.Category == "Activity.Test").ToArray();
             Assert.Equal(2, existing.Messages.Count);
             var entry = Assert.Single(entries);
@@ -34,7 +39,10 @@ public sealed class ActivityIntegrationTests
             service.Stop();
             Assert.Same(existing, Logger.Sink);
         }
-        finally { Logger.Sink = original; }
+        finally
+        {
+            Logger.Sink = original;
+        }
     }
 
     [AvaloniaFact]
@@ -56,7 +64,10 @@ public sealed class ActivityIntegrationTests
             Assert.Empty(service.Snapshot());
             Assert.Single(existing.Messages);
         }
-        finally { Logger.Sink = original; }
+        finally
+        {
+            Logger.Sink = original;
+        }
     }
 
     [AvaloniaFact]
@@ -67,11 +78,12 @@ public sealed class ActivityIntegrationTests
         try
         {
             var observedOffThread = false;
-            using var service = new ActivityService(new WeakObjectRegistry(), (method, _) =>
-            {
-                if (method == ActivityMethods.EntryAdded && !Dispatcher.UIThread.CheckAccess())
-                    observedOffThread = true;
-            });
+            using var service = new ActivityService(new WeakObjectRegistry(),
+                (method, _) =>
+                {
+                    if (method == ActivityMethods.EntryAdded && !Dispatcher.UIThread.CheckAccess())
+                        observedOffThread = true;
+                });
             service.Start(new ActivityStartRequest());
             var captureSink = Logger.Sink!;
             await Task.Run(() =>
@@ -86,7 +98,10 @@ public sealed class ActivityIntegrationTests
             Assert.Equal(500, service.Status().BufferedCount);
             Assert.False(observedOffThread);
         }
-        finally { Logger.Sink = original; }
+        finally
+        {
+            Logger.Sink = original;
+        }
     }
 
     [AvaloniaFact]
@@ -111,7 +126,10 @@ public sealed class ActivityIntegrationTests
             service.Stop();
             Assert.False(service.Status().IsRunning);
         }
-        finally { Logger.Sink = original; }
+        finally
+        {
+            Logger.Sink = original;
+        }
     }
 
     [AvaloniaFact]
@@ -127,8 +145,10 @@ public sealed class ActivityIntegrationTests
             var registry = new WeakObjectRegistry();
             var sourceId = registry.GetId(source);
             using var service = new ActivityService(registry, (_, _) => { });
-            service.Start(new ActivityStartRequest(CaptureLogs: false, CaptureEvents: true,
-                ObjectId: sourceId, EventName: "ActivityProbe"));
+            service.Start(new ActivityStartRequest(CaptureLogs: false,
+                CaptureEvents: true,
+                ObjectId: sourceId,
+                EventName: "ActivityProbe"));
             source.AddHandler(ProbeControl.ProbeEvent, (_, args) => args.Handled = true, RoutingStrategies.Bubble);
             other.RaiseEvent(new RoutedEventArgs(ProbeControl.ProbeEvent));
             Assert.Empty(service.Snapshot());
@@ -145,7 +165,10 @@ public sealed class ActivityIntegrationTests
             source.RaiseEvent(new RoutedEventArgs(ProbeControl.ProbeEvent));
             Assert.Equal(beforeStop, service.Snapshot().Count);
         }
-        finally { window.Close(); }
+        finally
+        {
+            window.Close();
+        }
     }
 
     [AvaloniaFact]
@@ -184,7 +207,10 @@ public sealed class ActivityIntegrationTests
             Assert.Equal("object_expired", error.Code);
             Assert.Same(sink, Logger.Sink);
         }
-        finally { Logger.Sink = original; }
+        finally
+        {
+            Logger.Sink = original;
+        }
     }
 
     [AvaloniaFact]
@@ -202,10 +228,14 @@ public sealed class ActivityIntegrationTests
                 GC.Collect();
                 GC.WaitForPendingFinalizers();
             }
+
             Assert.False(reference.IsAlive);
             Assert.Null(Assert.Single(service.Snapshot()).ObjectId);
         }
-        finally { Logger.Sink = original; }
+        finally
+        {
+            Logger.Sink = original;
+        }
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -219,17 +249,26 @@ public sealed class ActivityIntegrationTests
     private sealed class ProbeControl : Control
     {
         public static readonly RoutedEvent<RoutedEventArgs> ProbeEvent =
-            RoutedEvent.Register<ProbeControl, RoutedEventArgs>("ActivityProbe", RoutingStrategies.Tunnel | RoutingStrategies.Bubble);
+            RoutedEvent.Register<ProbeControl, RoutedEventArgs>("ActivityProbe",
+                RoutingStrategies.Tunnel | RoutingStrategies.Bubble);
 
-        static ProbeControl() { }
+        static ProbeControl()
+        {
+        }
     }
 
     private sealed class RecordingSink : ILogSink
     {
         public ConcurrentQueue<string> Messages { get; } = new();
         public bool IsEnabled(LogEventLevel level, string area) => true;
-        public void Log(LogEventLevel level, string area, object? source, string messageTemplate) => Messages.Enqueue(messageTemplate);
-        public void Log(LogEventLevel level, string area, object? source, string messageTemplate, params object?[] propertyValues) => Messages.Enqueue(messageTemplate);
+
+        public void Log(LogEventLevel level, string area, object? source, string messageTemplate) =>
+            Messages.Enqueue(messageTemplate);
+
+        public void Log(LogEventLevel level,
+            string area,
+            object? source,
+            string messageTemplate,
+            params object?[] propertyValues) => Messages.Enqueue(messageTemplate);
     }
 }
-

@@ -8,7 +8,8 @@ internal static partial class NativeMultiPickerFixture
 {
     internal static bool TryRun(string[] arguments)
     {
-        if (arguments.FirstOrDefault() != "--native-multi-picker") return false;
+        if (arguments.FirstOrDefault() != "--native-multi-picker")
+            return false;
 
         try
         {
@@ -17,7 +18,8 @@ internal static partial class NativeMultiPickerFixture
             Console.OutputEncoding = new UTF8Encoding(false);
             ApplicationConfiguration.Initialize();
             using var ready = new CountdownEvent(2);
-            var threads = new[] { StartPicker("first", arguments[1], ready), StartPicker("second", arguments[1], ready) };
+            var threads = new[]
+                { StartPicker("first", arguments[1], ready), StartPicker("second", arguments[1], ready) };
             if (!ready.Wait(TimeSpan.FromSeconds(10)))
                 throw new TimeoutException("The two independent picker owners did not appear.");
             using var process = Process.GetCurrentProcess();
@@ -26,7 +28,8 @@ internal static partial class NativeMultiPickerFixture
                 processId = process.Id, startTimeUtc = process.StartTime.ToUniversalTime(), pickerCount = 2
             }));
             Console.Out.Flush();
-            foreach (var thread in threads) thread.Join();
+            foreach (var thread in threads)
+                thread.Join();
             // Keep the target identity alive while the test inspects both closed dialogs.
             Thread.Sleep(Timeout.Infinite);
         }
@@ -35,6 +38,7 @@ internal static partial class NativeMultiPickerFixture
             Console.Error.WriteLine(exception);
             Environment.Exit(1);
         }
+
         return true;
     }
 

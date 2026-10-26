@@ -23,27 +23,37 @@ public sealed class PopupRootDiscoveryTests
         var flyout = new Flyout { Content = new StackPanel { Children = { first, second, nestedAnchor } } };
         var button = new Button { Name = "FlyoutButton", Content = "Open", Flyout = flyout };
         var window = NativePopupWindow();
-        window.Name = "ScopedWindow"; window.Content = button; window.Width = 400; window.Height = 300;
+        window.Name = "ScopedWindow";
+        window.Content = button;
+        window.Width = 400;
+        window.Height = 300;
         var unrelatedAnchor = new Button();
         var unrelated = NativePopupWindow();
-        unrelated.Name = "UnrelatedWindow"; unrelated.Content = unrelatedAnchor;
+        unrelated.Name = "UnrelatedWindow";
+        unrelated.Content = unrelatedAnchor;
         var unrelatedPopup = new Popup
         {
             PlacementTarget = unrelatedAnchor, Child = new TextBox { Name = "UnrelatedPopupInput" },
             IsLightDismissEnabled = false, ShouldUseOverlayLayer = false
         };
-        window.Show(); unrelated.Show(); window.UpdateLayout(); unrelated.UpdateLayout();
+        window.Show();
+        unrelated.Show();
+        window.UpdateLayout();
+        unrelated.UpdateLayout();
         try
         {
             unrelatedPopup.Open();
-            await using var agent = DiagnosticsAgent.Attach(Application.Current!, new DiagnosticsAgentOptions
-            { PipeName = "flyout-roots-" + Guid.NewGuid().ToString("N"), TopLevelProvider = () => [window] });
-            await using var client = new DiagnosticsClient(); await client.ConnectAsync(agent.PipeName);
+            await using var agent = DiagnosticsAgent.Attach(Application.Current!,
+                new DiagnosticsAgentOptions
+                    { PipeName = "flyout-roots-" + Guid.NewGuid().ToString("N"), TopLevelProvider = () => [window] });
+            await using var client = new DiagnosticsClient();
+            await client.ConnectAsync(agent.PipeName);
             Assert.Single(await client.GetRootsAsync(TreeKind.Visual));
             button.Focus();
             await client.SetFollowFocusAsync(true);
             flyout.Popup.ShouldUseOverlayLayer = false;
-            flyout.ShowAt(button); window.UpdateLayout();
+            flyout.ShowAt(button);
+            window.UpdateLayout();
             var popupRoot = Assert.IsType<PopupRoot>(TopLevel.GetTopLevel(first));
             Assert.DoesNotContain(flyout.Popup, window.GetLogicalDescendants().OfType<Popup>());
             Assert.Contains(flyout.Popup, window.OpenedPopups);
@@ -53,7 +63,11 @@ public sealed class PopupRootDiscoveryTests
             Assert.Empty((await client.SearchTreeAsync(new("UnrelatedPopupInput", TreeKind.Visual))).Matches);
             var checkbox = (await client.SearchTreeAsync(new("FlyoutCheckbox", TreeKind.Visual))).Matches.Single();
             var selected = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-            client.SelectionChanged += change => { if (change.ObjectId == checkbox.Id) selected.TrySetResult(); };
+            client.SelectionChanged += change =>
+            {
+                if (change.ObjectId == checkbox.Id)
+                    selected.TrySetResult();
+            };
             Assert.True(second.Focus());
             await selected.Task.WaitAsync(TimeSpan.FromSeconds(3));
             await client.HighlightAsync(checkbox.Id);
@@ -74,14 +88,22 @@ public sealed class PopupRootDiscoveryTests
             Assert.Equal(0, (await client.ReleaseTreeAsync([], TreeKind.Visual)).ObservedBranches);
             GC.KeepAlive(popupRoot);
         }
-        finally { nestedFlyout.Hide(); flyout.Hide(); unrelatedPopup.Close(); window.Close(); unrelated.Close(); }
+        finally
+        {
+            nestedFlyout.Hide();
+            flyout.Hide();
+            unrelatedPopup.Close();
+            window.Close();
+            unrelated.Close();
+        }
     }
 
     private static Window NativePopupWindow()
     {
         // The default headless platform forces overlay popups, hiding native PopupRoot regressions.
         // A separate real HeadlessWindowImpl keeps this test's setting local to its own windows.
-        var type = typeof(AvaloniaHeadlessPlatform).Assembly.GetType("Avalonia.Headless.HeadlessWindowImpl", throwOnError: true)!;
+        var type = typeof(AvaloniaHeadlessPlatform).Assembly.GetType("Avalonia.Headless.HeadlessWindowImpl",
+            throwOnError: true)!;
         var implementation = (IWindowImpl)Activator.CreateInstance(type,
             new AvaloniaHeadlessPlatformOptions { UseHeadlessDrawing = false, OverlayPopups = false })!;
         return new Window(implementation);

@@ -27,15 +27,18 @@ public sealed class NativeWorkerLifecycleTests
         ProcessIdentity? worker = null;
         try
         {
-            native = await NativeAutomationSession.AttachAsync(Target(target.Identity), new NativeAutomationOptions
-            {
-                WorkerPath = directory.ExecutablePath,
-                OperationTimeout = TimeSpan.FromSeconds(cancel ? 15 : 3)
-            }, TestContext.Current.CancellationToken);
+            native = await NativeAutomationSession.AttachAsync(Target(target.Identity),
+                new NativeAutomationOptions
+                {
+                    WorkerPath = directory.ExecutablePath,
+                    OperationTimeout = TimeSpan.FromSeconds(cancel ? 15 : 3)
+                },
+                TestContext.Current.CancellationToken);
             worker = await ReadStateAsync<ProcessIdentity>(directory.FilePath("attached.json"));
             Assert.Equal(directory.ExecutablePath, worker.ExecutablePath, ignoreCase: true);
             AssertRunning(worker);
-            using var cancellation = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+            using var cancellation =
+                CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
             var operation = native.GetWindowsAsync(cancellation.Token);
             var blocked = await ReadStateAsync<BlockedState>(directory.FilePath("blocked.json"));
             Assert.Equal("windows", blocked.Command);
@@ -52,17 +55,21 @@ public sealed class NativeWorkerLifecycleTests
                 var error = await Assert.ThrowsAsync<NativeAutomationException>(() => operation);
                 Assert.Equal("operation_timeout", error.Code);
             }
+
             Assert.True(timer.Elapsed < TimeSpan.FromSeconds(6), $"The blocked call took {timer.Elapsed} to return.");
             await AssertExitedAsync(worker);
             AssertRunning(target.Identity);
-            var expired = await Assert.ThrowsAsync<NativeAutomationException>(() => native.GetWindowsAsync(TestContext.Current.CancellationToken));
+            var expired = await Assert.ThrowsAsync<NativeAutomationException>(() =>
+                native.GetWindowsAsync(TestContext.Current.CancellationToken));
             Assert.Equal("session_expired", expired.Code);
             await AssertRealWorkerCanReattachAsync(target.Identity);
         }
         finally
         {
-            if (native is not null) await native.DisposeAsync();
-            if (worker is not null) await StopOwnedProcessAsync(worker);
+            if (native is not null)
+                await native.DisposeAsync();
+            if (worker is not null)
+                await StopOwnedProcessAsync(worker);
         }
     }
 
@@ -70,11 +77,15 @@ public sealed class NativeWorkerLifecycleTests
     public async Task Disposing_a_real_worker_session_preserves_the_target_and_allows_reattach()
     {
         await using var target = await StartTargetAsync();
-        await using var native = await NativeAutomationSession.AttachAsync(Target(target.Identity), RealWorkerOptions(), TestContext.Current.CancellationToken);
+        await using var native = await NativeAutomationSession.AttachAsync(Target(target.Identity),
+            RealWorkerOptions(),
+            TestContext.Current.CancellationToken);
         Assert.Empty(await native.GetWindowsAsync(TestContext.Current.CancellationToken));
         await native.DisposeAsync();
         AssertRunning(target.Identity);
-        var expired = await Assert.ThrowsAsync<NativeAutomationException>(() => native.GetWindowsAsync(TestContext.Current.CancellationToken));
+        var expired =
+            await Assert.ThrowsAsync<NativeAutomationException>(() =>
+                native.GetWindowsAsync(TestContext.Current.CancellationToken));
         Assert.Equal("session_expired", expired.Code);
         await AssertRealWorkerCanReattachAsync(target.Identity);
     }
@@ -84,9 +95,13 @@ public sealed class NativeWorkerLifecycleTests
     {
         await using var target = await StartTargetAsync();
         using var current = Process.GetCurrentProcess();
-        await using var host = OwnedProcess.Start(FixtureExecutable(), "--native-lifecycle-host", WorkerExecutable(),
-            target.Identity.ProcessId.ToString(CultureInfo.InvariantCulture), target.Identity.StartTimeUtcTicks.ToString(CultureInfo.InvariantCulture),
-            current.Id.ToString(CultureInfo.InvariantCulture), current.StartTime.ToUniversalTime().Ticks.ToString(CultureInfo.InvariantCulture));
+        await using var host = OwnedProcess.Start(FixtureExecutable(),
+            "--native-lifecycle-host",
+            WorkerExecutable(),
+            target.Identity.ProcessId.ToString(CultureInfo.InvariantCulture),
+            target.Identity.StartTimeUtcTicks.ToString(CultureInfo.InvariantCulture),
+            current.Id.ToString(CultureInfo.InvariantCulture),
+            current.StartTime.ToUniversalTime().Ticks.ToString(CultureInfo.InvariantCulture));
         ProcessIdentity? worker = null;
         try
         {
@@ -107,23 +122,35 @@ public sealed class NativeWorkerLifecycleTests
         }
         finally
         {
-            if (worker is not null) await StopOwnedProcessAsync(worker);
+            if (worker is not null)
+                await StopOwnedProcessAsync(worker);
         }
     }
 
     private static async Task AssertRealWorkerCanReattachAsync(ProcessIdentity target)
     {
-        await using var fresh = await NativeAutomationSession.AttachAsync(Target(target), RealWorkerOptions(), TestContext.Current.CancellationToken);
+        await using var fresh = await NativeAutomationSession.AttachAsync(Target(target),
+            RealWorkerOptions(),
+            TestContext.Current.CancellationToken);
         Assert.Empty(await fresh.GetWindowsAsync(TestContext.Current.CancellationToken));
         AssertRunning(target);
     }
 
-    private static NativeTargetIdentity Target(ProcessIdentity identity) => new(identity.ProcessId, new DateTimeOffset(identity.StartTimeUtcTicks, TimeSpan.Zero));
+    private static NativeTargetIdentity Target(ProcessIdentity identity) => new(identity.ProcessId,
+        new DateTimeOffset(identity.StartTimeUtcTicks, TimeSpan.Zero));
+
     private static NativeAutomationOptions RealWorkerOptions() => new() { WorkerPath = WorkerExecutable() };
-    private static string WorkerExecutable() => Path.ChangeExtension(ArtifactPath("AvaloniaDevTool.NativeAutomation.Worker.dll"), ".exe");
-    private static string FixtureExecutable() => Path.ChangeExtension(ArtifactPath("AvaloniaDevTool.NativeAutomation.Fixture.dll"), ".exe");
-    private static string ArtifactPath(string filename) => typeof(NativeWorkerLifecycleTests).Assembly.GetCustomAttributes<AssemblyMetadataAttribute>()
-        .Single(attribute => attribute.Key == "NativeTestPaths").Value!.Split('|').Single(path => Path.GetFileName(path) == filename);
+
+    private static string WorkerExecutable() =>
+        Path.ChangeExtension(ArtifactPath("AvaloniaDevTool.NativeAutomation.Worker.dll"), ".exe");
+
+    private static string FixtureExecutable() =>
+        Path.ChangeExtension(ArtifactPath("AvaloniaDevTool.NativeAutomation.Fixture.dll"), ".exe");
+
+    private static string ArtifactPath(string filename) => typeof(NativeWorkerLifecycleTests).Assembly
+        .GetCustomAttributes<AssemblyMetadataAttribute>()
+        .Single(attribute => attribute.Key == "NativeTestPaths").Value!.Split('|')
+        .Single(path => Path.GetFileName(path) == filename);
 
     private static async Task<OwnedProcess> StartTargetAsync()
     {
@@ -133,7 +160,11 @@ public sealed class NativeWorkerLifecycleTests
             Assert.Equal(process.Identity, await process.ReadStateAsync<ProcessIdentity>());
             return process;
         }
-        catch { await process.DisposeAsync(); throw; }
+        catch
+        {
+            await process.DisposeAsync();
+            throw;
+        }
     }
 
     private static async Task<T> ReadStateAsync<T>(string path)
@@ -142,7 +173,9 @@ public sealed class NativeWorkerLifecycleTests
         while (!File.Exists(path) && timer.Elapsed < TimeSpan.FromSeconds(15))
             await Task.Delay(20, TestContext.Current.CancellationToken);
         Assert.True(File.Exists(path), $"The lifecycle fixture did not publish '{path}'.");
-        return JsonSerializer.Deserialize<T>(await File.ReadAllTextAsync(path, Encoding.UTF8, TestContext.Current.CancellationToken), JsonOptions)!;
+        return JsonSerializer.Deserialize<T>(
+            await File.ReadAllTextAsync(path, Encoding.UTF8, TestContext.Current.CancellationToken),
+            JsonOptions)!;
     }
 
     private static void AssertRunning(ProcessIdentity identity)
@@ -169,14 +202,21 @@ public sealed class NativeWorkerLifecycleTests
             using var process = Process.GetProcessById(identity.ProcessId);
             try
             {
-                if (process.HasExited) return true;
+                if (process.HasExited)
+                    return true;
                 AssertIdentity(process, identity);
                 return false;
             }
-            catch (Exception exception) when (exception is Win32Exception or InvalidOperationException && process.HasExited)
-            { return true; }
+            catch (Exception exception) when (exception is Win32Exception or InvalidOperationException &&
+                                              process.HasExited)
+            {
+                return true;
+            }
         }
-        catch (ArgumentException) { return true; }
+        catch (ArgumentException)
+        {
+            return true;
+        }
     }
 
     private static async Task AssertExitedAsync(ProcessIdentity identity)
@@ -184,7 +224,8 @@ public sealed class NativeWorkerLifecycleTests
         var timer = Stopwatch.StartNew();
         while (!HasOsProcessExited(identity) && timer.Elapsed < TimeSpan.FromSeconds(8))
             await Task.Delay(25, TestContext.Current.CancellationToken);
-        Assert.True(HasOsProcessExited(identity), $"Owned process {identity.ProcessId}, started {identity.StartTimeUtcTicks}, '{identity.ExecutablePath}' is still running.");
+        Assert.True(HasOsProcessExited(identity),
+            $"Owned process {identity.ProcessId}, started {identity.StartTimeUtcTicks}, '{identity.ExecutablePath}' is still running.");
     }
 
     private static async Task StopOwnedProcessAsync(ProcessIdentity identity)
@@ -199,18 +240,26 @@ public sealed class NativeWorkerLifecycleTests
                 using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(8));
                 await process.WaitForExitAsync(timeout.Token);
             }
+
             Assert.True(HasOsProcessExited(identity));
         }
-        catch (ArgumentException) { }
+        catch (ArgumentException)
+        {
+        }
     }
 
     private sealed record ProcessIdentity(int ProcessId, long StartTimeUtcTicks, string ExecutablePath);
+
     private sealed record BlockedState(string Command, ProcessIdentity Process);
+
     private sealed record HostState(ProcessIdentity Host, ProcessIdentity Worker, long InputHandle);
 
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool QueryFullProcessImageName(SafeProcessHandle process, uint flags, StringBuilder path, ref int size);
+    private static extern bool QueryFullProcessImageName(SafeProcessHandle process,
+        uint flags,
+        StringBuilder path,
+        ref int size);
 
     private sealed class OwnedProcess(Process process, ProcessIdentity identity) : IAsyncDisposable
     {
@@ -225,9 +274,13 @@ public sealed class NativeWorkerLifecycleTests
                 RedirectStandardInput = true, RedirectStandardOutput = true, RedirectStandardError = true,
                 StandardOutputEncoding = Encoding.UTF8, StandardErrorEncoding = Encoding.UTF8
             };
-            foreach (var argument in arguments) start.ArgumentList.Add(argument);
-            var process = Process.Start(start) ?? throw new InvalidOperationException($"Could not start '{executablePath}'.");
-            var identity = new ProcessIdentity(process.Id, process.StartTime.ToUniversalTime().Ticks, Path.GetFullPath(executablePath));
+            foreach (var argument in arguments)
+                start.ArgumentList.Add(argument);
+            var process = Process.Start(start) ??
+                          throw new InvalidOperationException($"Could not start '{executablePath}'.");
+            var identity = new ProcessIdentity(process.Id,
+                process.StartTime.ToUniversalTime().Ticks,
+                Path.GetFullPath(executablePath));
             AssertIdentity(process, identity);
             return new OwnedProcess(process, identity);
         }
@@ -237,7 +290,10 @@ public sealed class NativeWorkerLifecycleTests
             using var timeout = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
             timeout.CancelAfter(TimeSpan.FromSeconds(20));
             var line = await process.StandardOutput.ReadLineAsync(timeout.Token);
-            Assert.True(line is not null, _diagnostics.IsCompletedSuccessfully ? _diagnostics.Result : "The lifecycle fixture exited without publishing its identity.");
+            Assert.True(line is not null,
+                _diagnostics.IsCompletedSuccessfully
+                    ? _diagnostics.Result
+                    : "The lifecycle fixture exited without publishing its identity.");
             return JsonSerializer.Deserialize<T>(line, JsonOptions)!;
         }
 
@@ -249,14 +305,23 @@ public sealed class NativeWorkerLifecycleTests
 
         public async ValueTask DisposeAsync()
         {
-            try { await StopOwnedProcessAsync(Identity); }
-            finally { process.Dispose(); }
+            try
+            {
+                await StopOwnedProcessAsync(Identity);
+            }
+            finally
+            {
+                process.Dispose();
+            }
         }
     }
 
     private sealed class WorkerDirectory : IDisposable
     {
-        private readonly string _root = Path.GetFullPath(Path.Combine(Path.GetTempPath(), "AvaloniaDevTool.NativeLifecycle", Guid.NewGuid().ToString("N")));
+        private readonly string _root = Path.GetFullPath(Path.Combine(Path.GetTempPath(),
+            "AvaloniaDevTool.NativeLifecycle",
+            Guid.NewGuid().ToString("N")));
+
         public string ExecutablePath => FilePath("AvaloniaDevTool.NativeAutomation.Fixture.exe");
 
         public WorkerDirectory()
@@ -264,22 +329,28 @@ public sealed class NativeWorkerLifecycleTests
             Directory.CreateDirectory(_root);
             var source = Path.GetDirectoryName(FixtureExecutable())!;
             foreach (var filename in new[]
-            {
-                "AvaloniaDevTool.NativeAutomation.Fixture.exe", "AvaloniaDevTool.NativeAutomation.Fixture.dll",
-                "AvaloniaDevTool.NativeAutomation.Fixture.runtimeconfig.json", "AvaloniaDevTool.NativeAutomation.Fixture.deps.json"
-            }) File.Copy(Path.Combine(source, filename), FilePath(filename));
-            File.WriteAllText(FilePath("native-lifecycle-fixture.json"), JsonSerializer.Serialize(new { controlDirectory = _root }, JsonOptions), new UTF8Encoding(false));
+                     {
+                         "AvaloniaDevTool.NativeAutomation.Fixture.exe", "AvaloniaDevTool.NativeAutomation.Fixture.dll",
+                         "AvaloniaDevTool.NativeAutomation.Fixture.runtimeconfig.json",
+                         "AvaloniaDevTool.NativeAutomation.Fixture.deps.json"
+                     })
+                File.Copy(Path.Combine(source, filename), FilePath(filename));
+            File.WriteAllText(FilePath("native-lifecycle-fixture.json"),
+                JsonSerializer.Serialize(new { controlDirectory = _root }, JsonOptions),
+                new UTF8Encoding(false));
         }
 
         public string FilePath(string filename) => Path.Combine(_root, filename);
 
         public void Dispose()
         {
-            var parent = Path.GetFullPath(Path.Combine(Path.GetTempPath(), "AvaloniaDevTool.NativeLifecycle")) + Path.DirectorySeparatorChar;
+            var parent = Path.GetFullPath(Path.Combine(Path.GetTempPath(), "AvaloniaDevTool.NativeLifecycle")) +
+                         Path.DirectorySeparatorChar;
             var resolved = Path.GetFullPath(_root);
             if (!resolved.StartsWith(parent, StringComparison.OrdinalIgnoreCase) ||
                 !Guid.TryParseExact(Path.GetFileName(resolved), "N", out _))
-                throw new InvalidOperationException("Refusing to remove a lifecycle directory outside this test's temporary root.");
+                throw new InvalidOperationException(
+                    "Refusing to remove a lifecycle directory outside this test's temporary root.");
             Directory.Delete(resolved, recursive: true);
         }
     }

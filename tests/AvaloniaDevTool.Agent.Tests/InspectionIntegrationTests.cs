@@ -21,20 +21,26 @@ public sealed class InspectionIntegrationTests
         text.Bind(TextBlock.TextProperty, new Binding(nameof(MessageModel.Text)) { Source = model });
         var window = new Window { Content = text };
         window.Styles.Add(new Style(selector => selector.OfType<TextBlock>().Class("diagnostic"))
-        { Setters = { new Setter(TextBlock.FontSizeProperty, 31d) } });
+            { Setters = { new Setter(TextBlock.FontSizeProperty, 31d) } });
         window.Show();
         try
         {
             Assert.Equal(31, text.FontSize);
             var result = Avalonia12DiagnosticsAdapter.Inspect(text);
-            Assert.Contains(result.Frames, frame => frame.IsActive && frame.Setters.Any(setter => setter.PropertyName == "FontSize"));
-            Assert.Contains(result.Bindings, binding => binding.PropertyName == "Text" && binding.Expression.Contains("Text", StringComparison.Ordinal));
+            Assert.Contains(result.Frames,
+                frame => frame.IsActive && frame.Setters.Any(setter => setter.PropertyName == "FontSize"));
+            Assert.Contains(result.Bindings,
+                binding => binding.PropertyName == "Text" &&
+                           binding.Expression.Contains("Text", StringComparison.Ordinal));
             Assert.Equal("Bound value", text.Text);
             model.Text = "Still bound";
             Assert.Equal("Still bound", text.Text);
             Assert.Contains("PrivateApi", result.Adapter);
         }
-        finally { window.Close(); }
+        finally
+        {
+            window.Close();
+        }
     }
 
     [AvaloniaFact]
@@ -47,10 +53,15 @@ public sealed class InspectionIntegrationTests
         try
         {
             var result = Avalonia12DiagnosticsAdapter.Inspect(text);
-            Assert.Contains(result.Bindings, binding => binding.PropertyName == "Text" &&
-                binding.ErrorType == "Error" && binding.Expression.Contains("MissingProperty", StringComparison.Ordinal));
+            Assert.Contains(result.Bindings,
+                binding => binding.PropertyName == "Text" &&
+                           binding.ErrorType == "Error" &&
+                           binding.Expression.Contains("MissingProperty", StringComparison.Ordinal));
         }
-        finally { window.Close(); }
+        finally
+        {
+            window.Close();
+        }
     }
 
     [AvaloniaFact]
@@ -76,10 +87,15 @@ public sealed class InspectionIntegrationTests
                 Assert.Equal(Colors.Lime, Assert.IsAssignableFrom<ISolidColorBrush>(border.Background).Color);
                 Assert.True(service.GetEntries(dictionary.Id).Single(entry => entry.Key == key).IsOverridden);
             }
+
             Assert.Same(original, application.Resources[key]);
             Assert.Same(original, border.Background);
         }
-        finally { window.Close(); application.Resources.Remove(key); }
+        finally
+        {
+            window.Close();
+            application.Resources.Remove(key);
+        }
     }
 
     [AvaloniaFact]
@@ -91,14 +107,18 @@ public sealed class InspectionIntegrationTests
         try
         {
             using var service = new ResourceInspectionService(application, new WeakObjectRegistry());
-            var dictionary = service.GetTrees(new ResourcesRequest()).Single(root => root.Name == "Application.Resources");
+            var dictionary = service.GetTrees(new ResourcesRequest())
+                .Single(root => root.Name == "Application.Resources");
             service.Set(new SetResourceRequest(dictionary.Id, key, "24"));
             application.Resources[key] = 48d;
             var error = Assert.Throws<RpcException>(() => service.Reset(new ResetResourceRequest(dictionary.Id, key)));
             Assert.Equal("resource_conflict", error.Code);
             Assert.Equal(48d, application.Resources[key]);
         }
-        finally { application.Resources.Remove(key); }
+        finally
+        {
+            application.Resources.Remove(key);
+        }
     }
 
     [AvaloniaFact]
@@ -115,7 +135,8 @@ public sealed class InspectionIntegrationTests
         var control = new Border { Name = "ResourceOwner", Resources = local };
         var objects = new WeakObjectRegistry();
         using var scoped = new ResourceInspectionService(application, objects);
-        var root = scoped.GetTrees(new ResourcesRequest(objects.GetId(control))).Single(node => node.Scope == "Element");
+        var root = scoped.GetTrees(new ResourcesRequest(objects.GetId(control)))
+            .Single(node => node.Scope == "Element");
         Assert.Contains(root.Children, child => child.Name.StartsWith("Merged", StringComparison.Ordinal));
         Assert.Contains(root.Children, child => child.Theme == "Dark");
     }
@@ -124,7 +145,8 @@ public sealed class InspectionIntegrationTests
     public void Asset_preview_reads_embedded_text_and_rejects_other_uri_schemes()
     {
         var assets = AssetInspectionService.List();
-        var asset = Assert.Single(assets, item => item.Uri.EndsWith("/Assets/inspection-probe.txt", StringComparison.Ordinal));
+        var asset = Assert.Single(assets,
+            item => item.Uri.EndsWith("/Assets/inspection-probe.txt", StringComparison.Ordinal));
         var result = AssetInspectionService.Open(asset.Uri);
         Assert.Contains("AvaloniaDevTool asset probe", result.Text);
         Assert.False(result.IsTruncated);
@@ -137,11 +159,15 @@ public sealed class InspectionIntegrationTests
     {
         private string _text = "";
         public event PropertyChangedEventHandler? PropertyChanged;
+
         public string Text
         {
             get => _text;
-            set { _text = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Text))); }
+            set
+            {
+                _text = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Text)));
+            }
         }
     }
 }
-

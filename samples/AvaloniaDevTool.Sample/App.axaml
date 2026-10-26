@@ -1,19 +1,25 @@
 <Application xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="AvaloniaDevTool.Sample.App"
-             RequestedThemeVariant="Light">
-  <Application.Resources>
-    <ResourceDictionary>
-      <SolidColorBrush x:Key="SampleAccentBrush" Color="#435DE7" />
-      <x:String x:Key="SampleResourceText">这是通过 DynamicResource 读取的应用资源。</x:String>
-      <ResourceDictionary.ThemeDictionaries>
-        <ResourceDictionary x:Key="Light"><SolidColorBrush x:Key="SampleThemeBrush" Color="#EAF0FF" /></ResourceDictionary>
-        <ResourceDictionary x:Key="Dark"><SolidColorBrush x:Key="SampleThemeBrush" Color="#26365A" /></ResourceDictionary>
-      </ResourceDictionary.ThemeDictionaries>
-    </ResourceDictionary>
-  </Application.Resources>
-  <Application.Styles>
-    <FluentTheme />
-  </Application.Styles>
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="AvaloniaDevTool.Sample.App"
+    RequestedThemeVariant="Light">
+    <Application.Resources>
+        <ResourceDictionary>
+            <SolidColorBrush x:Key="SampleAccentBrush"
+                Color="#435DE7" />
+            <x:String x:Key="SampleResourceText">这是通过 DynamicResource 读取的应用资源。</x:String>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="SampleThemeBrush"
+                        Color="#EAF0FF" />
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="SampleThemeBrush"
+                        Color="#26365A" />
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+    <Application.Styles>
+        <FluentTheme />
+    </Application.Styles>
 </Application>
-

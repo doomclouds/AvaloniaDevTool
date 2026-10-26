@@ -1,8 +1,40 @@
 # AvaloniaDevTool
 
-AvaloniaDevTool 提供自研 Avalonia 应用内 Agent 和独立 stdio MCP，当前使用 .NET 10、Avalonia 12.1.4。默认 `agent` profile 提供 **44 项工具**：canonical 16、`ui-*` 9、`native-*` 8、`file-dialog-*` 8、`capture-*` 3。能力包括通用界面操作、控件树/属性/状态、真实 Windows 文件弹窗、控件/窗口/区域 PNG，以及原始 metrics、样式/资源 Profiler、logs/events。
+AvaloniaDevTool 提供自研 Avalonia 应用内 Agent 和独立 MCP 宿主，支持本机 stdio 与内网 HTTP，当前使用 .NET 10、Avalonia 12.1.4。默认 `agent` profile 提供 **44 项工具**：canonical 16、`ui-*` 9、`native-*` 8、`file-dialog-*` 8、`capture-*` 3。能力包括通用界面操作、控件树/属性/状态、真实 Windows 文件弹窗、控件/窗口/区域 PNG，以及原始 metrics、样式/资源 Profiler、logs/events。
 
 产品提供操作和数据，调用方负责业务关联、业务判断及自己的流程编排。代表性业务脚本只用于研发验证；不提供业务断言引擎、视觉比对、性能阈值、发版门禁或 CI 平台。当前边界见 [Agent 范围](docs/agent-tools/architecture/current-agent-scope.md)，实现与验证结果见 [实现状态](docs/implementation-status.md) 和 [测试记录](docs/testing.md)，工具数和测试数均不表示产品完成率。
+
+## 理解架构与扩展
+
+先看[离线架构图](docs/architecture/overview.html)，再读[项目架构导航](docs/architecture.md)：运行进程、项目依赖、领域职责、启动流程和源码阅读路径都从这里进入。
+
+- [项目清单与依赖](docs/architecture/project-inventory.md)：22 个项目、编译引用、构建分发和测试支撑。
+- [结构与重构记录](docs/architecture/refactoring-blueprint.md)：实际目录、领域划分、资源所有权和本轮迁移结果。
+- [工具扩展指南](docs/architecture/extending-tools.md)：复用已有能力、新增 RPC、native 能力和框架适配的完整路径。
+- [内网双机 MCP 部署](docs/architecture/lan-mcp-design.md)：Codex 与 Avalonia 分处两台电脑，HTTP 无 Token、IP/端口参数和控制会话边界。
+
+源码已按领域目录归位，共享调用上下文与会话生命周期独立。旧公开工具聚合类保留兼容，HTTP 首版使用 agent 目录，stdio 保留三种 profile。
+
+代码格式由解决方案级 ReSharper `.DotSettings` 统一管理，固定工具版本、全量格式化命令及检查方式见[代码格式约定](docs/code-style.md)。
+
+## Codex 与被测电脑分开运行
+
+被测电脑 A 在完整 CLI 分发目录中运行宿主，并保持与目标应用相同的用户交互桌面：
+
+```powershell
+dotnet AvaloniaDevTool.Cli.dll mcp --transport http --listen 192.168.1.50 --port 7443
+```
+
+Codex 电脑 B 和其他 MCP 一样，通过标准配置加载连接，无需 Token：
+
+```toml
+[mcp_servers.avalonia_testpc]
+url = "http://192.168.1.50:7443/mcp"
+```
+
+将示例 IP 替换为 A 的实际地址。HTTP 连接后，用 `attach-to-app {}` 发现 A 的诊断端点，再用本次返回的应用 `id` 附加；应用须引用 Agent 并在 Avalonia 初始化后调用 `DiagnosticsAgent.Attach`。URL 选择电脑，应用 id 选择程序，nodeId 选择控件。
+
+A 的框架依赖式宿主需要 ASP.NET Core Runtime；native worker 还需要 Windows Desktop Runtime。文件预览的 MSBuild 评估和构建另需 .NET 10 SDK。安装 SDK 的开发机器通常已具备这些环境。完整分发保留 `previewer/`、`native-worker/` 和依赖文件，不能只复制 CLI DLL。构建、启动与关联流程见[部署说明](docs/architecture/lan-mcp-design.md)。
 
 ## 快速运行
 

@@ -24,7 +24,8 @@ public sealed class AgentIntegrationTests
         await using var connection = await TestConnection.CreateAsync(panel);
         var info = await connection.Peer.InvokeAsync<SessionInfo>(Methods.SessionInfo, null);
         Assert.Equal(DiagnosticsProtocol.Version, info.ProtocolVersion);
-        var roots = await connection.Peer.InvokeAsync<TreeNodeInfo[]>(Methods.TreeRoots, new TreeRootsRequest(TreeKind.Logical));
+        var roots = await connection.Peer.InvokeAsync<TreeNodeInfo[]>(Methods.TreeRoots,
+            new TreeRootsRequest(TreeKind.Logical));
         Assert.Single(roots);
         var children = await connection.Peer.InvokeAsync<TreeNodeInfo[]>(Methods.TreeChildren,
             new TreeChildrenRequest(roots[0].Id, TreeKind.Logical));
@@ -47,7 +48,8 @@ public sealed class AgentIntegrationTests
         text.Bind(TextBlock.TextProperty, new Binding(nameof(MessageModel.Text)) { Source = model });
         await using var connection = await TestConnection.CreateAsync(text);
         var nodeId = await connection.GetContentIdAsync();
-        var property = (await connection.GetPropertiesAsync(nodeId)).Single(x => x.Id == "Avalonia.Controls.TextBlock:Text");
+        var property =
+            (await connection.GetPropertiesAsync(nodeId)).Single(x => x.Id == "Avalonia.Controls.TextBlock:Text");
         await connection.Peer.InvokeAsync<OperationResult>(Methods.PropertiesSet,
             new SetPropertyRequest(nodeId, property.Id, "Inspection override"));
         Assert.Equal("Inspection override", text.Text);
@@ -59,7 +61,8 @@ public sealed class AgentIntegrationTests
         var overridden = (await connection.GetPropertiesAsync(nodeId)).Single(x => x.Id == property.Id);
         Assert.Equal("DiagnosticOverride", overridden.ValueSource);
         Assert.True(overridden.CanClear);
-        await connection.Peer.InvokeAsync<OperationResult>(Methods.PropertiesClear, new ClearPropertyRequest(nodeId, property.Id));
+        await connection.Peer.InvokeAsync<OperationResult>(Methods.PropertiesClear,
+            new ClearPropertyRequest(nodeId, property.Id));
         Assert.Equal("Updated while overridden", text.Text);
         model.Text = "Binding still connected";
         Assert.Equal("Binding still connected", text.Text);
@@ -74,15 +77,18 @@ public sealed class AgentIntegrationTests
         var properties = await connection.GetPropertiesAsync(nodeId);
         var bounds = properties.Single(x => x.Name == "Bounds");
         var error = await Assert.ThrowsAsync<RpcException>(() =>
-            connection.Peer.InvokeAsync<OperationResult>(Methods.PropertiesSet, new SetPropertyRequest(nodeId, bounds.Id, "1")));
+            connection.Peer.InvokeAsync<OperationResult>(Methods.PropertiesSet,
+                new SetPropertyRequest(nodeId, bounds.Id, "1")));
         Assert.Equal("readonly_property", error.Code);
         var width = properties.Single(x => x.Name == "Width");
         error = await Assert.ThrowsAsync<RpcException>(() =>
-            connection.Peer.InvokeAsync<OperationResult>(Methods.PropertiesSet, new SetPropertyRequest(nodeId, width.Id, "not a number")));
+            connection.Peer.InvokeAsync<OperationResult>(Methods.PropertiesSet,
+                new SetPropertyRequest(nodeId, width.Id, "not a number")));
         Assert.Equal("conversion_failed", error.Code);
         Assert.Equal(120, text.Width);
         error = await Assert.ThrowsAsync<RpcException>(() =>
-            connection.Peer.InvokeAsync<OperationResult>(Methods.PropertiesSet, new SetPropertyRequest(nodeId, "missing", "1")));
+            connection.Peer.InvokeAsync<OperationResult>(Methods.PropertiesSet,
+                new SetPropertyRequest(nodeId, "missing", "1")));
         Assert.Equal("property_not_found", error.Code);
     }
 
@@ -93,13 +99,18 @@ public sealed class AgentIntegrationTests
         await using var connection = await TestConnection.CreateAsync(text);
         var firstSession = await connection.Peer.InvokeAsync<SessionInfo>(Methods.SessionInfo, null);
         var nodeId = await connection.GetContentIdAsync();
-        var property = (await connection.GetPropertiesAsync(nodeId)).Single(x => x.Id == "Avalonia.Controls.TextBlock:Text");
-        await connection.Peer.InvokeAsync<OperationResult>(Methods.PropertiesSet, new SetPropertyRequest(nodeId, property.Id, "Temporary"));
+        var property =
+            (await connection.GetPropertiesAsync(nodeId)).Single(x => x.Id == "Avalonia.Controls.TextBlock:Text");
+        await connection.Peer.InvokeAsync<OperationResult>(Methods.PropertiesSet,
+            new SetPropertyRequest(nodeId, property.Id, "Temporary"));
         Assert.Equal("Temporary", text.Text);
         await connection.Peer.DisposeAsync();
         await WaitUntilAsync(() => !connection.Agent.IsConnected && text.Text == "Original");
         Assert.Equal("Original", text.Text);
-        await using var secondPipe = new NamedPipeClientStream(".", connection.Agent.PipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
+        await using var secondPipe = new NamedPipeClientStream(".",
+            connection.Agent.PipeName,
+            PipeDirection.InOut,
+            PipeOptions.Asynchronous);
         await secondPipe.ConnectAsync(CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(5));
         await using var secondPeer = new RpcPeer(secondPipe);
         secondPeer.Start();
@@ -113,7 +124,8 @@ public sealed class AgentIntegrationTests
         var panel = new StackPanel { Name = "Host" };
         await using var connection = await TestConnection.CreateAsync(panel);
         var panelId = await connection.GetContentIdAsync();
-        await connection.Peer.InvokeAsync<TreeNodeInfo[]>(Methods.TreeChildren, new TreeChildrenRequest(panelId, TreeKind.Logical));
+        await connection.Peer.InvokeAsync<TreeNodeInfo[]>(Methods.TreeChildren,
+            new TreeChildrenRequest(panelId, TreeKind.Logical));
         var received = new TaskCompletionSource<long?>(TaskCreationOptions.RunContinuationsAsynchronously);
         connection.Peer.NotificationReceived += (method, payload) =>
         {
@@ -137,9 +149,11 @@ public sealed class AgentIntegrationTests
         var nodeId = await connection.GetContentIdAsync();
         var row = (await connection.GetPropertiesAsync(nodeId))
             .Single(property => property.Name == "Row" && property.DeclaringType == typeof(Grid).FullName);
-        await connection.Peer.InvokeAsync<OperationResult>(Methods.PropertiesSet, new SetPropertyRequest(nodeId, row.Id, "4"));
+        await connection.Peer.InvokeAsync<OperationResult>(Methods.PropertiesSet,
+            new SetPropertyRequest(nodeId, row.Id, "4"));
         Assert.Equal(4, Grid.GetRow(text));
-        await connection.Peer.InvokeAsync<OperationResult>(Methods.PropertiesClear, new ClearPropertyRequest(nodeId, row.Id));
+        await connection.Peer.InvokeAsync<OperationResult>(Methods.PropertiesClear,
+            new ClearPropertyRequest(nodeId, row.Id));
         Assert.Equal(2, Grid.GetRow(text));
     }
 
@@ -164,16 +178,28 @@ public sealed class AgentIntegrationTests
             var visited = new HashSet<long>();
             while (pending.TryDequeue(out var node) && visited.Count < 500)
             {
-                if (!visited.Add(node.Id)) continue;
-                if (node.Name == "PopupContent") { found = true; break; }
-                if (!node.HasChildren) continue;
+                if (!visited.Add(node.Id))
+                    continue;
+                if (node.Name == "PopupContent")
+                {
+                    found = true;
+                    break;
+                }
+
+                if (!node.HasChildren)
+                    continue;
                 var children = await connection.Peer.InvokeAsync<TreeNodeInfo[]>(Methods.TreeChildren,
                     new TreeChildrenRequest(node.Id, TreeKind.Visual));
-                foreach (var child in children) pending.Enqueue(child);
+                foreach (var child in children)
+                    pending.Enqueue(child);
             }
+
             Assert.True(found);
         }
-        finally { popup.IsOpen = false; }
+        finally
+        {
+            popup.IsOpen = false;
+        }
     }
 
     [Fact]
@@ -186,6 +212,7 @@ public sealed class AgentIntegrationTests
             GC.Collect();
             GC.WaitForPendingFinalizers();
         }
+
         Assert.False(registry.TryGet(id, out _));
         var error = Assert.Throws<RpcException>(() => registry.Get(id));
         Assert.Equal("object_expired", error.Code);
@@ -243,21 +270,31 @@ public sealed class AgentIntegrationTests
     private sealed class MessageModel : INotifyPropertyChanged
     {
         private string _text = "";
+
         public string Text
         {
             get => _text;
-            set { _text = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Text))); }
+            set
+            {
+                _text = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Text)));
+            }
         }
+
         public event PropertyChangedEventHandler? PropertyChanged;
     }
 
     private sealed class TestConnection : IAsyncDisposable
     {
         private readonly Window _window;
+
         private TestConnection(Window window, DiagnosticsAgent agent, RpcPeer peer)
         {
-            _window = window; Agent = agent; Peer = peer;
+            _window = window;
+            Agent = agent;
+            Peer = peer;
         }
+
         public DiagnosticsAgent Agent { get; }
         public RpcPeer Peer { get; }
         public Window Window => _window;
@@ -267,12 +304,13 @@ public sealed class AgentIntegrationTests
             content.Name ??= "TestContent";
             var window = new Window { Width = 500, Height = 400, Content = content };
             window.Show();
-            var agent = DiagnosticsAgent.Attach(Application.Current!, new DiagnosticsAgentOptions
-            {
-                ApplicationName = "Agent integration tests",
-                PipeName = "avdt-test-" + Guid.NewGuid().ToString("N"),
-                TopLevelProvider = () => [window]
-            });
+            var agent = DiagnosticsAgent.Attach(Application.Current!,
+                new DiagnosticsAgentOptions
+                {
+                    ApplicationName = "Agent integration tests",
+                    PipeName = "avdt-test-" + Guid.NewGuid().ToString("N"),
+                    TopLevelProvider = () => [window]
+                });
             var pipe = new NamedPipeClientStream(".", agent.PipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
             await pipe.ConnectAsync(CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(5));
             var peer = new RpcPeer(pipe);
@@ -286,7 +324,8 @@ public sealed class AgentIntegrationTests
 
         public async Task<long> GetContentIdAsync()
         {
-            var roots = await Peer.InvokeAsync<TreeNodeInfo[]>(Methods.TreeRoots, new TreeRootsRequest(TreeKind.Logical));
+            var roots = await Peer.InvokeAsync<TreeNodeInfo[]>(Methods.TreeRoots,
+                new TreeRootsRequest(TreeKind.Logical));
             var children = await Peer.InvokeAsync<TreeNodeInfo[]>(Methods.TreeChildren,
                 new TreeChildrenRequest(roots[0].Id, TreeKind.Logical));
             return children.Single(node => node.Name == ((Control)_window.Content!).Name).Id;
@@ -300,4 +339,3 @@ public sealed class AgentIntegrationTests
         }
     }
 }
-

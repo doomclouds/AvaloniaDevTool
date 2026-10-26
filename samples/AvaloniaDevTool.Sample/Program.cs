@@ -14,17 +14,28 @@ internal static class Program
     {
         for (var i = 0; i < args.Length; i++)
         {
-            if (args[i] == "--remote") { EnableRemote = true; continue; }
+            if (args[i] == "--remote")
+            {
+                EnableRemote = true;
+                continue;
+            }
+
             if (args[i] == "--remote-port")
             {
-                if (++i >= args.Length || !int.TryParse(args[i], out var port) || port is < 0 or > 65535) return 1;
-                RemotePort = port; continue;
+                if (++i >= args.Length || !int.TryParse(args[i], out var port) || port is < 0 or > 65535)
+                    return 1;
+                RemotePort = port;
+                continue;
             }
+
             if (args[i] == "--remote-token-env")
             {
-                if (++i >= args.Length || string.IsNullOrWhiteSpace(args[i])) return 1;
-                RemoteTokenEnvironmentVariable = args[i]; continue;
+                if (++i >= args.Length || string.IsNullOrWhiteSpace(args[i]))
+                    return 1;
+                RemoteTokenEnvironmentVariable = args[i];
+                continue;
             }
+
             if (args[i] == "--pipe")
             {
                 if (++i >= args.Length || string.IsNullOrWhiteSpace(args[i]))
@@ -43,4 +54,3 @@ internal static class Program
     public static AppBuilder BuildAvaloniaApp() =>
         AppBuilder.Configure<App>().UsePlatformDetect().LogToTrace();
 }
-

@@ -1,9 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <IsAotCompatible>true</IsAotCompatible>
-  </PropertyGroup>
-  <ItemGroup>
-    <InternalsVisibleTo Include="AvaloniaDevTool.Protocol.Tests" />
-  </ItemGroup>
+    <PropertyGroup>
+        <IsAotCompatible>true</IsAotCompatible>
+    </PropertyGroup>
+    <ItemGroup>
+        <InternalsVisibleTo Include="AvaloniaDevTool.Protocol.Tests" />
+    </ItemGroup>
 </Project>
-

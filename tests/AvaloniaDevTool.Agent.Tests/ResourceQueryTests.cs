@@ -17,10 +17,13 @@ public sealed class ResourceQueryTests
     {
         var merged = new ResourceDictionary { ["Duplicate"] = 20 };
         var dark = new ResourceDictionary { ["Duplicate"] = 30 };
-        var control = new Border { Name = "QueryScope", Resources = new ResourceDictionary
+        var control = new Border
         {
-            ["Duplicate"] = 10, MergedDictionaries = { merged }, ThemeDictionaries = { [ThemeVariant.Dark] = dark }
-        } };
+            Name = "QueryScope", Resources = new ResourceDictionary
+            {
+                ["Duplicate"] = 10, MergedDictionaries = { merged }, ThemeDictionaries = { [ThemeVariant.Dark] = dark }
+            }
+        };
         var style = new Style();
         style.Resources["StyleMarker"] = "style";
         control.Styles.Add(style);
@@ -42,14 +45,16 @@ public sealed class ResourceQueryTests
         Assert.Equal(10, control.Resources["Duplicate"]);
         service.Reset(new(mergedRow.OwnerDictionaryId, mergedRow.StringKey!));
         Assert.Equal(20, merged["Duplicate"]);
-        Assert.Equal("resource_not_found", Assert.Throws<RpcException>(() => service.Set(new(owner.Id, "StyleMarker", "new"))).Code);
+        Assert.Equal("resource_not_found",
+            Assert.Throws<RpcException>(() => service.Set(new(owner.Id, "StyleMarker", "new"))).Code);
     }
 
     [AvaloniaFact]
     public void Pagination_filter_sort_and_budgets_are_explicit_and_bounded()
     {
         var dictionary = new ResourceDictionary();
-        for (var i = 0; i < 130; i++) dictionary["Key" + i.ToString("D3")] = i;
+        for (var i = 0; i < 130; i++)
+            dictionary["Key" + i.ToString("D3")] = i;
         dictionary["AString"] = "sample";
         var objects = new WeakObjectRegistry();
         using var service = new ResourceInspectionService(Application.Current!, objects);
@@ -72,15 +77,24 @@ public sealed class ResourceQueryTests
         Assert.Equal(7, capped.EntriesVisited);
         Assert.Equal(7, capped.TotalCount);
         Assert.Contains(capped.Limitations, note => note.Contains("budget", StringComparison.Ordinal));
-        foreach (var request in new[] { new ResourceEntriesQueryRequest(id, Offset: -1), new(id, Offset: 132),
-            new(id, Limit: 201), new(id, MaxNodes: 0), new(id, MaxEntries: 20001), new(id, Sort: (ResourceQuerySort)50) })
+        foreach (var request in new[]
+                 {
+                     new ResourceEntriesQueryRequest(id, Offset: -1), new(id, Offset: 132),
+                     new(id, Limit: 201), new(id, MaxNodes: 0), new(id, MaxEntries: 20001),
+                     new(id, Sort: (ResourceQuerySort)50)
+                 })
             Assert.Throws<RpcException>(() => service.QueryEntries(request));
         Assert.Empty(service.QueryEntries(new(id, Offset: 131)).Entries);
         var prefix = new string('A', 300);
         var longKeys = new ResourceDictionary { [prefix + "Z"] = 1, [prefix + "A"] = 2 };
         var orderedLongKeys = service.QueryEntries(new(objects.GetId(longKeys)));
         Assert.Equal(["2", "1"], orderedLongKeys.Entries.Select(entry => entry.Value));
-        Assert.All(orderedLongKeys.Entries, entry => { Assert.True(entry.KeyTruncated); Assert.False(entry.CanEdit); });
+        Assert.All(orderedLongKeys.Entries,
+            entry =>
+            {
+                Assert.True(entry.KeyTruncated);
+                Assert.False(entry.CanEdit);
+            });
     }
 
     [AvaloniaFact]
@@ -97,7 +111,8 @@ public sealed class ResourceQueryTests
         Assert.Equal(typeof(DangerousText).FullName, row.KeyType);
         Assert.False(row.CanEdit);
         Assert.NotNull(row.ValueObjectId);
-        Assert.Equal(row.KeyObjectId, service.QueryEntries(new(id)).Entries.Single(entry => entry.StringKey is null).KeyObjectId);
+        Assert.Equal(row.KeyObjectId,
+            service.QueryEntries(new(id)).Entries.Single(entry => entry.StringKey is null).KeyObjectId);
         Assert.Equal(row.KeyObjectId, service.ReadEntry(new(id, row.KeyObjectId)).KeyObjectId);
         Assert.Contains(service.GetEntries(id), entry => entry.KeyType == typeof(DangerousText).FullName);
         Assert.Equal(0, key.Calls);
@@ -108,7 +123,8 @@ public sealed class ResourceQueryTests
         Assert.InRange(longValue.Value!.Length, 1, 1025);
         Assert.InRange(JsonSerializer.SerializeToUtf8Bytes(page, ProtocolJson.Options).Length, 1, 16000);
         dictionary.Remove(key);
-        Assert.Equal("resource_not_found", Assert.Throws<RpcException>(() => service.ReadEntry(new(id, row.KeyObjectId))).Code);
+        Assert.Equal("resource_not_found",
+            Assert.Throws<RpcException>(() => service.ReadEntry(new(id, row.KeyObjectId))).Code);
     }
 
     [AvaloniaFact]
@@ -140,7 +156,9 @@ public sealed class ResourceQueryTests
         Assert.Contains(cycle.Limitations, note => note.Contains("cyclic", StringComparison.Ordinal));
         var cycleOwner = new Border { Name = "CycleOwner", Resources = cyclic };
         var cycleTree = service.GetTree(new(objects.GetId(cycleOwner)));
-        Assert.True(Assert.Single(Assert.Single(cycleTree.Roots, node => node.Name.Contains("CycleOwner", StringComparison.Ordinal)).Children).IsCycle);
+        Assert.True(Assert
+            .Single(Assert.Single(cycleTree.Roots, node => node.Name.Contains("CycleOwner", StringComparison.Ordinal))
+                .Children).IsCycle);
     }
 
     [AvaloniaFact]
@@ -149,7 +167,12 @@ public sealed class ResourceQueryTests
         var objects = new WeakObjectRegistry();
         using var service = new ResourceInspectionService(Application.Current!, objects);
         var (ownerId, keyId) = CreateTemporary(service, objects);
-        for (var i = 0; i < 3; i++) { GC.Collect(); GC.WaitForPendingFinalizers(); }
+        for (var i = 0; i < 3; i++)
+        {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+        }
+
         Assert.False(objects.TryGet(ownerId, out _));
         Assert.False(objects.TryGet(keyId, out _));
         Assert.Equal("object_expired", Assert.Throws<RpcException>(() => service.QueryEntries(new(ownerId))).Code);
@@ -168,7 +191,8 @@ public sealed class ResourceQueryTests
         Assert.Equal("resource_conflict", Assert.Throws<RpcException>(() => service.Reset(new(id, "Marker"))).Code);
         Assert.False(dictionary.ContainsKey("Marker"));
         Assert.Equal(7, merged["Marker"]);
-        Assert.Equal("resource_not_found", Assert.Throws<RpcException>(() => service.Set(new(id, "Marker", "10"))).Code);
+        Assert.Equal("resource_not_found",
+            Assert.Throws<RpcException>(() => service.Set(new(id, "Marker", "10"))).Code);
     }
 
     [AvaloniaFact]
@@ -186,6 +210,7 @@ public sealed class ResourceQueryTests
                 child = next;
             }
         }
+
         var owner = new Border { Name = "UnicodeResourceTree", Resources = dictionary };
         var objects = new WeakObjectRegistry();
         using var service = new ResourceInspectionService(Application.Current!, objects);
@@ -194,7 +219,8 @@ public sealed class ResourceQueryTests
         Assert.Contains(tree.Limitations, note => note.Contains("text budget", StringComparison.Ordinal));
         Assert.True(JsonSerializer.SerializeToUtf8Bytes(tree, ProtocolJson.Options).Length < RpcPeer.MaximumFrameBytes);
         var entries = new ResourceDictionary();
-        for (var index = 0; index < 200; index++) entries[new string('键', 250) + index] = new string('值', 1024);
+        for (var index = 0; index < 200; index++)
+            entries[new string('键', 250) + index] = new string('值', 1024);
         var page = service.QueryEntries(new(objects.GetId(entries), Limit: 200));
         Assert.Equal(200, page.Entries.Count);
         Assert.True(JsonSerializer.SerializeToUtf8Bytes(page, ProtocolJson.Options).Length < RpcPeer.MaximumFrameBytes);
@@ -204,18 +230,23 @@ public sealed class ResourceQueryTests
     public async Task Agent_client_resource_queries_round_trip_utf8_pages_and_original_owner_edits()
     {
         var merged = new ResourceDictionary { ["共享键"] = "原值" };
-        var control = new Border { Name = "WireResources", Resources = new ResourceDictionary
-        { ["本地键"] = "本地值", MergedDictionaries = { merged } } };
+        var control = new Border
+        {
+            Name = "WireResources", Resources = new ResourceDictionary
+                { ["本地键"] = "本地值", MergedDictionaries = { merged } }
+        };
         var window = new Window { Content = control };
         window.Show();
         try
         {
-            await using var agent = DiagnosticsAgent.Attach(Application.Current!, new DiagnosticsAgentOptions
-            { PipeName = "resource-query-" + Guid.NewGuid().ToString("N"), TopLevelProvider = () => [window] });
+            await using var agent = DiagnosticsAgent.Attach(Application.Current!,
+                new DiagnosticsAgentOptions
+                    { PipeName = "resource-query-" + Guid.NewGuid().ToString("N"), TopLevelProvider = () => [window] });
             await using var client = new DiagnosticsClient();
             await client.ConnectAsync(agent.PipeName);
             var rootNode = Assert.Single(await client.GetRootsAsync(TreeKind.Logical));
-            var node = Assert.Single(await client.GetChildrenAsync(rootNode.Id, TreeKind.Logical), item => item.Name == "WireResources");
+            var node = Assert.Single(await client.GetChildrenAsync(rootNode.Id, TreeKind.Logical),
+                item => item.Name == "WireResources");
             var tree = await client.QueryResourceTreeAsync(new(node.Id));
             var root = Assert.Single(tree.Roots, item => item.Name.Contains("WireResources", StringComparison.Ordinal));
             var page = await client.QueryResourceEntriesAsync(new(root.Id, IncludeNested: true, Limit: 1));
@@ -225,11 +256,15 @@ public sealed class ResourceQueryTests
             Assert.Equal("原值", row.Value);
             Assert.NotEqual(root.Id, row.OwnerDictionaryId);
             await client.SetResourceAsync(row.OwnerDictionaryId, row.StringKey!, "新值");
-            Assert.Equal("新值", (await client.ReadResourceEntryAsync(new(row.OwnerDictionaryId, row.KeyObjectId))).Value);
+            Assert.Equal("新值",
+                (await client.ReadResourceEntryAsync(new(row.OwnerDictionaryId, row.KeyObjectId))).Value);
             await client.ResetResourceAsync(row.OwnerDictionaryId, row.StringKey!);
             Assert.Equal("原值", merged["共享键"]);
         }
-        finally { window.Close(); }
+        finally
+        {
+            window.Close();
+        }
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -245,24 +280,43 @@ public sealed class ResourceQueryTests
     private sealed class DangerousText
     {
         public int Calls { get; private set; }
-        public override string ToString() { Calls++; throw new InvalidOperationException("Do not format user resource objects."); }
+
+        public override string ToString()
+        {
+            Calls++;
+            throw new InvalidOperationException("Do not format user resource objects.");
+        }
     }
 
     private sealed class CustomProvider : ResourceProvider
     {
         public override bool HasResources => true;
-        public override bool TryGetResource(object key, ThemeVariant? theme, out object? value) { value = null; return false; }
+
+        public override bool TryGetResource(object key, ThemeVariant? theme, out object? value)
+        {
+            value = null;
+            return false;
+        }
     }
 
     private sealed class CyclicDictionary : ResourceDictionary, IResourceDictionary
     {
-        public CyclicDictionary() { this["CycleMarker"] = 1; }
+        public CyclicDictionary()
+        {
+            this["CycleMarker"] = 1;
+        }
+
         IList<IResourceProvider> IResourceDictionary.MergedDictionaries => new List<IResourceProvider> { this };
     }
 
     private sealed class SharedDictionary : ResourceDictionary, IResourceProvider
     {
-        void IResourceProvider.AddOwner(IResourceHost owner) { }
-        void IResourceProvider.RemoveOwner(IResourceHost owner) { }
+        void IResourceProvider.AddOwner(IResourceHost owner)
+        {
+        }
+
+        void IResourceProvider.RemoveOwner(IResourceHost owner)
+        {
+        }
     }
 }

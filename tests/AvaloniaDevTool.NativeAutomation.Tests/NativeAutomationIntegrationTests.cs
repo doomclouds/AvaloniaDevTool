@@ -18,53 +18,77 @@ public sealed partial class NativeAutomationIntegrationTests
         var main = Assert.Single(roots, root => root.Title == "AVDT Native Scope Fixture");
         Assert.True(main.IsEnabled);
         Assert.All(roots, root => Assert.Equal(fixture.Id, root.ProcessId));
-        var bounded = await native.GetTreeAsync(new NativeTreeQuery { RootNodeId = main.NodeId, MaxNodes = 2, MaxDepth = 8 }, TestContext.Current.CancellationToken);
+        var bounded = await native.GetTreeAsync(
+            new NativeTreeQuery { RootNodeId = main.NodeId, MaxNodes = 2, MaxDepth = 8 },
+            TestContext.Current.CancellationToken);
         Assert.True(bounded.Truncated);
         Assert.Equal(2, bounded.Nodes.Length);
         var editor = await FindAsync(native, "NativeEditor");
         Assert.Equal("initial", editor.Value);
-        Assert.Equal("completed", (await CompleteAsync(native, new NativeActionRequest { NodeId = editor.NodeId, Action = "SetValue", Value = "changed 中文" })).Status);
-        Assert.Equal("changed 中文", (await native.GetElementAsync(editor.NodeId, TestContext.Current.CancellationToken)).Value);
+        Assert.Equal("completed",
+            (await CompleteAsync(native,
+                new NativeActionRequest { NodeId = editor.NodeId, Action = "SetValue", Value = "changed 中文" })).Status);
+        Assert.Equal("changed 中文",
+            (await native.GetElementAsync(editor.NodeId, TestContext.Current.CancellationToken)).Value);
         var toggle = await FindAsync(native, "NativeToggle");
         await CompleteAsync(native, new NativeActionRequest { NodeId = toggle.NodeId, Action = "Toggle" });
-        Assert.Equal("On", (await native.GetElementAsync(toggle.NodeId, TestContext.Current.CancellationToken)).ToggleState);
+        Assert.Equal("On",
+            (await native.GetElementAsync(toggle.NodeId, TestContext.Current.CancellationToken)).ToggleState);
         var invoke = await FindAsync(native, "NativeInvoke");
         await CompleteAsync(native, new NativeActionRequest { NodeId = invoke.NodeId, Action = "Invoke" });
         await WaitForStatusAsync(native, "invoked:1");
-        var unsupported = await CompleteAsync(native, new NativeActionRequest { NodeId = editor.NodeId, Action = "Toggle" });
+        var unsupported =
+            await CompleteAsync(native, new NativeActionRequest { NodeId = editor.NodeId, Action = "Toggle" });
         Assert.Equal("failed", unsupported.Status);
         Assert.Equal("unsupported_pattern", unsupported.ErrorCode);
         var modalButton = await FindAsync(native, "NativeModal");
-        var modalAction = await native.ExecuteAsync(new NativeActionRequest { NodeId = modalButton.NodeId, Action = "Invoke" }, TestContext.Current.CancellationToken);
-        Assert.True(modalAction.Status == "dispatched", $"Modal HWND={modalButton.NativeWindowHandle}, class={modalButton.ClassName}, action={modalAction.Status}");
+        var modalAction = await native.ExecuteAsync(
+            new NativeActionRequest { NodeId = modalButton.NodeId, Action = "Invoke" },
+            TestContext.Current.CancellationToken);
+        Assert.True(modalAction.Status == "dispatched",
+            $"Modal HWND={modalButton.NativeWindowHandle}, class={modalButton.ClassName}, action={modalAction.Status}");
         var owned = await WaitForWindowAsync(native, "AVDT Owned Modal");
         Assert.Equal(main.Handle, owned.OwnerHandle);
         Assert.True(owned.IsOwned);
         Assert.True(owned.IsModal);
-        Assert.False((await native.GetWindowsAsync(TestContext.Current.CancellationToken)).Single(window => window.NodeId == main.NodeId).IsEnabled);
-        var disabled = await Assert.ThrowsAsync<NativeAutomationException>(() => native.ExecuteAsync(new NativeActionRequest
-        { NodeId = invoke.NodeId, Action = "Invoke" }, TestContext.Current.CancellationToken));
+        Assert.False((await native.GetWindowsAsync(TestContext.Current.CancellationToken))
+            .Single(window => window.NodeId == main.NodeId).IsEnabled);
+        var disabled = await Assert.ThrowsAsync<NativeAutomationException>(() =>
+            native.ExecuteAsync(new NativeActionRequest
+                    { NodeId = invoke.NodeId, Action = "Invoke" },
+                TestContext.Current.CancellationToken));
         Assert.Equal("element_disabled", disabled.Code);
         Assert.Equal("invoked:1", (await FindAsync(native, "NativeStatus")).Name);
-        var blockedInput = await Assert.ThrowsAsync<NativeAutomationException>(() => native.SendInputAsync(new NativeInputRequest
-        { NodeId = editor.NodeId, Kind = "Text", Text = "must not reach disabled owner" }, TestContext.Current.CancellationToken));
+        var blockedInput = await Assert.ThrowsAsync<NativeAutomationException>(() =>
+            native.SendInputAsync(new NativeInputRequest
+                    { NodeId = editor.NodeId, Kind = "Text", Text = "must not reach disabled owner" },
+                TestContext.Current.CancellationToken));
         Assert.Equal("element_not_interactive", blockedInput.Code);
-        Assert.Equal("changed 中文", (await native.GetElementAsync(editor.NodeId, TestContext.Current.CancellationToken)).Value);
+        Assert.Equal("changed 中文",
+            (await native.GetElementAsync(editor.NodeId, TestContext.Current.CancellationToken)).Value);
         var close = await FindAsync(native, "NativeModalClose");
         await CompleteAsync(native, new NativeActionRequest { NodeId = close.NodeId, Action = "Invoke" });
         if (modalAction.OperationId is { } operationId)
             Assert.Equal("completed", (await WaitForOperationAsync(native, operationId)).Status);
-        var old = await Assert.ThrowsAsync<NativeAutomationException>(() => native.GetElementAsync(close.NodeId, TestContext.Current.CancellationToken));
+        var old = await Assert.ThrowsAsync<NativeAutomationException>(() =>
+            native.GetElementAsync(close.NodeId, TestContext.Current.CancellationToken));
         Assert.True(old.Code is "stale_node" or "out_of_scope", $"{old.Code}: {old.Message}");
         await using var fresh = await AttachAsync(fixture);
-        var crossSession = await Assert.ThrowsAsync<NativeAutomationException>(() => fresh.GetElementAsync(editor.NodeId, TestContext.Current.CancellationToken));
+        var crossSession = await Assert.ThrowsAsync<NativeAutomationException>(() =>
+            fresh.GetElementAsync(editor.NodeId, TestContext.Current.CancellationToken));
         Assert.Equal("stale_node", crossSession.Code);
-        var wrongIdentity = await Assert.ThrowsAsync<NativeAutomationException>(() => NativeAutomationSession.AttachAsync(
-            fixture.Id, new DateTimeOffset(fixture.StartTime.ToUniversalTime()).AddSeconds(1), Options(), TestContext.Current.CancellationToken));
+        var wrongIdentity = await Assert.ThrowsAsync<NativeAutomationException>(() =>
+            NativeAutomationSession.AttachAsync(
+                fixture.Id,
+                new DateTimeOffset(fixture.StartTime.ToUniversalTime()).AddSeconds(1),
+                Options(),
+                TestContext.Current.CancellationToken));
         Assert.Equal("target_changed", wrongIdentity.Code);
         await native.DisposeAsync();
         Assert.False(native.IsAlive);
-        Assert.Equal("session_expired", (await Assert.ThrowsAsync<NativeAutomationException>(() => native.GetWindowsAsync(TestContext.Current.CancellationToken))).Code);
+        Assert.Equal("session_expired",
+            (await Assert.ThrowsAsync<NativeAutomationException>(() =>
+                native.GetWindowsAsync(TestContext.Current.CancellationToken))).Code);
     }
 
     [Fact(SkipUnless = nameof(IsInteractiveWindows), Skip = "A real interactive Windows desktop is required.")]
@@ -73,7 +97,10 @@ public sealed partial class NativeAutomationIntegrationTests
         using var fixture = await StartFixtureAsync();
         var timer = Stopwatch.StartNew();
         var error = await Assert.ThrowsAsync<NativeAutomationException>(() => NativeAutomationSession.AttachAsync(
-            fixture.Id, fixture.StartTime.ToUniversalTime(), Options() with { OperationTimeout = TimeSpan.FromMilliseconds(1) }, TestContext.Current.CancellationToken));
+            fixture.Id,
+            fixture.StartTime.ToUniversalTime(),
+            Options() with { OperationTimeout = TimeSpan.FromMilliseconds(1) },
+            TestContext.Current.CancellationToken));
         Assert.Equal("operation_timeout", error.Code);
         Assert.True(timer.Elapsed < TimeSpan.FromSeconds(5));
         await using var fresh = await AttachAsync(fixture);
@@ -99,21 +126,30 @@ public sealed partial class NativeAutomationIntegrationTests
                 try
                 {
                     var result = await native.SendInputAsync(new NativeInputRequest
-                    { NodeId = node.NodeId, Kind = "KeyChord", Modifiers = ["Ctrl"], Keys = ["A"] }, TestContext.Current.CancellationToken);
+                            { NodeId = node.NodeId, Kind = "KeyChord", Modifiers = ["Ctrl"], Keys = ["A"] },
+                        TestContext.Current.CancellationToken);
                     Assert.True(result.Injected);
                     var text = $"{(node.NodeId == primary.NodeId ? "primary" : "secondary")}-{cycle}-焦点 😀";
                     Assert.True((await native.SendInputAsync(new NativeInputRequest
-                    { NodeId = node.NodeId, Kind = "Text", Text = text }, TestContext.Current.CancellationToken)).Injected);
+                            { NodeId = node.NodeId, Kind = "Text", Text = text },
+                        TestContext.Current.CancellationToken)).Injected);
                     var timer = Stopwatch.StartNew();
-                    while ((await native.GetElementAsync(node.NodeId, TestContext.Current.CancellationToken)).Value != text && timer.Elapsed < TimeSpan.FromSeconds(5))
+                    while ((await native.GetElementAsync(node.NodeId, TestContext.Current.CancellationToken)).Value !=
+                           text && timer.Elapsed < TimeSpan.FromSeconds(5))
                         await Task.Delay(10, TestContext.Current.CancellationToken);
-                    Assert.Equal(text, (await native.GetElementAsync(node.NodeId, TestContext.Current.CancellationToken)).Value);
+                    Assert.Equal(text,
+                        (await native.GetElementAsync(node.NodeId, TestContext.Current.CancellationToken)).Value);
                     count++;
                 }
-                catch (NativeAutomationException exception) { errors.Add($"{exception.Code}: {exception.Message}"); }
+                catch (NativeAutomationException exception)
+                {
+                    errors.Add($"{exception.Code}: {exception.Message}");
+                }
             }
         }
-        Assert.True(errors.Count == 0, $"Accepted {count}/80 scoped activations. Errors: {string.Join(" | ", errors.Take(8))}");
+
+        Assert.True(errors.Count == 0,
+            $"Accepted {count}/80 scoped activations. Errors: {string.Join(" | ", errors.Take(8))}");
     }
 
     [Fact(SkipUnless = nameof(IsInteractiveWindows), Skip = "A real interactive Windows desktop is required.")]
@@ -122,21 +158,31 @@ public sealed partial class NativeAutomationIntegrationTests
         using var fixture = await StartFixtureAsync();
         await using var native = await AttachAsync(fixture);
         var primary = await FindAsync(native, "NativeEditor");
-        await CompleteAsync(native, new NativeActionRequest { NodeId = (await FindAsync(native, "NativeSecondary")).NodeId, Action = "Invoke" });
+        await CompleteAsync(native,
+            new NativeActionRequest
+                { NodeId = (await FindAsync(native, "NativeSecondary")).NodeId, Action = "Invoke" });
         await WaitForWindowAsync(native, "AVDT Secondary Window");
-        await CompleteAsync(native, new NativeActionRequest { NodeId = (await FindAsync(native, "NativeEnableFocusInterruption")).NodeId, Action = "Invoke" });
+        await CompleteAsync(native,
+            new NativeActionRequest
+                { NodeId = (await FindAsync(native, "NativeEnableFocusInterruption")).NodeId, Action = "Invoke" });
         var interrupter = await WaitForWindowAsync(native, "AVDT Focus Interrupter");
         Assert.Equal(fixture.Id, interrupter.ProcessId);
         Assert.True(interrupter.IsOwned);
         var thirdEditor = await FindAsync(native, "NativeInterrupterEditor");
         Assert.True((await native.SendInputAsync(new NativeInputRequest
-        { NodeId = thirdEditor.NodeId, Kind = "KeyChord", Keys = ["End"] }, TestContext.Current.CancellationToken)).Injected);
-        Assert.True((await native.GetElementAsync(thirdEditor.NodeId, TestContext.Current.CancellationToken)).HasKeyboardFocus);
-        var error = await Assert.ThrowsAsync<NativeAutomationException>(() => native.SendInputAsync(new NativeInputRequest
-        { NodeId = primary.NodeId, Kind = "Text", Text = "must not reach another owned window" }, TestContext.Current.CancellationToken));
+                { NodeId = thirdEditor.NodeId, Kind = "KeyChord", Keys = ["End"] },
+            TestContext.Current.CancellationToken)).Injected);
+        Assert.True((await native.GetElementAsync(thirdEditor.NodeId, TestContext.Current.CancellationToken))
+            .HasKeyboardFocus);
+        var error = await Assert.ThrowsAsync<NativeAutomationException>(() =>
+            native.SendInputAsync(new NativeInputRequest
+                    { NodeId = primary.NodeId, Kind = "Text", Text = "must not reach another owned window" },
+                TestContext.Current.CancellationToken));
         Assert.Equal("foreground_changed", error.Code);
-        Assert.Equal("initial", (await native.GetElementAsync(primary.NodeId, TestContext.Current.CancellationToken)).Value);
-        Assert.Equal("untouched", (await native.GetElementAsync(thirdEditor.NodeId, TestContext.Current.CancellationToken)).Value);
+        Assert.Equal("initial",
+            (await native.GetElementAsync(primary.NodeId, TestContext.Current.CancellationToken)).Value);
+        Assert.Equal("untouched",
+            (await native.GetElementAsync(thirdEditor.NodeId, TestContext.Current.CancellationToken)).Value);
     }
 
     [Fact(SkipUnless = nameof(IsInteractiveWindows), Skip = "A real interactive Windows desktop is required.")]
@@ -155,7 +201,10 @@ public sealed partial class NativeAutomationIntegrationTests
             var timer = Stopwatch.StartNew();
             while (timer.Elapsed < TimeSpan.FromSeconds(5))
             {
-                try { await native.GetElementAsync(close.NodeId, TestContext.Current.CancellationToken); }
+                try
+                {
+                    await native.GetElementAsync(close.NodeId, TestContext.Current.CancellationToken);
+                }
                 catch (NativeAutomationException exception)
                 {
                     if (exception.Code is not ("stale_node" or "out_of_scope"))
@@ -163,12 +212,17 @@ public sealed partial class NativeAutomationIntegrationTests
                     break;
                 }
             }
-            while ((await native.GetWindowsAsync(TestContext.Current.CancellationToken)).Any(window => window.NodeId == owned.NodeId) && timer.Elapsed < TimeSpan.FromSeconds(5))
+
+            while ((await native.GetWindowsAsync(TestContext.Current.CancellationToken)).Any(window =>
+                       window.NodeId == owned.NodeId) && timer.Elapsed < TimeSpan.FromSeconds(5))
                 await Task.Delay(5, TestContext.Current.CancellationToken);
-            Assert.DoesNotContain(await native.GetWindowsAsync(TestContext.Current.CancellationToken), window => window.NodeId == owned.NodeId);
-            var closed = await Assert.ThrowsAsync<NativeAutomationException>(() => native.GetElementAsync(close.NodeId, TestContext.Current.CancellationToken));
+            Assert.DoesNotContain(await native.GetWindowsAsync(TestContext.Current.CancellationToken),
+                window => window.NodeId == owned.NodeId);
+            var closed = await Assert.ThrowsAsync<NativeAutomationException>(() =>
+                native.GetElementAsync(close.NodeId, TestContext.Current.CancellationToken));
             Assert.True(closed.Code is "stale_node" or "out_of_scope", $"{closed.Code}: {closed.Message}");
         }
+
         Assert.True(errors.Count == 0, string.Join(Environment.NewLine, errors));
     }
 
@@ -179,38 +233,59 @@ public sealed partial class NativeAutomationIntegrationTests
         await using var native = await AttachAsync(fixture);
         var editor = await FindAsync(native, "NativeEditor");
         var select = await native.SendInputAsync(new NativeInputRequest
-        { NodeId = editor.NodeId, Kind = "KeyChord", Modifiers = ["Ctrl"], Keys = ["A"] }, TestContext.Current.CancellationToken);
+                { NodeId = editor.NodeId, Kind = "KeyChord", Modifiers = ["Ctrl"], Keys = ["A"] },
+            TestContext.Current.CancellationToken);
         Assert.True(select.Injected);
         Assert.Equal(4, select.InputCount);
         var text = await native.SendInputAsync(new NativeInputRequest
-        { NodeId = editor.NodeId, Kind = "Text", Text = "原生 Unicode 😀" }, TestContext.Current.CancellationToken);
+                { NodeId = editor.NodeId, Kind = "Text", Text = "原生 Unicode 😀" },
+            TestContext.Current.CancellationToken);
         Assert.True(text.Injected);
         Assert.False(text.ApplicationEffectVerified);
         var timer = Stopwatch.StartNew();
-        while ((await native.GetElementAsync(editor.NodeId, TestContext.Current.CancellationToken)).Value != "原生 Unicode 😀" && timer.Elapsed < TimeSpan.FromSeconds(5))
+        while ((await native.GetElementAsync(editor.NodeId, TestContext.Current.CancellationToken)).Value !=
+               "原生 Unicode 😀" && timer.Elapsed < TimeSpan.FromSeconds(5))
             await Task.Delay(20, TestContext.Current.CancellationToken);
-        Assert.Equal("原生 Unicode 😀", (await native.GetElementAsync(editor.NodeId, TestContext.Current.CancellationToken)).Value);
+        Assert.Equal("原生 Unicode 😀",
+            (await native.GetElementAsync(editor.NodeId, TestContext.Current.CancellationToken)).Value);
         var invoke = await FindAsync(native, "NativeInvoke");
-        var click = await native.SendInputAsync(new NativeInputRequest { NodeId = invoke.NodeId, Kind = "Click" }, TestContext.Current.CancellationToken);
+        var click = await native.SendInputAsync(new NativeInputRequest { NodeId = invoke.NodeId, Kind = "Click" },
+            TestContext.Current.CancellationToken);
         Assert.True(click.Injected);
         Assert.Equal(3, click.InputCount);
         await WaitForStatusAsync(native, "invoked:1");
         var pointer = await FindAsync(native, "NativePointer");
-        Assert.True((await native.SendInputAsync(new NativeInputRequest { NodeId = pointer.NodeId, Kind = "RightClick" }, TestContext.Current.CancellationToken)).Injected);
+        Assert.True((await native.SendInputAsync(
+            new NativeInputRequest { NodeId = pointer.NodeId, Kind = "RightClick" },
+            TestContext.Current.CancellationToken)).Injected);
         await WaitForStatusAsync(native, "pointer:right");
-        Assert.True((await native.SendInputAsync(new NativeInputRequest { NodeId = pointer.NodeId, Kind = "DoubleClick" }, TestContext.Current.CancellationToken)).Injected);
+        Assert.True((await native.SendInputAsync(
+            new NativeInputRequest { NodeId = pointer.NodeId, Kind = "DoubleClick" },
+            TestContext.Current.CancellationToken)).Injected);
         await WaitForStatusAsync(native, "pointer:double");
-        Assert.True((await native.SendInputAsync(new NativeInputRequest { NodeId = pointer.NodeId, Kind = "Move", X = 10, Y = 10 }, TestContext.Current.CancellationToken)).Injected);
+        Assert.True((await native.SendInputAsync(
+            new NativeInputRequest { NodeId = pointer.NodeId, Kind = "Move", X = 10, Y = 10 },
+            TestContext.Current.CancellationToken)).Injected);
         var drag = await native.SendInputAsync(new NativeInputRequest
-        { NodeId = pointer.NodeId, Kind = "Drag", X = 10, Y = 10, TargetNodeId = pointer.NodeId, TargetX = 300, TargetY = 40 }, TestContext.Current.CancellationToken);
+            {
+                NodeId = pointer.NodeId, Kind = "Drag", X = 10, Y = 10, TargetNodeId = pointer.NodeId, TargetX = 300,
+                TargetY = 40
+            },
+            TestContext.Current.CancellationToken);
         Assert.True(drag.Injected);
         Assert.Equal(15, drag.InputCount);
-        Assert.True((await native.SendInputAsync(new NativeInputRequest { NodeId = pointer.NodeId, Kind = "Wheel", WheelDelta = 120 }, TestContext.Current.CancellationToken)).Injected);
-        var coordinates = await Assert.ThrowsAsync<NativeAutomationException>(() => native.SendInputAsync(new NativeInputRequest
-        { NodeId = pointer.NodeId, Kind = "Click", X = -1, Y = 0 }, TestContext.Current.CancellationToken));
+        Assert.True((await native.SendInputAsync(
+            new NativeInputRequest { NodeId = pointer.NodeId, Kind = "Wheel", WheelDelta = 120 },
+            TestContext.Current.CancellationToken)).Injected);
+        var coordinates = await Assert.ThrowsAsync<NativeAutomationException>(() =>
+            native.SendInputAsync(new NativeInputRequest
+                    { NodeId = pointer.NodeId, Kind = "Click", X = -1, Y = 0 },
+                TestContext.Current.CancellationToken));
         Assert.Equal("invalid_coordinates", coordinates.Code);
-        var global = await Assert.ThrowsAsync<NativeAutomationException>(() => native.SendInputAsync(new NativeInputRequest
-        { NodeId = editor.NodeId, Kind = "KeyChord", Modifiers = ["Alt"], Keys = ["Tab"] }, TestContext.Current.CancellationToken));
+        var global = await Assert.ThrowsAsync<NativeAutomationException>(() =>
+            native.SendInputAsync(new NativeInputRequest
+                    { NodeId = editor.NodeId, Kind = "KeyChord", Modifiers = ["Alt"], Keys = ["Tab"] },
+                TestContext.Current.CancellationToken));
         Assert.Equal("out_of_scope", global.Code);
     }
 
@@ -222,22 +297,38 @@ public sealed partial class NativeAutomationIntegrationTests
         Assert.Equal(status, (await FindAsync(native, "NativeStatus")).Name);
     }
 
-    private static NativeAutomationOptions Options() => new() { WorkerPath = ArtifactPath("AvaloniaDevTool.NativeAutomation.Worker.dll") };
-    private static Task<NativeAutomationSession> AttachAsync(Process fixture) => NativeAutomationSession.AttachAsync(
-        fixture.Id, fixture.StartTime.ToUniversalTime(), Options(), TestContext.Current.CancellationToken);
+    private static NativeAutomationOptions Options() => new()
+        { WorkerPath = ArtifactPath("AvaloniaDevTool.NativeAutomation.Worker.dll") };
 
-    private static string ArtifactPath(string filename) => typeof(NativeAutomationIntegrationTests).Assembly.GetCustomAttributes<AssemblyMetadataAttribute>()
-        .Single(attribute => attribute.Key == "NativeTestPaths").Value!.Split('|').Single(path => Path.GetFileName(path) == filename);
+    private static Task<NativeAutomationSession> AttachAsync(Process fixture) => NativeAutomationSession.AttachAsync(
+        fixture.Id,
+        fixture.StartTime.ToUniversalTime(),
+        Options(),
+        TestContext.Current.CancellationToken);
+
+    private static string ArtifactPath(string filename) => typeof(NativeAutomationIntegrationTests).Assembly
+        .GetCustomAttributes<AssemblyMetadataAttribute>()
+        .Single(attribute => attribute.Key == "NativeTestPaths").Value!.Split('|')
+        .Single(path => Path.GetFileName(path) == filename);
 
     private static async Task<Process> StartFixtureAsync()
     {
-        var start = new ProcessStartInfo("dotnet") { RedirectStandardOutput = true, RedirectStandardError = true, UseShellExecute = false };
+        var start = new ProcessStartInfo("dotnet")
+            { RedirectStandardOutput = true, RedirectStandardError = true, UseShellExecute = false };
         start.ArgumentList.Add(ArtifactPath("AvaloniaDevTool.NativeAutomation.Fixture.dll"));
         var process = new OwnedProcess(start);
         process.Start();
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(15));
-        try { Assert.NotNull(await process.StandardOutput.ReadLineAsync(timeout.Token)); return process; }
-        catch { process.Dispose(); throw; }
+        try
+        {
+            Assert.NotNull(await process.StandardOutput.ReadLineAsync(timeout.Token));
+            return process;
+        }
+        catch
+        {
+            process.Dispose();
+            throw;
+        }
     }
 
     private static async Task<NativeElementInfo> FindAsync(NativeAutomationSession native, string automationId) =>
@@ -249,40 +340,58 @@ public sealed partial class NativeAutomationIntegrationTests
         while (timer.Elapsed < TimeSpan.FromSeconds(10))
         {
             var window = (await native.GetWindowsAsync()).SingleOrDefault(item => item.Title == title);
-            if (window is not null) return window;
+            if (window is not null)
+                return window;
             await Task.Delay(50, TestContext.Current.CancellationToken);
         }
+
         throw new TimeoutException($"Native window '{title}' did not appear.");
     }
 
-    private static async Task<NativeActionResult> CompleteAsync(NativeAutomationSession native, NativeActionRequest request)
+    private static async Task<NativeActionResult> CompleteAsync(NativeAutomationSession native,
+        NativeActionRequest request)
     {
         var result = await native.ExecuteAsync(request);
         return result.Status == "pending" ? await WaitForOperationAsync(native, result.OperationId!) : result;
     }
 
-    private static async Task<NativeActionResult> WaitForOperationAsync(NativeAutomationSession native, string operationId)
+    private static async Task<NativeActionResult> WaitForOperationAsync(NativeAutomationSession native,
+        string operationId)
     {
         var timer = Stopwatch.StartNew();
         while (timer.Elapsed < TimeSpan.FromSeconds(10))
         {
             var result = await native.GetActionStatusAsync(operationId);
-            if (result.Status != "pending") return result;
+            if (result.Status != "pending")
+                return result;
             await Task.Delay(50, TestContext.Current.CancellationToken);
         }
+
         throw new TimeoutException("Native action did not finish.");
     }
 
     private sealed class OwnedProcess(ProcessStartInfo startInfo) : Process
     {
-        public new bool Start() { StartInfo = startInfo; return base.Start(); }
+        public new bool Start()
+        {
+            StartInfo = startInfo;
+            return base.Start();
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
-                try { if (!HasExited) Kill(entireProcessTree: true); }
-                catch (InvalidOperationException) { }
+                try
+                {
+                    if (!HasExited)
+                        Kill(entireProcessTree: true);
+                }
+                catch (InvalidOperationException)
+                {
+                }
             }
+
             base.Dispose(disposing);
         }
     }

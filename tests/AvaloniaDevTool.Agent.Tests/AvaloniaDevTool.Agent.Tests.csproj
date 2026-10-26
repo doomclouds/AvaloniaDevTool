@@ -1,22 +1,30 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <IsPackable>false</IsPackable>
-    <IsTestProject>true</IsTestProject>
-    <OutputType>Exe</OutputType>
-  </PropertyGroup>
-  <ItemGroup>
-    <AvaloniaResource Include="Assets/inspection-probe.txt" />
-    <AvaloniaResource Include="../Fixtures/asset-long-utf8.txt" Link="Assets/asset-long-utf8.txt" />
-    <PackageReference Include="Avalonia.Fonts.Inter" Version="$(AvaloniaVersion)" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
-    <PackageReference Include="xunit.v3" Version="3.2.2" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="4.0.1" PrivateAssets="all" />
-    <PackageReference Include="Avalonia.Headless.XUnit" Version="$(AvaloniaVersion)" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
-    <PackageReference Include="Avalonia.Skia" Version="$(AvaloniaVersion)" />
-    <ProjectReference Include="../../src/AvaloniaDevTool.Agent/AvaloniaDevTool.Agent.csproj" />
-    <ProjectReference Include="../../src/AvaloniaDevTool.Client/AvaloniaDevTool.Client.csproj" />
-    <ProjectReference Include="../../src/AvaloniaDevTool.Logging/AvaloniaDevTool.Logging.csproj" />
-  </ItemGroup>
+    <PropertyGroup>
+        <IsPackable>false</IsPackable>
+        <IsTestProject>true</IsTestProject>
+        <OutputType>Exe</OutputType>
+    </PropertyGroup>
+    <ItemGroup>
+        <AvaloniaResource Include="Assets/inspection-probe.txt" />
+        <AvaloniaResource Include="../Fixtures/asset-long-utf8.txt"
+            Link="Assets/asset-long-utf8.txt" />
+        <PackageReference Include="Avalonia.Fonts.Inter"
+            Version="$(AvaloniaVersion)" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk"
+            Version="18.11.0" />
+        <PackageReference Include="xunit.v3"
+            Version="3.2.2" />
+        <PackageReference Include="xunit.runner.visualstudio"
+            Version="4.0.1"
+            PrivateAssets="all" />
+        <PackageReference Include="Avalonia.Headless.XUnit"
+            Version="$(AvaloniaVersion)" />
+        <PackageReference Include="Avalonia.Themes.Fluent"
+            Version="$(AvaloniaVersion)" />
+        <PackageReference Include="Avalonia.Skia"
+            Version="$(AvaloniaVersion)" />
+        <ProjectReference Include="../../src/AvaloniaDevTool.Agent/AvaloniaDevTool.Agent.csproj" />
+        <ProjectReference Include="../../src/AvaloniaDevTool.Client/AvaloniaDevTool.Client.csproj" />
+        <ProjectReference Include="../../src/AvaloniaDevTool.Logging/AvaloniaDevTool.Logging.csproj" />
+    </ItemGroup>
 </Project>
-

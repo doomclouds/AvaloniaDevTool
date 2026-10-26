@@ -131,18 +131,20 @@ public sealed class LayoutInspectionTests
     {
         using var fixture = new Fixture(new Canvas { Width = 160, Height = 120 });
         foreach (var request in new[]
-        {
-            new LayoutSnapshotRequest(fixture.RootId, MaxNodes: 0),
-            new LayoutSnapshotRequest(fixture.RootId, MaxNodes: 257),
-            new LayoutSnapshotRequest(fixture.RootId, MaxDepth: -1),
-            new LayoutSnapshotRequest(fixture.RootId, MaxDepth: 65)
-        })
+                 {
+                     new LayoutSnapshotRequest(fixture.RootId, MaxNodes: 0),
+                     new LayoutSnapshotRequest(fixture.RootId, MaxNodes: 257),
+                     new LayoutSnapshotRequest(fixture.RootId, MaxDepth: -1),
+                     new LayoutSnapshotRequest(fixture.RootId, MaxDepth: 65)
+                 })
             Assert.Equal("invalid_request", Assert.Throws<RpcException>(() => fixture.Service.Snapshot(request)).Code);
-        Assert.Equal("object_expired", Assert.Throws<RpcException>(() =>
-            fixture.Service.Snapshot(new LayoutSnapshotRequest(long.MaxValue))).Code);
+        Assert.Equal("object_expired",
+            Assert.Throws<RpcException>(() =>
+                fixture.Service.Snapshot(new LayoutSnapshotRequest(long.MaxValue))).Code);
         var plainObjectId = fixture.Registry.GetId(new object());
-        Assert.Equal("unsupported_object", Assert.Throws<RpcException>(() =>
-            fixture.Service.Snapshot(new LayoutSnapshotRequest(plainObjectId))).Code);
+        Assert.Equal("unsupported_object",
+            Assert.Throws<RpcException>(() =>
+                fixture.Service.Snapshot(new LayoutSnapshotRequest(plainObjectId))).Code);
     }
 
     [AvaloniaFact]
@@ -151,15 +153,17 @@ public sealed class LayoutInspectionTests
         var root = new Canvas { Width = 160, Height = 120 };
         using var fixture = new Fixture(root);
         fixture.Host.Children.Remove(root);
-        Assert.Equal("detached_object", Assert.Throws<RpcException>(() =>
-            fixture.Service.Snapshot(new LayoutSnapshotRequest(fixture.RootId))).Code);
+        Assert.Equal("detached_object",
+            Assert.Throws<RpcException>(() =>
+                fixture.Service.Snapshot(new LayoutSnapshotRequest(fixture.RootId))).Code);
 
         var empty = new Canvas { Width = 0, Height = 120 };
         fixture.Host.Children.Add(empty);
         fixture.Window.UpdateLayout();
         var emptyId = fixture.Registry.GetId(empty);
-        Assert.Equal("invalid_layout", Assert.Throws<RpcException>(() =>
-            fixture.Service.Snapshot(new LayoutSnapshotRequest(emptyId))).Code);
+        Assert.Equal("invalid_layout",
+            Assert.Throws<RpcException>(() =>
+                fixture.Service.Snapshot(new LayoutSnapshotRequest(emptyId))).Code);
     }
 
     [AvaloniaFact]
@@ -193,4 +197,3 @@ public sealed class LayoutInspectionTests
         public void Dispose() => Window.Close();
     }
 }
-

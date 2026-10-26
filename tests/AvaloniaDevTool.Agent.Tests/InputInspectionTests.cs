@@ -18,8 +18,10 @@ public sealed class InputInspectionTests
         var text = new TextBox { Width = 220, Height = 50 };
         using var fixture = new Fixture(text);
         object? source = null;
-        text.AddHandler(InputElement.TextInputEvent, (_, args) => source = args.Source,
-            RoutingStrategies.Bubble, handledEventsToo: true);
+        text.AddHandler(InputElement.TextInputEvent,
+            (_, args) => source = args.Source,
+            RoutingStrategies.Bubble,
+            handledEventsToo: true);
 
         var typed = fixture.Send(InputKind.Text, text: "abc");
         Assert.True(typed.Delivered);
@@ -41,8 +43,10 @@ public sealed class InputInspectionTests
         var text = new TextBox { Width = 220, Height = 50 };
         using var fixture = new Fixture(text);
         KeyEventArgs? observed = null;
-        text.AddHandler(InputElement.KeyUpEvent, (_, args) => observed = args,
-            RoutingStrategies.Bubble, handledEventsToo: true);
+        text.AddHandler(InputElement.KeyUpEvent,
+            (_, args) => observed = args,
+            RoutingStrategies.Bubble,
+            handledEventsToo: true);
 
         var result = fixture.Send(InputKind.KeyUp, key: "F2", modifiers: ["Control", "Shift"]);
         Assert.True(result.Delivered);
@@ -63,19 +67,25 @@ public sealed class InputInspectionTests
         var releases = 0;
         IPointer? pointer = null;
         button.Click += (_, _) => clicks++;
-        button.AddHandler(InputElement.PointerPressedEvent, (_, args) =>
-        {
-            presses++;
-            pointer = args.Pointer;
-            Assert.Same(button, args.Source);
-            Assert.True(args.GetCurrentPoint(button).Properties.IsLeftButtonPressed);
-        }, RoutingStrategies.Bubble, handledEventsToo: true);
-        button.AddHandler(InputElement.PointerReleasedEvent, (_, args) =>
-        {
-            releases++;
-            Assert.Same(pointer, args.Pointer);
-            Assert.False(args.GetCurrentPoint(button).Properties.IsLeftButtonPressed);
-        }, RoutingStrategies.Bubble, handledEventsToo: true);
+        button.AddHandler(InputElement.PointerPressedEvent,
+            (_, args) =>
+            {
+                presses++;
+                pointer = args.Pointer;
+                Assert.Same(button, args.Source);
+                Assert.True(args.GetCurrentPoint(button).Properties.IsLeftButtonPressed);
+            },
+            RoutingStrategies.Bubble,
+            handledEventsToo: true);
+        button.AddHandler(InputElement.PointerReleasedEvent,
+            (_, args) =>
+            {
+                releases++;
+                Assert.Same(pointer, args.Pointer);
+                Assert.False(args.GetCurrentPoint(button).Properties.IsLeftButtonPressed);
+            },
+            RoutingStrategies.Bubble,
+            handledEventsToo: true);
 
         var result = fixture.Send(InputKind.Click);
         Assert.True(result.Delivered);
@@ -94,15 +104,18 @@ public sealed class InputInspectionTests
         var button = new Button { Width = 180, Height = 64, Content = "Press" };
         using var fixture = new Fixture(button);
         IPointer? pointer = null;
-        button.AddHandler(InputElement.PointerPressedEvent, (_, args) => pointer = args.Pointer,
-            RoutingStrategies.Bubble, handledEventsToo: true);
+        button.AddHandler(InputElement.PointerPressedEvent,
+            (_, args) => pointer = args.Pointer,
+            RoutingStrategies.Bubble,
+            handledEventsToo: true);
 
         fixture.Send(InputKind.PointerDown);
         Assert.True(button.IsPressed);
         Assert.NotNull(pointer);
         Assert.Same(button, pointer.Captured);
         Assert.Equal("input_state", Assert.Throws<RpcException>(() => fixture.Send(InputKind.PointerDown)).Code);
-        Assert.Equal("input_state", Assert.Throws<RpcException>(() => fixture.Send(InputKind.PointerUp, button: "Right")).Code);
+        Assert.Equal("input_state",
+            Assert.Throws<RpcException>(() => fixture.Send(InputKind.PointerUp, button: "Right")).Code);
         fixture.Service.Dispose();
         Assert.Null(pointer.Captured);
         Assert.False(button.IsPressed);
@@ -118,10 +131,14 @@ public sealed class InputInspectionTests
         IPointer? upPointer = null;
         var clicks = 0;
         button.Click += (_, _) => clicks++;
-        button.AddHandler(InputElement.PointerPressedEvent, (_, args) => downPointer = args.Pointer,
-            RoutingStrategies.Bubble, handledEventsToo: true);
-        button.AddHandler(InputElement.PointerReleasedEvent, (_, args) => upPointer = args.Pointer,
-            RoutingStrategies.Bubble, handledEventsToo: true);
+        button.AddHandler(InputElement.PointerPressedEvent,
+            (_, args) => downPointer = args.Pointer,
+            RoutingStrategies.Bubble,
+            handledEventsToo: true);
+        button.AddHandler(InputElement.PointerReleasedEvent,
+            (_, args) => upPointer = args.Pointer,
+            RoutingStrategies.Bubble,
+            handledEventsToo: true);
 
         fixture.Send(InputKind.PointerDown);
         fixture.Send(InputKind.PointerMove, x: 15, y: 20);
@@ -151,7 +168,11 @@ public sealed class InputInspectionTests
             movedLocal = args.GetPosition(target);
             movedRoot = args.GetPosition(fixture.Window);
         };
-        target.PointerWheelChanged += (_, args) => { wheel = args; args.Handled = true; };
+        target.PointerWheelChanged += (_, args) =>
+        {
+            wheel = args;
+            args.Handled = true;
+        };
 
         var expectedRoot = target.TranslatePoint(new Point(12, 18), fixture.Window);
         var moved = fixture.Send(InputKind.PointerMove, x: 12, y: 18, modifiers: ["Alt"]);
@@ -164,8 +185,13 @@ public sealed class InputInspectionTests
         Assert.Equal(expectedRoot.Value.X, movedRoot.Value.X, 8);
         Assert.Equal(expectedRoot.Value.Y, movedRoot.Value.Y, 8);
 
-        var result = fixture.Service.Send(new InputRequest(fixture.TargetId, InputKind.Wheel,
-            Modifiers: ["Shift"], X: 12, Y: 18, DeltaX: 1, DeltaY: -2));
+        var result = fixture.Service.Send(new InputRequest(fixture.TargetId,
+            InputKind.Wheel,
+            Modifiers: ["Shift"],
+            X: 12,
+            Y: 18,
+            DeltaX: 1,
+            DeltaY: -2));
         Assert.True(result.Handled);
         Assert.NotNull(wheel);
         Assert.Same(target, wheel.Source);
@@ -184,8 +210,10 @@ public sealed class InputInspectionTests
         IPointer? sessionPointer = null;
         target.PointerMoved += (_, args) =>
         {
-            if (devicePointer is null) devicePointer = args.Pointer;
-            else sessionPointer = args.Pointer;
+            if (devicePointer is null)
+                devicePointer = args.Pointer;
+            else
+                sessionPointer = args.Pointer;
         };
         var point = target.TranslatePoint(new Point(10, 10), fixture.Window)!.Value;
         fixture.Window.MouseMove(point);
@@ -199,7 +227,10 @@ public sealed class InputInspectionTests
             fixture.Service.Dispose();
             Assert.Same(target, devicePointer.Captured);
         }
-        finally { devicePointer.Capture(null); }
+        finally
+        {
+            devicePointer.Capture(null);
+        }
     }
 
     [AvaloniaFact]
@@ -207,7 +238,8 @@ public sealed class InputInspectionTests
     {
         var text = new TextBox { Width = 220, Height = 50, Text = "Original", IsReadOnly = true };
         using var fixture = new Fixture(text);
-        Assert.Equal("readonly_target", Assert.Throws<RpcException>(() => fixture.Send(InputKind.Text, text: "No")).Code);
+        Assert.Equal("readonly_target",
+            Assert.Throws<RpcException>(() => fixture.Send(InputKind.Text, text: "No")).Code);
         fixture.Send(InputKind.KeyDown, key: "Back");
         Assert.Equal("Original", text.Text);
 
@@ -224,19 +256,28 @@ public sealed class InputInspectionTests
         var text = new TextBox { Width = 220, Height = 50 };
         using var fixture = new Fixture(text);
         foreach (var key in new[] { "1", "Control+A", "DefinitelyNotAKey", "None" })
-            Assert.Equal("invalid_input", Assert.Throws<RpcException>(() => fixture.Send(InputKind.KeyDown, key: key)).Code);
+            Assert.Equal("invalid_input",
+                Assert.Throws<RpcException>(() => fixture.Send(InputKind.KeyDown, key: key)).Code);
         Assert.Equal("invalid_input", Assert.Throws<RpcException>(() => fixture.Send(InputKind.Text)).Code);
-        Assert.Equal("input_limit", Assert.Throws<RpcException>(() =>
-            fixture.Send(InputKind.Text, text: new string('a', 2049))).Code);
-        Assert.Equal("invalid_input", Assert.Throws<RpcException>(() => fixture.Send(InputKind.Click, button: "0")).Code);
-        Assert.Equal("invalid_input", Assert.Throws<RpcException>(() => fixture.Send(InputKind.Click, button: "None")).Code);
-        Assert.Equal("invalid_input", Assert.Throws<RpcException>(() => fixture.Send(InputKind.Click, modifiers: ["Ctrl"])).Code);
-        Assert.Equal("invalid_input", Assert.Throws<RpcException>(() => fixture.Send(InputKind.Click, modifiers: ["None", "Shift"])).Code);
-        Assert.Equal("invalid_input", Assert.Throws<RpcException>(() => fixture.Send(InputKind.Click, modifiers: ["Shift", "shift"])).Code);
+        Assert.Equal("input_limit",
+            Assert.Throws<RpcException>(() =>
+                fixture.Send(InputKind.Text, text: new string('a', 2049))).Code);
+        Assert.Equal("invalid_input",
+            Assert.Throws<RpcException>(() => fixture.Send(InputKind.Click, button: "0")).Code);
+        Assert.Equal("invalid_input",
+            Assert.Throws<RpcException>(() => fixture.Send(InputKind.Click, button: "None")).Code);
+        Assert.Equal("invalid_input",
+            Assert.Throws<RpcException>(() => fixture.Send(InputKind.Click, modifiers: ["Ctrl"])).Code);
+        Assert.Equal("invalid_input",
+            Assert.Throws<RpcException>(() => fixture.Send(InputKind.Click, modifiers: ["None", "Shift"])).Code);
+        Assert.Equal("invalid_input",
+            Assert.Throws<RpcException>(() => fixture.Send(InputKind.Click, modifiers: ["Shift", "shift"])).Code);
         foreach (var x in new[] { double.NaN, double.PositiveInfinity, -1, 221 })
-            Assert.Equal("invalid_coordinates", Assert.Throws<RpcException>(() => fixture.Send(InputKind.PointerMove, x: x)).Code);
-        Assert.Equal("invalid_coordinates", Assert.Throws<RpcException>(() => fixture.Service.Send(
-            new InputRequest(fixture.TargetId, InputKind.Wheel, DeltaY: double.NaN))).Code);
+            Assert.Equal("invalid_coordinates",
+                Assert.Throws<RpcException>(() => fixture.Send(InputKind.PointerMove, x: x)).Code);
+        Assert.Equal("invalid_coordinates",
+            Assert.Throws<RpcException>(() => fixture.Service.Send(
+                new InputRequest(fixture.TargetId, InputKind.Wheel, DeltaY: double.NaN))).Code);
         Assert.Equal("unsupported_input", Assert.Throws<RpcException>(() => fixture.Send((InputKind)99)).Code);
         Assert.True(fixture.Send(InputKind.Text, text: new string('a', 2048)).Delivered);
         Assert.Equal(2048, text.Text!.Length);
@@ -247,8 +288,9 @@ public sealed class InputInspectionTests
     {
         var target = new Border { Width = 120, Height = 80, Background = Brushes.White };
         using var fixture = new Fixture(target);
-        Assert.Equal("object_expired", Assert.Throws<RpcException>(() =>
-            fixture.Service.Send(new InputRequest(long.MaxValue, InputKind.Click))).Code);
+        Assert.Equal("object_expired",
+            Assert.Throws<RpcException>(() =>
+                fixture.Service.Send(new InputRequest(long.MaxValue, InputKind.Click))).Code);
         Assert.Equal("focus_failed", Assert.Throws<RpcException>(() => fixture.Send(InputKind.KeyDown, key: "A")).Code);
         fixture.Host.Children.Remove(target);
         Assert.Equal("detached_object", Assert.Throws<RpcException>(() => fixture.Send(InputKind.Click)).Code);
@@ -282,8 +324,13 @@ public sealed class InputInspectionTests
         public Window Window { get; }
         public InputInspectionService Service { get; }
 
-        public InputResult Send(InputKind kind, string? text = null, string? key = null,
-            IReadOnlyList<string>? modifiers = null, double? x = null, double? y = null, string button = "Left") =>
+        public InputResult Send(InputKind kind,
+            string? text = null,
+            string? key = null,
+            IReadOnlyList<string>? modifiers = null,
+            double? x = null,
+            double? y = null,
+            string button = "Left") =>
             Service.Send(new InputRequest(TargetId, kind, text, key, modifiers, x, y, Button: button));
 
         public void Dispose()
@@ -293,4 +340,3 @@ public sealed class InputInspectionTests
         }
     }
 }
-

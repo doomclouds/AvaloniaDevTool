@@ -5,11 +5,19 @@ namespace AvaloniaDevTool.Sample;
 internal static class SampleMetrics
 {
     private static readonly Meter Meter = new("AvaloniaDevTool.Sample", "1.0.0");
-    private static readonly Counter<long> Actions = Meter.CreateCounter<long>("sample.actions", "{action}", "Raw sample button action increments.");
-    private static readonly Histogram<double> Duration = Meter.CreateHistogram<double>("sample.duration", "ms", "Synthetic durations for histogram inspection.");
+
+    private static readonly Counter<long> Actions =
+        Meter.CreateCounter<long>("sample.actions", "{action}", "Raw sample button action increments.");
+
+    private static readonly Histogram<double> Duration =
+        Meter.CreateHistogram<double>("sample.duration", "ms", "Synthetic durations for histogram inspection.");
+
     private static int _queueDepth = 3;
+
     static SampleMetrics() => Meter.CreateObservableGauge("sample.queue_depth",
-        () => Volatile.Read(ref _queueDepth), "{item}", "Current synthetic queue depth.");
+        () => Volatile.Read(ref _queueDepth),
+        "{item}",
+        "Current synthetic queue depth.");
 
     public static int RecordBatch()
     {
@@ -19,4 +27,3 @@ internal static class SampleMetrics
         return Interlocked.Increment(ref _queueDepth);
     }
 }
-

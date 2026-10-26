@@ -23,7 +23,8 @@ public sealed partial class NativeAutomationIntegrationTests
         // Establish the fixture's foreground activation before applying a clip;
         // Windows can release a previous process's clip during activation.
         Assert.True((await native.SendInputAsync(new NativeInputRequest
-        { NodeId = editor.NodeId, Kind = "Move" }, TestContext.Current.CancellationToken)).Injected);
+                { NodeId = editor.NodeId, Kind = "Move" },
+            TestContext.Current.CancellationToken)).Injected);
         Assert.True(ReadPhysicalClip(out var previousClip));
         var applied = false;
         try
@@ -39,36 +40,76 @@ public sealed partial class NativeAutomationIntegrationTests
             var targetX = buttonBounds.X + buttonBounds.Width / 2;
             var targetY = buttonBounds.Y + buttonBounds.Height / 2;
             Assert.True(targetX < activeClip.Left || targetX >= activeClip.Right ||
-                targetY < activeClip.Top || targetY >= activeClip.Bottom, "The clip must exclude the requested button point.");
-            var error = await Assert.ThrowsAsync<NativeAutomationException>(() => native.SendInputAsync(new NativeInputRequest
-            { NodeId = button.NodeId, Kind = "DoubleClick" }, TestContext.Current.CancellationToken));
+                        targetY < activeClip.Top || targetY >= activeClip.Bottom,
+                "The clip must exclude the requested button point.");
+            var error = await Assert.ThrowsAsync<NativeAutomationException>(() =>
+                native.SendInputAsync(new NativeInputRequest
+                        { NodeId = button.NodeId, Kind = "DoubleClick" },
+                    TestContext.Current.CancellationToken));
             Assert.Equal("input_not_arrived", error.Code);
             Assert.Contains("no buttons or keys were injected", error.Message);
-            Assert.Equal("idle", (await native.GetElementAsync(status.NodeId, TestContext.Current.CancellationToken)).Name);
+            Assert.Equal("idle",
+                (await native.GetElementAsync(status.NodeId, TestContext.Current.CancellationToken)).Name);
         }
-        finally { if (applied) Assert.True(WritePhysicalClip(ref previousClip)); }
+        finally
+        {
+            if (applied)
+                Assert.True(WritePhysicalClip(ref previousClip));
+        }
+
         var accepted = await native.SendInputAsync(new NativeInputRequest
-        { NodeId = button.NodeId, Kind = "Click" }, TestContext.Current.CancellationToken);
+                { NodeId = button.NodeId, Kind = "Click" },
+            TestContext.Current.CancellationToken);
         Assert.True(accepted.Injected);
         Assert.Equal(3, accepted.InputCount);
         await WaitForStatusAsync(native, "invoked:1");
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    private struct ClipRectangle { public int Left; public int Top; public int Right; public int Bottom; }
-    [DllImport("user32.dll")][return: MarshalAs(UnmanagedType.Bool)] private static extern bool GetClipCursor(out ClipRectangle clip);
-    [DllImport("user32.dll")][return: MarshalAs(UnmanagedType.Bool)] private static extern bool ClipCursor(ref ClipRectangle clip);
-    [DllImport("user32.dll")] private static extern nint SetThreadDpiAwarenessContext(nint context);
+    private struct ClipRectangle
+    {
+        public int Left;
+        public int Top;
+        public int Right;
+        public int Bottom;
+    }
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool GetClipCursor(out ClipRectangle clip);
+
+    [DllImport("user32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool ClipCursor(ref ClipRectangle clip);
+
+    [DllImport("user32.dll")]
+    private static extern nint SetThreadDpiAwarenessContext(nint context);
+
     private static bool ReadPhysicalClip(out ClipRectangle clip)
     {
         var previous = SetThreadDpiAwarenessContext(new nint(-4));
-        try { return GetClipCursor(out clip); }
-        finally { if (previous != 0) SetThreadDpiAwarenessContext(previous); }
+        try
+        {
+            return GetClipCursor(out clip);
+        }
+        finally
+        {
+            if (previous != 0)
+                SetThreadDpiAwarenessContext(previous);
+        }
     }
+
     private static bool WritePhysicalClip(ref ClipRectangle clip)
     {
         var previous = SetThreadDpiAwarenessContext(new nint(-4));
-        try { return ClipCursor(ref clip); }
-        finally { if (previous != 0) SetThreadDpiAwarenessContext(previous); }
+        try
+        {
+            return ClipCursor(ref clip);
+        }
+        finally
+        {
+            if (previous != 0)
+                SetThreadDpiAwarenessContext(previous);
+        }
     }
 }

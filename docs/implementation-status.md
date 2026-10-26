@@ -1,12 +1,20 @@
 # 自研 Agent / MCP 实现状态
 
-核对日期：2026-10-25。当前用户目标是 **Windows 完整界面交互与真实原生文件流程**。默认 `agent` profile 已注册 **44 项工具**：canonical16 + ui9 + native8 + file-dialog8 + capture3。工具注册、源码实现、专项通过、真实桌面和最终统一批次分别记录；当前范围内基础能力与研发验证已交付，排除项和平台/渲染限制见当前范围文档；不以工具或测试数量换算产品完成率。
+核对日期：2026-10-26。当前用户目标是 **Windows 完整界面交互与真实原生文件流程**。默认 `agent` profile 已注册 **44 项工具**：canonical16 + ui9 + native8 + file-dialog8 + capture3。工具注册、源码实现、专项通过、真实桌面和最终统一批次分别记录；当前范围内基础能力与研发验证已交付，排除项和平台/渲染限制见当前范围文档；不以工具或测试数量换算产品完成率。
 
-最新能力验证批次为 **579通过、0失败、1项Explicit未执行**，绑定340个输入、22项目Debug/Release零警告零错误，source drift=0，自有进程清理完成。逐项结果与DLL/TRX哈希见[最新验证](agent-tools/verification/2026-10-25-capabilities-final.json)，产品范围以[当前边界](agent-tools/architecture/current-agent-scope.md)为准。此前477/1/1与467等批次保留为历史。
+2026-10-25 的历史能力验证批次为 **579通过、0失败、1项Explicit未执行**，绑定340个输入、22项目Debug/Release零警告零错误，source drift=0，自有进程清理完成。逐项结果与DLL/TRX哈希见[最新验证](agent-tools/verification/2026-10-25-capabilities-final.json)，产品范围以[当前边界](agent-tools/architecture/current-agent-scope.md)为准。此前477/1/1与467等批次保留为历史。
 
 双击/焦点修复阶段的历史统一批次 **417/417通过，0失败、0跳过**，22项目Debug/Release构建均零警告零错误。原生双击业务计数/手势、窗口切换/抢占、受限光标防错与DPI恢复均已进入同一批。详见 [修复阶段结果](agent-tools/verification/2026-10-25-native-fixed.json)、[修复记录](agent-tools/research/native-input-fixes.md) 与 [官方差异/未完成清单](agent-tools/research/official-vs-own-agent.md)。较早413项中的2项失败保留为历史，不再代表最新源码；全套测试通过也不代表所有平台/provider/异常分支均验收完成。
 
-显式 `--profile official` 保留 canonical 16 项兼容入口，`--profile extended` 保留 62 项旧诊断工具。原版公开 schema、未知语义及许可运行对照属于独立兼容研究；原版许可对照继续 deferred，不把原版 Community 产品限制作为自研 Agent 的前置要求。
+显式 `--profile official` 保留 canonical 16 项兼容入口，`--profile extended` 保留 62 项旧诊断工具。原版公开 schema、未知语义及许可运行对照属于独立兼容研究；许可对照材料保留为历史兼容研究，不作为当前自研 Agent 的运行或交付前置要求。
+
+## 本轮结构与内网交付
+
+stdio 与内网无 Token Streamable HTTP 两种宿主已实现。Codex 端按标准 URL 配置加载连接；完整执行端仍在被测电脑，内部管道、native worker、预览和采集不跨到控制电脑。HTTP 首版仅 agent44，stdio 保留三种 profile。
+
+九个生产项目已按领域归目录；Agent 同步路由按17领域显式注册，组合入口保留生命周期。managed 调用上下文、节点代际、工具 Catalog 和 HTTP 控制会话独立。Protocol/Client 混合契约与薄代理也已归域；旧公开聚合类型继续兼容。具体位置见[结构记录](architecture/refactoring-blueprint.md)。
+
+22 项目 Debug/Release 零警告零错误，69 项新增/关联 CLI 检查通过。完整批次643通过、8项既有系统输入因外部 PickerHost 阻挡失败、1项Explicit未执行；过滤这八项的源码复核643通过、0失败、1项Explicit未执行；之后PickerHost退出，原八项定向复测8/8通过，历史失败保留。真实HTTP模态/文件/PNG、实际Codex、发布包和WSL mirrored路径已验证；独立物理双机和WSL另一条非回环路径仍未确认。结果与范围见[本轮验证](architecture/verification-2026-10-26.json)、[测试说明](testing.md)和[限制](architecture/limitations.md)。
 
 ## 当前交付与证据
 
@@ -14,7 +22,7 @@
 | --- | --- | --- |
 | 默认 MCP 表面 | agent 44 项；official 16、extended 62 显式选择 | 实际 schema/结果需匹配当前 tools/list 和构建版本 |
 | Avalonia 框架交互 | 点击/双击/右键、组合键、文本选区、控件选择/provider动作、capture 拖动、等待 | 新 stdio 交互专项 7/7；headless 状态断言不等于全部真实桌面已过 |
-| Windows native | net10.0 facade + net10.0-windows7.0 隔离 worker；UIA pattern、窗口/树/查找、受限 OS 输入 | 最新NativeAutomation.Tests 127通过、1项Explicit未执行；16条文件路径预检是子集，不重复累加 |
+| Windows native | net10.0 facade + net10.0-windows7.0 隔离 worker；UIA pattern、窗口/树/查找、受限 OS 输入 | 本轮 Native 122通过、5项输入受前台阻挡、1项Explicit未执行；历史127通过另留记录，预检子集不重复累加 |
 | 原生文件弹窗 | 发现/检查、路径/类型设置、接受/取消、真实覆盖提示、等待、过期身份拒绝 | Controller → 真实 AutomationSample → 应用 I/O 独立9个场景已通过；不是 stdio MCP 全套结果 |
 | 真实 MCP native/文件 | 完整文件、普通UI、十轮同点双击与手势等已进入当前常规统一回归 | 不推导任意自绘provider、所有输入设备或未覆盖失败分支均支持 |
 | 验收目标与项目 | AutomationSample、NativeAutomation.Tests/Fixture；slnx 22项目 | Debug/Release构建已过，本批常规执行项全部通过，Explicit未计通过；固定验收清单仍保留部分验证项 |
@@ -30,7 +38,7 @@ Controller 的9个真实场景包含单选、多选、明确扩展名和类型�
 
 保存验收必须验证目标流真实写入、短内容覆盖长文件时截断、关闭流后磁盘长度/hash、重新通过真实 Open 读回。取消必须比较原文档/路径和已有文件；选择器关闭、`AcceptedDialogClosed`、`Injected`、`completed` 都不能单独证明业务成功。实际 I/O 错误需要应用 UI 和结果文件可观察，不静默吞掉。
 
-当前统一结果：**579通过、0失败、1项Explicit未执行**（Agent282、CLI118、Native127通过/1未执行、Previewer15、Protocol26、Remote11）。已排除能力不作为待完成；未执行实验与已知渲染/平台边界仍明确保留。
+历史统一结果：**579通过、0失败、1项Explicit未执行**（Agent282、CLI118、Native127通过/1未执行、Previewer15、Protocol26、Remote11）。已排除能力不作为待完成；未执行实验与已知渲染/平台边界仍明确保留。
 
 ## 运行边界
 

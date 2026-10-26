@@ -27,7 +27,8 @@ public sealed class OfficialPreviewTests
         await using var client = await CreateClientAsync();
         var tools = await client.ListToolsAsync(cancellationToken: TestContext.Current.CancellationToken);
         var schema = Assert.Single(tools, tool => tool.Name == "attach-to-file").JsonSchema;
-        Assert.Equal(new[] { "xamlFilePath", "xamlProjectPath" }, schema.GetProperty("required").EnumerateArray().Select(value => value.GetString()));
+        Assert.Equal(new[] { "xamlFilePath", "xamlProjectPath" },
+            schema.GetProperty("required").EnumerateArray().Select(value => value.GetString()));
         Assert.Equal(3, schema.GetProperty("properties").EnumerateObject().Count());
         Assert.False(schema.GetProperty("properties").GetProperty("build").GetProperty("default").GetBoolean());
         var before = File.GetLastWriteTimeUtc(files.Output);
@@ -44,14 +45,19 @@ public sealed class OfficialPreviewTests
             Assert.Equal("Built custom control", (await FindAsync(client, "CustomControlText")).Preview);
             Assert.Equal("Referenced assembly control", (await FindAsync(client, "ReferencedControlText")).Preview);
             var original = await FindAsync(client, "SavedText");
-            var originalImage = await ScreenshotAsync(client, (await FindTypeAsync(client, "AvaloniaDevTool.PreviewFixture.FixtureView")).Id);
+            var originalImage = await ScreenshotAsync(client,
+                (await FindTypeAsync(client, "AvaloniaDevTool.PreviewFixture.FixtureView")).Id);
             files.Write(files.Initial.Replace("First source", "官方路径 热更新", StringComparison.Ordinal));
             var second = await WaitForNodeAsync(client, "SavedText", node => node?.Preview == "官方路径 热更新");
             Assert.NotEqual(original.Id, second.Id);
-            Assert.NotEqual(originalImage, await ScreenshotAsync(client, (await FindTypeAsync(client, "AvaloniaDevTool.PreviewFixture.FixtureView")).Id));
+            Assert.NotEqual(originalImage,
+                await ScreenshotAsync(client,
+                    (await FindTypeAsync(client, "AvaloniaDevTool.PreviewFixture.FixtureView")).Id));
             Assert.True((await CallAsync(client, "props", new() { ["nodeId"] = original.Id })).IsError);
             files.Write("<UserControl");
-            await WaitForNodeAsync(client, "PreviewErrorText", node => node?.Preview?.Contains("xaml_load_failed", StringComparison.Ordinal) == true);
+            await WaitForNodeAsync(client,
+                "PreviewErrorText",
+                node => node?.Preview?.Contains("xaml_load_failed", StringComparison.Ordinal) == true);
             Assert.Equal(second.Id, (await FindAsync(client, "SavedText")).Id);
             files.Write(files.Initial.Replace("First source", "Recovered official preview", StringComparison.Ordinal));
             await WaitForNodeAsync(client, "SavedText", node => node?.Preview == "Recovered official preview");
@@ -59,7 +65,10 @@ public sealed class OfficialPreviewTests
             await WaitForExitAsync(pid);
             Assert.True((await CallAsync(client, "tree", new())).IsError);
         }
-        finally { await CallAsync(client, "detach", new()); }
+        finally
+        {
+            await CallAsync(client, "detach", new());
+        }
     }
 
     [Fact]
@@ -82,7 +91,11 @@ public sealed class OfficialPreviewTests
             Assert.Equal("Project App resource", (await FindAsync(client, "WindowResourceText")).Preview);
             Assert.True((await CallAsync(client, "props", new() { ["nodeId"] = oldNode.Id })).IsError);
         }
-        finally { await CallAsync(client, "detach", new()); }
+        finally
+        {
+            await CallAsync(client, "detach", new());
+        }
+
         await WaitForExitAsync(second.Session.ProcessId);
     }
 
@@ -95,15 +108,22 @@ public sealed class OfficialPreviewTests
         Assert.True(missing.IsError);
         Assert.Contains("project_not_built", Text(missing));
         Assert.False(File.Exists(files.BuildMarker));
-        await File.WriteAllTextAsync(Path.Combine(files.Root, "Broken.cs"), "this is not valid C#;", Encoding.UTF8, TestContext.Current.CancellationToken);
+        await File.WriteAllTextAsync(Path.Combine(files.Root, "Broken.cs"),
+            "this is not valid C#;",
+            Encoding.UTF8,
+            TestContext.Current.CancellationToken);
         var failed = await CallAsync(client, "attach-to-file", files.Arguments(build: true));
         Assert.True(failed.IsError);
         Assert.Contains("project_build_failed", Text(failed));
         Assert.True((await CallAsync(client, "tree", new())).IsError);
         File.Delete(Path.Combine(files.Root, "Broken.cs"));
         await files.BuildAsync();
-        await File.WriteAllTextAsync(Path.Combine(files.Root, "Broken.cs"), "still not valid C#;", Encoding.UTF8, TestContext.Current.CancellationToken);
-        Assert.Contains("project_build_failed", Text(await CallAsync(client, "attach-to-file", files.Arguments(build: true))));
+        await File.WriteAllTextAsync(Path.Combine(files.Root, "Broken.cs"),
+            "still not valid C#;",
+            Encoding.UTF8,
+            TestContext.Current.CancellationToken);
+        Assert.Contains("project_build_failed",
+            Text(await CallAsync(client, "attach-to-file", files.Arguments(build: true))));
         Assert.True((await CallAsync(client, "tree", new())).IsError);
         File.Delete(Path.Combine(files.Root, "Broken.cs"));
         files.Write("<UserControl");
@@ -115,7 +135,8 @@ public sealed class OfficialPreviewTests
         relative["xamlFilePath"] = "FixtureView.axaml";
         Assert.Contains("invalid_path", Text(await CallAsync(client, "attach-to-file", relative)));
         var outside = files.Arguments();
-        outside["xamlFilePath"] = Path.Combine(Repository, "tests", "AvaloniaDevTool.PreviewFixture", "FixtureView.axaml");
+        outside["xamlFilePath"] =
+            Path.Combine(Repository, "tests", "AvaloniaDevTool.PreviewFixture", "FixtureView.axaml");
         Assert.Contains("source_outside_project", Text(await CallAsync(client, "attach-to-file", outside)));
     }
 
@@ -128,15 +149,23 @@ public sealed class OfficialPreviewTests
         await using var client = await CreateClientAsync(new() { ["AVDT_OFFICIAL_PREVIEW_BLOCK"] = childPid });
         var request = new RequestId("official-preview-cancel");
         var pending = client.SendRequestAsync(new JsonRpcRequest
-        {
-            Id = request, Method = "tools/call", Params = JsonSerializer.SerializeToNode(new { name = "attach-to-file", arguments = files.Arguments() })
-        }, TestContext.Current.CancellationToken);
+            {
+                Id = request, Method = "tools/call",
+                Params = JsonSerializer.SerializeToNode(new { name = "attach-to-file", arguments = files.Arguments() })
+            },
+            TestContext.Current.CancellationToken);
         await WaitUntilAsync(() => File.Exists(childPid));
-        var pid = int.Parse((await File.ReadAllTextAsync(childPid, Encoding.UTF8, TestContext.Current.CancellationToken)).Trim('\uFEFF', ' ', '\r', '\n'));
+        var pid = int.Parse(
+            (await File.ReadAllTextAsync(childPid, Encoding.UTF8, TestContext.Current.CancellationToken)).Trim('\uFEFF',
+                ' ',
+                '\r',
+                '\n'));
         await client.SendMessageAsync(new JsonRpcNotification
-        {
-            Method = "notifications/cancelled", Params = JsonSerializer.SerializeToNode(new CancelledNotificationParams { RequestId = request })
-        }, TestContext.Current.CancellationToken);
+            {
+                Method = "notifications/cancelled",
+                Params = JsonSerializer.SerializeToNode(new CancelledNotificationParams { RequestId = request })
+            },
+            TestContext.Current.CancellationToken);
         await Assert.ThrowsAnyAsync<OperationCanceledException>(async () => await pending);
         await WaitForExitAsync(pid);
         Assert.True((await CallAsync(client, "tree", new())).IsError);
@@ -148,7 +177,8 @@ public sealed class OfficialPreviewTests
         using var files = new ProjectFiles();
         await files.BuildAsync();
         var candidatePid = Path.Combine(files.Root, "blocked-window.pid");
-        await using var client = await CreateClientAsync(new() { ["AVDT_OFFICIAL_PREVIEW_BLOCK_WINDOW"] = candidatePid });
+        await using var client =
+            await CreateClientAsync(new() { ["AVDT_OFFICIAL_PREVIEW_BLOCK_WINDOW"] = candidatePid });
         var first = Read<PreviewAttachment>(await CallAsync(client, "attach-to-file", files.Arguments()));
         var original = await FindAsync(client, "SavedText");
         try
@@ -157,15 +187,24 @@ public sealed class OfficialPreviewTests
             arguments["xamlFilePath"] = Path.Combine(files.Root, "FixtureWindow.axaml");
             var request = new RequestId("official-switch-cancel");
             var pending = client.SendRequestAsync(new JsonRpcRequest
-            {
-                Id = request, Method = "tools/call", Params = JsonSerializer.SerializeToNode(new { name = "attach-to-file", arguments })
-            }, TestContext.Current.CancellationToken);
+                {
+                    Id = request, Method = "tools/call",
+                    Params = JsonSerializer.SerializeToNode(new { name = "attach-to-file", arguments })
+                },
+                TestContext.Current.CancellationToken);
             await WaitUntilAsync(() => File.Exists(candidatePid));
-            var pid = int.Parse((await File.ReadAllTextAsync(candidatePid, Encoding.UTF8, TestContext.Current.CancellationToken)).Trim('\uFEFF', ' ', '\r', '\n'));
+            var pid = int.Parse(
+                (await File.ReadAllTextAsync(candidatePid, Encoding.UTF8, TestContext.Current.CancellationToken)).Trim(
+                    '\uFEFF',
+                    ' ',
+                    '\r',
+                    '\n'));
             await client.SendMessageAsync(new JsonRpcNotification
-            {
-                Method = "notifications/cancelled", Params = JsonSerializer.SerializeToNode(new CancelledNotificationParams { RequestId = request })
-            }, TestContext.Current.CancellationToken);
+                {
+                    Method = "notifications/cancelled",
+                    Params = JsonSerializer.SerializeToNode(new CancelledNotificationParams { RequestId = request })
+                },
+                TestContext.Current.CancellationToken);
             await Assert.ThrowsAnyAsync<OperationCanceledException>(async () => await pending);
             await WaitForExitAsync(pid);
             Assert.Equal(original.Id, (await FindAsync(client, "SavedText")).Id);
@@ -173,7 +212,11 @@ public sealed class OfficialPreviewTests
             using var previous = Process.GetProcessById(first.Session.ProcessId);
             Assert.False(previous.HasExited);
         }
-        finally { await CallAsync(client, "detach", new()); }
+        finally
+        {
+            await CallAsync(client, "detach", new());
+        }
+
         await WaitForExitAsync(first.Session.ProcessId);
     }
 
@@ -189,16 +232,25 @@ public sealed class OfficialPreviewTests
         {
             await InitializeOwnerAsync(owner);
             await owner.StandardInput.WriteLineAsync(JsonSerializer.Serialize(new
-            { jsonrpc = "2.0", id = 2, method = "tools/call", @params = new { name = "attach-to-file", arguments = files.Arguments() } }));
+            {
+                jsonrpc = "2.0", id = 2, method = "tools/call",
+                @params = new { name = "attach-to-file", arguments = files.Arguments() }
+            }));
             await WaitUntilAsync(() => File.Exists(childPid));
-            var pid = int.Parse((await File.ReadAllTextAsync(childPid, Encoding.UTF8, TestContext.Current.CancellationToken)).Trim('\uFEFF', ' ', '\r', '\n'));
+            var pid = int.Parse(
+                (await File.ReadAllTextAsync(childPid, Encoding.UTF8, TestContext.Current.CancellationToken)).Trim(
+                    '\uFEFF',
+                    ' ',
+                    '\r',
+                    '\n'));
             owner.Kill();
             await owner.WaitForExitAsync(TestContext.Current.CancellationToken);
             await WaitForExitAsync(pid);
         }
         finally
         {
-            if (!owner.HasExited) owner.Kill(entireProcessTree: true);
+            if (!owner.HasExited)
+                owner.Kill(entireProcessTree: true);
             await owner.WaitForExitAsync(TestContext.Current.CancellationToken);
             await errors;
         }
@@ -207,7 +259,8 @@ public sealed class OfficialPreviewTests
     [Fact]
     public async Task Windows_abrupt_owner_exit_kills_an_in_progress_build_and_its_owned_descendant()
     {
-        if (!OperatingSystem.IsWindows()) return;
+        if (!OperatingSystem.IsWindows())
+            return;
         using var files = new ProjectFiles(blockBuild: true);
         using var owner = StartOwner();
         var errors = owner.StandardError.ReadToEndAsync(TestContext.Current.CancellationToken);
@@ -215,16 +268,22 @@ public sealed class OfficialPreviewTests
         {
             await InitializeOwnerAsync(owner);
             await owner.StandardInput.WriteLineAsync(JsonSerializer.Serialize(new
-            { jsonrpc = "2.0", id = 2, method = "tools/call", @params = new { name = "attach-to-file", arguments = files.Arguments(build: true) } }));
+            {
+                jsonrpc = "2.0", id = 2, method = "tools/call",
+                @params = new { name = "attach-to-file", arguments = files.Arguments(build: true) }
+            }));
             await WaitUntilAsync(() => File.Exists(files.BuildPid));
-            var pid = int.Parse((await File.ReadAllTextAsync(files.BuildPid, Encoding.UTF8, TestContext.Current.CancellationToken)).Trim('\uFEFF', ' ', '\r', '\n'));
+            var pid = int.Parse(
+                (await File.ReadAllTextAsync(files.BuildPid, Encoding.UTF8, TestContext.Current.CancellationToken))
+                .Trim('\uFEFF', ' ', '\r', '\n'));
             owner.Kill();
             await owner.WaitForExitAsync(TestContext.Current.CancellationToken);
             await WaitForExitAsync(pid);
         }
         finally
         {
-            if (!owner.HasExited) owner.Kill(entireProcessTree: true);
+            if (!owner.HasExited)
+                owner.Kill(entireProcessTree: true);
             await owner.WaitForExitAsync(TestContext.Current.CancellationToken);
             await errors;
         }
@@ -233,20 +292,31 @@ public sealed class OfficialPreviewTests
     [Fact]
     public async Task Windows_build_request_cancellation_stops_the_build_and_its_owned_descendant()
     {
-        if (!OperatingSystem.IsWindows()) return;
+        if (!OperatingSystem.IsWindows())
+            return;
         using var files = new ProjectFiles(blockBuild: true);
         await using var client = await CreateClientAsync();
         var request = new RequestId("official-build-cancel");
         var pending = client.SendRequestAsync(new JsonRpcRequest
-        {
-            Id = request, Method = "tools/call", Params = JsonSerializer.SerializeToNode(new { name = "attach-to-file", arguments = files.Arguments(build: true) })
-        }, TestContext.Current.CancellationToken);
+            {
+                Id = request, Method = "tools/call",
+                Params = JsonSerializer.SerializeToNode(new
+                    { name = "attach-to-file", arguments = files.Arguments(build: true) })
+            },
+            TestContext.Current.CancellationToken);
         await WaitUntilAsync(() => File.Exists(files.BuildPid));
-        var pid = int.Parse((await File.ReadAllTextAsync(files.BuildPid, Encoding.UTF8, TestContext.Current.CancellationToken)).Trim('\uFEFF', ' ', '\r', '\n'));
+        var pid = int.Parse(
+            (await File.ReadAllTextAsync(files.BuildPid, Encoding.UTF8, TestContext.Current.CancellationToken)).Trim(
+                '\uFEFF',
+                ' ',
+                '\r',
+                '\n'));
         await client.SendMessageAsync(new JsonRpcNotification
-        {
-            Method = "notifications/cancelled", Params = JsonSerializer.SerializeToNode(new CancelledNotificationParams { RequestId = request })
-        }, TestContext.Current.CancellationToken);
+            {
+                Method = "notifications/cancelled",
+                Params = JsonSerializer.SerializeToNode(new CancelledNotificationParams { RequestId = request })
+            },
+            TestContext.Current.CancellationToken);
         await Assert.ThrowsAnyAsync<OperationCanceledException>(async () => await pending);
         await WaitForExitAsync(pid);
         Assert.True((await CallAsync(client, "tree", new())).IsError);
@@ -255,10 +325,12 @@ public sealed class OfficialPreviewTests
     [Fact]
     public async Task Windows_fixture_prebuild_releases_a_detached_child_holding_its_project_directory()
     {
-        if (!OperatingSystem.IsWindows()) return;
+        if (!OperatingSystem.IsWindows())
+            return;
         using var files = new ProjectFiles(detachBuildChild: true);
         await files.BuildAsync();
-        var pid = int.Parse((await File.ReadAllTextAsync(files.DetachedBuildPid, Encoding.UTF8,
+        var pid = int.Parse((await File.ReadAllTextAsync(files.DetachedBuildPid,
+            Encoding.UTF8,
             TestContext.Current.CancellationToken)).Trim('\uFEFF', ' ', '\r', '\n'));
         await WaitForExitAsync(pid);
     }
@@ -268,9 +340,14 @@ public sealed class OfficialPreviewTests
         await owner.StandardInput.WriteLineAsync(JsonSerializer.Serialize(new
         {
             jsonrpc = "2.0", id = 1, method = "initialize",
-            @params = new { protocolVersion = "2025-11-25", capabilities = new { }, clientInfo = new { name = "official-preview-owner", version = "1" } }
+            @params = new
+            {
+                protocolVersion = "2025-11-25", capabilities = new { },
+                clientInfo = new { name = "official-preview-owner", version = "1" }
+            }
         }));
-        var initialized = JsonNode.Parse((await owner.StandardOutput.ReadLineAsync(TestContext.Current.CancellationToken))!);
+        var initialized =
+            JsonNode.Parse((await owner.StandardOutput.ReadLineAsync(TestContext.Current.CancellationToken))!);
         Assert.NotNull(initialized?["result"]);
         await owner.StandardInput.WriteLineAsync("{\"jsonrpc\":\"2.0\",\"method\":\"notifications/initialized\"}");
     }
@@ -278,11 +355,17 @@ public sealed class OfficialPreviewTests
     private static Process StartOwner(Dictionary<string, string?>? environment = null)
     {
         var start = new ProcessStartInfo("dotnet")
-        { UseShellExecute = false, CreateNoWindow = true, RedirectStandardInput = true, RedirectStandardOutput = true, RedirectStandardError = true };
+        {
+            UseShellExecute = false, CreateNoWindow = true, RedirectStandardInput = true, RedirectStandardOutput = true,
+            RedirectStandardError = true
+        };
         start.ArgumentList.Add(CliPath);
-        start.ArgumentList.Add("mcp"); start.ArgumentList.Add("--profile"); start.ArgumentList.Add("official");
+        start.ArgumentList.Add("mcp");
+        start.ArgumentList.Add("--profile");
+        start.ArgumentList.Add("official");
         start.Environment["AVDT_PREVIEW_HEADLESS"] = "true";
-        foreach (var item in environment ?? []) start.Environment[item.Key] = item.Value;
+        foreach (var item in environment ?? [])
+            start.Environment[item.Key] = item.Value;
         return Process.Start(start)!;
     }
 
@@ -291,17 +374,24 @@ public sealed class OfficialPreviewTests
         environment ??= new();
         environment["AVDT_PREVIEW_HEADLESS"] = "true";
         return McpClient.CreateAsync(new StdioClientTransport(new StdioClientTransportOptions
-        { Command = "dotnet", Name = "official project preview", Arguments = [CliPath, "mcp", "--profile", "official"], EnvironmentVariables = environment, ShutdownTimeout = TimeSpan.FromSeconds(5) }));
+        {
+            Command = "dotnet", Name = "official project preview",
+            Arguments = [CliPath, "mcp", "--profile", "official"], EnvironmentVariables = environment,
+            ShutdownTimeout = TimeSpan.FromSeconds(5)
+        }));
     }
 
-    private static Task<CallToolResult> CallAsync(McpClient client, string tool, Dictionary<string, object?> arguments) =>
+    private static Task<CallToolResult>
+        CallAsync(McpClient client, string tool, Dictionary<string, object?> arguments) =>
         client.CallToolAsync(tool, arguments, cancellationToken: TestContext.Current.CancellationToken).AsTask();
 
     private static async Task<TreeNodeInfo> FindAsync(McpClient client, string name) => Assert.Single(
-        Read<TreeSearchResult>(await CallAsync(client, "search", new() { ["query"] = name })).Matches, node => node.Name == name);
+        Read<TreeSearchResult>(await CallAsync(client, "search", new() { ["query"] = name })).Matches,
+        node => node.Name == name);
 
     private static async Task<TreeNodeInfo> FindTypeAsync(McpClient client, string type) => Assert.Single(
-        Read<TreeSearchResult>(await CallAsync(client, "search", new() { ["query"] = type })).Matches, node => node.TypeName == type);
+        Read<TreeSearchResult>(await CallAsync(client, "search", new() { ["query"] = type })).Matches,
+        node => node.TypeName == type);
 
     private static async Task<string> ScreenshotAsync(McpClient client, long nodeId)
     {
@@ -317,51 +407,74 @@ public sealed class OfficialPreviewTests
         return Convert.ToBase64String(image.DecodedData.Span);
     }
 
-    private static async Task<TreeNodeInfo> WaitForNodeAsync(McpClient client, string name, Func<TreeNodeInfo?, bool> predicate)
+    private static async Task<TreeNodeInfo> WaitForNodeAsync(McpClient client,
+        string name,
+        Func<TreeNodeInfo?, bool> predicate)
     {
         using var timeout = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
         timeout.CancelAfter(TimeSpan.FromSeconds(15));
         while (true)
         {
-            var call = await client.CallToolAsync("search", new Dictionary<string, object?> { ["query"] = name }, cancellationToken: timeout.Token);
+            var call = await client.CallToolAsync("search",
+                new Dictionary<string, object?> { ["query"] = name },
+                cancellationToken: timeout.Token);
             if (call.IsError == true && Text(call).Contains("stale_session", StringComparison.Ordinal))
             {
                 await Task.Delay(50, timeout.Token);
                 continue;
             }
+
             var result = Read<TreeSearchResult>(call);
             var node = result.Matches.FirstOrDefault(value => value.Name == name);
-            if (predicate(node)) return node!;
+            if (predicate(node))
+                return node!;
             await Task.Delay(50, timeout.Token);
         }
     }
 
     private static Task WaitForExitAsync(int pid) => WaitUntilAsync(() =>
     {
-        try { using var process = Process.GetProcessById(pid); return process.HasExited; }
-        catch (ArgumentException) { return true; }
+        try
+        {
+            using var process = Process.GetProcessById(pid);
+            return process.HasExited;
+        }
+        catch (ArgumentException)
+        {
+            return true;
+        }
     });
 
     private static async Task WaitUntilAsync(Func<bool> predicate)
     {
         using var timeout = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
         timeout.CancelAfter(TimeSpan.FromSeconds(25));
-        while (!predicate()) await Task.Delay(40, timeout.Token);
+        while (!predicate())
+            await Task.Delay(40, timeout.Token);
     }
 
-    private static string Text(CallToolResult result) => string.Join('\n', result.Content.OfType<TextContentBlock>().Select(item => item.Text));
+    private static string Text(CallToolResult result) =>
+        string.Join('\n', result.Content.OfType<TextContentBlock>().Select(item => item.Text));
+
     private static T Read<T>(CallToolResult result)
     {
         Assert.False(result.IsError == true, Text(result));
-        var root = result.StructuredContent is { } structured ? JsonNode.Parse(JsonSerializer.Serialize(structured)) : JsonNode.Parse(Text(result));
-        if (root is JsonObject obj && obj.TryGetPropertyValue("result", out var wrapped)) root = wrapped;
+        var root = result.StructuredContent is { } structured
+            ? JsonNode.Parse(JsonSerializer.Serialize(structured))
+            : JsonNode.Parse(Text(result));
+        if (root is JsonObject obj && obj.TryGetPropertyValue("result", out var wrapped))
+            root = wrapped;
         return root!.Deserialize<T>(ProtocolJson.Options)!;
     }
-    private static string Metadata(string key) => Path.GetFullPath(typeof(OfficialPreviewTests).Assembly.GetCustomAttributes<AssemblyMetadataAttribute>().Single(item => item.Key == key).Value!);
 
-    private sealed class ProjectFiles : IDisposable
+    private static string Metadata(string key) => Path.GetFullPath(typeof(OfficialPreviewTests).Assembly
+        .GetCustomAttributes<AssemblyMetadataAttribute>().Single(item => item.Key == key).Value!);
+
+    internal sealed class ProjectFiles : IDisposable
     {
-        private static readonly string TestRoot = Path.Combine(Path.GetTempPath(), "AvaloniaDevTool.OfficialPreview.Tests");
+        private static readonly string TestRoot =
+            Path.Combine(Path.GetTempPath(), "AvaloniaDevTool.OfficialPreview.Tests");
+
         private readonly string _container = Path.Combine(TestRoot, Guid.NewGuid().ToString("N"));
         public string Root => Path.Combine(_container, "中文 空格 预览项目");
         public string Project => Path.Combine(Root, "Fixture 项目.csproj");
@@ -371,27 +484,48 @@ public sealed class OfficialPreviewTests
         public string BuildPid => Path.Combine(Root, "build.pid");
         public string DetachedBuildPid => Path.Combine(Root, "detached-build-child.pid");
         public string Initial { get; }
+
         public ProjectFiles(bool multitarget = false, bool blockBuild = false, bool detachBuildChild = false)
         {
             Directory.CreateDirectory(Root);
             var controls = Path.Combine(_container, "AvaloniaDevTool.PreviewFixture.Controls");
             Directory.CreateDirectory(controls);
-            foreach (var file in Directory.GetFiles(Path.Combine(Repository, "tests", "AvaloniaDevTool.PreviewFixture.Controls"), "*", SearchOption.TopDirectoryOnly))
+            foreach (var file in Directory.GetFiles(
+                         Path.Combine(Repository, "tests", "AvaloniaDevTool.PreviewFixture.Controls"),
+                         "*",
+                         SearchOption.TopDirectoryOnly))
                 File.Copy(file, Path.Combine(controls, Path.GetFileName(file)));
-            File.WriteAllText(Path.Combine(_container, "Directory.Build.props"), """
+            File.WriteAllText(Path.Combine(_container, "Directory.Build.props"),
+                """
                 <Project><PropertyGroup><TargetFramework>net10.0</TargetFramework><Nullable>enable</Nullable><ImplicitUsings>enable</ImplicitUsings><AvaloniaVersion>12.1.4</AvaloniaVersion></PropertyGroup></Project>
-                """, Encoding.UTF8);
+                """,
+                Encoding.UTF8);
             var source = Path.Combine(Repository, "tests", "AvaloniaDevTool.PreviewFixture");
-            foreach (var file in Directory.GetFiles(source, "*.axaml")) File.Copy(file, Path.Combine(Root, Path.GetFileName(file)));
-            var program = File.ReadAllText(Path.Combine(source, "Program.cs"), Encoding.UTF8).Replace("public static AppBuilder BuildAvaloniaApp()\n    {", "public static AppBuilder BuildAvaloniaApp()\n    {\n        if (Environment.GetEnvironmentVariable(\"AVDT_OFFICIAL_PREVIEW_BLOCK\") is { } pid) { Program.PublishPid(pid); Thread.Sleep(TimeSpan.FromSeconds(60)); }", StringComparison.Ordinal);
+            foreach (var file in Directory.GetFiles(source, "*.axaml"))
+                File.Copy(file, Path.Combine(Root, Path.GetFileName(file)));
+            var program = File.ReadAllText(Path.Combine(source, "Program.cs"), Encoding.UTF8).Replace(
+                "public static AppBuilder BuildAvaloniaApp()\n    {",
+                "public static AppBuilder BuildAvaloniaApp()\n    {\n        if (Environment.GetEnvironmentVariable(\"AVDT_OFFICIAL_PREVIEW_BLOCK\") is { } pid) { Program.PublishPid(pid); Thread.Sleep(TimeSpan.FromSeconds(60)); }",
+                StringComparison.Ordinal);
             // Repository files may use CRLF. Preserve the actual builder rather than relying on line endings.
-            program = program.Replace("public static AppBuilder BuildAvaloniaApp()\r\n    {", "public static AppBuilder BuildAvaloniaApp()\r\n    {\r\n        if (Environment.GetEnvironmentVariable(\"AVDT_OFFICIAL_PREVIEW_BLOCK\") is { } pid) { Program.PublishPid(pid); Thread.Sleep(TimeSpan.FromSeconds(60)); }", StringComparison.Ordinal);
-            program = program.Replace("public FixtureWindow() => AvaloniaXamlLoader.Load(this);", "public FixtureWindow() { if (Environment.GetEnvironmentVariable(\"AVDT_OFFICIAL_PREVIEW_BLOCK_WINDOW\") is { } pid) { Program.PublishPid(pid); Thread.Sleep(TimeSpan.FromSeconds(60)); } AvaloniaXamlLoader.Load(this); }", StringComparison.Ordinal);
+            program = program.Replace("public static AppBuilder BuildAvaloniaApp()\r\n    {",
+                "public static AppBuilder BuildAvaloniaApp()\r\n    {\r\n        if (Environment.GetEnvironmentVariable(\"AVDT_OFFICIAL_PREVIEW_BLOCK\") is { } pid) { Program.PublishPid(pid); Thread.Sleep(TimeSpan.FromSeconds(60)); }",
+                StringComparison.Ordinal);
+            program = program.Replace("public FixtureWindow() => AvaloniaXamlLoader.Load(this);",
+                "public FixtureWindow() { if (Environment.GetEnvironmentVariable(\"AVDT_OFFICIAL_PREVIEW_BLOCK_WINDOW\") is { } pid) { Program.PublishPid(pid); Thread.Sleep(TimeSpan.FromSeconds(60)); } AvaloniaXamlLoader.Load(this); }",
+                StringComparison.Ordinal);
             File.WriteAllText(Path.Combine(Root, "Program.cs"), program, Encoding.UTF8);
-            var framework = multitarget ? "<TargetFramework /><TargetFrameworks>net10.0-windows;net10.0</TargetFrameworks>" : "<TargetFramework>net10.0</TargetFramework>";
-            var blocked = blockBuild ? "<Exec Command=\"powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)/block-build.ps1&quot;\" />" : "";
-            var detached = detachBuildChild ? "<Target Name=\"StartDetachedBuildChild\" AfterTargets=\"Build\"><Exec Command=\"powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)/detach-build-child.ps1&quot;\" /></Target>" : "";
-            File.WriteAllText(Project, $$"""
+            var framework = multitarget
+                ? "<TargetFramework /><TargetFrameworks>net10.0-windows;net10.0</TargetFrameworks>"
+                : "<TargetFramework>net10.0</TargetFramework>";
+            var blocked = blockBuild
+                ? "<Exec Command=\"powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)/block-build.ps1&quot;\" />"
+                : "";
+            var detached = detachBuildChild
+                ? "<Target Name=\"StartDetachedBuildChild\" AfterTargets=\"Build\"><Exec Command=\"powershell -NoProfile -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)/detach-build-child.ps1&quot;\" /></Target>"
+                : "";
+            File.WriteAllText(Project,
+                $$"""
                 <Project Sdk="Microsoft.NET.Sdk">
                   <PropertyGroup><OutputType>Exe</OutputType><AssemblyName>AvaloniaDevTool.PreviewFixture</AssemblyName><AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>{{framework}}</PropertyGroup>
                   <ItemGroup>
@@ -403,33 +537,58 @@ public sealed class OfficialPreviewTests
                   <Target Name="RecordOfficialBuild" BeforeTargets="CoreCompile"><WriteLinesToFile File="$(MSBuildProjectDirectory)/build.marker" Lines="real build" Overwrite="true" />{{blocked}}</Target>
                   {{detached}}
                 </Project>
-                """, Encoding.UTF8);
-            if (blockBuild) File.WriteAllText(Path.Combine(Root, "block-build.ps1"), "$PID | Set-Content -LiteralPath '" + BuildPid.Replace("'", "''", StringComparison.Ordinal) + "' -Encoding utf8\nStart-Sleep -Seconds 60\n", Encoding.UTF8);
+                """,
+                Encoding.UTF8);
+            if (blockBuild)
+                File.WriteAllText(Path.Combine(Root, "block-build.ps1"),
+                    "$PID | Set-Content -LiteralPath '" + BuildPid.Replace("'", "''", StringComparison.Ordinal) +
+                    "' -Encoding utf8\nStart-Sleep -Seconds 60\n",
+                    Encoding.UTF8);
             if (detachBuildChild)
             {
                 var childScript = Path.Combine(Root, "owned-build-child.ps1");
-                File.WriteAllText(childScript, "[System.IO.File]::WriteAllText('" + DetachedBuildPid.Replace("'", "''", StringComparison.Ordinal) + "', $PID.ToString(), [System.Text.UTF8Encoding]::new($false))\nStart-Sleep -Seconds 60\n", Encoding.UTF8);
-                File.WriteAllText(Path.Combine(Root, "detach-build-child.ps1"), $$"""
+                File.WriteAllText(childScript,
+                    "[System.IO.File]::WriteAllText('" + DetachedBuildPid.Replace("'", "''", StringComparison.Ordinal) +
+                    "', $PID.ToString(), [System.Text.UTF8Encoding]::new($false))\nStart-Sleep -Seconds 60\n",
+                    Encoding.UTF8);
+                File.WriteAllText(Path.Combine(Root, "detach-build-child.ps1"),
+                    $$"""
                     $taskShell = (Get-Process -Id $PID).Path
                     $taskChild = Start-Process -FilePath $taskShell -ArgumentList @('-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', '"{{childScript.Replace("'", "''", StringComparison.Ordinal)}}"') -WorkingDirectory '{{controls.Replace("'", "''", StringComparison.Ordinal)}}' -WindowStyle Hidden -PassThru
                     $taskWatch = [System.Diagnostics.Stopwatch]::StartNew()
                     while (-not [System.IO.File]::Exists('{{DetachedBuildPid.Replace("'", "''", StringComparison.Ordinal)}}') -and $taskWatch.ElapsedMilliseconds -lt 5000) { Start-Sleep -Milliseconds 10 }
                     if (-not [System.IO.File]::Exists('{{DetachedBuildPid.Replace("'", "''", StringComparison.Ordinal)}}')) { throw 'The owned build child did not start.' }
-                    """, Encoding.UTF8);
+                    """,
+                    Encoding.UTF8);
             }
+
             Initial = File.ReadAllText(Source, Encoding.UTF8);
         }
+
         public Dictionary<string, object?> Arguments(bool? build = null)
         {
-            var arguments = new Dictionary<string, object?> { ["xamlFilePath"] = Source, ["xamlProjectPath"] = Project };
-            if (build is not null) arguments["build"] = build.Value;
+            var arguments = new Dictionary<string, object?>
+                { ["xamlFilePath"] = Source, ["xamlProjectPath"] = Project };
+            if (build is not null)
+                arguments["build"] = build.Value;
             return arguments;
         }
+
         public void Write(string value) => File.WriteAllText(Source, value, new UTF8Encoding(false));
+
         public async Task BuildAsync()
         {
-            var start = new ProcessStartInfo("dotnet") { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true, RedirectStandardError = true };
-            foreach (var argument in new[] { "build", Project, "--framework", "net10.0", "--nologo", "-nodeReuse:false", "-property:UseSharedCompilation=false" }) start.ArgumentList.Add(argument);
+            var start = new ProcessStartInfo("dotnet")
+            {
+                UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = true,
+                RedirectStandardError = true
+            };
+            foreach (var argument in new[]
+                     {
+                         "build", Project, "--framework", "net10.0", "--nologo", "-nodeReuse:false",
+                         "-property:UseSharedCompilation=false"
+                     })
+                start.ArgumentList.Add(argument);
             start.Environment["DOTNET_CLI_USE_MSBUILD_SERVER"] = "0";
             start.Environment["MSBUILDDISABLENODEREUSE"] = "1";
             using var job = OwnedTestBuildJob.Create();
@@ -449,32 +608,49 @@ public sealed class OfficialPreviewTests
             {
                 if (!process.HasExited)
                 {
-                    try { process.Kill(entireProcessTree: true); }
-                    catch (Win32Exception) when (process.HasExited) { }
+                    try
+                    {
+                        process.Kill(entireProcessTree: true);
+                    }
+                    catch (Win32Exception) when (process.HasExited)
+                    {
+                    }
+
                     await process.WaitForExitAsync(CancellationToken.None);
                 }
+
                 job?.Dispose();
                 await Task.WhenAll(output, errors);
             }
+
             Assert.True(File.Exists(Output));
             File.Delete(BuildMarker);
         }
+
         public void Dispose()
         {
             var absolute = Path.GetFullPath(_container);
-            if (!absolute.StartsWith(Path.GetFullPath(TestRoot) + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+            if (!absolute.StartsWith(Path.GetFullPath(TestRoot) + Path.DirectorySeparatorChar,
+                    StringComparison.OrdinalIgnoreCase))
                 throw new InvalidOperationException("Cleanup escaped the official preview temporary root.");
             // Preview owners and children have exited before disposal; Windows can briefly retain directory handles.
             var cleanup = Stopwatch.StartNew();
             var retryLimit = TimeSpan.FromSeconds(2);
             while (Directory.Exists(absolute))
             {
-                try { Directory.Delete(absolute, recursive: true); return; }
-                catch (Exception exception) when ((exception is IOException or UnauthorizedAccessException) && cleanup.Elapsed < retryLimit)
+                try
+                {
+                    Directory.Delete(absolute, recursive: true);
+                    return;
+                }
+                catch (Exception exception) when ((exception is IOException or UnauthorizedAccessException) &&
+                                                  cleanup.Elapsed < retryLimit)
                 {
                     var remaining = retryLimit - cleanup.Elapsed;
                     if (remaining > TimeSpan.Zero)
-                        Thread.Sleep(remaining < TimeSpan.FromMilliseconds(50) ? remaining : TimeSpan.FromMilliseconds(50));
+                        Thread.Sleep(remaining < TimeSpan.FromMilliseconds(50)
+                            ? remaining
+                            : TimeSpan.FromMilliseconds(50));
                 }
             }
         }
@@ -482,27 +658,38 @@ public sealed class OfficialPreviewTests
 
     private sealed class OwnedTestBuildJob : SafeHandleZeroOrMinusOneIsInvalid
     {
-        private OwnedTestBuildJob() : base(ownsHandle: true) { }
+        private OwnedTestBuildJob() : base(ownsHandle: true)
+        {
+        }
+
         public static OwnedTestBuildJob? Create()
         {
-            if (!OperatingSystem.IsWindows()) return null;
+            if (!OperatingSystem.IsWindows())
+                return null;
             var job = CreateJobObjectW(IntPtr.Zero, null);
-            if (job.IsInvalid) throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not create the fixture build job.");
+            if (job.IsInvalid)
+                throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not create the fixture build job.");
             var limits = new ExtendedLimit { BasicLimitInformation = new BasicLimit { LimitFlags = 0x2000 } };
             if (!SetInformationJobObject(job, 9, ref limits, (uint)Marshal.SizeOf<ExtendedLimit>()))
             {
-                var error = Marshal.GetLastWin32Error(); job.Dispose();
+                var error = Marshal.GetLastWin32Error();
+                job.Dispose();
                 throw new Win32Exception(error, "Could not configure the fixture build job.");
             }
+
             return job;
         }
+
         public void Assign(Process process)
         {
             if (!AssignProcessToJobObject(this, process.Handle))
                 throw new Win32Exception(Marshal.GetLastWin32Error(), "Could not own the fixture build process.");
         }
+
         protected override bool ReleaseHandle() => CloseHandle(handle);
-        [StructLayout(LayoutKind.Sequential)] private struct BasicLimit
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct BasicLimit
         {
             public long PerProcessUserTimeLimit, PerJobUserTimeLimit;
             public uint LimitFlags;
@@ -511,21 +698,42 @@ public sealed class OfficialPreviewTests
             public UIntPtr Affinity;
             public uint PriorityClass, SchedulingClass;
         }
-        [StructLayout(LayoutKind.Sequential)] private struct IoCounters
-        { public ulong ReadOperationCount, WriteOperationCount, OtherOperationCount, ReadTransferCount, WriteTransferCount, OtherTransferCount; }
-        [StructLayout(LayoutKind.Sequential)] private struct ExtendedLimit
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct IoCounters
+        {
+            public ulong ReadOperationCount,
+                WriteOperationCount,
+                OtherOperationCount,
+                ReadTransferCount,
+                WriteTransferCount,
+                OtherTransferCount;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct ExtendedLimit
         {
             public BasicLimit BasicLimitInformation;
             public IoCounters IoInfo;
             public UIntPtr ProcessMemoryLimit, JobMemoryLimit, PeakProcessMemoryUsed, PeakJobMemoryUsed;
         }
+
         [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern OwnedTestBuildJob CreateJobObjectW(IntPtr attributes, string? name);
-        [DllImport("kernel32.dll", SetLastError = true)] [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool SetInformationJobObject(OwnedTestBuildJob job, int informationClass, ref ExtendedLimit information, uint length);
-        [DllImport("kernel32.dll", SetLastError = true)] [return: MarshalAs(UnmanagedType.Bool)]
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool SetInformationJobObject(OwnedTestBuildJob job,
+            int informationClass,
+            ref ExtendedLimit information,
+            uint length);
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool AssignProcessToJobObject(OwnedTestBuildJob job, IntPtr process);
-        [DllImport("kernel32.dll", SetLastError = true)] [return: MarshalAs(UnmanagedType.Bool)]
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool CloseHandle(IntPtr handle);
     }
 }

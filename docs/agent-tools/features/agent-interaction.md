@@ -22,7 +22,7 @@
 
 框架输入发送 Avalonia 路由事件，不注入 Windows 键鼠，不创建 IME composition，不传递文件或数据 DragDrop。`ui-select-item` 是选择控件状态，`ui-control-action` 是 provider 动作；需要验证用户手势本身时，应选择对应 pointer/key 工具并断言实际事件和状态。
 
-实现入口：[`AgentTools.Interaction.cs`](../../../src/AvaloniaDevTool.Cli/AgentTools.Interaction.cs)、[`AgentTools.Wait.cs`](../../../src/AvaloniaDevTool.Cli/AgentTools.Wait.cs)、[`InputInspectionService.Interactions.cs`](../../../src/AvaloniaDevTool.Agent/InputInspectionService.Interactions.cs)。
+实现入口：[`AgentTools.Interaction.cs`](../../../src/AvaloniaDevTool.Cli/Tools/Input/AgentTools.Interaction.cs)、[`AgentTools.Wait.cs`](../../../src/AvaloniaDevTool.Cli/Tools/Input/AgentTools.Wait.cs)、[`InputInspectionService.Interactions.cs`](../../../src/AvaloniaDevTool.Agent/Features/Input/InputInspectionService.Interactions.cs)。
 
 ## Windows 原生节点
 
@@ -47,7 +47,7 @@ worker 以独立消息泵接收目标及 owned 进程的窗口销毁通知，将
 
 执行前严格核对 foreground、PID/start time、owner 和节点，恢复最小化根并请求前台；实际前台不符、目标点被其他窗口遮挡、物理鼠标/修饰键正在按住、目标 offscreen/disabled 时拒绝。会离开目标输入范围的系统切换快捷键被拒绝。按压与释放放在同一个 SendInput 批次；部分投递失败时按返回count推算成功前缀，并尽力逐项释放仍按下的键/按钮，清理失败不遮蔽原异常。前缀是清理假设，OS再次拒绝时不能保证状态恢复。返回 `Injected/InputCount` 只证明系统接受输入，`ApplicationEffectVerified=false`；Unicode 注入不宣称 IME，drag 不宣称文件/数据 DragDrop。已有真实MCP正常输入和焦点效果证据，具体批次与未触发的OS失败场景见[测试记录](../../testing.md)。
 
-实现入口：[`AgentTools.Native.cs`](../../../src/AvaloniaDevTool.Cli/AgentTools.Native.cs)、[`AgentTools.NativeInput.cs`](../../../src/AvaloniaDevTool.Cli/AgentTools.NativeInput.cs)、[`ToolSession.Native.cs`](../../../src/AvaloniaDevTool.Cli/ToolSession.Native.cs)、[`NativeAutomationBackend.cs`](../../../src/AvaloniaDevTool.NativeAutomation.Worker/NativeAutomationBackend.cs) 和 [`NativeAutomationBackend.Input.cs`](../../../src/AvaloniaDevTool.NativeAutomation.Worker/NativeAutomationBackend.Input.cs)。worker 有界超时、回收和身份验证见[完整交互架构](../architecture/complete-ui-automation.md)。
+实现入口：[`AgentTools.Native.cs`](../../../src/AvaloniaDevTool.Cli/Tools/Native/AgentTools.Native.cs)、[`AgentTools.NativeInput.cs`](../../../src/AvaloniaDevTool.Cli/Tools/Native/AgentTools.NativeInput.cs)、[`ToolSession.Native.cs`](../../../src/AvaloniaDevTool.Cli/Native/ToolSession.Native.cs)、[`NativeAutomationBackend.cs`](../../../src/AvaloniaDevTool.NativeAutomation.Worker/Sessions/NativeAutomationBackend.cs) 和 [`NativeAutomationBackend.Input.cs`](../../../src/AvaloniaDevTool.NativeAutomation.Worker/Input/NativeAutomationBackend.Input.cs)。worker 有界超时、回收和身份验证见[完整交互架构](../architecture/complete-ui-automation.md)。
 
 ## PNG 截图
 
@@ -68,7 +68,7 @@ native 截图拒绝不可见、最小化或 offscreen 节点；采集前后核�
 
 已执行的截图专项包括：managed Headless 新增 7 项及既有 official/Agent/Protocol AOT 相关检查；真实 WinForms SDK 捕获 RGB 与动态文字并核对 foreground 不变；真实 stdio MCP 捕获实际 Avalonia 控件、原生主窗、CommonItemDialog 和路径框区域，以及无效/stale 拒绝。native 几何 70 项只证明坐标/预算算法，不算运行截图。实际主窗与 OS picker PNG 已人工查看清晰；这些专项不替代本轮完整回归，结果见 [测试说明](../../testing.md)。
 
-截图不计算视觉差异、不维护基线，也不作业务判断。源码见 [AgentTools.Screenshot](../../../src/AvaloniaDevTool.Cli/AgentTools.Screenshot.cs)、[AgentTools.NativeScreenshot](../../../src/AvaloniaDevTool.Cli/AgentTools.NativeScreenshot.cs) 和 [native 捕获实现](../../../src/AvaloniaDevTool.NativeAutomation.Worker/NativeAutomationBackend.Screenshot.cs)。
+截图不计算视觉差异、不维护基线，也不作业务判断。源码见 [AgentTools.Screenshot](../../../src/AvaloniaDevTool.Cli/Tools/Rendering/AgentTools.Screenshot.cs)、[AgentTools.NativeScreenshot](../../../src/AvaloniaDevTool.Cli/Tools/Native/AgentTools.NativeScreenshot.cs) 和 [native 捕获实现](../../../src/AvaloniaDevTool.NativeAutomation.Worker/Capture/NativeAutomationBackend.Screenshot.cs)。
 
 ## 同连接原始诊断采集
 
@@ -84,7 +84,7 @@ meterNames/instrumentNames 各最多 16 个非空模式，每项最多 128 字�
 
 采集复用当前 ToolSession 的唯一目标诊断连接，不另开 extended 抢占连接。启动前检查所选服务，不接管已在运行的 listener；部分启动失败只撤销本次拥有的服务。目标切换、重连、外部重启或 mutation epoch 变化后旧 ID 不停止新采集。每个 MCP 会话最多保留 64 次采集。对应 capture 20 项 Headless/故障 RPC 专项已验证，统一回归结果单列。
 
-调用方依据原始数据自行关联业务与分析性能；本工具不设性能阈值、业务断言或 CI 门禁。源码见 [AgentTools.Capture](../../../src/AvaloniaDevTool.Cli/AgentTools.Capture.cs) 与 [ToolSession.Capture](../../../src/AvaloniaDevTool.Cli/ToolSession.Capture.cs)。
+调用方依据原始数据自行关联业务与分析性能；本工具不设性能阈值、业务断言或 CI 门禁。源码见 [AgentTools.Capture](../../../src/AvaloniaDevTool.Cli/Tools/Diagnostics/Capture/AgentTools.Capture.cs) 与 [ToolSession.Capture](../../../src/AvaloniaDevTool.Cli/Capture/ToolSession.Capture.cs)。
 
 ## 真实文件弹窗
 

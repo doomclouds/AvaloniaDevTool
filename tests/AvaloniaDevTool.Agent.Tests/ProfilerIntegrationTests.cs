@@ -24,10 +24,12 @@ public sealed class ProfilerIntegrationTests
         try
         {
             var diagnostic = typeof(AvaloniaObject).Assembly.GetType("Avalonia.Diagnostics.Diagnostic")!;
-            var enabled = diagnostic.GetProperty("IsEnabled", BindingFlags.Static | BindingFlags.Public)!.GetValue(null);
+            var enabled =
+                diagnostic.GetProperty("IsEnabled", BindingFlags.Static | BindingFlags.Public)!.GetValue(null);
             using var service = new ProfilerService((_, _) => { });
             service.Start(new ProfilerStartRequest(Filter: "ProfilerProbe", NotificationIntervalMs: 5000));
-            Assert.Equal(enabled, diagnostic.GetProperty("IsEnabled", BindingFlags.Static | BindingFlags.Public)!.GetValue(null));
+            Assert.Equal(enabled,
+                diagnostic.GetProperty("IsEnabled", BindingFlags.Static | BindingFlags.Public)!.GetValue(null));
             window.Styles.Add(new Style(selector => selector.OfType<Button>().Class("ProfilerProbeActive"))
             {
                 Setters = { new Setter(Visual.OpacityProperty, 0.5d) }
@@ -50,12 +52,19 @@ public sealed class ProfilerIntegrationTests
             Assert.False(button.TryFindResource("ProfilerProbeMissing", out _));
             var snapshot = service.Snapshot();
             Assert.Equal(0, snapshot.Status.CallbackErrors);
-            Assert.Contains(snapshot.Samples, sample => sample.Category == ProfilerCategory.StyleAttach &&
-                sample.Selector!.Contains("ProfilerProbeActive", StringComparison.Ordinal) && sample.Result == "Sometimes" && sample.IsMatch is true);
-            Assert.Contains(snapshot.Samples, sample => sample.Category == ProfilerCategory.StyleAttach &&
-                sample.Selector!.Contains("ProfilerProbeNever", StringComparison.Ordinal) && sample.FastReject && sample.IsMatch is false);
-            Assert.Contains(snapshot.Samples, sample => sample.Category == ProfilerCategory.StyleEvaluate && sample.IsActive is true);
-            Assert.Contains(snapshot.Samples, sample => sample.Category == ProfilerCategory.StyleEvaluate && sample.IsActive is false);
+            Assert.Contains(snapshot.Samples,
+                sample => sample.Category == ProfilerCategory.StyleAttach &&
+                          sample.Selector!.Contains("ProfilerProbeActive", StringComparison.Ordinal) &&
+                          sample.Result == "Sometimes" && sample.IsMatch is true);
+            Assert.Contains(snapshot.Samples,
+                sample => sample.Category == ProfilerCategory.StyleAttach &&
+                          sample.Selector!.Contains("ProfilerProbeNever", StringComparison.Ordinal) &&
+                          sample.FastReject &&
+                          sample.IsMatch is false);
+            Assert.Contains(snapshot.Samples,
+                sample => sample.Category == ProfilerCategory.StyleEvaluate && sample.IsActive is true);
+            Assert.Contains(snapshot.Samples,
+                sample => sample.Category == ProfilerCategory.StyleEvaluate && sample.IsActive is false);
             var hit = Assert.Single(snapshot.Samples, sample => sample.Key == "ProfilerProbeExisting");
             Assert.Equal("True", hit.Result);
             Assert.True(hit.IsMatch);
@@ -67,7 +76,9 @@ public sealed class ProfilerIntegrationTests
             service.Stop();
             window.Close();
             // The service owns its listener, never Avalonia's shared ActivitySource.
-            var source = (ActivitySource)diagnostic.GetField("s_activitySource", BindingFlags.Static | BindingFlags.NonPublic)!.GetValue(null)!;
+            var source =
+                (ActivitySource)diagnostic.GetField("s_activitySource", BindingFlags.Static | BindingFlags.NonPublic)!
+                    .GetValue(null)!;
             using var external = new ActivityListener
             {
                 ShouldListenTo = candidate => ReferenceEquals(candidate, source),
@@ -77,7 +88,10 @@ public sealed class ProfilerIntegrationTests
             using var stillAvailable = source.StartActivity("ExternalProbe");
             Assert.NotNull(stillAvailable);
         }
-        finally { window.Close(); }
+        finally
+        {
+            window.Close();
+        }
     }
 
     [AvaloniaFact]
@@ -85,9 +99,15 @@ public sealed class ProfilerIntegrationTests
     {
         using var source = TestSource();
         using var service = new ProfilerService((_, _) => { });
-        service.Start(new ProfilerStartRequest(Categories: [ProfilerCategory.ResourceLookup], Capacity: 3,
-            PendingCapacity: 2, MaxGroups: 1, MaxInFlight: 2, MaxTags: 1, NotificationIntervalMs: 5000));
-        for (var index = 0; index < 5; index++) Resource(source, "one", true);
+        service.Start(new ProfilerStartRequest(Categories: [ProfilerCategory.ResourceLookup],
+            Capacity: 3,
+            PendingCapacity: 2,
+            MaxGroups: 1,
+            MaxInFlight: 2,
+            MaxTags: 1,
+            NotificationIntervalMs: 5000));
+        for (var index = 0; index < 5; index++)
+            Resource(source, "one", true);
         Resource(source, "other", true);
         using var first = source.StartActivity("Avalonia.FindingResource");
         using var second = source.StartActivity("Avalonia.FindingResource");
@@ -112,7 +132,8 @@ public sealed class ProfilerIntegrationTests
         var stopped = service.Stop();
         Assert.Equal(2, stopped.IncompleteOperations);
         Assert.Equal(0, stopped.InFlightCount);
-        first?.Stop(); second?.Stop();
+        first?.Stop();
+        second?.Stop();
         Assert.Equal(stopped.CompletedOperations, service.Status().CompletedOperations);
     }
 
@@ -121,9 +142,18 @@ public sealed class ProfilerIntegrationTests
     {
         using var source = TestSource();
         using var service = new ProfilerService((_, _) => { });
-        service.Start(new ProfilerStartRequest(Categories: [ProfilerCategory.ResourceLookup], Filter: "wanted", NotificationIntervalMs: 5000));
-        using (source.StartActivity("Avalonia.AttachingStyle")) { }
-        using (source.StartActivity("UnknownOperation")) { }
+        service.Start(new ProfilerStartRequest(Categories:
+            [ProfilerCategory.ResourceLookup],
+            Filter: "wanted",
+            NotificationIntervalMs: 5000));
+        using (source.StartActivity("Avalonia.AttachingStyle"))
+        {
+        }
+
+        using (source.StartActivity("UnknownOperation"))
+        {
+        }
+
         Resource(source, "WANTED-key", true);
         Resource(source, "excluded-key", true);
         var snapshot = service.Snapshot();
@@ -139,7 +169,8 @@ public sealed class ProfilerIntegrationTests
         var button = new Button();
         button.Resources["ProfilerThemeKey"] = 42;
         using var service = new ProfilerService((_, _) => { });
-        service.Start(new ProfilerStartRequest(Categories: [ProfilerCategory.ResourceLookup], Filter: "ProfilerThemeKey",
+        service.Start(new ProfilerStartRequest(Categories: [ProfilerCategory.ResourceLookup],
+            Filter: "ProfilerThemeKey",
             NotificationIntervalMs: 5000));
         Assert.True(button.TryFindResource("ProfilerThemeKey", ThemeVariant.Light, out _));
         Assert.True(button.TryFindResource("ProfilerThemeKey", ThemeVariant.Dark, out _));
@@ -155,19 +186,25 @@ public sealed class ProfilerIntegrationTests
     {
         using var source = TestSource();
         using var service = new ProfilerService((_, _) => { });
-        service.Start(new ProfilerStartRequest(Categories: [ProfilerCategory.ResourceLookup], NotificationIntervalMs: 5000));
+        service.Start(new ProfilerStartRequest(Categories:
+            [ProfilerCategory.ResourceLookup],
+            NotificationIntervalMs: 5000));
         var prefix = new string('k', 300);
         Resource(source, prefix + "first", true);
         Resource(source, prefix + "second", true);
         Resource(source, prefix + "first", true);
         using (var first = source.StartActivity("Avalonia.FindingResource"))
         {
-            first!.SetTag("Key", "a:b"); first.SetTag("ThemeVariant", "c");
+            first!.SetTag("Key", "a:b");
+            first.SetTag("ThemeVariant", "c");
         }
+
         using (var second = source.StartActivity("Avalonia.FindingResource"))
         {
-            second!.SetTag("Key", "a"); second.SetTag("ThemeVariant", "b:c");
+            second!.SetTag("Key", "a");
+            second.SetTag("ThemeVariant", "b:c");
         }
+
         var snapshot = service.Snapshot();
         Assert.Equal(4, snapshot.Groups.Count);
         Assert.Equal(snapshot.Samples[0].Key, snapshot.Samples[1].Key);
@@ -187,8 +224,14 @@ public sealed class ProfilerIntegrationTests
             onUiThread &= Dispatcher.UIThread.CheckAccess();
             notifications.Add((ProfilerSamplesAddedNotification)payload);
         });
-        service.Start(new ProfilerStartRequest(Categories: [ProfilerCategory.ResourceLookup], NotificationIntervalMs: 50));
-        await Task.Run(() => { for (var index = 0; index < 130; index++) Resource(source, "background", true); });
+        service.Start(new ProfilerStartRequest(Categories:
+            [ProfilerCategory.ResourceLookup],
+            NotificationIntervalMs: 50));
+        await Task.Run(() =>
+        {
+            for (var index = 0; index < 130; index++)
+                Resource(source, "background", true);
+        });
         await WaitUntilAsync(() => notifications.Sum(item => item.Samples.Count) == 130);
         Assert.True(onUiThread);
         Assert.All(notifications, item => Assert.InRange(item.Samples.Count, 1, 64));
@@ -210,7 +253,9 @@ public sealed class ProfilerIntegrationTests
         service.Clear();
         Assert.Empty(service.Snapshot().Samples);
         Assert.False(service.Status().IsRunning);
-        service.Start(new ProfilerStartRequest(Categories: [ProfilerCategory.ResourceLookup], NotificationIntervalMs: 50));
+        service.Start(new ProfilerStartRequest(Categories:
+            [ProfilerCategory.ResourceLookup],
+            NotificationIntervalMs: 50));
         var final = source.StartActivity("Avalonia.FindingResource");
         service.Dispose();
         final?.Stop();
@@ -229,18 +274,22 @@ public sealed class ProfilerIntegrationTests
         var weak = CaptureTemporaryObjects(source);
         for (var index = 0; index < 3 && weak.Any(reference => reference.IsAlive); index++)
         {
-            GC.Collect(); GC.WaitForPendingFinalizers(); GC.Collect();
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
         }
+
         Assert.All(weak, reference => Assert.False(reference.IsAlive));
         Resource(source, new string('x', 5000), true);
         var snapshot = service.Snapshot();
         Assert.Equal(2, snapshot.Samples.Count);
         Assert.Contains(nameof(ThrowingObject), snapshot.Samples[0].Key);
-        Assert.All(snapshot.Samples.SelectMany(sample => sample.Tags), tag =>
-        {
-            Assert.True(tag.Key.Length <= 32);
-            Assert.True(tag.Value?.Length is null or <= 96);
-        });
+        Assert.All(snapshot.Samples.SelectMany(sample => sample.Tags),
+            tag =>
+            {
+                Assert.True(tag.Key.Length <= 32);
+                Assert.True(tag.Value?.Length is null or <= 96);
+            });
         Assert.Equal(96, snapshot.Samples[1].Key!.Length);
     }
 
@@ -254,20 +303,26 @@ public sealed class ProfilerIntegrationTests
         Assert.Throws<RpcException>(() => service.Start(new ProfilerStartRequest(Categories: [(ProfilerCategory)99])));
         Assert.Equal(status.CaptureId, service.Status().CaptureId);
         Assert.Throws<RpcException>(() => service.Start(new ProfilerStartRequest(Categories: [])));
-        service.Start(new ProfilerStartRequest(Capacity: 1024, PendingCapacity: 2048, MaxTags: 8,
-            MaxGroups: 128, NotificationIntervalMs: 5000));
+        service.Start(new ProfilerStartRequest(Capacity: 1024,
+            PendingCapacity: 2048,
+            MaxTags: 8,
+            MaxGroups: 128,
+            NotificationIntervalMs: 5000));
         for (var index = 0; index < 1024; index++)
         {
             using var activity = source.StartActivity("Avalonia.EvaluatingStyle");
             activity!.SetTag("Selector", index % 128 + new string('\u4e2d', 300));
             activity.SetTag("Style", new string('\u4e2d', 300));
             activity.SetTag("IsActive", new string('\u4e2d', 300));
-            for (var tag = 0; tag < 8; tag++) activity.SetTag("tag" + tag + new string('\u4e2d', 80), new string('\u4e2d', 400));
+            for (var tag = 0; tag < 8; tag++)
+                activity.SetTag("tag" + tag + new string('\u4e2d', 80), new string('\u4e2d', 400));
         }
+
         var snapshot = service.Snapshot();
         Assert.Equal(1024, snapshot.Samples.Count);
         Assert.Equal(128, snapshot.Groups.Count);
-        Assert.True(System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(snapshot, ProtocolJson.Options).Length < RpcPeer.MaximumFrameBytes);
+        Assert.True(System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(snapshot, ProtocolJson.Options).Length <
+                    RpcPeer.MaximumFrameBytes);
     }
 
     [AvaloniaFact]
@@ -275,13 +330,16 @@ public sealed class ProfilerIntegrationTests
     {
         using var source = TestSource();
         using var service = new ProfilerService((_, _) => { });
-        service.Start(new ProfilerStartRequest(Categories: [ProfilerCategory.ResourceLookup], NotificationIntervalMs: 5000));
+        service.Start(new ProfilerStartRequest(Categories:
+            [ProfilerCategory.ResourceLookup],
+            NotificationIntervalMs: 5000));
         using var cancel = new CancellationTokenSource();
         using var started = new ManualResetEventSlim();
         var producer = Task.Run(() =>
         {
             started.Set();
-            while (!cancel.IsCancellationRequested) Resource(source, "race", true);
+            while (!cancel.IsCancellationRequested)
+                Resource(source, "race", true);
         });
         Assert.True(started.Wait(TimeSpan.FromSeconds(5)));
         await WaitUntilAsync(() => service.Status().CompletedOperations > 10);
@@ -291,7 +349,9 @@ public sealed class ProfilerIntegrationTests
         Assert.Equal(stopped.CompletedOperations, service.Status().CompletedOperations);
         Assert.Equal(stopped.StartedOperations, service.Status().StartedOperations);
         Assert.Equal(0, service.Status().InFlightCount);
-        service.Start(new ProfilerStartRequest(Categories: [ProfilerCategory.ResourceLookup], NotificationIntervalMs: 5000));
+        service.Start(new ProfilerStartRequest(Categories:
+            [ProfilerCategory.ResourceLookup],
+            NotificationIntervalMs: 5000));
         Resource(source, "after-restart", true);
         Assert.Equal("after-restart", Assert.Single(service.Snapshot().Samples).Key);
         Assert.Equal(0, service.Status().CallbackErrors);
@@ -302,7 +362,9 @@ public sealed class ProfilerIntegrationTests
     {
         using var source = TestSource();
         using var service = new ProfilerService((_, _) => { });
-        service.Start(new ProfilerStartRequest(Categories: [ProfilerCategory.ResourceLookup], NotificationIntervalMs: 5000));
+        service.Start(new ProfilerStartRequest(Categories:
+            [ProfilerCategory.ResourceLookup],
+            NotificationIntervalMs: 5000));
         using var parent = new Activity("hierarchical-parent").SetIdFormat(ActivityIdFormat.Hierarchical).Start();
         var first = source.StartActivity("Avalonia.FindingResource");
         var second = source.StartActivity("Avalonia.FindingResource");
@@ -310,8 +372,10 @@ public sealed class ProfilerIntegrationTests
         Assert.NotNull(second);
         Assert.Equal(ActivityIdFormat.Hierarchical, first.IdFormat);
         Assert.Equal(2, service.Status().InFlightCount);
-        second.SetTag("Key", "second"); second.Stop();
-        first.SetTag("Key", "first"); first.Stop();
+        second.SetTag("Key", "second");
+        second.Stop();
+        first.SetTag("Key", "first");
+        first.Stop();
         Assert.Equal(2, service.Snapshot().Samples.Count);
         Assert.Equal(0, service.Status().InFlightCount);
     }
@@ -323,16 +387,21 @@ public sealed class ProfilerIntegrationTests
         window.Show();
         try
         {
-            await using var agent = DiagnosticsAgent.Attach(Application.Current!, new DiagnosticsAgentOptions
-            {
-                PipeName = "profiler-rpc-" + Guid.NewGuid().ToString("N"), TopLevelProvider = () => [window]
-            });
+            await using var agent = DiagnosticsAgent.Attach(Application.Current!,
+                new DiagnosticsAgentOptions
+                {
+                    PipeName = "profiler-rpc-" + Guid.NewGuid().ToString("N"), TopLevelProvider = () => [window]
+                });
             await using var client = new DiagnosticsClient();
             await client.ConnectAsync(agent.PipeName);
-            var notification = new TaskCompletionSource<ProfilerSamplesAddedNotification>(TaskCreationOptions.RunContinuationsAsynchronously);
+            var notification =
+                new TaskCompletionSource<ProfilerSamplesAddedNotification>(TaskCreationOptions
+                    .RunContinuationsAsynchronously);
             client.ProfilerSamplesAdded += payload => notification.TrySetResult(payload);
-            var started = await client.StartProfilerAsync(new ProfilerStartRequest(Categories: [ProfilerCategory.ResourceLookup],
-                Filter: "ProfilerClient", NotificationIntervalMs: 50));
+            var started = await client.StartProfilerAsync(new ProfilerStartRequest(Categories:
+                [ProfilerCategory.ResourceLookup],
+                Filter: "ProfilerClient",
+                NotificationIntervalMs: 50));
             window.Resources["ProfilerClientKey"] = 42;
             Assert.True(window.TryFindResource("ProfilerClientKey", out _));
             var notified = await notification.Task.WaitAsync(TimeSpan.FromSeconds(5));
@@ -351,15 +420,20 @@ public sealed class ProfilerIntegrationTests
             await client.DisconnectAsync();
             await WaitUntilAsync(() => !source.HasListeners());
         }
-        finally { window.Close(); }
+        finally
+        {
+            window.Close();
+        }
     }
 
     private static ActivitySource TestSource() => new(Avalonia12ActivityAdapter.SourceName);
+
     private static void Resource(ActivitySource source, object key, bool? found)
     {
         using var activity = source.StartActivity("Avalonia.FindingResource");
         activity?.SetTag("Key", key);
-        if (found is not null) activity?.SetTag("Result", found.Value);
+        if (found is not null)
+            activity?.SetTag("Result", found.Value);
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -374,17 +448,20 @@ public sealed class ProfilerIntegrationTests
             activity?.SetTag("Control", control);
             activity?.SetTag("Style", style);
         }
+
         return [new(key), new(control), new(style)];
     }
 
     private sealed class ThrowingObject
     {
-        public override string ToString() => throw new InvalidOperationException("Application ToString must not execute.");
+        public override string ToString() =>
+            throw new InvalidOperationException("Application ToString must not execute.");
     }
 
     private static async Task WaitUntilAsync(Func<bool> predicate)
     {
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-        while (!predicate()) await Task.Delay(10, timeout.Token);
+        while (!predicate())
+            await Task.Delay(10, timeout.Token);
     }
 }

@@ -20,10 +20,14 @@ internal static class Program
     {
         for (var i = 0; i < args.Length; i++)
         {
-            if (args[i] == "--pipe" && i + 1 < args.Length) PipeName = args[++i];
-            else if (args[i] == "--ready-file" && i + 1 < args.Length) ReadyFile = args[++i];
-            else throw new ArgumentException("Usage: AvaloniaDevTool.AotSample [--pipe NAME] [--ready-file PATH]");
+            if (args[i] == "--pipe" && i + 1 < args.Length)
+                PipeName = args[++i];
+            else if (args[i] == "--ready-file" && i + 1 < args.Length)
+                ReadyFile = args[++i];
+            else
+                throw new ArgumentException("Usage: AvaloniaDevTool.AotSample [--pipe NAME] [--ready-file PATH]");
         }
+
         return AppBuilder.Configure<AotApplication>().UsePlatformDetect().StartWithClassicDesktopLifetime([]);
     }
 }
@@ -59,18 +63,23 @@ public sealed class AotApplication : Application
             desktop.MainWindow = window;
             desktop.ShutdownMode = ShutdownMode.OnMainWindowClose;
             // This dedicated diagnostics consumer intentionally enables the Agent in Release.
-            _agent = DiagnosticsAgent.Attach(this, new DiagnosticsAgentOptions
-            {
-                PipeName = Program.PipeName,
-                ApplicationName = "Native AOT consumer"
-            });
+            _agent = DiagnosticsAgent.Attach(this,
+                new DiagnosticsAgentOptions
+                {
+                    PipeName = Program.PipeName,
+                    ApplicationName = "Native AOT consumer"
+                });
             window.Opened += (_, _) => Dispatcher.UIThread.Post(() =>
-            {
-                if (Program.ReadyFile is { } path)
-                    File.WriteAllText(path, $"pid={Environment.ProcessId}\npipe={Program.PipeName}\ndynamicCodeSupported={RuntimeFeature.IsDynamicCodeSupported}\ndynamicCodeCompiled={RuntimeFeature.IsDynamicCodeCompiled}\n", System.Text.Encoding.UTF8);
-            }, DispatcherPriority.Background);
+                {
+                    if (Program.ReadyFile is { } path)
+                        File.WriteAllText(path,
+                            $"pid={Environment.ProcessId}\npipe={Program.PipeName}\ndynamicCodeSupported={RuntimeFeature.IsDynamicCodeSupported}\ndynamicCodeCompiled={RuntimeFeature.IsDynamicCodeCompiled}\n",
+                            System.Text.Encoding.UTF8);
+                },
+                DispatcherPriority.Background);
             desktop.Exit += (_, _) => _agent.Dispose();
         }
+
         base.OnFrameworkInitializationCompleted();
     }
 }

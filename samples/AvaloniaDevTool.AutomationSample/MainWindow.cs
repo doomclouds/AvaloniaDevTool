@@ -13,8 +13,11 @@ namespace AvaloniaDevTool.AutomationSample;
 public sealed partial class MainWindow : Window
 {
     private readonly TextBlock _interactionStatus = Label("InteractionStatus", "Ready");
+
     private readonly TextBlock _counterPointerTrace = Identify(new TextBlock
-    { Text = "[]", IsVisible = false, Width = 0, Height = 0 }, "CounterPointerTrace");
+            { Text = "[]", IsVisible = false, Width = 0, Height = 0 },
+        "CounterPointerTrace");
+
     private readonly TextBlock _doubleTapStatus = Label("DoubleTapStatus", "DoubleTaps=0");
     private readonly Queue<CounterPointerEvent> _counterEvents = new();
     private readonly TextBlock _windowStatus = Label("WindowStatus", "Secondary closed");
@@ -86,7 +89,8 @@ public sealed partial class MainWindow : Window
         var actions = Identify(new MenuItem { Header = "_Actions" }, "ActionsMenu");
         var invoke = Identify(new MenuItem { Header = "Invoke menu action" }, "MenuActionItem");
         invoke.Click += (_, _) => _menuStatus.Text = "Menu action invoked";
-        var check = Identify(new MenuItem { Header = "Checked menu action", ToggleType = MenuItemToggleType.CheckBox }, "MenuCheckItem");
+        var check = Identify(new MenuItem { Header = "Checked menu action", ToggleType = MenuItemToggleType.CheckBox },
+            "MenuCheckItem");
         check.Click += (_, _) => _menuStatus.Text = $"Menu checked={check.IsChecked}";
         var submenu = Identify(new MenuItem { Header = "Nested actions" }, "NestedMenu");
         var nestedAction = Identify(new MenuItem { Header = "Invoke nested action" }, "NestedMenuActionItem");
@@ -102,7 +106,9 @@ public sealed partial class MainWindow : Window
     private Control BuildControlsPage()
     {
         var page = new StackPanel { Spacing = 10, Margin = new Thickness(8, 12) };
-        var input = Identify(new TextBox { Text = "initial text", PlaceholderText = "Type an acceptance value", Width = 350 }, "InputTextBox");
+        var input = Identify(new TextBox
+                { Text = "initial text", PlaceholderText = "Type an acceptance value", Width = 350 },
+            "InputTextBox");
         input.KeyDown += (_, args) =>
         {
             if (args.Key == Key.Enter)
@@ -114,27 +120,40 @@ public sealed partial class MainWindow : Window
             _interactionStatus.Text = $"Clicks={++_clicks}";
             RecordCounterPointer("click", null, 0, counter);
         };
-        counter.AddHandler(PointerPressedEvent, (_, args) => RecordCounterPointer("down", args.ClickCount, args.Timestamp, counter, args),
-            RoutingStrategies.Bubble, handledEventsToo: true);
-        counter.AddHandler(PointerReleasedEvent, (_, args) => RecordCounterPointer("up", null, args.Timestamp, counter, args),
-            RoutingStrategies.Bubble, handledEventsToo: true);
-        counter.AddHandler(DoubleTappedEvent, (_, _) => RecordCounterPointer("double", null, 0, counter),
-            RoutingStrategies.Bubble, handledEventsToo: true);
+        counter.AddHandler(PointerPressedEvent,
+            (_, args) => RecordCounterPointer("down", args.ClickCount, args.Timestamp, counter, args),
+            RoutingStrategies.Bubble,
+            handledEventsToo: true);
+        counter.AddHandler(PointerReleasedEvent,
+            (_, args) => RecordCounterPointer("up", null, args.Timestamp, counter, args),
+            RoutingStrategies.Bubble,
+            handledEventsToo: true);
+        counter.AddHandler(DoubleTappedEvent,
+            (_, _) => RecordCounterPointer("double", null, 0, counter),
+            RoutingStrategies.Bubble,
+            handledEventsToo: true);
         counter.PointerCaptureLost += (_, _) => RecordCounterPointer("capture-lost", null, 0, counter);
         counter.LostFocus += (_, _) => RecordCounterPointer("focus-lost", null, 0, counter);
-        AddHandler(PointerPressedEvent, (_, args) => RecordCounterPointer("window-down", args.ClickCount, args.Timestamp, counter, args),
-            RoutingStrategies.Tunnel, handledEventsToo: true);
-        AddHandler(PointerReleasedEvent, (_, args) => RecordCounterPointer("window-up", null, args.Timestamp, counter, args),
-            RoutingStrategies.Tunnel, handledEventsToo: true);
+        AddHandler(PointerPressedEvent,
+            (_, args) => RecordCounterPointer("window-down", args.ClickCount, args.Timestamp, counter, args),
+            RoutingStrategies.Tunnel,
+            handledEventsToo: true);
+        AddHandler(PointerReleasedEvent,
+            (_, args) => RecordCounterPointer("window-up", null, args.Timestamp, counter, args),
+            RoutingStrategies.Tunnel,
+            handledEventsToo: true);
         var doubleTap = Identify(new Border
-        {
-            Width = 150, Height = 30, Background = Brushes.LightSteelBlue, Padding = new Thickness(8, 2),
-            Child = Label("DoubleTapTargetText", "Double-tap target")
-        }, "DoubleTapTarget");
+            {
+                Width = 150, Height = 30, Background = Brushes.LightSteelBlue, Padding = new Thickness(8, 2),
+                Child = Label("DoubleTapTargetText", "Double-tap target")
+            },
+            "DoubleTapTarget");
         AutomationProperties.SetAccessibilityView(doubleTap, AccessibilityView.Control);
         doubleTap.DoubleTapped += (_, _) => _doubleTapStatus.Text = $"DoubleTaps={++_doubleTaps}";
-        page.Children.Add(Row(input, ActionButton("CommitInputButton", "Commit input", () => _inputStatus.Text = $"Committed: {input.Text}"),
-            counter, doubleTap));
+        page.Children.Add(Row(input,
+            ActionButton("CommitInputButton", "Commit input", () => _inputStatus.Text = $"Committed: {input.Text}"),
+            counter,
+            doubleTap));
         page.Children.Add(Row(_inputStatus, _doubleTapStatus));
         page.Children.Add(BuildManagedGateControls());
 
@@ -142,10 +161,19 @@ public sealed partial class MainWindow : Window
         check.IsCheckedChanged += (_, _) => _interactionStatus.Text = $"Option={check.IsChecked}";
         var toggle = Identify(new ToggleSwitch { Content = "Toggle option", IsChecked = false }, "OptionToggle");
         toggle.IsCheckedChanged += (_, _) => _interactionStatus.Text = $"Toggle={toggle.IsChecked}";
-        var radioA = Identify(new RadioButton { Content = "Mode A", GroupName = "Mode", IsChecked = true }, "ModeARadio");
+        var radioA = Identify(new RadioButton { Content = "Mode A", GroupName = "Mode", IsChecked = true },
+            "ModeARadio");
         var radioB = Identify(new RadioButton { Content = "Mode B", GroupName = "Mode" }, "ModeBRadio");
-        radioB.IsCheckedChanged += (_, _) => { if (radioB.IsChecked == true) _interactionStatus.Text = "Mode=B"; };
-        radioA.IsCheckedChanged += (_, _) => { if (radioA.IsChecked == true) _interactionStatus.Text = "Mode=A"; };
+        radioB.IsCheckedChanged += (_, _) =>
+        {
+            if (radioB.IsChecked == true)
+                _interactionStatus.Text = "Mode=B";
+        };
+        radioA.IsCheckedChanged += (_, _) =>
+        {
+            if (radioA.IsChecked == true)
+                _interactionStatus.Text = "Mode=A";
+        };
         page.Children.Add(Row(check, toggle, radioA, radioB));
 
         var combo = Identify(new ComboBox { Width = 190, SelectedIndex = 0 }, "ChoiceComboBox");
@@ -157,7 +185,8 @@ public sealed partial class MainWindow : Window
             _comboChoice = (combo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "None";
             UpdateSelectionStatus();
         };
-        var list = Identify(new ListBox { Width = 240, Height = 116, SelectionMode = SelectionMode.Single }, "ChoiceListBox");
+        var list = Identify(new ListBox { Width = 240, Height = 116, SelectionMode = SelectionMode.Single },
+            "ChoiceListBox");
         foreach (var choice in new[] { "One", "Two", "Three" })
             list.Items.Add(Identify(new ListBoxItem { Content = choice }, $"List{choice}Item"));
         list.SelectedIndex = 0;
@@ -182,22 +211,39 @@ public sealed partial class MainWindow : Window
         page.Children.Add(Row(_windowStatus, _dialogStatus));
 
         var popupButton = ActionButton("OpenPopupButton", "Open popup", () => { });
-        var popup = Identify(new Popup { PlacementTarget = popupButton, Placement = PlacementMode.Bottom, IsLightDismissEnabled = true }, "AcceptancePopup");
+        var popup = Identify(new Popup
+                { PlacementTarget = popupButton, Placement = PlacementMode.Bottom, IsLightDismissEnabled = true },
+            "AcceptancePopup");
         popup.Child = new Border
         {
-            Padding = new Thickness(14), Background = Brushes.AliceBlue, BorderBrush = Brushes.SteelBlue, BorderThickness = new Thickness(1),
+            Padding = new Thickness(14), Background = Brushes.AliceBlue, BorderBrush = Brushes.SteelBlue,
+            BorderThickness = new Thickness(1),
             Child = new StackPanel
             {
                 Spacing = 8,
                 Children =
                 {
                     Label("PopupText", "Popup content is a separate popup root"),
-                    ActionButton("PopupActionButton", "Invoke popup action", () => { _popupStatus.Text = "Popup action invoked"; popup.IsOpen = false; })
+                    ActionButton("PopupActionButton",
+                        "Invoke popup action",
+                        () =>
+                        {
+                            _popupStatus.Text = "Popup action invoked";
+                            popup.IsOpen = false;
+                        })
                 }
             }
         };
-        popupButton.Click += (_, _) => { popup.IsOpen = true; _popupStatus.Text = "Popup open"; };
-        popup.Closed += (_, _) => { if (_popupStatus.Text == "Popup open") _popupStatus.Text = "Popup dismissed"; };
+        popupButton.Click += (_, _) =>
+        {
+            popup.IsOpen = true;
+            _popupStatus.Text = "Popup open";
+        };
+        popup.Closed += (_, _) =>
+        {
+            if (_popupStatus.Text == "Popup open")
+                _popupStatus.Text = "Popup dismissed";
+        };
 
         var flyout = new Flyout
         {
@@ -207,18 +253,29 @@ public sealed partial class MainWindow : Window
                 Children =
                 {
                     Label("FlyoutText", "Flyout content"),
-                    ActionButton("FlyoutActionButton", "Invoke flyout action", () => _flyoutStatus.Text = "Flyout action invoked")
+                    ActionButton("FlyoutActionButton",
+                        "Invoke flyout action",
+                        () => _flyoutStatus.Text = "Flyout action invoked")
                 }
             }
         };
         var flyoutButton = ActionButton("OpenFlyoutButton", "Open flyout", () => { });
-        flyoutButton.Click += (_, _) => { _flyoutStatus.Text = "Flyout open"; flyout.ShowAt(flyoutButton); };
-        flyout.Closed += (_, _) => { if (_flyoutStatus.Text == "Flyout open") _flyoutStatus.Text = "Flyout dismissed"; };
-        var contextTarget = Identify(new Border
+        flyoutButton.Click += (_, _) =>
         {
-            Background = Brushes.Lavender, Padding = new Thickness(10),
-            Child = Label("ContextTargetText", "Right-click for context menu")
-        }, "ContextMenuTarget");
+            _flyoutStatus.Text = "Flyout open";
+            flyout.ShowAt(flyoutButton);
+        };
+        flyout.Closed += (_, _) =>
+        {
+            if (_flyoutStatus.Text == "Flyout open")
+                _flyoutStatus.Text = "Flyout dismissed";
+        };
+        var contextTarget = Identify(new Border
+            {
+                Background = Brushes.Lavender, Padding = new Thickness(10),
+                Child = Label("ContextTargetText", "Right-click for context menu")
+            },
+            "ContextMenuTarget");
         var contextMenu = Identify(new ContextMenu(), "AcceptanceContextMenu");
         var contextAction = Identify(new MenuItem { Header = "Invoke context action" }, "ContextMenuActionItem");
         contextAction.Click += (_, _) => _menuStatus.Text = "Context menu action invoked";
@@ -237,39 +294,49 @@ public sealed partial class MainWindow : Window
         for (var i = 1; i <= 60; i++)
         {
             var number = i;
-            rows.Children.Add(ActionButton($"ScrollItem{i:00}", $"Scroll row {i:00}", () => _scrollStatus.Text = $"Clicked row={number:00}"));
+            rows.Children.Add(ActionButton($"ScrollItem{i:00}",
+                $"Scroll row {i:00}",
+                () => _scrollStatus.Text = $"Clicked row={number:00}"));
         }
+
         var scroll = Identify(new ScrollViewer
-        {
-            Height = 240, Content = rows, VerticalScrollBarVisibility = ScrollBarVisibility.Visible,
-            HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled
-        }, "LongScrollViewer");
-        scroll.ScrollChanged += (_, _) => _scrollStatus.Text = $"Offset={scroll.Offset.Y.ToString("0.0", CultureInfo.InvariantCulture)}; Extent={scroll.Extent.Height.ToString("0.0", CultureInfo.InvariantCulture)}";
+            {
+                Height = 240, Content = rows, VerticalScrollBarVisibility = ScrollBarVisibility.Visible,
+                HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled
+            },
+            "LongScrollViewer");
+        scroll.ScrollChanged += (_, _) =>
+            _scrollStatus.Text =
+                $"Offset={scroll.Offset.Y.ToString("0.0", CultureInfo.InvariantCulture)}; Extent={scroll.Extent.Height.ToString("0.0", CultureInfo.InvariantCulture)}";
 
         var canvas = Identify(new Canvas
-        {
-            Height = 180, Width = 760, Background = Brushes.Gainsboro, ClipToBounds = true
-        }, "DragCanvas");
+            {
+                Height = 180, Width = 760, Background = Brushes.Gainsboro, ClipToBounds = true
+            },
+            "DragCanvas");
         var target = Identify(new Border
-        {
-            Width = 120, Height = 80, Background = Brushes.LightGreen, BorderBrush = Brushes.DarkGreen,
-            BorderThickness = new Thickness(2), Child = Label("DropTargetText", "Drop zone"),
-            IsHitTestVisible = false
-        }, "DropTarget");
+            {
+                Width = 120, Height = 80, Background = Brushes.LightGreen, BorderBrush = Brushes.DarkGreen,
+                BorderThickness = new Thickness(2), Child = Label("DropTargetText", "Drop zone"),
+                IsHitTestVisible = false
+            },
+            "DropTarget");
         Canvas.SetLeft(target, 600);
         Canvas.SetTop(target, 70);
         canvas.Children.Add(target);
         var handle = Identify(new Border
-        {
-            Width = 100, Height = 56, Background = Brushes.CornflowerBlue, BorderBrush = Brushes.Navy,
-            BorderThickness = new Thickness(2), Cursor = new Cursor(StandardCursorType.SizeAll),
-            Child = Label("DragHandleText", "Drag me")
-        }, "DragHandle");
+            {
+                Width = 100, Height = 56, Background = Brushes.CornflowerBlue, BorderBrush = Brushes.Navy,
+                BorderThickness = new Thickness(2), Cursor = new Cursor(StandardCursorType.SizeAll),
+                Child = Label("DragHandleText", "Drag me")
+            },
+            "DragHandle");
         Canvas.SetLeft(handle, 20);
         Canvas.SetTop(handle, 20);
         handle.PointerPressed += (_, args) =>
         {
-            if (!args.GetCurrentPoint(handle).Properties.IsLeftButtonPressed) return;
+            if (!args.GetCurrentPoint(handle).Properties.IsLeftButtonPressed)
+                return;
             _dragStart = args.GetPosition(canvas);
             _dragOrigin = new Point(Canvas.GetLeft(handle), Canvas.GetTop(handle));
             args.Pointer.Capture(handle);
@@ -278,7 +345,8 @@ public sealed partial class MainWindow : Window
         };
         handle.PointerMoved += (_, args) =>
         {
-            if (_dragStart is not { } start) return;
+            if (_dragStart is not { } start)
+                return;
             var delta = args.GetPosition(canvas) - start;
             var x = Math.Clamp(_dragOrigin.X + delta.X, 0, canvas.Bounds.Width - handle.Width);
             var y = Math.Clamp(_dragOrigin.Y + delta.Y, 0, canvas.Bounds.Height - handle.Height);
@@ -288,11 +356,14 @@ public sealed partial class MainWindow : Window
         };
         handle.PointerReleased += (_, args) =>
         {
-            if (_dragStart is null) return;
+            if (_dragStart is null)
+                return;
             _dragStart = null;
             args.Pointer.Capture(null);
-            var center = new Point(Canvas.GetLeft(handle) + handle.Width / 2, Canvas.GetTop(handle) + handle.Height / 2);
-            var dropped = new Rect(Canvas.GetLeft(target), Canvas.GetTop(target), target.Width, target.Height).Contains(center);
+            var center = new Point(Canvas.GetLeft(handle) + handle.Width / 2,
+                Canvas.GetTop(handle) + handle.Height / 2);
+            var dropped =
+                new Rect(Canvas.GetLeft(target), Canvas.GetTop(target), target.Width, target.Height).Contains(center);
             _dragStatus.Text = $"Dropped={dropped}; x={Canvas.GetLeft(handle):0}; y={Canvas.GetTop(handle):0}";
             args.Handled = true;
         };
@@ -303,9 +374,17 @@ public sealed partial class MainWindow : Window
             Margin = new Thickness(8, 12), Spacing = 10,
             Children =
             {
-                Label("ScrollInstructions", "Scroll to row 60 and invoke it; drag the blue handle into the green drop zone."),
+                Label("ScrollInstructions",
+                    "Scroll to row 60 and invoke it; drag the blue handle into the green drop zone."),
                 scroll, _scrollStatus, canvas, _dragStatus,
-                ActionButton("ResetDragButton", "Reset drag", () => { Canvas.SetLeft(handle, 20); Canvas.SetTop(handle, 20); _dragStatus.Text = "Drag reset"; })
+                ActionButton("ResetDragButton",
+                    "Reset drag",
+                    () =>
+                    {
+                        Canvas.SetLeft(handle, 20);
+                        Canvas.SetTop(handle, 20);
+                        _dragStatus.Text = "Drag reset";
+                    })
             }
         };
     }
@@ -317,29 +396,37 @@ public sealed partial class MainWindow : Window
             existing.Activate();
             return;
         }
+
         var secondaryInput = Identify(new TextBox { Text = "secondary text" }, "SecondaryInput");
         var secondaryStatus = Label("SecondaryStatus", "Secondary ready");
         var window = Identify(new Window
-        {
-            Title = "Automation secondary window", Width = 460, Height = 280,
-            WindowStartupLocation = WindowStartupLocation.CenterOwner
-        }, "SecondaryWindow");
+            {
+                Title = "Automation secondary window", Width = 460, Height = 280,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner
+            },
+            "SecondaryWindow");
         window.Content = new StackPanel
         {
             Margin = new Thickness(22), Spacing = 12,
             Children =
             {
                 Label("SecondaryHeading", "Independent desktop window"), secondaryInput,
-                ActionButton("SecondaryActionButton", "Apply secondary input", () =>
-                {
-                    secondaryStatus.Text = $"Applied {++_secondaryClicks}: {secondaryInput.Text}";
-                    _windowStatus.Text = secondaryStatus.Text;
-                }),
+                ActionButton("SecondaryActionButton",
+                    "Apply secondary input",
+                    () =>
+                    {
+                        secondaryStatus.Text = $"Applied {++_secondaryClicks}: {secondaryInput.Text}";
+                        _windowStatus.Text = secondaryStatus.Text;
+                    }),
                 secondaryStatus,
                 ActionButton("CloseSecondaryButton", "Close secondary", () => window.Close())
             }
         };
-        window.Closed += (_, _) => { _secondary = null; _windowStatus.Text = "Secondary closed"; };
+        window.Closed += (_, _) =>
+        {
+            _secondary = null;
+            _windowStatus.Text = "Secondary closed";
+        };
         _secondary = window;
         window.Show(this);
         _windowStatus.Text = "Secondary open";
@@ -349,10 +436,11 @@ public sealed partial class MainWindow : Window
     {
         var input = Identify(new TextBox { Text = "dialog text" }, "DialogInput");
         var dialog = Identify(new Window
-        {
-            Title = "Automation modal dialog", Width = 440, Height = 230, CanResize = false,
-            WindowStartupLocation = WindowStartupLocation.CenterOwner
-        }, "ModalDialog");
+            {
+                Title = "Automation modal dialog", Width = 440, Height = 230, CanResize = false,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner
+            },
+            "ModalDialog");
         dialog.Content = new StackPanel
         {
             Margin = new Thickness(22), Spacing = 14,
@@ -368,32 +456,60 @@ public sealed partial class MainWindow : Window
         _dialogStatus.Text = result is null ? "Dialog cancelled" : $"Dialog accepted: {result}";
     }
 
-    private void UpdateSelectionStatus() => _selectionStatus.Text = $"Combo={_comboChoice}; List={_listChoice}; Tab={_tabChoice}";
+    private void UpdateSelectionStatus() =>
+        _selectionStatus.Text = $"Combo={_comboChoice}; List={_listChoice}; Tab={_tabChoice}";
 
-    private void RecordCounterPointer(string kind, int? clickCount, ulong timestamp, Button counter, PointerEventArgs? args = null)
+    private void RecordCounterPointer(string kind,
+        int? clickCount,
+        ulong timestamp,
+        Button counter,
+        PointerEventArgs? args = null)
     {
         var point = args?.GetPosition(counter);
         var source = args?.Source as StyledElement;
         var captured = args?.Pointer.Captured as StyledElement;
-        _counterEvents.Enqueue(new CounterPointerEvent(kind, clickCount, timestamp, _clicks, counter.IsPressed,
-            source?.Name ?? args?.Source?.GetType().Name, point?.X, point?.Y, captured?.Name ?? captured?.GetType().Name));
-        while (_counterEvents.Count > 32) _counterEvents.Dequeue();
+        _counterEvents.Enqueue(new CounterPointerEvent(kind,
+            clickCount,
+            timestamp,
+            _clicks,
+            counter.IsPressed,
+            source?.Name ?? args?.Source?.GetType().Name,
+            point?.X,
+            point?.Y,
+            captured?.Name ?? captured?.GetType().Name));
+        while (_counterEvents.Count > 32)
+            _counterEvents.Dequeue();
         // Property previews are bounded; keep the most recent input evidence first.
         _counterPointerTrace.Text = System.Text.Json.JsonSerializer.Serialize(_counterEvents.Reverse());
     }
 
-    private sealed record CounterPointerEvent(string Kind, int? ClickCount, ulong Timestamp, int Clicks,
-        bool IsPressed, string? Source, double? X, double? Y, string? Captured);
+    private sealed record CounterPointerEvent(
+        string Kind,
+        int? ClickCount,
+        ulong Timestamp,
+        int Clicks,
+        bool IsPressed,
+        string? Source,
+        double? X,
+        double? Y,
+        string? Captured);
 
     private static StackPanel Row(params Control[] children)
     {
-        var row = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 12, VerticalAlignment = VerticalAlignment.Center };
-        foreach (var child in children) row.Children.Add(child);
+        var row = new StackPanel
+            { Orientation = Orientation.Horizontal, Spacing = 12, VerticalAlignment = VerticalAlignment.Center };
+        foreach (var child in children)
+            row.Children.Add(child);
         return row;
     }
 
     private static TextBlock Label(string id, string text, double fontSize = 14) =>
-        Identify(new TextBlock { Text = text, FontSize = fontSize, TextWrapping = TextWrapping.Wrap, VerticalAlignment = VerticalAlignment.Center }, id);
+        Identify(new TextBlock
+            {
+                Text = text, FontSize = fontSize, TextWrapping = TextWrapping.Wrap,
+                VerticalAlignment = VerticalAlignment.Center
+            },
+            id);
 
     private static Button ActionButton(string id, string text, Action action)
     {

@@ -1,4 +1,9 @@
-<Window xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        x:Class="AvaloniaDevTool.PreviewFixture.FixtureWindow" Width="320" Height="200" Background="#455A64">
-  <TextBlock Name="WindowResourceText" Text="{DynamicResource FixtureTitle}" />
+<Window xmlns="https://github.com/avaloniaui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="AvaloniaDevTool.PreviewFixture.FixtureWindow"
+    Width="320"
+    Height="200"
+    Background="#455A64">
+    <TextBlock Name="WindowResourceText"
+        Text="{DynamicResource FixtureTitle}" />
 </Window>

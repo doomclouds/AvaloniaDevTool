@@ -81,7 +81,10 @@ public sealed class NativeScreenshotGeometryTests
     {
         var valid = Rectangle();
         NativeScreenshotRequest[] requests =
-        [valid with { X = value }, valid with { Y = value }, valid with { Width = value }, valid with { Height = value }];
+        [
+            valid with { X = value }, valid with { Y = value }, valid with { Width = value },
+            valid with { Height = value }
+        ];
 
         foreach (var request in requests)
             AssertError("invalid_coordinates", () => NativeScreenshotRegion.ValidateRequest(request));
@@ -122,7 +125,8 @@ public sealed class NativeScreenshotGeometryTests
     public void A_node_local_rectangle_is_offset_from_the_scoped_window_source()
     {
         var region = NativeScreenshotRegion.Create(Rectangle(5, 7, 20, 10),
-            new NativeBounds(130, 240, 50, 40), new NativeBounds(100, 200, 200, 100));
+            new NativeBounds(130, 240, 50, 40),
+            new NativeBounds(100, 200, 200, 100));
 
         Assert.Equal(new NativeScreenshotRegion(35, 47, 20, 10, new(135, 247, 20, 10)), region);
     }
@@ -131,7 +135,8 @@ public sealed class NativeScreenshotGeometryTests
     public void Fractional_bounds_round_outward_to_include_each_intersecting_physical_pixel()
     {
         var region = NativeScreenshotRegion.Create(Rectangle(0.5, 0.5, 10.25, 5.25),
-            new NativeBounds(10.25, 20.75, 40.5, 30.125), Window);
+            new NativeBounds(10.25, 20.75, 40.5, 30.125),
+            Window);
 
         Assert.Equal(new NativeScreenshotRegion(10, 21, 11, 6, new(10, 21, 11, 6)), region);
     }
@@ -140,7 +145,8 @@ public sealed class NativeScreenshotGeometryTests
     public void Negative_screen_coordinates_preserve_floor_and_ceiling_semantics()
     {
         var region = NativeScreenshotRegion.Create(new() { NodeId = "scoped-node" },
-            new NativeBounds(-1750.75, -950.25, 10.5, 20.5), new NativeBounds(-1920, -1080, 1920, 1080));
+            new NativeBounds(-1750.75, -950.25, 10.5, 20.5),
+            new NativeBounds(-1920, -1080, 1920, 1080));
 
         Assert.Equal(new NativeScreenshotRegion(169, 129, 11, 22, new(-1751, -951, 11, 22)), region);
     }
@@ -156,9 +162,12 @@ public sealed class NativeScreenshotGeometryTests
             new NativeBounds(-1600 + 100 * scale, 120 * scale, 200 * scale, 100 * scale),
             new NativeBounds(-1600, 0, 1600, 1200));
 
-        Assert.Equal(new NativeScreenshotRegion((int)(120 * scale), (int)(132 * scale),
-            (int)(40 * scale), (int)(24 * scale),
-            new(-1600 + 120 * scale, 132 * scale, 40 * scale, 24 * scale)), region);
+        Assert.Equal(new NativeScreenshotRegion((int)(120 * scale),
+                (int)(132 * scale),
+                (int)(40 * scale),
+                (int)(24 * scale),
+                new(-1600 + 120 * scale, 132 * scale, 40 * scale, 24 * scale)),
+            region);
     }
 
     [Theory]
@@ -170,7 +179,8 @@ public sealed class NativeScreenshotGeometryTests
     [InlineData(double.MaxValue, 0, double.MaxValue, 1)]
     public void The_requested_rectangle_must_remain_inside_the_node(double x, double y, double width, double height)
     {
-        AssertError("invalid_coordinates", () => NativeScreenshotRegion.Create(Rectangle(x, y, width, height), Window, Window));
+        AssertError("invalid_coordinates",
+            () => NativeScreenshotRegion.Create(Rectangle(x, y, width, height), Window, Window));
     }
 
     [Theory]
@@ -182,8 +192,10 @@ public sealed class NativeScreenshotGeometryTests
     [InlineData(100, 99.75)]
     public void A_region_outside_any_side_of_the_window_source_is_rejected(double x, double y)
     {
-        AssertError("screenshot_region_out_of_bounds", () => NativeScreenshotRegion.Create(Rectangle(width: 2, height: 2),
-            new NativeBounds(x, y, 2, 2), new NativeBounds(100, 100, 10, 10)));
+        AssertError("screenshot_region_out_of_bounds",
+            () => NativeScreenshotRegion.Create(Rectangle(width: 2, height: 2),
+                new NativeBounds(x, y, 2, 2),
+                new NativeBounds(100, 100, 10, 10)));
     }
 
     [Fact]
@@ -191,7 +203,8 @@ public sealed class NativeScreenshotGeometryTests
     {
         var node = new NativeBounds(80, 80, 80, 80);
         var window = new NativeBounds(100, 100, 100, 100);
-        AssertError("screenshot_region_out_of_bounds", () => NativeScreenshotRegion.Create(new() { NodeId = "scoped-node" }, node, window));
+        AssertError("screenshot_region_out_of_bounds",
+            () => NativeScreenshotRegion.Create(new() { NodeId = "scoped-node" }, node, window));
 
         var region = NativeScreenshotRegion.Create(Rectangle(20, 20, 60, 60), node, window);
 
@@ -227,10 +240,15 @@ public sealed class NativeScreenshotGeometryTests
     [InlineData(0, 0.5, 10, 10)]
     [InlineData(0, 0, 10.5, 10)]
     [InlineData(0, 0, 10, 10.5)]
-    public void The_complete_window_source_must_use_integer_physical_pixels(double x, double y, double width, double height)
+    public void The_complete_window_source_must_use_integer_physical_pixels(double x,
+        double y,
+        double width,
+        double height)
     {
-        AssertError("screenshot_source_limit", () => NativeScreenshotRegion.Create(Rectangle(), new NativeBounds(1, 1, 1, 1),
-            new NativeBounds(x, y, width, height)));
+        AssertError("screenshot_source_limit",
+            () => NativeScreenshotRegion.Create(Rectangle(),
+                new NativeBounds(1, 1, 1, 1),
+                new NativeBounds(x, y, width, height)));
     }
 
     [Fact]
@@ -241,8 +259,10 @@ public sealed class NativeScreenshotGeometryTests
         var region = NativeScreenshotRegion.Create(request, node, new NativeBounds(0, 0, 16_000_000, 1));
         Assert.Equal(new NativeScreenshotRegion(0, 0, 1, 1, node), region);
 
-        AssertError("screenshot_source_limit", () => NativeScreenshotRegion.Create(request, node,
-            new NativeBounds(0, 0, 16_000_001, 1)));
+        AssertError("screenshot_source_limit",
+            () => NativeScreenshotRegion.Create(request,
+                node,
+                new NativeBounds(0, 0, 16_000_001, 1)));
     }
 
     [Fact]
@@ -252,7 +272,8 @@ public sealed class NativeScreenshotGeometryTests
         var region = NativeScreenshotRegion.Create(Rectangle(0.1, 0.1, 1, 1, maxPixels: 4), node, Window);
         Assert.Equal(new NativeScreenshotRegion(0, 0, 2, 2, new(0, 0, 2, 2)), region);
 
-        AssertError("screenshot_pixel_limit", () => NativeScreenshotRegion.Create(Rectangle(0.1, 0.1, 1, 1, maxPixels: 3), node, Window));
+        AssertError("screenshot_pixel_limit",
+            () => NativeScreenshotRegion.Create(Rectangle(0.1, 0.1, 1, 1, maxPixels: 3), node, Window));
     }
 
     [Fact]
@@ -263,8 +284,10 @@ public sealed class NativeScreenshotGeometryTests
         var region = NativeScreenshotRegion.Create(request, bounds, bounds);
         Assert.Equal(new NativeScreenshotRegion(0, 0, 4000, 4000, bounds), region);
 
-        AssertError("screenshot_pixel_limit", () => NativeScreenshotRegion.Create(request with { MaxPixels = 15_999_999 }, bounds, bounds));
-        AssertError("screenshot_pixel_limit", () => NativeScreenshotRegion.Create(request with { MaxPixels = 8_000_000 }, bounds, bounds));
+        AssertError("screenshot_pixel_limit",
+            () => NativeScreenshotRegion.Create(request with { MaxPixels = 15_999_999 }, bounds, bounds));
+        AssertError("screenshot_pixel_limit",
+            () => NativeScreenshotRegion.Create(request with { MaxPixels = 8_000_000 }, bounds, bounds));
     }
 
     [Fact]
@@ -307,7 +330,10 @@ public sealed class NativeScreenshotGeometryTests
         AssertError("invalid_coordinates", () => NativeScreenshotRegion.Create(request, node, Window));
     }
 
-    private static NativeScreenshotRequest Rectangle(double x = 0, double y = 0, double width = 1, double height = 1,
+    private static NativeScreenshotRequest Rectangle(double x = 0,
+        double y = 0,
+        double width = 1,
+        double height = 1,
         int maxPixels = 8_000_000) => new()
     {
         NodeId = "scoped-node", X = x, Y = y, Width = width, Height = height, MaxPixels = maxPixels

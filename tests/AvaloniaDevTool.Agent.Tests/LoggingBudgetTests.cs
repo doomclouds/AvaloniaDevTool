@@ -19,10 +19,12 @@ public sealed class LoggingBudgetTests
         window.Show();
         try
         {
-            await using var agent = DiagnosticsAgent.Attach(Application.Current!, new DiagnosticsAgentOptions
-            {
-                PipeName = "logging-budget-" + Guid.NewGuid().ToString("N"), TopLevelProvider = () => [window], LogSources = [source]
-            });
+            await using var agent = DiagnosticsAgent.Attach(Application.Current!,
+                new DiagnosticsAgentOptions
+                {
+                    PipeName = "logging-budget-" + Guid.NewGuid().ToString("N"), TopLevelProvider = () => [window],
+                    LogSources = [source]
+                });
             await using var client = new DiagnosticsClient();
             await client.ConnectAsync(agent.PipeName);
             await client.StartActivityAsync(new ActivityStartRequest());
@@ -30,14 +32,23 @@ public sealed class LoggingBudgetTests
             await Task.Run(() =>
             {
                 for (var index = 0; index < 48; index++)
-                    source.Publish(new("Warning", "Budget", "Entry {Index}",
-                        [new("Index", index), .. Enumerable.Range(1, 31).Select(value => new KeyValuePair<string, object?>("P" + value, text))]));
+                    source.Publish(new("Warning",
+                        "Budget",
+                        "Entry {Index}",
+                        [
+                            new("Index", index),
+                            .. Enumerable.Range(1, 31)
+                                .Select(value => new KeyValuePair<string, object?>("P" + value, text))
+                        ]));
             });
             var history = await client.GetActivityAsync();
             Assert.NotEmpty(history);
             Assert.Equal("47", history[^1].LogDetails!.Parameters[0].Value);
-            Assert.True(JsonSerializer.SerializeToUtf8Bytes(history, ProtocolJson.Options).Length < RpcPeer.MaximumFrameBytes - 4096);
-            Assert.All(history, entry => Assert.True(JsonSerializer.SerializeToUtf8Bytes(entry, ProtocolJson.Options).Length <= ActivityService.MaximumEntryBytes));
+            Assert.True(JsonSerializer.SerializeToUtf8Bytes(history, ProtocolJson.Options).Length <
+                        RpcPeer.MaximumFrameBytes - 4096);
+            Assert.All(history,
+                entry => Assert.True(JsonSerializer.SerializeToUtf8Bytes(entry, ProtocolJson.Options).Length <=
+                                     ActivityService.MaximumEntryBytes));
             var status = await client.GetActivityStatusAsync();
             Assert.InRange(status.BufferedBytes, 1, status.ByteBudget);
             Assert.Equal(ActivityService.BufferedByteBudget, status.ByteBudget);
@@ -54,7 +65,10 @@ public sealed class LoggingBudgetTests
             Assert.Equal(0, status.ByteEvictedCount);
             Assert.Equal(0, status.BudgetTruncatedCount);
         }
-        finally { window.Close(); }
+        finally
+        {
+            window.Close();
+        }
     }
 
     [AvaloniaFact]
@@ -64,12 +78,19 @@ public sealed class LoggingBudgetTests
         using var service = new ActivityService(new WeakObjectRegistry(), (_, _) => { }, [source]);
         service.Start(new ActivityStartRequest());
         var text = string.Concat(Enumerable.Repeat("中\"\\\n\u0001", 210));
-        var parameters = Enumerable.Range(0, 32).Select(index => new KeyValuePair<string, object?>("P" + index, text)).ToArray();
-        var scopes = Enumerable.Range(0, 8).Select(_ => (IReadOnlyList<KeyValuePair<string, object?>>)parameters).ToArray();
-        source.Publish(new("Error", "Maximum", new string('中', 6000), parameters,
-            new AggregateException(Enumerable.Range(0, 20).Select(_ => new Exception(text))), Scopes: scopes));
+        var parameters = Enumerable.Range(0, 32).Select(index => new KeyValuePair<string, object?>("P" + index, text))
+            .ToArray();
+        var scopes = Enumerable.Range(0, 8).Select(_ => (IReadOnlyList<KeyValuePair<string, object?>>)parameters)
+            .ToArray();
+        source.Publish(new("Error",
+            "Maximum",
+            new string('中', 6000),
+            parameters,
+            new AggregateException(Enumerable.Range(0, 20).Select(_ => new Exception(text))),
+            Scopes: scopes));
         var entry = Assert.Single(service.Snapshot());
-        Assert.True(JsonSerializer.SerializeToUtf8Bytes(entry, ProtocolJson.Options).Length <= ActivityService.MaximumEntryBytes);
+        Assert.True(JsonSerializer.SerializeToUtf8Bytes(entry, ProtocolJson.Options).Length <=
+                    ActivityService.MaximumEntryBytes);
         Assert.True(entry.LogDetails!.ByteBudgetTruncated);
         Assert.Equal(32, entry.LogDetails.Parameters.Count);
         Assert.Contains(entry.LogDetails.Parameters, parameter => parameter.IsTruncated);
@@ -87,13 +108,21 @@ public sealed class LoggingBudgetTests
         var source = new DiagnosticsLogSource();
         using var service = new ActivityService(new WeakObjectRegistry(), (_, _) => { }, [source]);
         service.Start(new ActivityStartRequest());
-        source.Publish(new("Warning", "Ordinary", "Ordinary {P0}", Enumerable.Range(0, 32)
-            .Select(index => new KeyValuePair<string, object?>("P" + index, new string('x', 1024))).ToArray()));
+        source.Publish(new("Warning",
+            "Ordinary",
+            "Ordinary {P0}",
+            Enumerable.Range(0, 32)
+                .Select(index => new KeyValuePair<string, object?>("P" + index, new string('x', 1024))).ToArray()));
         var details = Assert.Single(service.Snapshot()).LogDetails!;
         Assert.False(details.ByteBudgetTruncated);
         Assert.False(details.ParametersTruncated);
         Assert.Equal(32, details.Parameters.Count);
-        Assert.All(details.Parameters, parameter => { Assert.Equal(1024, parameter.Value!.Length); Assert.False(parameter.IsTruncated); });
+        Assert.All(details.Parameters,
+            parameter =>
+            {
+                Assert.Equal(1024, parameter.Value!.Length);
+                Assert.False(parameter.IsTruncated);
+            });
     }
 
     [AvaloniaFact]
@@ -102,18 +131,24 @@ public sealed class LoggingBudgetTests
         var source = new DiagnosticsLogSource();
         var notified = 0;
         var oversizedNotification = false;
-        using var service = new ActivityService(new WeakObjectRegistry(), (method, payload) =>
-        {
-            if (method != ActivityMethods.EntryAdded) return;
-            oversizedNotification |= JsonSerializer.SerializeToUtf8Bytes(payload, ProtocolJson.Options).Length > ActivityService.MaximumEntryBytes;
-            notified++;
-        }, [source]);
+        using var service = new ActivityService(new WeakObjectRegistry(),
+            (method, payload) =>
+            {
+                if (method != ActivityMethods.EntryAdded)
+                    return;
+                oversizedNotification |= JsonSerializer.SerializeToUtf8Bytes(payload, ProtocolJson.Options).Length >
+                                         ActivityService.MaximumEntryBytes;
+                notified++;
+            },
+            [source]);
         service.Start(new ActivityStartRequest());
         var text = string.Concat(Enumerable.Repeat("中\"\\\n\u0001", 210));
-        var parameters = Enumerable.Range(0, 32).Select(index => new KeyValuePair<string, object?>("P" + index, text)).ToArray();
+        var parameters = Enumerable.Range(0, 32).Select(index => new KeyValuePair<string, object?>("P" + index, text))
+            .ToArray();
         var workers = Enumerable.Range(0, 4).Select(worker => Task.Run(() =>
         {
-            for (var index = 0; index < 120; index++) source.Publish(new("Warning", "Concurrent", $"Worker {worker}: {index}", parameters));
+            for (var index = 0; index < 120; index++)
+                source.Publish(new("Warning", "Concurrent", $"Worker {worker}: {index}", parameters));
         })).ToArray();
         for (var cycle = 0; cycle < 6; cycle++)
         {
@@ -122,8 +157,13 @@ public sealed class LoggingBudgetTests
             var status = service.Status();
             Assert.InRange(status.BufferedBytes, 0, ActivityService.BufferedByteBudget);
             service.Clear();
-            if (cycle % 2 == 0) { service.Stop(); service.Start(new ActivityStartRequest()); }
+            if (cycle % 2 == 0)
+            {
+                service.Stop();
+                service.Start(new ActivityStartRequest());
+            }
         }
+
         await Task.WhenAll(workers);
         service.Stop();
         Assert.InRange(service.Status().BufferedBytes, 0, ActivityService.BufferedByteBudget);
@@ -145,13 +185,16 @@ public sealed class LoggingBudgetTests
         using var service = new ActivityService(new WeakObjectRegistry(), (_, _) => { }, [source], sender.SendAsync);
         service.Start(new ActivityStartRequest());
         var text = new string('中', 1024);
-        for (var index = 0; index < 300; index++) source.Publish(new("Warning", "Slow", "Entry {Index}: {Value}", [new("Index", index), new("Value", text)]));
+        for (var index = 0; index < 300; index++)
+            source.Publish(new("Warning", "Slow", "Entry {Index}: {Value}", [new("Index", index), new("Value", text)]));
         _ = service.Snapshot();
         await WaitUntilAsync(() => sender.EntryStarted > 0);
-        for (var index = 300; index < 600; index++) source.Publish(new("Warning", "Slow", "Entry {Index}: {Value}", [new("Index", index), new("Value", text)]));
+        for (var index = 300; index < 600; index++)
+            source.Publish(new("Warning", "Slow", "Entry {Index}: {Value}", [new("Index", index), new("Value", text)]));
         var history = service.Snapshot();
         Assert.Equal("599", history[^1].LogDetails!.Parameters[0].Value);
-        Assert.True(JsonSerializer.SerializeToUtf8Bytes(history, ProtocolJson.Options).Length < RpcPeer.MaximumFrameBytes - 4096);
+        Assert.True(JsonSerializer.SerializeToUtf8Bytes(history, ProtocolJson.Options).Length <
+                    RpcPeer.MaximumFrameBytes - 4096);
         var status = service.Status();
         Assert.InRange(status.BufferedBytes, 1, ActivityService.BufferedByteBudget);
         Assert.InRange(status.NotificationBufferedBytes, 1, ActivityService.NotificationByteBudget);
@@ -202,7 +245,8 @@ public sealed class LoggingBudgetTests
     private static async Task WaitUntilAsync(Func<bool> predicate)
     {
         var end = DateTime.UtcNow.AddSeconds(8);
-        while (!predicate() && DateTime.UtcNow < end) await Task.Delay(5);
+        while (!predicate() && DateTime.UtcNow < end)
+            await Task.Delay(5);
         Assert.True(predicate());
     }
 
@@ -225,13 +269,17 @@ public sealed class LoggingBudgetTests
             Interlocked.Exchange(ref _maximumActive, Math.Max(active, MaximumActive));
             try
             {
-                if (method != ActivityMethods.EntryAdded) return;
+                if (method != ActivityMethods.EntryAdded)
+                    return;
                 Interlocked.Increment(ref _entryStarted);
                 await Volatile.Read(ref _gate).Task.WaitAsync(token);
                 token.ThrowIfCancellationRequested();
                 Completed.Enqueue(((ActivityEntry)payload).Sequence);
             }
-            finally { Interlocked.Decrement(ref _active); }
+            finally
+            {
+                Interlocked.Decrement(ref _active);
+            }
         }
 
         private static TaskCompletionSource NewGate() => new(TaskCreationOptions.RunContinuationsAsynchronously);

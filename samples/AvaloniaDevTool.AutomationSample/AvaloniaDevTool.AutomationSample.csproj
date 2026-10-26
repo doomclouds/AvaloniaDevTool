@@ -1,10 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="Avalonia.Desktop" Version="$(AvaloniaVersion)" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="$(AvaloniaVersion)" />
-    <ProjectReference Include="../../src/AvaloniaDevTool.Agent/AvaloniaDevTool.Agent.csproj" />
-  </ItemGroup>
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Avalonia.Desktop"
+            Version="$(AvaloniaVersion)" />
+        <PackageReference Include="Avalonia.Themes.Fluent"
+            Version="$(AvaloniaVersion)" />
+        <ProjectReference Include="../../src/AvaloniaDevTool.Agent/AvaloniaDevTool.Agent.csproj" />
+    </ItemGroup>
 </Project>

@@ -17,19 +17,23 @@ public sealed partial class App
             var token = Program.RemoteTokenEnvironmentVariable is { } variable
                 ? Environment.GetEnvironmentVariable(variable)
                 : DiagnosticsRemoteServer.GenerateBearerToken();
-            if (string.IsNullOrWhiteSpace(token)) throw new InvalidOperationException("指定的令牌环境变量为空。");
-            var server = await DiagnosticsRemoteServer.StartAsync(agent, new DiagnosticsRemoteServerOptions
-            { BearerToken = token, Port = Program.RemotePort });
+            if (string.IsNullOrWhiteSpace(token))
+                throw new InvalidOperationException("指定的令牌环境变量为空。");
+            var server = await DiagnosticsRemoteServer.StartAsync(agent,
+                new DiagnosticsRemoteServerOptions
+                    { BearerToken = token, Port = Program.RemotePort });
             var accepted = await Dispatcher.UIThread.InvokeAsync(() =>
             {
-                if (_remoteStopping) return false;
+                if (_remoteStopping)
+                    return false;
                 _remoteServer = server;
                 RemoteToken = token;
                 window.ViewModel.RemoteEndpoint = server.Endpoint.AbsoluteUri;
                 window.ViewModel.RemoteReady = true;
                 return true;
             });
-            if (!accepted) await server.DisposeAsync();
+            if (!accepted)
+                await server.DisposeAsync();
         }
         catch (Exception error)
         {
@@ -45,7 +49,8 @@ public sealed partial class App
     {
         _remoteStopping = true;
         RemoteToken = null;
-        if (_remoteServer is { } server) _ = server.DisposeAsync().AsTask();
+        if (_remoteServer is { } server)
+            _ = server.DisposeAsync().AsTask();
         _remoteServer = null;
     }
 }

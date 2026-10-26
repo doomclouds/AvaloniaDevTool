@@ -48,8 +48,10 @@ public sealed class AgentCaptureMcpTests
         Log("Capture raw warning");
         var current = Read<AgentCaptureResult>(await Call(mcp, "capture-status", ("captureId", started.CaptureId)));
         Assert.Equal("9007199254740993", Assert.Single(current.Metrics!.Samples).RawValue);
-        Assert.Contains(current.Profiler!.Samples, sample => sample.Category == ProfilerCategory.ResourceLookup && sample.Key == "CaptureRawResource");
-        Assert.Contains(current.Activity!.Entries, entry => entry.Category == "Capture.Tests" && entry.Message == "Capture raw warning");
+        Assert.Contains(current.Profiler!.Samples,
+            sample => sample.Category == ProfilerCategory.ResourceLookup && sample.Key == "CaptureRawResource");
+        Assert.Contains(current.Activity!.Entries,
+            entry => entry.Category == "Capture.Tests" && entry.Message == "Capture raw warning");
 
         var stopped = Read<AgentCaptureResult>(await Call(mcp, "capture-stop", ("captureId", started.CaptureId)));
         Assert.Equal("stopped", stopped.State);
@@ -62,7 +64,8 @@ public sealed class AgentCaptureMcpTests
         Log("After stopped capture");
         var frozen = Read<AgentCaptureResult>(await Call(mcp, "capture-status", ("captureId", started.CaptureId)));
         Assert.Equal(Serialize(stopped), Serialize(frozen));
-        Assert.Equal(Serialize(stopped), Serialize(Read<AgentCaptureResult>(await Call(mcp, "capture-stop", ("captureId", started.CaptureId)))));
+        Assert.Equal(Serialize(stopped),
+            Serialize(Read<AgentCaptureResult>(await Call(mcp, "capture-stop", ("captureId", started.CaptureId)))));
     }
 
     [AvaloniaTheory]
@@ -85,7 +88,8 @@ public sealed class AgentCaptureMcpTests
                 counter.Add(17);
                 break;
             case "profiler":
-                await client.StartProfilerAsync(new ProfilerStartRequest(Categories: [ProfilerCategory.ResourceLookup]), Token);
+                await client.StartProfilerAsync(new ProfilerStartRequest(Categories: [ProfilerCategory.ResourceLookup]),
+                    Token);
                 fixture.EmitResourceLookup("PreflightPreserved");
                 break;
             case "activity":
@@ -93,6 +97,7 @@ public sealed class AgentCaptureMcpTests
                 Log("Preflight retained activity", LogEventLevel.Error);
                 break;
         }
+
         var beforeMetrics = await client.GetMetricsSnapshotAsync(Token);
         var beforeProfiler = await client.GetProfilerSnapshotAsync(Token);
         var beforeActivity = await client.GetActivityStatusAsync(Token);
@@ -105,11 +110,14 @@ public sealed class AgentCaptureMcpTests
         Assert.Equal(running == "activity", afterActivity.IsRunning);
         Assert.Equal(beforeMetrics.Status.CaptureId, afterMetrics.Status.CaptureId);
         Assert.Equal(beforeProfiler.Status.CaptureId, afterProfiler.Status.CaptureId);
-        Assert.Equal(beforeMetrics.Samples.Select(sample => sample.RawValue), afterMetrics.Samples.Select(sample => sample.RawValue));
-        Assert.Equal(beforeProfiler.Samples.Select(sample => sample.Sequence), afterProfiler.Samples.Select(sample => sample.Sequence));
+        Assert.Equal(beforeMetrics.Samples.Select(sample => sample.RawValue),
+            afterMetrics.Samples.Select(sample => sample.RawValue));
+        Assert.Equal(beforeProfiler.Samples.Select(sample => sample.Sequence),
+            afterProfiler.Samples.Select(sample => sample.Sequence));
         Assert.Equal(beforeActivity.MinimumLogLevel, afterActivity.MinimumLogLevel);
         if (running == "activity")
-            Assert.Contains(await client.GetActivityAsync(Token), entry => entry.Message == "Preflight retained activity");
+            Assert.Contains(await client.GetActivityAsync(Token),
+                entry => entry.Message == "Preflight retained activity");
     }
 
     [AvaloniaTheory]
@@ -127,7 +135,10 @@ public sealed class AgentCaptureMcpTests
         var client = await session.GetAsync(Token);
         await Assert.ThrowsAsync<McpException>(() => invalid switch
         {
-            "no-service" => tools.StartCapture(metrics: false, profiler: false, activity: false, cancellationToken: Token),
+            "no-service" => tools.StartCapture(metrics: false,
+                profiler: false,
+                activity: false,
+                cancellationToken: Token),
             "invalid-category" => tools.StartCapture(profilerCategories: ["MissingCategory"], cancellationToken: Token),
             "invalid-log-level" => tools.StartCapture(minimumLevel: "MissingLevel", cancellationToken: Token),
             "invalid-capacity" => tools.StartCapture(capacity: 0, cancellationToken: Token),
@@ -193,16 +204,25 @@ public sealed class AgentCaptureMcpTests
         await using var agent = fixture.Attach();
         await using var session = new ToolSession(agent.PipeName);
         var tools = CreateTools(session);
-        var capture = await tools.StartCapture(metrics: service == "metrics", profiler: service == "profiler",
-            activity: service == "activity", cancellationToken: Token);
+        var capture = await tools.StartCapture(metrics: service == "metrics",
+            profiler: service == "profiler",
+            activity: service == "activity",
+            cancellationToken: Token);
         var client = await session.GetAsync(Token);
         switch (service)
         {
-            case "metrics": await client.StartMetricsAsync(new MetricsStartRequest(MeterNames: ["ExternalOwner"]), Token); break;
-            case "profiler": await client.StartProfilerAsync(new ProfilerStartRequest(Filter: "ExternalOwner"), Token); break;
+            case "metrics":
+                await client.StartMetricsAsync(new MetricsStartRequest(MeterNames: ["ExternalOwner"]), Token);
+                break;
+            case "profiler":
+                await client.StartProfilerAsync(new ProfilerStartRequest(Filter: "ExternalOwner"), Token);
+                break;
             // Identical settings also constitute a new owner's capture.
-            case "activity": await client.StartActivityAsync(new ActivityStartRequest(EventName: "Click"), Token); break;
+            case "activity":
+                await client.StartActivityAsync(new ActivityStartRequest(EventName: "Click"), Token);
+                break;
         }
+
         var stopped = await tools.StopCapture(capture.CaptureId, Token);
         Assert.NotEqual("stopped", stopped.State);
         Assert.NotEmpty(stopped.Issues);
@@ -224,8 +244,13 @@ public sealed class AgentCaptureMcpTests
         var tools = CreateTools(session);
         using var meter = NewMeter();
         var counter = meter.CreateCounter<int>("bounded");
-        var capture = await tools.StartCapture(profiler: false, activity: false, meterNames: [meter.Name], capacity: 2, cancellationToken: Token);
-        for (var index = 1; index <= 6; index++) counter.Add(index);
+        var capture = await tools.StartCapture(profiler: false,
+            activity: false,
+            meterNames: [meter.Name],
+            capacity: 2,
+            cancellationToken: Token);
+        for (var index = 1; index <= 6; index++)
+            counter.Add(index);
         var stopped = await tools.StopCapture(capture.CaptureId, Token);
         Assert.Equal(4, stopped.Metrics!.Status.EvictedHistorySamples);
         Assert.Equal(["5", "6"], stopped.Metrics.Samples.Select(sample => sample.RawValue));
@@ -279,7 +304,9 @@ public sealed class AgentCaptureMcpTests
         var expected = client.GetDiagnosticMutationEpoch(DiagnosticCaptureService.Metrics);
         var replacement = await client.StartMetricsAsync(new MetricsStartRequest(), Token);
         var error = await Assert.ThrowsAsync<RpcException>(() => client.RunOwnedDiagnosticMutationAsync(
-            DiagnosticCaptureService.Metrics, expected, () => client.StopMetricsAsync(Token)));
+            DiagnosticCaptureService.Metrics,
+            expected,
+            () => client.StopMetricsAsync(Token)));
         Assert.Equal("capture_ownership_lost", error.Code);
         Assert.DoesNotContain(MetricsMethods.Stop, endpoint.Requests);
         Assert.True(endpoint.Metrics.IsRunning);
@@ -293,39 +320,48 @@ public sealed class AgentCaptureMcpTests
         await using var session = new ToolSession(endpoint.PipeName);
         var client = await session.GetAsync(Token);
         var expected = client.GetDiagnosticMutationEpoch(DiagnosticCaptureService.Metrics);
-        var responseReady = new TaskCompletionSource<MetricsStatusDto>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var responseReady =
+            new TaskCompletionSource<MetricsStatusDto>(TaskCreationOptions.RunContinuationsAsynchronously);
         var releaseResponse = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-        var original = client.RunOwnedDiagnosticMutationAsync(DiagnosticCaptureService.Metrics, expected, async () =>
-        {
-            var response = await client.StartMetricsAsync(new MetricsStartRequest(), Token);
-            responseReady.TrySetResult(response);
-            await releaseResponse.Task.WaitAsync(Token);
-            return response;
-        });
+        var original = client.RunOwnedDiagnosticMutationAsync(DiagnosticCaptureService.Metrics,
+            expected,
+            async () =>
+            {
+                var response = await client.StartMetricsAsync(new MetricsStartRequest(), Token);
+                responseReady.TrySetResult(response);
+                await releaseResponse.Task.WaitAsync(Token);
+                return response;
+            });
         try
         {
             var first = await responseReady.Task.WaitAsync(TimeSpan.FromSeconds(5), Token);
-            var replacement = await client.StartMetricsAsync(new MetricsStartRequest(), Token).WaitAsync(TimeSpan.FromSeconds(5), Token);
+            var replacement = await client.StartMetricsAsync(new MetricsStartRequest(), Token)
+                .WaitAsync(TimeSpan.FromSeconds(5), Token);
             Assert.False(original.IsCompleted);
             Assert.NotEqual(first.CaptureId, replacement.CaptureId);
             Assert.Equal(expected + 2, client.GetDiagnosticMutationEpoch(DiagnosticCaptureService.Metrics));
             releaseResponse.TrySetResult();
             Assert.Equal(first.CaptureId, (await original).CaptureId);
             var error = await Assert.ThrowsAsync<RpcException>(() => client.RunOwnedDiagnosticMutationAsync(
-                DiagnosticCaptureService.Metrics, expected + 1, () => client.StopMetricsAsync(Token)));
+                DiagnosticCaptureService.Metrics,
+                expected + 1,
+                () => client.StopMetricsAsync(Token)));
             Assert.Equal("capture_ownership_lost", error.Code);
             Assert.DoesNotContain(MetricsMethods.Stop, endpoint.Requests);
             Assert.True(endpoint.Metrics.IsRunning);
             Assert.Equal(replacement.CaptureId, endpoint.Metrics.CaptureId);
         }
-        finally { releaseResponse.TrySetResult(); }
+        finally
+        {
+            releaseResponse.TrySetResult();
+        }
     }
 
     private static AgentTools CreateTools(ToolSession session) => new(session, new OfficialTools(session));
 
     private static Meter NewMeter() => new("Capture.Tests." + Guid.NewGuid().ToString("N"));
 
-    private static void Log(string message, LogEventLevel level = LogEventLevel.Warning) =>
+    internal static void Log(string message, LogEventLevel level = LogEventLevel.Warning) =>
         Logger.Sink?.Log(level, "Capture.Tests", null, message);
 
     private static string Serialize<T>(T value) => JsonSerializer.Serialize(value, ProtocolJson.Options);
@@ -335,25 +371,33 @@ public sealed class AgentCaptureMcpTests
         var cliPath = typeof(AgentCaptureMcpTests).Assembly.GetCustomAttributes<AssemblyMetadataAttribute>()
             .Single(item => item.Key == "PreviewCliPath").Value!;
         return McpClient.CreateAsync(new StdioClientTransport(new StdioClientTransportOptions
-        {
-            Command = "dotnet", Name = "Agent diagnostics capture stdio tests",
-            Arguments = [cliPath, "mcp", "--pipe", pipe], ShutdownTimeout = TimeSpan.FromSeconds(5)
-        }), cancellationToken: Token);
+            {
+                Command = "dotnet", Name = "Agent diagnostics capture stdio tests",
+                Arguments = [cliPath, "mcp", "--pipe", pipe], ShutdownTimeout = TimeSpan.FromSeconds(5)
+            }),
+            cancellationToken: Token);
     }
 
-    private static ValueTask<CallToolResult> Call(McpClient client, string name, params (string Name, object? Value)[] values) =>
-        client.CallToolAsync(name, values.ToDictionary(value => value.Name, value => value.Value), cancellationToken: Token);
+    private static ValueTask<CallToolResult> Call(McpClient client,
+        string name,
+        params (string Name, object? Value)[] values) =>
+        client.CallToolAsync(name,
+            values.ToDictionary(value => value.Name, value => value.Value),
+            cancellationToken: Token);
 
     private static T Read<T>(CallToolResult result)
     {
         var text = string.Join("\n", result.Content.OfType<TextContentBlock>().Select(block => block.Text));
         Assert.False(result.IsError == true, text);
-        var root = result.StructuredContent is { } content ? JsonNode.Parse(JsonSerializer.Serialize(content)) : JsonNode.Parse(text);
-        if (root is JsonObject obj && obj.TryGetPropertyValue("result", out var wrapped)) root = wrapped;
+        var root = result.StructuredContent is { } content
+            ? JsonNode.Parse(JsonSerializer.Serialize(content))
+            : JsonNode.Parse(text);
+        if (root is JsonObject obj && obj.TryGetPropertyValue("result", out var wrapped))
+            root = wrapped;
         return root!.Deserialize<T>(ProtocolJson.Options)!;
     }
 
-    private sealed class Fixture : IDisposable
+    internal sealed class Fixture : IDisposable
     {
         private readonly Button _button = new() { Width = 180, Height = 60, Content = "Capture target" };
         private readonly Window _window;
@@ -365,11 +409,12 @@ public sealed class AgentCaptureMcpTests
             _window.UpdateLayout();
         }
 
-        public DiagnosticsAgent Attach() => DiagnosticsAgent.Attach(Application.Current!, new DiagnosticsAgentOptions
-        {
-            PipeName = DiagnosticsProtocol.PipePrefix + "capture-tests-" + Guid.NewGuid().ToString("N"),
-            ApplicationName = "Agent capture tests", TopLevelProvider = () => [_window]
-        });
+        public DiagnosticsAgent Attach() => DiagnosticsAgent.Attach(Application.Current!,
+            new DiagnosticsAgentOptions
+            {
+                PipeName = DiagnosticsProtocol.PipePrefix + "capture-tests-" + Guid.NewGuid().ToString("N"),
+                ApplicationName = "Agent capture tests", TopLevelProvider = () => [_window]
+            });
 
         public void EmitResourceLookup(string key)
         {
@@ -388,8 +433,13 @@ public sealed class AgentCaptureMcpTests
         private readonly NamedPipeServerStream _pipe;
         private readonly RpcPeer _peer;
         private readonly Task _connected;
-        private readonly SessionInfo _session = new(Guid.NewGuid().ToString("N"), "Capture fault endpoint",
-            Environment.ProcessId, "12.1.4", DiagnosticsProtocol.Version);
+
+        private readonly SessionInfo _session = new(Guid.NewGuid().ToString("N"),
+            "Capture fault endpoint",
+            Environment.ProcessId,
+            "12.1.4",
+            DiagnosticsProtocol.Version);
+
         private readonly ProfilerStatusDto _profiler = Empty<ProfilerStatusDto>();
         private readonly ActivityStatus _activity = new(false, false, false, 0, 0, "Warning", "Click", null);
 
@@ -398,7 +448,10 @@ public sealed class AgentCaptureMcpTests
             _failProfilerStart = failProfilerStart;
             _failMetricsStop = failMetricsStop;
             PipeName = "capture-fault-tests-" + Guid.NewGuid().ToString("N");
-            _pipe = new NamedPipeServerStream(PipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Byte,
+            _pipe = new NamedPipeServerStream(PipeName,
+                PipeDirection.InOut,
+                1,
+                PipeTransmissionMode.Byte,
                 PipeOptions.Asynchronous | PipeOptions.CurrentUserOnly);
             _peer = new RpcPeer(_pipe, HandleAsync);
             _connected = ConnectAsync();
@@ -420,27 +473,47 @@ public sealed class AgentCaptureMcpTests
             object result;
             switch (method)
             {
-                case Methods.SessionInfo: result = _session; break;
-                case MetricsMethods.Status: result = Metrics; break;
-                case MetricsMethods.Snapshot: result = new MetricsSnapshotDto(Metrics, [], [], []); break;
+                case Methods.SessionInfo:
+                    result = _session;
+                    break;
+                case MetricsMethods.Status:
+                    result = Metrics;
+                    break;
+                case MetricsMethods.Snapshot:
+                    result = new MetricsSnapshotDto(Metrics, [], [], []);
+                    break;
                 case MetricsMethods.Start:
                     Metrics = Metrics with { IsRunning = true, CaptureId = Guid.NewGuid().ToString("N") };
                     result = Metrics;
                     break;
                 case MetricsMethods.Stop:
-                    if (_failMetricsStop) throw new RpcException("fixture_stop_failed", "The fixture metrics listener could not be stopped.");
+                    if (_failMetricsStop)
+                        throw new RpcException("fixture_stop_failed",
+                            "The fixture metrics listener could not be stopped.");
                     Metrics = Metrics with { IsRunning = false };
                     result = Metrics;
                     break;
-                case ProfilerMethods.Status: result = _profiler; break;
-                case ProfilerMethods.Snapshot: result = new ProfilerSnapshotDto(_profiler, [], []); break;
+                case ProfilerMethods.Status:
+                    result = _profiler;
+                    break;
+                case ProfilerMethods.Snapshot:
+                    result = new ProfilerSnapshotDto(_profiler, [], []);
+                    break;
                 case ProfilerMethods.Start:
-                    if (_failProfilerStart) throw new RpcException("fixture_start_failed", "The fixture profiler listener could not be started.");
+                    if (_failProfilerStart)
+                        throw new RpcException("fixture_start_failed",
+                            "The fixture profiler listener could not be started.");
                     throw new InvalidOperationException("Profiler start was not expected.");
-                case ActivityMethods.Status: result = _activity; break;
-                case ActivityMethods.Snapshot: result = Array.Empty<ActivityEntry>(); break;
-                default: throw new RpcException("unknown_method", "Unexpected fixture request: " + method);
+                case ActivityMethods.Status:
+                    result = _activity;
+                    break;
+                case ActivityMethods.Snapshot:
+                    result = Array.Empty<ActivityEntry>();
+                    break;
+                default:
+                    throw new RpcException("unknown_method", "Unexpected fixture request: " + method);
             }
+
             return Task.FromResult<object?>(result);
         }
 

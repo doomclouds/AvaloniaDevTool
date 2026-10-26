@@ -117,7 +117,7 @@ samples/AvaloniaDevTool.XamlMcpTarget/
 
 ## 必须保留或迁移的许可告知
 
-- `src/AvaloniaDevTool.Agent/BindingDetailsReader.cs:1-2` 的 XamlMcp 改编来源仍然有效。保留 Agent 下 `ThirdParty/THIRD-PARTY-NOTICES.md`、`XamlMcp-LICENSE.txt` 和 `AvaloniaDevTool.Agent.csproj` 对 `ThirdParty/*` 的 build/publish 复制规则。删除整个外部后端不影响 Agent 内改编代码的归属要求。
+- `src/AvaloniaDevTool.Agent/Features/Styles/BindingDetailsReader.cs:1-2` 的 XamlMcp 改编来源仍然有效。保留 Agent 下 `ThirdParty/THIRD-PARTY-NOTICES.md`、`XamlMcp-LICENSE.txt` 和 `AvaloniaDevTool.Agent.csproj` 对 `ThirdParty/*` 的 build/publish 复制规则。删除整个外部后端不影响 Agent 内改编代码的归属要求。
 - CLI 仍引用 `ModelContextProtocol` 2.3.0。收缩前仓库中对应完整许可证仅位于 `src/AvaloniaDevTool.Backends.XamlMcp/ThirdParty/McpSdk-2.3.0-LICENSE.txt`；删除 backend 目录前，应将这一份原文迁移到 CLI 的第三方目录，并随 CLI 构建/发布输出保留。该原文包含 Apache 2.0 转许可及保留 MIT 贡献告知，不能只保留其中一种。
 - `McpSdk-1.4.1-LICENSE.txt` 对应被下载的外部 XamlMcp.Server 独立运行目录；不再分发该上游 Server 后可连同其专用告知退役。
 - 目前 Agent 已确认的源码改编是 XamlMcp 绑定诊断；审计没有将 CDP/Declarative/ClassicDiagnostics 的 MIT 候选研究误报成已复制代码。以后若采用其代码或重要部分，要随具体副本保留版权、完整许可及修改来源，不能用删除研究文档代替归属清理。

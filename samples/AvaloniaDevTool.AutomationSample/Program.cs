@@ -24,17 +24,30 @@ internal static class Program
             for (var i = 0; i < args.Length; i++)
             {
                 var option = args[i];
-                if (option is not ("--pipe" or "--test-root" or "--ready-file" or "--result-file" or "--io-gate") || ++i >= args.Length || string.IsNullOrWhiteSpace(args[i]))
-                    throw new ArgumentException("Usage: AvaloniaDevTool.AutomationSample [--pipe NAME] [--test-root DIRECTORY] [--ready-file PATH] [--result-file PATH] [--io-gate DIRECTORY (test only)]");
+                if (option is not ("--pipe" or "--test-root" or "--ready-file" or "--result-file" or "--io-gate") ||
+                    ++i >= args.Length || string.IsNullOrWhiteSpace(args[i]))
+                    throw new ArgumentException(
+                        "Usage: AvaloniaDevTool.AutomationSample [--pipe NAME] [--test-root DIRECTORY] [--ready-file PATH] [--result-file PATH] [--io-gate DIRECTORY (test only)]");
                 switch (option)
                 {
-                    case "--pipe": PipeName = args[i]; break;
-                    case "--test-root": TestRoot = Path.GetFullPath(args[i]); break;
-                    case "--ready-file": ReadyFile = Path.GetFullPath(args[i]); break;
-                    case "--result-file": ResultFile = Path.GetFullPath(args[i]); break;
-                    case "--io-gate": IoGateDirectory = Path.GetFullPath(args[i]); break;
+                    case "--pipe":
+                        PipeName = args[i];
+                        break;
+                    case "--test-root":
+                        TestRoot = Path.GetFullPath(args[i]);
+                        break;
+                    case "--ready-file":
+                        ReadyFile = Path.GetFullPath(args[i]);
+                        break;
+                    case "--result-file":
+                        ResultFile = Path.GetFullPath(args[i]);
+                        break;
+                    case "--io-gate":
+                        IoGateDirectory = Path.GetFullPath(args[i]);
+                        break;
                 }
             }
+
             if (PipeName.IndexOfAny(['/', '\\', ':']) >= 0)
                 throw new ArgumentException("The pipe name must be a simple local pipe name.");
             if (TestRoot is not null)
@@ -68,11 +81,12 @@ public sealed class AutomationApplication : Application
             var mainWindow = new MainWindow();
             desktop.MainWindow = mainWindow;
             // This dedicated acceptance target intentionally exposes the Agent in Release.
-            _agent = DiagnosticsAgent.Attach(this, new DiagnosticsAgentOptions
-            {
-                PipeName = Program.PipeName,
-                ApplicationName = "Avalonia automation acceptance sample"
-            });
+            _agent = DiagnosticsAgent.Attach(this,
+                new DiagnosticsAgentOptions
+                {
+                    PipeName = Program.PipeName,
+                    ApplicationName = "Avalonia automation acceptance sample"
+                });
             mainWindow.Opened += (_, _) =>
             {
                 if (Program.ReadyFile is { } readyFile)
@@ -85,6 +99,7 @@ public sealed class AutomationApplication : Application
             };
             desktop.Exit += (_, _) => _agent.Dispose();
         }
+
         base.OnFrameworkInitializationCompleted();
     }
 }

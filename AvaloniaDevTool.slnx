@@ -1,30 +1,30 @@
 <Solution>
-  <Folder Name="/samples/">
-    <Project Path="samples/AvaloniaDevTool.AutomationSample/AvaloniaDevTool.AutomationSample.csproj" />
-    <Project Path="samples/AvaloniaDevTool.Sample/AvaloniaDevTool.Sample.csproj" />
-    <Project Path="samples/AvaloniaDevTool.AotSample/AvaloniaDevTool.AotSample.csproj" />
-  </Folder>
-  <Folder Name="/src/">
-    <Project Path="src/AvaloniaDevTool.NativeAutomation/AvaloniaDevTool.NativeAutomation.csproj" />
-    <Project Path="src/AvaloniaDevTool.NativeAutomation.Worker/AvaloniaDevTool.NativeAutomation.Worker.csproj" />
-    <Project Path="src/AvaloniaDevTool.Agent/AvaloniaDevTool.Agent.csproj" />
-    <Project Path="src/AvaloniaDevTool.Cli/AvaloniaDevTool.Cli.csproj" />
-    <Project Path="src/AvaloniaDevTool.Client/AvaloniaDevTool.Client.csproj" />
-    <Project Path="src/AvaloniaDevTool.Logging/AvaloniaDevTool.Logging.csproj" />
-    <Project Path="src/AvaloniaDevTool.Previewer/AvaloniaDevTool.Previewer.csproj" />
-    <Project Path="src/AvaloniaDevTool.Protocol/AvaloniaDevTool.Protocol.csproj" />
-    <Project Path="src/AvaloniaDevTool.Remote/AvaloniaDevTool.Remote.csproj" />
-  </Folder>
-  <Folder Name="/tests/">
-    <Project Path="tests/AvaloniaDevTool.NativeAutomation.Tests/AvaloniaDevTool.NativeAutomation.Tests.csproj" />
-    <Project Path="tests/AvaloniaDevTool.NativeAutomation.Fixture/AvaloniaDevTool.NativeAutomation.Fixture.csproj" />
-    <Project Path="tests/AvaloniaDevTool.Agent.Tests/AvaloniaDevTool.Agent.Tests.csproj" />
-    <Project Path="tests/AvaloniaDevTool.AotSmoke/AvaloniaDevTool.AotSmoke.csproj" />
-    <Project Path="tests/AvaloniaDevTool.Cli.Tests/AvaloniaDevTool.Cli.Tests.csproj" />
-    <Project Path="tests/AvaloniaDevTool.Previewer.Tests/AvaloniaDevTool.Previewer.Tests.csproj" />
-    <Project Path="tests/AvaloniaDevTool.PreviewFixture/AvaloniaDevTool.PreviewFixture.csproj" />
-    <Project Path="tests/AvaloniaDevTool.PreviewFixture.Controls/AvaloniaDevTool.PreviewFixture.Controls.csproj" />
-    <Project Path="tests/AvaloniaDevTool.Protocol.Tests/AvaloniaDevTool.Protocol.Tests.csproj" />
-    <Project Path="tests/AvaloniaDevTool.Remote.Tests/AvaloniaDevTool.Remote.Tests.csproj" />
-  </Folder>
+    <Folder Name="/samples/">
+        <Project Path="samples/AvaloniaDevTool.AutomationSample/AvaloniaDevTool.AutomationSample.csproj" />
+        <Project Path="samples/AvaloniaDevTool.Sample/AvaloniaDevTool.Sample.csproj" />
+        <Project Path="samples/AvaloniaDevTool.AotSample/AvaloniaDevTool.AotSample.csproj" />
+    </Folder>
+    <Folder Name="/src/">
+        <Project Path="src/AvaloniaDevTool.NativeAutomation/AvaloniaDevTool.NativeAutomation.csproj" />
+        <Project Path="src/AvaloniaDevTool.NativeAutomation.Worker/AvaloniaDevTool.NativeAutomation.Worker.csproj" />
+        <Project Path="src/AvaloniaDevTool.Agent/AvaloniaDevTool.Agent.csproj" />
+        <Project Path="src/AvaloniaDevTool.Cli/AvaloniaDevTool.Cli.csproj" />
+        <Project Path="src/AvaloniaDevTool.Client/AvaloniaDevTool.Client.csproj" />
+        <Project Path="src/AvaloniaDevTool.Logging/AvaloniaDevTool.Logging.csproj" />
+        <Project Path="src/AvaloniaDevTool.Previewer/AvaloniaDevTool.Previewer.csproj" />
+        <Project Path="src/AvaloniaDevTool.Protocol/AvaloniaDevTool.Protocol.csproj" />
+        <Project Path="src/AvaloniaDevTool.Remote/AvaloniaDevTool.Remote.csproj" />
+    </Folder>
+    <Folder Name="/tests/">
+        <Project Path="tests/AvaloniaDevTool.NativeAutomation.Tests/AvaloniaDevTool.NativeAutomation.Tests.csproj" />
+        <Project Path="tests/AvaloniaDevTool.NativeAutomation.Fixture/AvaloniaDevTool.NativeAutomation.Fixture.csproj" />
+        <Project Path="tests/AvaloniaDevTool.Agent.Tests/AvaloniaDevTool.Agent.Tests.csproj" />
+        <Project Path="tests/AvaloniaDevTool.AotSmoke/AvaloniaDevTool.AotSmoke.csproj" />
+        <Project Path="tests/AvaloniaDevTool.Cli.Tests/AvaloniaDevTool.Cli.Tests.csproj" />
+        <Project Path="tests/AvaloniaDevTool.Previewer.Tests/AvaloniaDevTool.Previewer.Tests.csproj" />
+        <Project Path="tests/AvaloniaDevTool.PreviewFixture/AvaloniaDevTool.PreviewFixture.csproj" />
+        <Project Path="tests/AvaloniaDevTool.PreviewFixture.Controls/AvaloniaDevTool.PreviewFixture.Controls.csproj" />
+        <Project Path="tests/AvaloniaDevTool.Protocol.Tests/AvaloniaDevTool.Protocol.Tests.csproj" />
+        <Project Path="tests/AvaloniaDevTool.Remote.Tests/AvaloniaDevTool.Remote.Tests.csproj" />
+    </Folder>
 </Solution>

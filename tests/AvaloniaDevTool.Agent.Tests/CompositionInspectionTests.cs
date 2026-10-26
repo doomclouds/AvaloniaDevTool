@@ -47,7 +47,8 @@ public sealed class CompositionInspectionTests
     [AvaloniaTheory]
     [InlineData(1)]
     [InlineData(0.5)]
-    public async Task Hierarchical_transform_opacity_clip_and_z_order_recompose_to_normal_screenshot_pixels(double opacity)
+    public async Task Hierarchical_transform_opacity_clip_and_z_order_recompose_to_normal_screenshot_pixels(
+        double opacity)
     {
         var back = new Border { Name = "Back", Width = 25, Height = 20, Background = Brushes.Red };
         var front = new Border
@@ -71,7 +72,8 @@ public sealed class CompositionInspectionTests
         var root = new Canvas { Width = 100, Height = 80, Background = Brushes.Blue, Children = { group } };
         using var fixture = new Fixture(root);
         var snapshot = await fixture.Capture();
-        var children = snapshot.Layers.Where(layer => layer.ParentCaptureId == snapshot.Layers.Single(layer => layer.Name == "Group").CaptureId).ToArray();
+        var children = snapshot.Layers.Where(layer =>
+            layer.ParentCaptureId == snapshot.Layers.Single(layer => layer.Name == "Group").CaptureId).ToArray();
         Assert.Equal(new[] { "Back", "Front" }, children.Select(layer => layer.Name!).ToArray());
         Assert.Equal(5, children[1].ZIndex);
         Assert.Equal(2, children[1].Transform.M11);
@@ -89,21 +91,23 @@ public sealed class CompositionInspectionTests
         using var expectedPixels = Decode(expected);
         using var actualPixels = Decode(actual);
         for (var y = 0; y < 80; y++)
-            for (var x = 0; x < 100; x++)
+        for (var x = 0; x < 100; x++)
+        {
+            var expectedPixel = expectedPixels.GetPixel(x, y);
+            var actualPixel = actualPixels.GetPixel(x, y);
+            if (opacity == 1)
+                Assert.Equal(expectedPixel, actualPixel);
+            else
             {
-                var expectedPixel = expectedPixels.GetPixel(x, y);
-                var actualPixel = actualPixels.GetPixel(x, y);
-                if (opacity == 1) Assert.Equal(expectedPixel, actualPixel);
-                else
-                {
-                    // Two fractional opacity scopes each introduce at most one 8-bit rounding unit.
-                    Assert.InRange(Math.Abs(expectedPixel.Red - actualPixel.Red), 0, 2);
-                    Assert.InRange(Math.Abs(expectedPixel.Green - actualPixel.Green), 0, 2);
-                    Assert.InRange(Math.Abs(expectedPixel.Blue - actualPixel.Blue), 0, 2);
-                    Assert.Equal(expectedPixel.Alpha, actualPixel.Alpha);
-                    Assert.False(snapshot.SupportsExactComposite);
-                }
+                // Two fractional opacity scopes each introduce at most one 8-bit rounding unit.
+                Assert.InRange(Math.Abs(expectedPixel.Red - actualPixel.Red), 0, 2);
+                Assert.InRange(Math.Abs(expectedPixel.Green - actualPixel.Green), 0, 2);
+                Assert.InRange(Math.Abs(expectedPixel.Blue - actualPixel.Blue), 0, 2);
+                Assert.Equal(expectedPixel.Alpha, actualPixel.Alpha);
+                Assert.False(snapshot.SupportsExactComposite);
             }
+        }
+
         reconstructed.Dispose();
     }
 
@@ -157,7 +161,8 @@ public sealed class CompositionInspectionTests
         var bytes = await fixture.Capture(new CompositionSnapshotRequest(fixture.RootId, MaxImageBytes: 1));
         Assert.All(bytes.Layers, layer => Assert.Equal("ImageBudgetExceeded", layer.ImageStatus));
         Assert.All(bytes.Layers, layer => Assert.Null(layer.PngBase64));
-        Assert.True(JsonSerializer.SerializeToUtf8Bytes(complete, ProtocolJson.Options).Length < RpcPeer.MaximumFrameBytes - 4096);
+        Assert.True(JsonSerializer.SerializeToUtf8Bytes(complete, ProtocolJson.Options).Length <
+                    RpcPeer.MaximumFrameBytes - 4096);
     }
 
     [AvaloniaFact]
@@ -166,7 +171,10 @@ public sealed class CompositionInspectionTests
         var root = new Canvas
         {
             Width = 120, Height = 90,
-            Children = { new Border { Width = 30, Height = 20, Background = Brushes.Red, Effect = new BlurEffect { Radius = 2 } } }
+            Children =
+            {
+                new Border { Width = 30, Height = 20, Background = Brushes.Red, Effect = new BlurEffect { Radius = 2 } }
+            }
         };
         using var fixture = new Fixture(root);
         var snapshot = await fixture.Capture();
@@ -202,7 +210,8 @@ public sealed class CompositionInspectionTests
         Assert.NotNull(pathClip.PathData);
         Assert.False(pathClip.PathData.StartsWith("F1", StringComparison.Ordinal));
         Assert.Equal("RoundedRectangle", snapshot.Layers.Single(layer => layer.Name == "Rounded").BoundsClip!.Kind);
-        Assert.Equal(new CornerRadius(7), CornerRadius.Parse(snapshot.Layers.Single(layer => layer.Name == "Rounded").BoundsClip!.CornerRadius!));
+        Assert.Equal(new CornerRadius(7),
+            CornerRadius.Parse(snapshot.Layers.Single(layer => layer.Name == "Rounded").BoundsClip!.CornerRadius!));
         Assert.Equal("UnavailablePath", snapshot.Layers.Single(layer => layer.Name == "Stream").Clip!.Kind);
         Assert.False(snapshot.SupportsExactComposite);
         Assert.All(snapshot.Layers.Skip(1), layer => Assert.Equal("Captured", layer.ImageStatus));
@@ -213,18 +222,20 @@ public sealed class CompositionInspectionTests
     {
         using var fixture = new Fixture(new Canvas { Width = 120, Height = 90 });
         foreach (var request in new[]
-        {
-            new CompositionSnapshotRequest(fixture.RootId, MaxNodes: 257),
-            new CompositionSnapshotRequest(fixture.RootId, MaxDepth: -1),
-            new CompositionSnapshotRequest(fixture.RootId, MaxImageBytes: 0),
-            new CompositionSnapshotRequest(fixture.RootId, MaxTotalImageBytes: 2097153),
-            new CompositionSnapshotRequest(fixture.RootId, MaxTotalPixels: 4194305),
-            new CompositionSnapshotRequest(fixture.RootId, Scaling: double.NaN)
-        })
-            Assert.Equal("invalid_request", (await Assert.ThrowsAsync<RpcException>(() => fixture.Service.CaptureAsync(request))).Code);
+                 {
+                     new CompositionSnapshotRequest(fixture.RootId, MaxNodes: 257),
+                     new CompositionSnapshotRequest(fixture.RootId, MaxDepth: -1),
+                     new CompositionSnapshotRequest(fixture.RootId, MaxImageBytes: 0),
+                     new CompositionSnapshotRequest(fixture.RootId, MaxTotalImageBytes: 2097153),
+                     new CompositionSnapshotRequest(fixture.RootId, MaxTotalPixels: 4194305),
+                     new CompositionSnapshotRequest(fixture.RootId, Scaling: double.NaN)
+                 })
+            Assert.Equal("invalid_request",
+                (await Assert.ThrowsAsync<RpcException>(() => fixture.Service.CaptureAsync(request))).Code);
         using var cancelled = new CancellationTokenSource();
         cancelled.Cancel();
-        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => fixture.Service.CaptureAsync(new(fixture.RootId), cancelled.Token));
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
+            fixture.Service.CaptureAsync(new(fixture.RootId), cancelled.Token));
         var pending = fixture.Service.CaptureAsync(new(fixture.RootId));
         fixture.Host.Children.Clear();
         Assert.Equal("detached_object", (await Assert.ThrowsAsync<RpcException>(() => pending)).Code);
@@ -241,11 +252,12 @@ public sealed class CompositionInspectionTests
             Children = { new Border { Name = "Red", Width = 30, Height = 20, Background = Brushes.Red } }
         };
         using var fixture = new Fixture(root);
-        await using var agent = DiagnosticsAgent.Attach(Application.Current!, new DiagnosticsAgentOptions
-        {
-            PipeName = "avdt-composition-test-" + Guid.NewGuid().ToString("N"),
-            TopLevelProvider = () => [fixture.Window]
-        });
+        await using var agent = DiagnosticsAgent.Attach(Application.Current!,
+            new DiagnosticsAgentOptions
+            {
+                PipeName = "avdt-composition-test-" + Guid.NewGuid().ToString("N"),
+                TopLevelProvider = () => [fixture.Window]
+            });
         await using var client = new DiagnosticsClient();
         await client.ConnectAsync(agent.PipeName);
         var roots = await client.GetRootsAsync(TreeKind.Logical);
@@ -259,6 +271,7 @@ public sealed class CompositionInspectionTests
             AvaloniaHeadlessPlatform.ForceRenderTimerTick();
             await Task.Delay(5);
         }
+
         var snapshot = await pending.WaitAsync(TimeSpan.FromSeconds(2));
         Assert.Equal(target.Id, snapshot.RootObjectId);
         Assert.Equal(2, snapshot.Layers.Count);
@@ -267,7 +280,9 @@ public sealed class CompositionInspectionTests
         Assert.NotNull(await client.GetRootsAsync(TreeKind.Logical));
     }
 
-    private static SKBitmap Decode(CompositionLayer layer) => SKBitmap.Decode(Convert.FromBase64String(Assert.IsType<string>(layer.PngBase64)));
+    private static SKBitmap Decode(CompositionLayer layer) =>
+        SKBitmap.Decode(Convert.FromBase64String(Assert.IsType<string>(layer.PngBase64)));
+
     private static SKBitmap Decode(Bitmap bitmap)
     {
         using var memory = new MemoryStream();
@@ -287,11 +302,13 @@ public sealed class CompositionInspectionTests
             Window.UpdateLayout();
             using var frame = Window.CaptureRenderedFrame();
         }
+
         public WeakObjectRegistry Registry { get; } = new();
         public CompositionInspectionService Service { get; }
         public Canvas Host { get; }
         public Window Window { get; }
         public long RootId { get; }
+
         public async Task<CompositionSnapshot> Capture(CompositionSnapshotRequest? request = null)
         {
             var pending = Service.CaptureAsync(request ?? new(RootId));
@@ -301,14 +318,21 @@ public sealed class CompositionInspectionTests
                 AvaloniaHeadlessPlatform.ForceRenderTimerTick();
                 await Task.Delay(5);
             }
+
             return await pending;
         }
-        public void Dispose() { Service.Dispose(); Window.Close(); }
+
+        public void Dispose()
+        {
+            Service.Dispose();
+            Window.Close();
+        }
     }
 
     private sealed class OverflowControl : Control
     {
-        public override void Render(DrawingContext context) => context.FillRectangle(Brushes.Magenta, new Rect(-4, -2, 24, 14));
+        public override void Render(DrawingContext context) =>
+            context.FillRectangle(Brushes.Magenta, new Rect(-4, -2, 24, 14));
     }
 
     private sealed class CustomPaint : CompositionCustomVisualHandler
@@ -320,24 +344,41 @@ public sealed class CompositionInspectionTests
     private sealed class CompositeControl(CompositionSnapshot snapshot) : Control, IDisposable
     {
         private readonly Dictionary<long, Bitmap> _images = snapshot.Layers.Where(layer => layer.PngBase64 is not null)
-            .ToDictionary(layer => layer.CaptureId, layer => new Bitmap(new MemoryStream(Convert.FromBase64String(layer.PngBase64!))));
+            .ToDictionary(layer => layer.CaptureId,
+                layer => new Bitmap(new MemoryStream(Convert.FromBase64String(layer.PngBase64!))));
+
         public override void Render(DrawingContext context)
         {
             Draw(snapshot.Layers[0]);
+
             void Draw(CompositionLayer layer)
             {
-                if (!layer.IsVisible) return;
+                if (!layer.IsVisible)
+                    return;
                 var m = layer.Transform;
-                using var transform = context.PushTransform(new Matrix(m.M11, m.M12, m.M21, m.M22, m.OffsetX, m.OffsetY));
+                using var transform =
+                    context.PushTransform(new Matrix(m.M11, m.M12, m.M21, m.M22, m.OffsetX, m.OffsetY));
                 using var opacity = context.PushOpacity(layer.Opacity);
-                using var clip = layer.ClipToBounds ? context.PushClip(new Rect(0, 0, layer.Width, layer.Height)) : default;
+                using var clip = layer.ClipToBounds
+                    ? context.PushClip(new Rect(0, 0, layer.Width, layer.Height))
+                    : default;
                 using var geometryClip = layer.Clip is { Kind: "Rectangle", Bounds: { } clipBounds }
-                    ? context.PushGeometryClip(new RectangleGeometry(new Rect(clipBounds.X, clipBounds.Y, clipBounds.Width, clipBounds.Height))) : default;
+                    ? context.PushGeometryClip(new RectangleGeometry(new Rect(clipBounds.X,
+                        clipBounds.Y,
+                        clipBounds.Width,
+                        clipBounds.Height)))
+                    : default;
                 if (_images.TryGetValue(layer.CaptureId, out var image) && layer.ContentBounds is { } bounds)
                     context.DrawImage(image, new Rect(bounds.X, bounds.Y, bounds.Width, bounds.Height));
-                foreach (var child in snapshot.Layers.Where(child => child.ParentCaptureId == layer.CaptureId)) Draw(child);
+                foreach (var child in snapshot.Layers.Where(child => child.ParentCaptureId == layer.CaptureId))
+                    Draw(child);
             }
         }
-        public void Dispose() { foreach (var image in _images.Values) image.Dispose(); }
+
+        public void Dispose()
+        {
+            foreach (var image in _images.Values)
+                image.Dispose();
+        }
     }
 }

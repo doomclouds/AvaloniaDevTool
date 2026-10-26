@@ -17,8 +17,15 @@ public sealed class TransportTests
         await using var pair = await PipePair.CreateAsync(async (_, _, token) =>
         {
             entered.TrySetResult();
-            try { await Task.Delay(Timeout.InfiniteTimeSpan, token); }
-            finally { cancelled.TrySetResult(); }
+            try
+            {
+                await Task.Delay(Timeout.InfiniteTimeSpan, token);
+            }
+            finally
+            {
+                cancelled.TrySetResult();
+            }
+
             return 1;
         });
         var pending = pair.Client.InvokeAsync<int>("wait", null);
@@ -34,7 +41,8 @@ public sealed class TransportTests
     public async Task ConcurrentRequestsRetainTheirResultsAcrossFragmentedReads()
     {
         await using var pair = await PipePair.CreateAsync((_, payload, _) =>
-            Task.FromResult<object?>(ProtocolJson.Read<int>(payload) * 3), fragmentedReads: true);
+                Task.FromResult<object?>(ProtocolJson.Read<int>(payload) * 3),
+            fragmentedReads: true);
         var results = await Task.WhenAll(Enumerable.Range(1, 50)
             .Select(value => pair.Client.InvokeAsync<int>("multiply", value)));
         Assert.Equal(Enumerable.Range(1, 50).Select(value => value * 3), results);
@@ -44,7 +52,9 @@ public sealed class TransportTests
     public async Task RemoteErrorDoesNotCloseTheSession()
     {
         await using var pair = await PipePair.CreateAsync((method, _, _) =>
-            method == "fail" ? throw new RpcException("object_expired", "The control was collected.") : Task.FromResult<object?>(42));
+            method == "fail"
+                ? throw new RpcException("object_expired", "The control was collected.")
+                : Task.FromResult<object?>(42));
         var error = await Assert.ThrowsAsync<RpcException>(() => pair.Client.InvokeAsync<int>("fail", null));
         Assert.Equal("object_expired", error.Code);
         Assert.Equal(42, await pair.Client.InvokeAsync<int>("ok", null));
@@ -64,7 +74,8 @@ public sealed class TransportTests
     public async Task NotificationsDoNotConsumePendingResponses()
     {
         await using var pair = await PipePair.CreateAsync((_, _, _) => Task.FromResult<object?>(27));
-        var notification = new TaskCompletionSource<SelectionChangedNotification>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var notification =
+            new TaskCompletionSource<SelectionChangedNotification>(TaskCreationOptions.RunContinuationsAsynchronously);
         pair.Client.NotificationReceived += (method, payload) =>
         {
             if (method == Methods.SelectionChanged)
@@ -87,6 +98,7 @@ public sealed class TransportTests
                 entered.TrySetResult();
                 await release.Task.WaitAsync(token);
             }
+
             return 7;
         });
         using var cancellation = new CancellationTokenSource();
@@ -111,7 +123,8 @@ public sealed class TransportTests
         var pending = pair.Client.InvokeAsync<int>("wait", null);
         await entered.Task.WaitAsync(TimeSpan.FromSeconds(5));
         await pair.Server.DisposeAsync();
-        var error = await Assert.ThrowsAsync<RpcException>(async () => await pending.WaitAsync(TimeSpan.FromSeconds(5)));
+        var error = await Assert.ThrowsAsync<RpcException>(async () =>
+            await pending.WaitAsync(TimeSpan.FromSeconds(5)));
         Assert.Equal("connection_closed", error.Code);
     }
 
@@ -154,8 +167,9 @@ public sealed class TransportTests
     {
         var name = "avdt-version-" + Guid.NewGuid().ToString("N");
         await using var server = NewServer(name);
-        await using var peer = new RpcPeer(server, (_, _, _) => Task.FromResult<object?>(
-            new SessionInfo("session", "Test", Environment.ProcessId, "12", 99)));
+        await using var peer = new RpcPeer(server,
+            (_, _, _) => Task.FromResult<object?>(
+                new SessionInfo("session", "Test", Environment.ProcessId, "12", 99)));
         await using var client = new DiagnosticsClient();
         var connect = client.ConnectAsync(name);
         await server.WaitForConnectionAsync();
@@ -174,8 +188,13 @@ public sealed class TransportTests
         {
             var name = "avdt-client-" + Guid.NewGuid().ToString("N");
             await using var server = NewServer(name);
-            await using var peer = new RpcPeer(server, (_, _, _) => Task.FromResult<object?>(
-                new SessionInfo("session-" + iteration, "Test", Environment.ProcessId, "12.1.4", DiagnosticsProtocol.Version)));
+            await using var peer = new RpcPeer(server,
+                (_, _, _) => Task.FromResult<object?>(
+                    new SessionInfo("session-" + iteration,
+                        "Test",
+                        Environment.ProcessId,
+                        "12.1.4",
+                        DiagnosticsProtocol.Version)));
             var connect = client.ConnectAsync(name);
             await server.WaitForConnectionAsync();
             peer.Start();
@@ -183,7 +202,13 @@ public sealed class TransportTests
             Assert.True(client.IsConnected);
             Assert.Equal("session-" + iteration, client.Session!.SessionId);
             var disconnected = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-            void OnChanged() { if (!client.IsConnected) disconnected.TrySetResult(); }
+
+            void OnChanged()
+            {
+                if (!client.IsConnected)
+                    disconnected.TrySetResult();
+            }
+
             client.ConnectionChanged += OnChanged;
             await peer.DisposeAsync();
             await disconnected.Task.WaitAsync(TimeSpan.FromSeconds(5));
@@ -193,13 +218,20 @@ public sealed class TransportTests
     }
 
     private static NamedPipeServerStream NewServer(string name) =>
-        new(name, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous | PipeOptions.CurrentUserOnly);
+        new(name,
+            PipeDirection.InOut,
+            1,
+            PipeTransmissionMode.Byte,
+            PipeOptions.Asynchronous | PipeOptions.CurrentUserOnly);
 
     private sealed class PipePair(RpcPeer server, RpcPeer client) : IAsyncDisposable
     {
         public RpcPeer Server { get; } = server;
         public RpcPeer Client { get; } = client;
-        public static async Task<PipePair> CreateAsync(Func<string, JsonElement, CancellationToken, Task<object?>> handler, bool fragmentedReads = false)
+
+        public static async Task<PipePair> CreateAsync(
+            Func<string, JsonElement, CancellationToken, Task<object?>> handler,
+            bool fragmentedReads = false)
         {
             var name = "avdt-rpc-" + Guid.NewGuid().ToString("N");
             var serverStream = NewServer(name);
@@ -213,6 +245,7 @@ public sealed class TransportTests
             client.Start();
             return new PipePair(server, client);
         }
+
         public async ValueTask DisposeAsync()
         {
             await Client.DisposeAsync();
@@ -226,18 +259,38 @@ public sealed class TransportTests
         public override bool CanSeek => false;
         public override bool CanWrite => inner.CanWrite;
         public override long Length => throw new NotSupportedException();
-        public override long Position { get => throw new NotSupportedException(); set => throw new NotSupportedException(); }
+
+        public override long Position
+        {
+            get => throw new NotSupportedException();
+            set => throw new NotSupportedException();
+        }
+
         public override void Flush() => inner.Flush();
         public override Task FlushAsync(CancellationToken cancellationToken) => inner.FlushAsync(cancellationToken);
-        public override int Read(byte[] buffer, int offset, int count) => inner.Read(buffer, offset, Math.Min(3, count));
+
+        public override int Read(byte[] buffer, int offset, int count) =>
+            inner.Read(buffer, offset, Math.Min(3, count));
+
         public override ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default) =>
             inner.ReadAsync(buffer[..Math.Min(3, buffer.Length)], cancellationToken);
+
         public override void Write(byte[] buffer, int offset, int count) => inner.Write(buffer, offset, count);
-        public override ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default) => inner.WriteAsync(buffer, cancellationToken);
+
+        public override ValueTask
+            WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default) =>
+            inner.WriteAsync(buffer, cancellationToken);
+
         public override long Seek(long offset, SeekOrigin origin) => throw new NotSupportedException();
         public override void SetLength(long value) => throw new NotSupportedException();
-        protected override void Dispose(bool disposing) { if (disposing) inner.Dispose(); base.Dispose(disposing); }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+                inner.Dispose();
+            base.Dispose(disposing);
+        }
+
         public override ValueTask DisposeAsync() => inner.DisposeAsync();
     }
 }
-

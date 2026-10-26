@@ -32,22 +32,29 @@ public sealed class Phase7McpTests
         target.Show();
         try
         {
-            await using var agent = DiagnosticsAgent.Attach(Application.Current!, new DiagnosticsAgentOptions
-            { PipeName = "phase7-mcp-" + Guid.NewGuid().ToString("N"), TopLevelProvider = () => [target] });
+            await using var agent = DiagnosticsAgent.Attach(Application.Current!,
+                new DiagnosticsAgentOptions
+                    { PipeName = "phase7-mcp-" + Guid.NewGuid().ToString("N"), TopLevelProvider = () => [target] });
             await using var client = await CreateClientAsync();
             var tools = await client.ListToolsAsync(cancellationToken: TestContext.Current.CancellationToken);
             var metricsStart = Assert.Single(tools, tool => tool.Name == "metrics-start");
-            foreach (var parameter in new[] { "pollIntervalMs", "notificationIntervalMs", "historyWindowMs", "frameIntervalMs", "aggregateFrames" })
+            foreach (var parameter in new[]
+                     {
+                         "pollIntervalMs", "notificationIntervalMs", "historyWindowMs", "frameIntervalMs",
+                         "aggregateFrames"
+                     })
                 Assert.Contains(parameter, metricsStart.JsonSchema.ToString());
             Assert.Contains(tools, tool => tool.Name == "metrics-clear");
             Assert.Contains(tools, tool => tool.Name == "set-brush");
-            Read<SessionInfo>(await client.CallToolAsync("attach-to-app", new Dictionary<string, object?> { ["pipeName"] = agent.PipeName }));
-            var started = Read<MetricsStatusDto>(await client.CallToolAsync("metrics-start", new Dictionary<string, object?>
-            {
-                ["meterNames"] = new[] { meter.Name }, ["capacity"] = 128, ["pollIntervalMs"] = 250,
-                ["notificationIntervalMs"] = 100, ["historyWindowMs"] = 30000, ["frameIntervalMs"] = 10000,
-                ["aggregateFrames"] = true
-            }));
+            Read<SessionInfo>(await client.CallToolAsync("attach-to-app",
+                new Dictionary<string, object?> { ["pipeName"] = agent.PipeName }));
+            var started = Read<MetricsStatusDto>(await client.CallToolAsync("metrics-start",
+                new Dictionary<string, object?>
+                {
+                    ["meterNames"] = new[] { meter.Name }, ["capacity"] = 128, ["pollIntervalMs"] = 250,
+                    ["notificationIntervalMs"] = 100, ["historyWindowMs"] = 30000, ["frameIntervalMs"] = 10000,
+                    ["aggregateFrames"] = true
+                }));
             Assert.True(started.IsRunning);
             Assert.Equal(128, started.Capacity);
             Assert.Equal(250, started.PollIntervalMs);
@@ -55,9 +62,11 @@ public sealed class Phase7McpTests
             Assert.Equal(30000, started.HistoryWindowMs);
             Assert.Equal(10000, started.FrameIntervalMs);
             Assert.True(started.AggregateFrames);
-            foreach (var value in new[] { 1, 2, 3, 4, 100 }) histogram.Record(value);
+            foreach (var value in new[] { 1, 2, 3, 4, 100 })
+                histogram.Record(value);
             counter.Add(9);
-            var snapshot = Read<MetricsSnapshotDto>(await client.CallToolAsync("metrics", new Dictionary<string, object?>()));
+            var snapshot =
+                Read<MetricsSnapshotDto>(await client.CallToolAsync("metrics", new Dictionary<string, object?>()));
             Assert.Equal(6, snapshot.Samples.Count);
             var histogramInstrument = snapshot.Instruments.Single(item => item.Name == "duration");
             var histogramSeries = snapshot.Series.Single(item => item.InstrumentId == histogramInstrument.Id);
@@ -70,29 +79,43 @@ public sealed class Phase7McpTests
             Assert.Equal(22, frame.Value);
             Assert.Equal(100, frame.P90);
             Assert.Equal("observation_mean", frame.Aggregation);
-            var cleared = Read<MetricsStatusDto>(await client.CallToolAsync("metrics-clear", new Dictionary<string, object?>
-            { ["seriesId"] = histogramSeries.Id }));
+            var cleared = Read<MetricsStatusDto>(await client.CallToolAsync("metrics-clear",
+                new Dictionary<string, object?>
+                    { ["seriesId"] = histogramSeries.Id }));
             Assert.True(cleared.IsRunning);
             Assert.Equal(started.CaptureId, cleared.CaptureId);
             Assert.True(cleared.Revision > snapshot.Status.Revision);
-            snapshot = Read<MetricsSnapshotDto>(await client.CallToolAsync("metrics", new Dictionary<string, object?>()));
+            snapshot = Read<MetricsSnapshotDto>(
+                await client.CallToolAsync("metrics", new Dictionary<string, object?>()));
             Assert.Equal(9, Assert.Single(snapshot.Samples).Value);
             Assert.Equal(0, snapshot.Series.Single(item => item.Id == histogramSeries.Id).WindowCount);
             histogram.Record(50);
-            snapshot = Read<MetricsSnapshotDto>(await client.CallToolAsync("metrics", new Dictionary<string, object?>()));
+            snapshot = Read<MetricsSnapshotDto>(
+                await client.CallToolAsync("metrics", new Dictionary<string, object?>()));
             Assert.Equal(1, snapshot.Series.Single(item => item.Id == histogramSeries.Id).WindowCount);
-            Assert.Contains(snapshot.Samples, item => item.SeriesId == histogramSeries.Id && item.Value == 50 && item.Sequence > 6);
+            Assert.Contains(snapshot.Samples,
+                item => item.SeriesId == histogramSeries.Id && item.Value == 50 && item.Sequence > 6);
 
-            var nodeId = Assert.Single(Read<TreeSearchResult>(await client.CallToolAsync("search", new Dictionary<string, object?>
-            { ["query"] = edited.Name, ["kind"] = "Logical" })).Matches).Id;
-            async Task<PropertyInfoDto> Background() => Assert.Single(Read<PropertyInfoDto[]>(await client.CallToolAsync("props",
-                new Dictionary<string, object?> { ["nodeId"] = nodeId, ["propertyNames"] = new[] { "Background" } })));
+            var nodeId = Assert.Single(Read<TreeSearchResult>(await client.CallToolAsync("search",
+                new Dictionary<string, object?>
+                    { ["query"] = edited.Name, ["kind"] = "Logical" })).Matches).Id;
+
+            async Task<PropertyInfoDto> Background() => Assert.Single(Read<PropertyInfoDto[]>(
+                await client.CallToolAsync("props",
+                    new Dictionary<string, object?>
+                        { ["nodeId"] = nodeId, ["propertyNames"] = new[] { "Background" } })));
+
             var property = await Background();
             Assert.Equal(BrushKind.Linear, property.Presentation!.Brush!.Kind);
-            var draft = new BrushDto(BrushKind.Linear, Opacity: .7, Stops: [new("Green", 0), new("Purple", 1)],
-                SpreadMethod: "Reflect", StartPoint: "0%, 50%", EndPoint: "100%, 50%");
-            Read<OperationResult>(await client.CallToolAsync("set-brush", new Dictionary<string, object?>
-            { ["nodeId"] = nodeId, ["propertyName"] = property.Id, ["brush"] = draft }));
+            var draft = new BrushDto(BrushKind.Linear,
+                Opacity: .7,
+                Stops: [new("Green", 0), new("Purple", 1)],
+                SpreadMethod: "Reflect",
+                StartPoint: "0%, 50%",
+                EndPoint: "100%, 50%");
+            Read<OperationResult>(await client.CallToolAsync("set-brush",
+                new Dictionary<string, object?>
+                    { ["nodeId"] = nodeId, ["propertyName"] = property.Id, ["brush"] = draft }));
             var applied = Assert.IsType<LinearGradientBrush>(edited.Background);
             Assert.NotSame(original, applied);
             Assert.Equal(.7, applied.Opacity);
@@ -111,16 +134,26 @@ public sealed class Phase7McpTests
             Assert.Equal(Colors.Blue, original.GradientStops[1].Color);
             Assert.Equal(RelativePoint.TopLeft, original.StartPoint);
             Assert.Equal(RelativePoint.Parse("100%, 0%"), original.EndPoint);
-            Assert.NotEqual(true, (await client.CallToolAsync("set-prop", new Dictionary<string, object?>
-            { ["nodeId"] = nodeId, ["propertyName"] = property.Id, ["value"] = null })).IsError);
+            Assert.NotEqual(true,
+                (await client.CallToolAsync("set-prop",
+                    new Dictionary<string, object?>
+                        { ["nodeId"] = nodeId, ["propertyName"] = property.Id, ["value"] = null })).IsError);
             Assert.Same(original, edited.Background);
             Assert.Equal(Colors.Red.ToString(), (await Background()).Presentation!.Brush!.Stops![0].Color);
-            var allCleared = Read<MetricsStatusDto>(await client.CallToolAsync("metrics-clear", new Dictionary<string, object?>()));
+            var allCleared =
+                Read<MetricsStatusDto>(await client.CallToolAsync("metrics-clear", new Dictionary<string, object?>()));
             Assert.True(allCleared.IsRunning);
-            Assert.Empty(Read<MetricsSnapshotDto>(await client.CallToolAsync("metrics", new Dictionary<string, object?>())).Samples);
-            Assert.False(Read<MetricsStatusDto>(await client.CallToolAsync("metrics-stop", new Dictionary<string, object?>())).IsRunning);
+            Assert.Empty(
+                Read<MetricsSnapshotDto>(await client.CallToolAsync("metrics", new Dictionary<string, object?>()))
+                    .Samples);
+            Assert.False(
+                Read<MetricsStatusDto>(await client.CallToolAsync("metrics-stop", new Dictionary<string, object?>()))
+                    .IsRunning);
         }
-        finally { target.Close(); }
+        finally
+        {
+            target.Close();
+        }
     }
 
     private static Task<McpClient> CreateClientAsync()
@@ -129,8 +162,12 @@ public sealed class Phase7McpTests
         return McpClient.CreateAsync(new StdioClientTransport(new StdioClientTransportOptions
         {
             Command = "dotnet", Name = "Phase 7 metrics and brush MCP integration",
-            Arguments = ["exec", "--runtimeconfig", Path.ChangeExtension(assembly, ".runtimeconfig.json"), "--depsfile",
-                Path.ChangeExtension(assembly, ".deps.json"), typeof(Program).Assembly.Location, "mcp", "--profile", "extended"],
+            Arguments =
+            [
+                "exec", "--runtimeconfig", Path.ChangeExtension(assembly, ".runtimeconfig.json"), "--depsfile",
+                Path.ChangeExtension(assembly, ".deps.json"), typeof(Program).Assembly.Location, "mcp", "--profile",
+                "extended"
+            ],
             ShutdownTimeout = TimeSpan.FromSeconds(5)
         }));
     }
@@ -139,8 +176,11 @@ public sealed class Phase7McpTests
     {
         Assert.NotEqual(true, result.IsError);
         var text = string.Join("\n", result.Content.OfType<TextContentBlock>().Select(item => item.Text));
-        var root = result.StructuredContent is { } structured ? JsonNode.Parse(JsonSerializer.Serialize(structured)) : JsonNode.Parse(text);
-        if (root is JsonObject obj && obj.TryGetPropertyValue("result", out var wrapped)) root = wrapped;
+        var root = result.StructuredContent is { } structured
+            ? JsonNode.Parse(JsonSerializer.Serialize(structured))
+            : JsonNode.Parse(text);
+        if (root is JsonObject obj && obj.TryGetPropertyValue("result", out var wrapped))
+            root = wrapped;
         return root!.Deserialize<T>(ProtocolJson.Options)!;
     }
 }

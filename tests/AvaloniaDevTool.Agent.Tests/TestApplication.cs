@@ -17,4 +17,3 @@ public sealed class TestApplication : Application
 {
     public override void Initialize() => Styles.Add(new FluentTheme());
 }
-

@@ -35,8 +35,12 @@ public sealed class WebSocketStreamTests
                 for (var offset = 0; offset < RpcWebSocketStream.MaximumMessageBytes; offset += chunk.Length)
                     await pair.Client.SendAsync(chunk, WebSocketMessageType.Binary, false, CancellationToken.None);
             }
-            catch (WebSocketException) { }
-            catch (IOException) { }
+            catch (WebSocketException)
+            {
+            }
+            catch (IOException)
+            {
+            }
         });
         var error = await Assert.ThrowsAsync<RpcException>(() => reading.WaitAsync(TimeSpan.FromSeconds(5)));
         Assert.Equal("invalid_frame", error.Code);
@@ -59,9 +63,11 @@ public sealed class WebSocketStreamTests
     {
         await using var pair = await SocketPair.CreateAsync();
         RpcPeer? server = null;
-        await using var client = new RpcPeer(new RpcWebSocketStream(pair.Client), (_, _, _) => Task.FromResult<object?>(6));
-        await using var serverPeer = new RpcPeer(new RpcWebSocketStream(pair.Server), async (_, _, token) =>
-            await server!.InvokeAsync<int>("callback", null, token) * 7);
+        await using var client =
+            new RpcPeer(new RpcWebSocketStream(pair.Client), (_, _, _) => Task.FromResult<object?>(6));
+        await using var serverPeer = new RpcPeer(new RpcWebSocketStream(pair.Server),
+            async (_, _, token) =>
+                await server!.InvokeAsync<int>("callback", null, token) * 7);
         server = serverPeer;
         client.Start();
         serverPeer.Start();
@@ -71,25 +77,34 @@ public sealed class WebSocketStreamTests
     private static async Task ReadUntilErrorAsync(Stream stream)
     {
         var buffer = new byte[4096];
-        while (await stream.ReadAsync(buffer) != 0) { }
+        while (await stream.ReadAsync(buffer) != 0)
+        {
+        }
     }
 
     private sealed class SocketPair(WebSocket server, WebSocket client) : IAsyncDisposable
     {
         public WebSocket Server { get; } = server;
         public WebSocket Client { get; } = client;
+
         public static async Task<SocketPair> CreateAsync()
         {
             var name = "avdt-websocket-" + Guid.NewGuid().ToString("N");
-            var serverPipe = new NamedPipeServerStream(name, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
+            var serverPipe = new NamedPipeServerStream(name,
+                PipeDirection.InOut,
+                1,
+                PipeTransmissionMode.Byte,
+                PipeOptions.Asynchronous);
             var clientPipe = new NamedPipeClientStream(".", name, PipeDirection.InOut, PipeOptions.Asynchronous);
             await Task.WhenAll(serverPipe.WaitForConnectionAsync(), clientPipe.ConnectAsync());
             return new SocketPair(WebSocket.CreateFromStream(serverPipe, true, null, Timeout.InfiniteTimeSpan),
                 WebSocket.CreateFromStream(clientPipe, false, null, Timeout.InfiniteTimeSpan));
         }
+
         public ValueTask DisposeAsync()
         {
-            Server.Dispose(); Client.Dispose();
+            Server.Dispose();
+            Client.Dispose();
             return ValueTask.CompletedTask;
         }
     }

@@ -56,7 +56,8 @@ public sealed class ExplorationIntegrationTests
         Assert.Equal(1, limitedResults.Visited);
         Assert.True(limitedResults.Truncated);
         var invalid = await Assert.ThrowsAsync<RpcException>(() => target.Peer.InvokeAsync<TreeSearchResult>(
-            ExplorationMethods.Search, new TreeSearchRequest("", TreeKind.Logical, MaxResults: 0)));
+            ExplorationMethods.Search,
+            new TreeSearchRequest("", TreeKind.Logical, MaxResults: 0)));
         Assert.Equal("invalid_request", invalid.Code);
     }
 
@@ -69,13 +70,16 @@ public sealed class ExplorationIntegrationTests
         var node = Assert.Single((await target.SearchAsync("Detachable")).Matches);
         panel.Children.Remove(text);
         var detached = await Assert.ThrowsAsync<RpcException>(() => target.Peer.InvokeAsync<TreeNodeInfo[]>(
-            ExplorationMethods.Ancestors, new TreeAncestorsRequest(node.Id, TreeKind.Logical)));
+            ExplorationMethods.Ancestors,
+            new TreeAncestorsRequest(node.Id, TreeKind.Logical)));
         Assert.Equal("object_detached", detached.Code);
         var expired = await Assert.ThrowsAsync<RpcException>(() => target.Peer.InvokeAsync<TreeNodeInfo[]>(
-            ExplorationMethods.Ancestors, new TreeAncestorsRequest(long.MaxValue, TreeKind.Visual)));
+            ExplorationMethods.Ancestors,
+            new TreeAncestorsRequest(long.MaxValue, TreeKind.Visual)));
         Assert.Equal("object_expired", expired.Code);
         var expiredRoot = await Assert.ThrowsAsync<RpcException>(() => target.Peer.InvokeAsync<TreeSearchResult>(
-            ExplorationMethods.Search, new TreeSearchRequest("x", TreeKind.Logical, long.MaxValue)));
+            ExplorationMethods.Search,
+            new TreeSearchRequest("x", TreeKind.Logical, long.MaxValue)));
         Assert.Equal("object_expired", expiredRoot.Code);
         GC.KeepAlive(text);
     }
@@ -96,7 +100,8 @@ public sealed class ExplorationIntegrationTests
         Assert.True((await target.ActionAsync(node.Id, ElementAction.Enable)).Succeeded);
         model.Enabled = false;
         Assert.True(button.IsEnabled);
-        var properties = await target.Peer.InvokeAsync<PropertyInfoDto[]>(Methods.PropertiesGet, new ObjectRequest(node.Id));
+        var properties =
+            await target.Peer.InvokeAsync<PropertyInfoDto[]>(Methods.PropertiesGet, new ObjectRequest(node.Id));
         var enabled = properties.Single(property => property.Name == "IsEnabled");
         await target.Peer.InvokeAsync<OperationResult>(Methods.PropertiesClear,
             new ClearPropertyRequest(node.Id, enabled.Id));
@@ -113,8 +118,11 @@ public sealed class ExplorationIntegrationTests
         ((IPseudoClasses)control.Classes).Set(":probe", true);
         await using var target = await TargetSession.CreateAsync(control);
         var node = Assert.Single((await target.SearchAsync("PseudoTarget")).Matches);
-        var initial = await target.Peer.InvokeAsync<PseudoClassInfo[]>(ExplorationMethods.PseudoClasses, new ObjectRequest(node.Id));
-        Assert.Contains(initial, info => info.Name == ":probe" && info.IsDeclared && info.IsActive && !info.HasOverride);
+        var initial =
+            await target.Peer.InvokeAsync<PseudoClassInfo[]>(ExplorationMethods.PseudoClasses,
+                new ObjectRequest(node.Id));
+        Assert.Contains(initial,
+            info => info.Name == ":probe" && info.IsDeclared && info.IsActive && !info.HasOverride);
         await target.Peer.InvokeAsync<OperationResult>(ExplorationMethods.SetPseudoClass,
             new SetPseudoClassRequest(node.Id, ":probe", false));
         Assert.DoesNotContain(":probe", control.Classes);
@@ -125,10 +133,14 @@ public sealed class ExplorationIntegrationTests
         Assert.Contains(":probe", control.Classes);
         await target.Peer.InvokeAsync<OperationResult>(ExplorationMethods.SetPseudoClass,
             new SetPseudoClassRequest(node.Id, ":temporary", true));
-        var changed = await target.Peer.InvokeAsync<PseudoClassInfo[]>(ExplorationMethods.PseudoClasses, new ObjectRequest(node.Id));
-        Assert.Contains(changed, info => info.Name == ":temporary" && info.IsActive && info.HasOverride && !info.IsDeclared);
+        var changed =
+            await target.Peer.InvokeAsync<PseudoClassInfo[]>(ExplorationMethods.PseudoClasses,
+                new ObjectRequest(node.Id));
+        Assert.Contains(changed,
+            info => info.Name == ":temporary" && info.IsActive && info.HasOverride && !info.IsDeclared);
         var invalid = await Assert.ThrowsAsync<RpcException>(() => target.Peer.InvokeAsync<OperationResult>(
-            ExplorationMethods.SetPseudoClass, new SetPseudoClassRequest(node.Id, "business", false)));
+            ExplorationMethods.SetPseudoClass,
+            new SetPseudoClassRequest(node.Id, "business", false)));
         Assert.Equal("invalid_request", invalid.Code);
         await target.Peer.DisposeAsync();
         await WaitUntilAsync(() => !target.Agent.IsConnected);
@@ -143,7 +155,8 @@ public sealed class ExplorationIntegrationTests
         var border = new Border { Name = "ScreenshotTarget", Width = 120, Height = 64, Background = Brushes.Crimson };
         await using var target = await TargetSession.CreateAsync(border);
         var node = Assert.Single((await target.SearchAsync("ScreenshotTarget")).Matches);
-        var screenshot = await target.Peer.InvokeAsync<ElementScreenshot>(ExplorationMethods.Screenshot, new ObjectRequest(node.Id));
+        var screenshot =
+            await target.Peer.InvokeAsync<ElementScreenshot>(ExplorationMethods.Screenshot, new ObjectRequest(node.Id));
         var bytes = Convert.FromBase64String(screenshot.PngBase64);
         Assert.Equal([137, 80, 78, 71, 13, 10, 26, 10], bytes.Take(8).Select(value => (int)value));
         Assert.Equal(120, screenshot.Width);
@@ -161,11 +174,13 @@ public sealed class ExplorationIntegrationTests
         var manyPixels = new Border { Name = "ManyPixels", Width = 1536, Height = 1536 };
         var canvas = new Canvas { Children = { empty, wide, manyPixels } };
         await using var target = await TargetSession.CreateAsync(canvas);
-        foreach (var (name, code) in new[] { ("Empty", "invalid_bounds"), ("Wide", "screenshot_limit"), ("ManyPixels", "screenshot_limit") })
+        foreach (var (name, code) in new[]
+                     { ("Empty", "invalid_bounds"), ("Wide", "screenshot_limit"), ("ManyPixels", "screenshot_limit") })
         {
             var node = (await target.SearchAsync(name)).Matches.Single(item => item.Name == name);
             var error = await Assert.ThrowsAsync<RpcException>(() => target.Peer.InvokeAsync<ElementScreenshot>(
-                ExplorationMethods.Screenshot, new ObjectRequest(node.Id)));
+                ExplorationMethods.Screenshot,
+                new ObjectRequest(node.Id)));
             Assert.Equal(code, error.Code);
         }
     }
@@ -174,11 +189,13 @@ public sealed class ExplorationIntegrationTests
     public async Task Screenshot_rejects_png_over_body_limit_without_downscaling()
     {
         using var bitmap = CreateNoiseBitmap(1024, 1024);
-        var image = new Image { Name = "NoiseTarget", Width = 1024, Height = 1024, Source = bitmap, Stretch = Stretch.Fill };
+        var image = new Image
+            { Name = "NoiseTarget", Width = 1024, Height = 1024, Source = bitmap, Stretch = Stretch.Fill };
         await using var target = await TargetSession.CreateAsync(new Canvas { Children = { image } });
         var node = Assert.Single((await target.SearchAsync("NoiseTarget")).Matches);
         var error = await Assert.ThrowsAsync<RpcException>(() => target.Peer.InvokeAsync<ElementScreenshot>(
-            ExplorationMethods.Screenshot, new ObjectRequest(node.Id)));
+            ExplorationMethods.Screenshot,
+            new ObjectRequest(node.Id)));
         Assert.Equal("screenshot_limit", error.Code);
         Assert.Equal(1024, image.Bounds.Width);
         Assert.Equal(1024, image.Bounds.Height);
@@ -186,13 +203,16 @@ public sealed class ExplorationIntegrationTests
 
     private static WriteableBitmap CreateNoiseBitmap(int width, int height)
     {
-        var bitmap = new WriteableBitmap(new PixelSize(width, height), new Vector(96, 96), PixelFormat.Rgba8888, AlphaFormat.Opaque);
+        var bitmap = new WriteableBitmap(new PixelSize(width, height),
+            new Vector(96, 96),
+            PixelFormat.Rgba8888,
+            AlphaFormat.Opaque);
         using var framebuffer = bitmap.Lock();
         var data = new byte[framebuffer.RowBytes * height];
         new Random(783).NextBytes(data);
         for (var row = 0; row < height; row++)
-            for (var column = 0; column < width; column++)
-                data[row * framebuffer.RowBytes + column * 4 + 3] = 255;
+        for (var column = 0; column < width; column++)
+            data[row * framebuffer.RowBytes + column * 4 + 3] = 255;
         Marshal.Copy(data, 0, framebuffer.Address, data.Length);
         return bitmap;
     }
@@ -210,11 +230,17 @@ public sealed class ExplorationIntegrationTests
     private sealed class EnabledModel : INotifyPropertyChanged
     {
         private bool _enabled;
+
         public bool Enabled
         {
             get => _enabled;
-            set { _enabled = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Enabled))); }
+            set
+            {
+                _enabled = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Enabled)));
+            }
         }
+
         public event PropertyChangedEventHandler? PropertyChanged;
     }
 
@@ -222,17 +248,19 @@ public sealed class ExplorationIntegrationTests
     {
         public DiagnosticsAgent Agent { get; } = agent;
         public RpcPeer Peer { get; } = peer;
+
         public static async Task<TargetSession> CreateAsync(Control content)
         {
             var window = new Window { Name = "ExplorationRoot", Width = 400, Height = 300, Content = content };
             window.Show();
             window.UpdateLayout();
-            var agent = DiagnosticsAgent.Attach(Application.Current!, new DiagnosticsAgentOptions
-            {
-                PipeName = "exploration-tests-" + Guid.NewGuid().ToString("N"),
-                ApplicationName = "Exploration tests",
-                TopLevelProvider = () => [window]
-            });
+            var agent = DiagnosticsAgent.Attach(Application.Current!,
+                new DiagnosticsAgentOptions
+                {
+                    PipeName = "exploration-tests-" + Guid.NewGuid().ToString("N"),
+                    ApplicationName = "Exploration tests",
+                    TopLevelProvider = () => [window]
+                });
             var pipe = new NamedPipeClientStream(".", agent.PipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
             await pipe.ConnectAsync(CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(5));
             var peer = new RpcPeer(pipe);
@@ -240,10 +268,16 @@ public sealed class ExplorationIntegrationTests
             await peer.InvokeAsync<SessionInfo>(Methods.SessionInfo, null);
             return new TargetSession(window, agent, peer);
         }
+
         public Task<TreeSearchResult> SearchAsync(string query) => Peer.InvokeAsync<TreeSearchResult>(
-            ExplorationMethods.Search, new TreeSearchRequest(query, TreeKind.Logical));
-        public Task<ElementActionResult> ActionAsync(long id, ElementAction action) => Peer.InvokeAsync<ElementActionResult>(
-            ExplorationMethods.Action, new ElementActionRequest(id, action));
+            ExplorationMethods.Search,
+            new TreeSearchRequest(query, TreeKind.Logical));
+
+        public Task<ElementActionResult> ActionAsync(long id, ElementAction action) =>
+            Peer.InvokeAsync<ElementActionResult>(
+                ExplorationMethods.Action,
+                new ElementActionRequest(id, action));
+
         public async ValueTask DisposeAsync()
         {
             await Peer.DisposeAsync();
@@ -252,4 +286,3 @@ public sealed class ExplorationIntegrationTests
         }
     }
 }
-

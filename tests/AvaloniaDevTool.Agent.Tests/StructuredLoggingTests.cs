@@ -31,10 +31,19 @@ public sealed class StructuredLoggingTests
             Assert.True(source.HasSubscribers);
             await Task.Run(() =>
             {
-                for (var index = 0; index < 650; index++) source.Publish(new("Warning", "Orders", "Rejected {Amount}",
-                    [new("Amount", 12)]));
-                source.Publish(new("Warning", "Orders", "Accepted {Amount:0.0} for {Customer}; {Missing}; {State}",
-                    [new("Amount", 12.25m), new("Customer", "A"), new("Missing", null), new("State", new UnsafeValue())], Source: target));
+                for (var index = 0; index < 650; index++)
+                    source.Publish(new("Warning",
+                        "Orders",
+                        "Rejected {Amount}",
+                        [new("Amount", 12)]));
+                source.Publish(new("Warning",
+                    "Orders",
+                    "Accepted {Amount:0.0} for {Customer}; {Missing}; {State}",
+                    [
+                        new("Amount", 12.25m), new("Customer", "A"), new("Missing", null),
+                        new("State", new UnsafeValue())
+                    ],
+                    Source: target));
             });
             var entry = Assert.Single(await client.GetActivityAsync());
             Assert.Equal("Accepted 12.3 for A; (null); [UnsafeValue: unavailable]", entry.Message);
@@ -54,14 +63,18 @@ public sealed class StructuredLoggingTests
             source.Publish(new("Error", "Orders", "Accepted after stop", []));
             Assert.Single(await client.GetActivityAsync());
         }
-        finally { window.Close(); }
+        finally
+        {
+            window.Close();
+        }
     }
 
     [AvaloniaFact]
     public async Task Real_logger_factory_maps_original_format_event_id_scope_level_and_exception()
     {
         using var provider = new DiagnosticsLoggerProvider();
-        using var factory = LoggerFactory.Create(builder => builder.SetMinimumLevel(LogLevel.Trace).AddProvider(provider));
+        using var factory =
+            LoggerFactory.Create(builder => builder.SetMinimumLevel(LogLevel.Trace).AddProvider(provider));
         var window = new Window();
         window.Show();
         try
@@ -74,8 +87,11 @@ public sealed class StructuredLoggingTests
             await Task.Run(() =>
             {
                 using (logger.BeginScope(new Dictionary<string, object?> { ["Tenant"] = 42 }))
-                    logger.LogCritical(new EventId(71, "SaveFailed"), new InvalidOperationException("cannot save", new Exception("inner")),
-                        "Save {Count} for {User}", 3, "alice");
+                    logger.LogCritical(new EventId(71, "SaveFailed"),
+                        new InvalidOperationException("cannot save", new Exception("inner")),
+                        "Save {Count} for {User}",
+                        3,
+                        "alice");
             });
             var entry = Assert.Single(await client.GetActivityAsync(), item => item.Category == "Application.Orders");
             Assert.Equal("Fatal", entry.Level);
@@ -92,7 +108,10 @@ public sealed class StructuredLoggingTests
             await client.StopActivityAsync();
             Assert.False(logger.IsEnabled(LogLevel.Warning));
         }
-        finally { window.Close(); }
+        finally
+        {
+            window.Close();
+        }
     }
 
     [AvaloniaFact]
@@ -103,9 +122,15 @@ public sealed class StructuredLoggingTests
         service.Start(new ActivityStartRequest());
         var unsafeValue = new UnsafeValue();
         var exception = new Exception("root");
-        typeof(Exception).GetField("_innerException", BindingFlags.NonPublic | BindingFlags.Instance)!.SetValue(exception, exception);
-        source.Publish(new("Error", "Bounds", new string('t', 6000),
-            Enumerable.Range(0, 80).Select(index => new KeyValuePair<string, object?>("P" + index, index == 0 ? unsafeValue : new string('x', 2000))).ToArray(),
+        typeof(Exception).GetField("_innerException", BindingFlags.NonPublic | BindingFlags.Instance)!.SetValue(
+            exception,
+            exception);
+        source.Publish(new("Error",
+            "Bounds",
+            new string('t', 6000),
+            Enumerable.Range(0, 80).Select(index =>
+                    new KeyValuePair<string, object?>("P" + index, index == 0 ? unsafeValue : new string('x', 2000)))
+                .ToArray(),
             new AggregateException(Enumerable.Repeat(exception, 100))));
         var entry = Assert.Single(service.Snapshot());
         var details = Assert.IsType<LogDetails>(entry.LogDetails);
@@ -116,7 +141,8 @@ public sealed class StructuredLoggingTests
         Assert.Equal(1025, details.Parameters[1].Value!.Length);
         Assert.True(details.Exception!.IsTruncated);
         Assert.True(CountExceptions(details.Exception) <= 9);
-        Assert.Contains(details.Exception.InnerExceptions, item => item.IsCycle || item.InnerExceptions.Any(child => child.IsCycle));
+        Assert.Contains(details.Exception.InnerExceptions,
+            item => item.IsCycle || item.InnerExceptions.Any(child => child.IsCycle));
         Assert.Equal(0, unsafeValue.Calls);
     }
 
@@ -175,11 +201,12 @@ public sealed class StructuredLoggingTests
         Avalonia.Logging.Logger.Sink = previous;
         try
         {
-            using var service = new ActivityService(new WeakObjectRegistry(), (method, _) =>
-            {
-                if (method == ActivityMethods.EntryAdded)
-                    Avalonia.Logging.Logger.Sink!.Log(LogEventLevel.Warning, "Observer", null, "Do not recapture");
-            });
+            using var service = new ActivityService(new WeakObjectRegistry(),
+                (method, _) =>
+                {
+                    if (method == ActivityMethods.EntryAdded)
+                        Avalonia.Logging.Logger.Sink!.Log(LogEventLevel.Warning, "Observer", null, "Do not recapture");
+                });
             service.Start(new ActivityStartRequest());
             Avalonia.Logging.Logger.Sink!.Log(LogEventLevel.Warning, "Reentry", null, "One");
             Assert.Single(service.Snapshot());
@@ -187,7 +214,10 @@ public sealed class StructuredLoggingTests
             service.Stop();
             Assert.Same(previous, Avalonia.Logging.Logger.Sink);
         }
-        finally { Avalonia.Logging.Logger.Sink = original; }
+        finally
+        {
+            Avalonia.Logging.Logger.Sink = original;
+        }
     }
 
     [AvaloniaFact]
@@ -214,14 +244,19 @@ public sealed class StructuredLoggingTests
             second.Stop();
             Assert.Same(previous, Avalonia.Logging.Logger.Sink);
         }
-        finally { Avalonia.Logging.Logger.Sink = original; }
+        finally
+        {
+            Avalonia.Logging.Logger.Sink = original;
+        }
     }
 
     private static DiagnosticsAgent CreateAgent(Window window, IDiagnosticsLogSource source) =>
-        DiagnosticsAgent.Attach(Application.Current!, new DiagnosticsAgentOptions
-        {
-            PipeName = "structured-logs-" + Guid.NewGuid().ToString("N"), TopLevelProvider = () => [window], LogSources = [source]
-        });
+        DiagnosticsAgent.Attach(Application.Current!,
+            new DiagnosticsAgentOptions
+            {
+                PipeName = "structured-logs-" + Guid.NewGuid().ToString("N"), TopLevelProvider = () => [window],
+                LogSources = [source]
+            });
 
     private static int CountExceptions(LogExceptionInfo error) => 1 + error.InnerExceptions.Sum(CountExceptions);
 
@@ -237,29 +272,61 @@ public sealed class StructuredLoggingTests
 
     private static void Collect()
     {
-        for (var index = 0; index < 3; index++) { GC.Collect(); GC.WaitForPendingFinalizers(); }
+        for (var index = 0; index < 3; index++)
+        {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+        }
     }
 
     private sealed class UnsafeValue : IFormattable
     {
         public int Calls { get; private set; }
-        public override string ToString() { Calls++; throw new InvalidOperationException("Business ToString invoked"); }
+
+        public override string ToString()
+        {
+            Calls++;
+            throw new InvalidOperationException("Business ToString invoked");
+        }
+
         public string ToString(string? format, IFormatProvider? provider) => ToString();
     }
 
     private sealed class UnsafeException : Exception
     {
         public int Calls { get; private set; }
-        public override string Message { get { Calls++; throw new InvalidOperationException("Unsafe Message invoked"); } }
-        public override string? StackTrace { get { Calls++; throw new InvalidOperationException("Unsafe StackTrace invoked"); } }
+
+        public override string Message
+        {
+            get
+            {
+                Calls++;
+                throw new InvalidOperationException("Unsafe Message invoked");
+            }
+        }
+
+        public override string? StackTrace
+        {
+            get
+            {
+                Calls++;
+                throw new InvalidOperationException("Unsafe StackTrace invoked");
+            }
+        }
     }
 
     private sealed class ReentrantSink : ILogSink
     {
         public bool IsEnabled(LogEventLevel level, string area) => true;
+
         public void Log(LogEventLevel level, string area, object? source, string messageTemplate) =>
             Avalonia.Logging.Logger.Sink?.Log(level, area, source, "Reentrant");
-        public void Log(LogEventLevel level, string area, object? source, string messageTemplate, params object?[] propertyValues) =>
+
+        public void Log(LogEventLevel level,
+            string area,
+            object? source,
+            string messageTemplate,
+            params object?[] propertyValues) =>
             Log(level, area, source, messageTemplate);
     }
 
@@ -268,6 +335,11 @@ public sealed class StructuredLoggingTests
         public int Count { get; private set; }
         public bool IsEnabled(LogEventLevel level, string area) => true;
         public void Log(LogEventLevel level, string area, object? source, string messageTemplate) => Count++;
-        public void Log(LogEventLevel level, string area, object? source, string messageTemplate, params object?[] propertyValues) => Count++;
+
+        public void Log(LogEventLevel level,
+            string area,
+            object? source,
+            string messageTemplate,
+            params object?[] propertyValues) => Count++;
     }
 }

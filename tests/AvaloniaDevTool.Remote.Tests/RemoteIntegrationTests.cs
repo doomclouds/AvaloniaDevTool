@@ -27,7 +27,8 @@ public sealed class RemoteIntegrationTests
         Assert.Equal(DiagnosticsProtocol.Version, client.Session!.ProtocolVersion);
         var firstSession = client.Session.SessionId;
         var root = Assert.Single(await client.GetRootsAsync(TreeKind.Logical));
-        var node = (await client.GetChildrenAsync(root.Id, TreeKind.Logical)).Single(value => value.Name == "RemoteMessage");
+        var node = (await client.GetChildrenAsync(root.Id, TreeKind.Logical)).Single(value =>
+            value.Name == "RemoteMessage");
         var property = (await client.GetPropertiesAsync(node.Id)).Single(value => value.Name == "Text");
         Assert.Equal("Original", property.Value);
         var changed = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -35,7 +36,8 @@ public sealed class RemoteIntegrationTests
         await client.SetPropertyAsync(node.Id, property.Id, "Remote edit");
         Assert.Equal("Remote edit", target.Text.Text);
         await changed.Task.WaitAsync(TimeSpan.FromSeconds(5));
-        Assert.Contains(await client.GetPropertiesAsync(node.Id), value => value.Name == "Text" && value.Value == "Remote edit");
+        Assert.Contains(await client.GetPropertiesAsync(node.Id),
+            value => value.Name == "Text" && value.Value == "Remote edit");
         await client.DisconnectAsync();
         await WaitUntilAsync(() => !target.Agent.IsConnected);
         Assert.Equal("Original", target.Text.Text);
@@ -53,12 +55,14 @@ public sealed class RemoteIntegrationTests
         foreach (var token in new string?[] { null, DiagnosticsRemoteServer.GenerateBearerToken() })
         {
             using var request = new HttpRequestMessage(HttpMethod.Get, uri);
-            if (token is not null) request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            if (token is not null)
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
             using var response = await http.SendAsync(request);
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
             Assert.DoesNotContain(target.Token, await response.Content.ReadAsStringAsync());
             Assert.False(target.Agent.IsConnected);
         }
+
         using var originRequest = new HttpRequestMessage(HttpMethod.Get, uri);
         originRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", target.Token);
         originRequest.Headers.Add("Origin", "https://untrusted.invalid");
@@ -78,7 +82,8 @@ public sealed class RemoteIntegrationTests
         await using var pipeClient = new DiagnosticsClient();
         await pipeClient.ConnectAsync(target.Agent.PipeName);
         await using var remote = new DiagnosticsClient();
-        await Assert.ThrowsAsync<WebSocketException>(() => remote.ConnectRemoteAsync(target.Server.Endpoint, target.Token));
+        await Assert.ThrowsAsync<WebSocketException>(() =>
+            remote.ConnectRemoteAsync(target.Server.Endpoint, target.Token));
         Assert.Single(await pipeClient.GetRootsAsync(TreeKind.Logical));
         await pipeClient.DisconnectAsync();
         await WaitUntilAsync(() => !target.Agent.IsConnected);
@@ -99,13 +104,17 @@ public sealed class RemoteIntegrationTests
         await using var target = await Target.CreateAsync();
         using var socket = await target.ConnectSocketAsync();
         if (text)
-            await socket.SendAsync(Encoding.UTF8.GetBytes("invalid"), WebSocketMessageType.Text, true, CancellationToken.None);
+            await socket.SendAsync(Encoding.UTF8.GetBytes("invalid"),
+                WebSocketMessageType.Text,
+                true,
+                CancellationToken.None);
         else
         {
             var invalid = new byte[4];
             BinaryPrimitives.WriteInt32LittleEndian(invalid, RpcPeer.MaximumFrameBytes + 1);
             await socket.SendAsync(invalid, WebSocketMessageType.Binary, true, CancellationToken.None);
         }
+
         await WaitUntilAsync(() => !target.Agent.IsConnected);
         await using var client = new DiagnosticsClient();
         await client.ConnectRemoteAsync(target.Server.Endpoint, target.Token);
@@ -138,14 +147,19 @@ public sealed class RemoteIntegrationTests
         await using var client = new DiagnosticsClient();
         await client.ConnectRemoteAsync(target.Server.Endpoint, target.Token);
         var disconnected = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-        client.ConnectionChanged += () => { if (!client.IsConnected) disconnected.TrySetResult(); };
+        client.ConnectionChanged += () =>
+        {
+            if (!client.IsConnected)
+                disconnected.TrySetResult();
+        };
         await target.Server.DisposeAsync();
         await disconnected.Task.WaitAsync(TimeSpan.FromSeconds(5));
         await WaitUntilAsync(() => !target.Agent.IsConnected);
         Assert.Null(client.Session);
         using var socket = new ClientWebSocket();
         socket.Options.SetRequestHeader("Authorization", "Bearer " + target.Token);
-        await Assert.ThrowsAsync<WebSocketException>(() => socket.ConnectAsync(target.Server.Endpoint, CancellationToken.None));
+        await Assert.ThrowsAsync<WebSocketException>(() =>
+            socket.ConnectAsync(target.Server.Endpoint, CancellationToken.None));
         await client.ConnectAsync(target.Agent.PipeName);
         Assert.Single(await client.GetRootsAsync(TreeKind.Logical));
     }
@@ -166,11 +180,15 @@ public sealed class RemoteIntegrationTests
     {
         await using var target = await Target.CreateAsync();
         using var key = RSA.Create(2048);
-        var request = new CertificateRequest("CN=avdt-untrusted-test", key, HashAlgorithmName.SHA256, RSASignaturePadding.Pkcs1);
+        var request = new CertificateRequest("CN=avdt-untrusted-test",
+            key,
+            HashAlgorithmName.SHA256,
+            RSASignaturePadding.Pkcs1);
         var names = new SubjectAlternativeNameBuilder();
         names.AddIpAddress(IPAddress.Loopback);
         request.CertificateExtensions.Add(names.Build());
-        using var certificate = request.CreateSelfSigned(DateTimeOffset.UtcNow.AddMinutes(-1), DateTimeOffset.UtcNow.AddMinutes(5));
+        using var certificate =
+            request.CreateSelfSigned(DateTimeOffset.UtcNow.AddMinutes(-1), DateTimeOffset.UtcNow.AddMinutes(5));
         await using var tlsServer = await DiagnosticsRemoteServer.StartAsync(target.Agent,
             new DiagnosticsRemoteServerOptions { BearerToken = target.Token, ServerCertificate = certificate });
         Assert.Equal("wss", tlsServer.Endpoint.Scheme);
@@ -189,10 +207,12 @@ public sealed class RemoteIntegrationTests
         await using var client = new DiagnosticsClient();
         using var cancellation = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
         var connecting = client.ConnectRemoteAsync(new Uri($"ws://127.0.0.1:{port}/diagnostics"),
-            DiagnosticsRemoteServer.GenerateBearerToken(), cancellation.Token);
+            DiagnosticsRemoteServer.GenerateBearerToken(),
+            cancellation.Token);
         using var connection = await listener.AcceptTcpClientAsync(TestContext.Current.CancellationToken);
         await cancellation.CancelAsync();
-        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => connecting.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken));
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
+            connecting.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken));
         Assert.False(client.IsConnected);
     }
 
@@ -201,35 +221,51 @@ public sealed class RemoteIntegrationTests
     {
         using var cancellation = new CancellationTokenSource();
         await using var client = new DiagnosticsClient();
-        foreach (var endpoint in new[] { "http://127.0.0.1/diagnostics", "ws://example.com/diagnostics", "ws://localhost/diagnostics", "ws://user:secret@127.0.0.1/diagnostics", "ws://127.0.0.1/diagnostics?token=secret", "ws://127.0.0.1/diagnostics#secret" })
-            await Assert.ThrowsAsync<ArgumentException>(() => client.ConnectRemoteAsync(new Uri(endpoint), "token", cancellation.Token));
+        foreach (var endpoint in new[]
+                 {
+                     "http://127.0.0.1/diagnostics", "ws://example.com/diagnostics", "ws://localhost/diagnostics",
+                     "ws://user:secret@127.0.0.1/diagnostics", "ws://127.0.0.1/diagnostics?token=secret",
+                     "ws://127.0.0.1/diagnostics#secret"
+                 })
+            await Assert.ThrowsAsync<ArgumentException>(() =>
+                client.ConnectRemoteAsync(new Uri(endpoint), "token", cancellation.Token));
         Assert.Equal(43, DiagnosticsRemoteServer.GenerateBearerToken().Length);
     }
 
     private static async Task WaitUntilAsync(Func<bool> predicate)
     {
         using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-        while (!predicate()) await Task.Delay(25, timeout.Token);
+        while (!predicate())
+            await Task.Delay(25, timeout.Token);
     }
 
-    private sealed class Target(Window window, TextBlock text, DiagnosticsAgent agent,
-        DiagnosticsRemoteServer server, string token) : IAsyncDisposable
+    private sealed class Target(
+        Window window,
+        TextBlock text,
+        DiagnosticsAgent agent,
+        DiagnosticsRemoteServer server,
+        string token) : IAsyncDisposable
     {
         public TextBlock Text { get; } = text;
         public DiagnosticsAgent Agent { get; } = agent;
         public DiagnosticsRemoteServer Server { get; } = server;
         public string Token { get; } = token;
+
         public static async Task<Target> CreateAsync()
         {
             var text = new TextBlock { Name = "RemoteMessage", Text = "Original" };
             var window = new Window { Width = 400, Height = 300, Content = text };
             window.Show();
-            var agent = DiagnosticsAgent.Attach(Application.Current!, new DiagnosticsAgentOptions
-            { PipeName = "avdt-remote-" + Guid.NewGuid().ToString("N"), TopLevelProvider = () => [window] });
+            var agent = DiagnosticsAgent.Attach(Application.Current!,
+                new DiagnosticsAgentOptions
+                    { PipeName = "avdt-remote-" + Guid.NewGuid().ToString("N"), TopLevelProvider = () => [window] });
             var token = DiagnosticsRemoteServer.GenerateBearerToken();
-            var server = await DiagnosticsRemoteServer.StartAsync(agent, new DiagnosticsRemoteServerOptions { BearerToken = token });
+            var server =
+                await DiagnosticsRemoteServer.StartAsync(agent,
+                    new DiagnosticsRemoteServerOptions { BearerToken = token });
             return new Target(window, text, agent, server, token);
         }
+
         public async Task<ClientWebSocket> ConnectSocketAsync()
         {
             var socket = new ClientWebSocket();
@@ -238,6 +274,7 @@ public sealed class RemoteIntegrationTests
             await WaitUntilAsync(() => Agent.IsConnected);
             return socket;
         }
+
         public async ValueTask DisposeAsync()
         {
             await Server.DisposeAsync();
@@ -246,4 +283,3 @@ public sealed class RemoteIntegrationTests
         }
     }
 }
-

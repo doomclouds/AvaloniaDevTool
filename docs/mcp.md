@@ -1,6 +1,6 @@
 # MCP 与命令行
 
-本项目使用 ModelContextProtocol 2.3.0 提供独立 stdio 服务，连接自研 Agent SDK；不依赖原版 DeveloperTools 的运行进程或账户。默认 `agent` profile 提供 44 项工具：canonical 16、框架交互/截图 9、Windows native 8、文件弹窗 8、同连接原始采集 3。显式 `official` 保留 canonical 16 项兼容入口，显式 `extended` 保留旧 62 项诊断扩展。extended 与 canonical 是独立契约，不是兼容超集。
+本项目使用 ModelContextProtocol 2.3.0 提供 stdio 和内网 Streamable HTTP 两种 MCP 入口，连接自研 Agent SDK；不依赖原版 DeveloperTools 的运行进程或账户。默认 `agent` profile 提供 44 项工具：canonical 16、框架交互/截图 9、Windows native 8、文件弹窗 8、同连接原始采集 3。stdio 显式 `official` 保留 canonical 16 项兼容入口，`extended` 保留旧 62 项诊断扩展；HTTP 首版仅提供 agent。extended 与 canonical 是独立契约，不是兼容超集。
 
 ## 启动
 
@@ -16,7 +16,7 @@ dotnet src/AvaloniaDevTool.Cli/bin/Debug/net10.0/AvaloniaDevTool.Cli.dll mcp
 dotnet src/AvaloniaDevTool.Cli/bin/Debug/net10.0/AvaloniaDevTool.Cli.dll mcp --pipe avalonia-devtool-demo
 ```
 
-等价的显式默认值为 `--profile agent`。启动选项只接受 `--pipe NAME` 和 `--profile agent|official|extended`，每项一次且需要非空值。标准输出只承载协议，运行日志写入标准错误；构建应在客户端启动前完成。
+等价的显式默认值为 `--transport stdio --profile agent`。`--pipe`、`--profile` 和 `--transport` 每项一次且需要非空值；`--listen IP`、`--port PORT` 只在 HTTP 模式下有效。stdio 标准输出只承载协议，运行日志写入标准错误；构建应在客户端启动前完成。
 
 MCP 客户端进程配置示例：
 
@@ -31,6 +31,29 @@ MCP 客户端进程配置示例：
 ```
 
 路径应换为实际构建产物。示例不自动修改任何客户端配置。
+
+## 内网 HTTP 与标准 Codex 配置
+
+被测电脑 A 在完整 CLI 分发目录中运行以下命令，将 IP 替换为 A 的实际内网地址：
+
+```powershell
+dotnet AvaloniaDevTool.Cli.dll mcp --transport http --listen 192.168.1.50 --port 7443
+```
+
+Codex 电脑 B 使用与其他 MCP 相同的标准配置加载连接，无需 Token：
+
+```toml
+[mcp_servers.avalonia_testpc]
+url = "http://192.168.1.50:7443/mcp"
+```
+
+HTTP 条目不设置 `command/args`；它连接 A 已运行的服务，不在 B 启动执行端。默认 HTTP 只监听 `127.0.0.1:7443`；内网须显式 `--listen`。`0.0.0.0` 只能作为绑定地址，URL 填 A 的可达 IP。`/mcp` 为标准 MCP，现有 `/diagnostics` WebSocket 是另一条内部 RPC 接口。
+
+工具执行、应用发现、文件路径、预览构建、native worker 均在 A。MCP 连通后，通过下面的“发现、附加和节点”步骤选择 A 上的程序；应用须事先接入 SDK。
+
+HTTP 采用独立逻辑会话和单桌面控制租约；发现应用不抢占目标，首次附加取得控制，detach 释放控制但保持 MCP 会话。十分钟无工具/协议活动且无活跃调用时失效，断线写操作不盲目重试。HTTP 首版选择 official/extended 会在监听前报 `unsupported_profile`。
+
+完整启动、运行时依赖、应用关联和验证边界见[内网部署](architecture/lan-mcp-design.md)。
 
 ## 默认 agent 工具
 

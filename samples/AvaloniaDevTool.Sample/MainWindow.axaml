@@ -1,270 +1,518 @@
 <Window xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:local="using:AvaloniaDevTool.Sample"
-        x:Class="AvaloniaDevTool.Sample.MainWindow"
-        x:DataType="local:SampleViewModel"
-        Title="Avalonia 测试工作台"
-        Name="SampleMainWindow"
-        AutomationProperties.AutomationId="Sample.MainWindow"
-        Width="1180" Height="850" MinWidth="760" MinHeight="600"
-        Background="#F3F5FA" FontFamily="Segoe UI, Microsoft YaHei"
-        WindowStartupLocation="CenterScreen">
-  <Window.Resources>
-    <x:String x:Key="SampleWindowResource">窗口本地资源</x:String>
-    <Thickness x:Key="SampleWindowPadding">12,8</Thickness>
-  </Window.Resources>
-  <Window.Styles>
-    <Style Selector="Border.card">
-      <Setter Property="Background" Value="White" />
-      <Setter Property="CornerRadius" Value="12" />
-      <Setter Property="Padding" Value="22" />
-      <Setter Property="BorderBrush" Value="#E3E8F2" />
-      <Setter Property="BorderThickness" Value="1" />
-    </Style>
-    <Style Selector="TextBlock.section">
-      <Setter Property="FontSize" Value="19" />
-      <Setter Property="FontWeight" Value="SemiBold" />
-      <Setter Property="Foreground" Value="#18243C" />
-    </Style>
-    <Style Selector="TextBlock.help">
-      <Setter Property="Foreground" Value="#65718B" />
-      <Setter Property="FontSize" Value="13" />
-      <Setter Property="TextWrapping" Value="Wrap" />
-      <Setter Property="LineHeight" Value="21" />
-    </Style>
-    <Style Selector="Button.primary">
-      <Setter Property="Background" Value="#435DE7" />
-      <Setter Property="Foreground" Value="White" />
-      <Setter Property="CornerRadius" Value="7" />
-      <Setter Property="Padding" Value="16,10" />
-    </Style>
-    <Style Selector="Button">
-      <Setter Property="CornerRadius" Value="7" />
-    </Style>
-    <Style Selector="Button.diagnosticTarget">
-      <Setter Property="Background" Value="{DynamicResource SampleAccentBrush}" />
-      <Setter Property="Foreground" Value="White" />
-      <Setter Property="Padding" Value="18,10" />
-    </Style>
-    <Style Selector="Button.diagnosticTarget.emphasized">
-      <Setter Property="FontWeight" Value="Bold" />
-      <Setter Property="BorderThickness" Value="3" />
-      <Setter Property="BorderBrush" Value="#F4B942" />
-    </Style>
-  </Window.Styles>
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:AvaloniaDevTool.Sample"
+    x:Class="AvaloniaDevTool.Sample.MainWindow"
+    x:DataType="local:SampleViewModel"
+    Title="Avalonia 测试工作台"
+    Name="SampleMainWindow"
+    AutomationProperties.AutomationId="Sample.MainWindow"
+    Width="1180"
+    Height="850"
+    MinWidth="760"
+    MinHeight="600"
+    Background="#F3F5FA"
+    FontFamily="Segoe UI, Microsoft YaHei"
+    WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <x:String x:Key="SampleWindowResource">窗口本地资源</x:String>
+        <Thickness x:Key="SampleWindowPadding">12,8</Thickness>
+    </Window.Resources>
+    <Window.Styles>
+        <Style Selector="Border.card">
+            <Setter Property="Background"
+                Value="White" />
+            <Setter Property="CornerRadius"
+                Value="12" />
+            <Setter Property="Padding"
+                Value="22" />
+            <Setter Property="BorderBrush"
+                Value="#E3E8F2" />
+            <Setter Property="BorderThickness"
+                Value="1" />
+        </Style>
+        <Style Selector="TextBlock.section">
+            <Setter Property="FontSize"
+                Value="19" />
+            <Setter Property="FontWeight"
+                Value="SemiBold" />
+            <Setter Property="Foreground"
+                Value="#18243C" />
+        </Style>
+        <Style Selector="TextBlock.help">
+            <Setter Property="Foreground"
+                Value="#65718B" />
+            <Setter Property="FontSize"
+                Value="13" />
+            <Setter Property="TextWrapping"
+                Value="Wrap" />
+            <Setter Property="LineHeight"
+                Value="21" />
+        </Style>
+        <Style Selector="Button.primary">
+            <Setter Property="Background"
+                Value="#435DE7" />
+            <Setter Property="Foreground"
+                Value="White" />
+            <Setter Property="CornerRadius"
+                Value="7" />
+            <Setter Property="Padding"
+                Value="16,10" />
+        </Style>
+        <Style Selector="Button">
+            <Setter Property="CornerRadius"
+                Value="7" />
+        </Style>
+        <Style Selector="Button.diagnosticTarget">
+            <Setter Property="Background"
+                Value="{DynamicResource SampleAccentBrush}" />
+            <Setter Property="Foreground"
+                Value="White" />
+            <Setter Property="Padding"
+                Value="18,10" />
+        </Style>
+        <Style Selector="Button.diagnosticTarget.emphasized">
+            <Setter Property="FontWeight"
+                Value="Bold" />
+            <Setter Property="BorderThickness"
+                Value="3" />
+            <Setter Property="BorderBrush"
+                Value="#F4B942" />
+        </Style>
+    </Window.Styles>
 
-  <Grid RowDefinitions="Auto,*,Auto">
-    <Border Background="#17223C" Padding="28,23">
-      <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
-        <StackPanel Spacing="7">
-          <TextBlock Text="AVALONIA / DIAGNOSTICS PLAYGROUND" Foreground="#A5B5DD" FontSize="11" LetterSpacing="2" />
-          <TextBlock Text="Avalonia 测试工作台" Foreground="White" FontWeight="SemiBold" FontSize="27" />
-          <TextBlock Text="连接、控件树、属性编辑与点击拾取的实际测试目标" Foreground="#BBC7E0" FontSize="14" />
-        </StackPanel>
-        <Border Grid.Column="1" Background="#233D43" CornerRadius="20" Padding="13,7" VerticalAlignment="Top">
-          <TextBlock Text="{Binding AgentStatus}" Foreground="#8EE0BD" FontSize="12" />
-        </Border>
-        <Grid Grid.Row="1" Grid.ColumnSpan="2" ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,22,0,0">
-          <TextBlock Text="本机管道" Foreground="#CCD5EB" VerticalAlignment="Center" Margin="0,0,12,0" />
-          <TextBox Grid.Column="1" Name="PipeNameBox"
-                   AutomationProperties.AutomationId="Sample.ConnectPipe"
-                   Text="{Binding PipeName, Mode=OneWay}" IsReadOnly="True"
-                   Background="#24314E" Foreground="White" BorderBrush="#3C4C6B"
-                   FontFamily="Cascadia Code, Consolas" Padding="12,9" />
-          <Button Grid.Column="2" Content="复制名称" Click="CopyPipeClick" Margin="10,0,0,0"
-                  AutomationProperties.AutomationId="Sample.CopyPipe" Padding="15,8" />
-          <TextBlock Grid.Column="3" Text="{Binding ProcessLabel}" Foreground="#A5B5DD"
-                     VerticalAlignment="Center" Margin="16,0,0,0" />
-        </Grid>
-      </Grid>
-    </Border>
-
-    <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" Padding="26,24">
-      <StackPanel Spacing="20">
-        <Border Background="#EAF0FF" CornerRadius="9" Padding="17,13">
-          <TextBlock Text="使用方式：让 MCP 客户端连接当前应用，再查询 Visual / Logical 树、读取或修改目标控件属性。上方管道名可用于底层诊断连接。"
-                     Foreground="#354B93" TextWrapping="Wrap" LineHeight="21" />
-        </Border>
-
-        <Grid ColumnDefinitions="*,*" ColumnSpacing="20">
-          <Border Classes="card">
-            <StackPanel Spacing="15">
-              <TextBlock Classes="section" Text="01 / 常见属性与数据绑定" />
-              <TextBlock Classes="help" Text="这些命名控件可用于检查 Width、Margin、Background、IsEnabled 和文本等属性。" />
-              <TextBox Name="UserNameInput" Text="{Binding UserName, Mode=TwoWay}"
-                       PlaceholderText="输入姓名" AutomationProperties.AutomationId="Sample.UserName" />
-              <TextBlock Name="GreetingText" Text="{Binding Greeting}" TextWrapping="Wrap" Foreground="#354B93" />
-              <Grid ColumnDefinitions="*,Auto">
-                <CheckBox Name="PreviewToggle" IsChecked="{Binding IsPreviewEnabled, Mode=TwoWay}"
-                          Content="启用预览按钮" AutomationProperties.AutomationId="Sample.Enabled" />
-                <Button Grid.Column="1" Name="PreviewButton" Content="预览"
-                        IsEnabled="{Binding IsPreviewEnabled}" Click="PreviewClick"
-                        Classes="primary" AutomationProperties.AutomationId="Sample.PreviewButton" />
-              </Grid>
-              <Grid ColumnDefinitions="*,Auto" VerticalAlignment="Center">
-                <Slider Name="ProgressSlider" Minimum="0" Maximum="100"
-                        Value="{Binding Progress, Mode=TwoWay}" AutomationProperties.AutomationId="Sample.Progress" />
-                <TextBlock Grid.Column="1" Text="{Binding Progress, StringFormat='{}{0:F0}%'}"
-                           VerticalAlignment="Center" Width="52" TextAlignment="Right" />
-              </Grid>
-              <ProgressBar Name="ProgressPreview" Minimum="0" Maximum="100" Height="9"
-                           Value="{Binding Progress}" Foreground="#435DE7" />
-              <ComboBox Name="ModeSelector" ItemsSource="{Binding Modes}"
-                        SelectedItem="{Binding SelectedMode, Mode=TwoWay}" HorizontalAlignment="Stretch"
-                        AutomationProperties.AutomationId="Sample.Mode" />
-            </StackPanel>
-          </Border>
-
-          <Border Grid.Column="1" Classes="card">
-            <StackPanel Spacing="15">
-              <TextBlock Classes="section" Text="02 / 绑定与本地修改" />
-              <TextBlock Classes="help" Text="通过诊断客户端修改下方 BoundText 的 Text，再更新绑定源，观察值和来源。清除诊断修改后，应重新显示绑定源的值。" />
-              <Border Background="#F1F4FF" BorderBrush="#D6DFFF" BorderThickness="1" CornerRadius="8" Padding="18">
-                <TextBlock Name="BoundText" Text="{Binding BoundMessage}" TextWrapping="Wrap"
-                           FontSize="18" FontWeight="SemiBold" Foreground="#435DE7"
-                           AutomationProperties.AutomationId="Sample.BoundText" />
-              </Border>
-              <Button Name="UpdateBindingButton" Content="更新绑定源" Click="UpdateSourceClick"
-                      HorizontalAlignment="Left" Classes="primary"
-                      AutomationProperties.AutomationId="Sample.UpdateBindingSource" />
-              <Separator Margin="0,5" />
-              <TextBlock Classes="help" Text="模板测试：展开 Expander，并在 Visual 树中查看按钮、输入框的模板子元素。Logical 树保留内容关系。" />
-              <Expander Name="TemplateExpander" Header="展开模板与内容" IsExpanded="True"
-                        AutomationProperties.AutomationId="Sample.TemplateExpander">
-                <Border Padding="0,13,0,0">
-                  <TextBox Name="NestedTemplateInput" Text="位于 Expander 内容中的 TextBox"
-                           AutomationProperties.AutomationId="Sample.NestedInput" />
-                </Border>
-              </Expander>
-            </StackPanel>
-          </Border>
-        </Grid>
-
-        <Grid ColumnDefinitions="*,*" ColumnSpacing="20">
-          <Border Classes="card">
-            <StackPanel Spacing="15">
-              <Grid ColumnDefinitions="*,Auto">
-                <TextBlock Classes="section" Text="03 / 动态控件树" />
-                <TextBlock Grid.Column="1" Text="{Binding DynamicCount, StringFormat='{}{0} 个节点'}"
-                           Foreground="#65718B" VerticalAlignment="Center" />
-              </Grid>
-              <TextBlock Classes="help" Text="添加或移除真实控件，检查树是否更新，以及已移除节点的远程句柄是否正确失效。" />
-              <StackPanel Orientation="Horizontal" Spacing="9">
-                <Button Content="添加节点" Click="AddNodeClick" Classes="primary"
-                        AutomationProperties.AutomationId="Sample.AddNode" />
-                <Button Content="移除末项" Click="RemoveNodeClick"
-                        AutomationProperties.AutomationId="Sample.RemoveNode" />
-              </StackPanel>
-              <StackPanel Name="DynamicChildren" Spacing="8"
-                          AutomationProperties.AutomationId="Sample.DynamicChildren" />
-            </StackPanel>
-          </Border>
-
-          <Border Grid.Column="1" Classes="card">
-            <StackPanel Spacing="15">
-              <TextBlock Classes="section" Text="04 / 多窗口与弹出内容" />
-              <TextBlock Classes="help" Text="打开另一个顶层窗口，验证根列表和跨窗口拾取。Flyout 可用于观察弹出层与主窗口树的差异。" />
-              <Button Name="OpenWindowButton" Content="打开第二窗口" Click="OpenWindowClick"
-                      HorizontalAlignment="Left" Classes="primary"
-                      AutomationProperties.AutomationId="Sample.OpenWindow" />
-              <Button Name="PopupButton" Content="显示 Flyout" HorizontalAlignment="Left"
-                      AutomationProperties.AutomationId="Sample.OpenPopup">
-                <Button.Flyout>
-                  <Flyout>
-                    <StackPanel Name="SampleFlyoutContent" Spacing="12" Width="260">
-                      <TextBlock Text="弹出内容也是检查目标" FontWeight="SemiBold" FontSize="16" />
-                      <TextBox Name="PopupTextInput" Text="尝试拾取这个输入框"
-                               AutomationProperties.AutomationId="Sample.PopupInput" />
-                      <CheckBox Content="弹出层复选框" />
-                    </StackPanel>
-                  </Flyout>
-                </Button.Flyout>
-              </Button>
-              <Border Background="#F7F8FC" CornerRadius="8" Padding="16" Margin="0,4,0,0">
-                <StackPanel Spacing="9">
-                  <TextBlock Text="建议验证" FontWeight="SemiBold" Foreground="#18243C" />
-                  <TextBlock Classes="help" Text="• 展开与切换两种控件树&#10;• 修改、清除属性并观察绑定&#10;• 拾取命名控件及模板内容&#10;• 删除选中节点，再刷新属性&#10;• 断开连接后确认高亮被移除" />
+    <Grid RowDefinitions="Auto,*,Auto">
+        <Border Background="#17223C"
+            Padding="28,23">
+            <Grid ColumnDefinitions="*,Auto"
+                RowDefinitions="Auto,Auto">
+                <StackPanel Spacing="7">
+                    <TextBlock Text="AVALONIA / DIAGNOSTICS PLAYGROUND"
+                        Foreground="#A5B5DD"
+                        FontSize="11"
+                        LetterSpacing="2" />
+                    <TextBlock Text="Avalonia 测试工作台"
+                        Foreground="White"
+                        FontWeight="SemiBold"
+                        FontSize="27" />
+                    <TextBlock Text="连接、控件树、属性编辑与点击拾取的实际测试目标"
+                        Foreground="#BBC7E0"
+                        FontSize="14" />
                 </StackPanel>
-              </Border>
-            </StackPanel>
-          </Border>
-        </Grid>
-        <Grid ColumnDefinitions="*,*" ColumnSpacing="20">
-          <Border Classes="card">
-            <StackPanel Spacing="14">
-              <TextBlock Classes="section" Text="05 / 样式、绑定与资源" />
-              <TextBlock Classes="help" Text="查询样式按钮的样式与绑定信息。切换 class 会改变命中样式；通过资源诊断接口可编辑 SampleAccentBrush 与 SampleResourceText。" />
-              <Button Name="StyleTarget" Content="样式与 DynamicResource 目标" Classes="diagnosticTarget emphasized"
-                      HorizontalAlignment="Left" AutomationProperties.AutomationId="Sample.StyleTarget" />
-              <Button Content="切换 emphasized class" Click="ToggleClassClick" HorizontalAlignment="Left" AutomationProperties.AutomationId="Sample.ToggleClass" />
-              <Border Background="{DynamicResource SampleAccentBrush}" CornerRadius="7" Padding="14">
-                <TextBlock Name="ResourcePreview" Text="{DynamicResource SampleResourceText}" Foreground="White" TextWrapping="Wrap" AutomationProperties.AutomationId="Sample.ResourcePreview" />
-              </Border>
-              <Button Content="应用主动更新资源" Click="ChangeResourceClick" HorizontalAlignment="Left" AutomationProperties.AutomationId="Sample.ChangeResource" />
-              <TextBlock Classes="help" Text="绑定校验示例：输入负数或非整数，再选中输入框检查绑定表达式与校验错误。" />
-              <TextBox Name="ValidationInput" Text="{Binding ValidatedCount, Mode=TwoWay}" AutomationProperties.AutomationId="Sample.ValidationInput" />
-            </StackPanel>
-          </Border>
-          <Border Grid.Column="1" Classes="card">
-            <StackPanel Spacing="14">
-              <TextBlock Classes="section" Text="06 / 日志、事件与资产" />
-              <TextBlock Classes="help" Text="通过诊断接口开始日志 / 事件捕获后，点下面按钮。事件名 Click 可观察路由，* 会捕获全部已注册事件。" />
-              <WrapPanel>
-                <Button Content="发送 Warning" Click="EmitWarningClick" Margin="0,0,8,8" AutomationProperties.AutomationId="Sample.EmitWarning" />
-                <Button Content="发送 Information" Click="EmitInformationClick" Margin="0,0,8,8" AutomationProperties.AutomationId="Sample.EmitInformation" />
-                <Button Content="后台发送 30 条" Click="EmitBackgroundClick" Margin="0,0,8,8" AutomationProperties.AutomationId="Sample.EmitBackground" />
-              </WrapPanel>
-              <TextBlock Classes="help" Text="查询 AvaloniaDevTool.Sample 的资产，可读取 Assets/sample.json、sample.svg 的文本及 sample.png 的图片。单项预览限制为 1 MiB。" />
-              <Image Source="/Assets/sample.png" Width="256" Height="128" Stretch="Fill" HorizontalAlignment="Left" AutomationProperties.AutomationId="Sample.AssetPreview" />
-            </StackPanel>
-          </Border>
-        </Grid>
-        <Border Classes="card">
-          <StackPanel Spacing="13">
-            <TextBlock Classes="section" Text="07 / Meter 指标与保留窗口统计" />
-            <TextBlock Classes="help" Text="通过诊断接口使用 Meter 名称 AvaloniaDevTool.Sample 开始采集，再点击按钮。Counter 记录原始 +1，Histogram 记录 12、18、27、40、95、15 ms 六个合成样本，ObservableGauge 持续给出队列深度。" />
-            <Button Content="生成一组测试指标" Click="RecordMetricsClick" HorizontalAlignment="Left" Classes="primary" AutomationProperties.AutomationId="Sample.RecordMetrics" />
-            <TextBlock Classes="help" Text="采集结果的 min / max / mean / p50 / p95 仅代表当前保留样本窗口，不能当作应用全生命周期统计。" />
-            <Separator />
-            <TextBlock Classes="section" Text="08 / 样式与资源性能" />
-            <TextBlock Classes="help" Text="通过性能诊断接口开始采集后点击下方按钮，将实际创建并移除一个控件、切换样式类并查找已有和缺失资源。耗时来自框架活动，单位为微秒。" />
-            <Button Content="生成样式与资源活动" Click="GenerateProfilerActivitiesClick" HorizontalAlignment="Left" Classes="primary" AutomationProperties.AutomationId="Sample.GenerateProfilerActivities" />
-            <Separator />
-            <TextBlock Classes="section" Text="09 / 结构化日志与嵌套资源" />
-            <TextBlock Classes="help" Text="开始日志采集后点击按钮，按 Count=7 筛选并读取原始模板、scope、EventId、异常链和来源。查询本窗口资源时包含嵌套字典、筛选 DemoResource，可分页读取 125 个条目并比较重复键的实际 owner。" />
-            <Button Content="发送结构化日志" Click="EmitStructuredLogsClick" HorizontalAlignment="Left" Classes="primary" AutomationProperties.AutomationId="Sample.EmitStructuredLogs" />
-            <Separator />
-            <TextBlock Classes="section" Text="10 / 回环 WebSocket 诊断" />
-            <TextBlock Classes="help" Text="启动参数 --remote 开启回环监听，使用下方地址和独立令牌连接。同一 Agent 的管道与 WebSocket 共用一个会话；测试另一入口前请先断开。" />
-            <TextBox Text="{Binding RemoteEndpoint, Mode=OneWay}" IsReadOnly="True" AutomationProperties.AutomationId="Sample.RemoteEndpoint" />
-            <Button Content="复制本次连接令牌" Click="CopyRemoteTokenClick" IsEnabled="{Binding RemoteReady}" HorizontalAlignment="Left" AutomationProperties.AutomationId="Sample.CopyRemoteToken" />
-            <Separator />
-            <TextBlock Classes="section" Text="11 / 盒模型与渲染诊断" />
-            <TextBlock Classes="help" Text="选择下方区域，通过高亮与测量诊断接口开启 Margin、Padding、信息、标尺与引导线。橙色在边界外，绿色从边框内开始；旋转后分区应随控件变换。渲染诊断使用 Avalonia 自身 FPS 与失效区域开关。" />
-            <Button Content="旋转 / 复位盒模型" Click="ToggleBoxModelTransformClick" HorizontalAlignment="Left" AutomationProperties.AutomationId="Sample.ToggleBoxModelTransform" />
-            <Border Name="BoxModelTarget" Width="360" Height="130" HorizontalAlignment="Left"
-                    Margin="24,12,36,18" Padding="22,14,16,10" BorderThickness="3" BorderBrush="#435DE7" Background="#EAF0FF"
-                    RenderTransformOrigin="50%,50%" AutomationProperties.AutomationId="Sample.BoxModelTarget">
-              <TextBlock Text="Margin 24,12,36,18&#10;Border 3 · Padding 22,14,16,10" VerticalAlignment="Center" TextWrapping="Wrap" />
-            </Border>
-            <Separator />
-            <TextBlock Classes="section" Text="12 / 绑定文化与源更新时机" />
-            <TextBlock Classes="help" Text="两个文本读取同一 decimal，分别使用 fr-FR / en-US 和 N2。选择 CultureFrench 或 CultureEnglish，在样式绑定页核对 ConverterCulture、来源和 StringFormat；输入框失去焦点时更新源。" />
-            <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
-              <StackPanel><TextBlock Text="fr-FR" /><TextBlock Name="CultureFrench" FontSize="22" AutomationProperties.AutomationId="Sample.CultureFrench" /></StackPanel>
-              <StackPanel Grid.Column="1"><TextBlock Text="en-US" /><TextBlock Name="CultureEnglish" FontSize="22" AutomationProperties.AutomationId="Sample.CultureEnglish" /></StackPanel>
+                <Border Grid.Column="1"
+                    Background="#233D43"
+                    CornerRadius="20"
+                    Padding="13,7"
+                    VerticalAlignment="Top">
+                    <TextBlock Text="{Binding AgentStatus}"
+                        Foreground="#8EE0BD"
+                        FontSize="12" />
+                </Border>
+                <Grid Grid.Row="1"
+                    Grid.ColumnSpan="2"
+                    ColumnDefinitions="Auto,*,Auto,Auto"
+                    Margin="0,22,0,0">
+                    <TextBlock Text="本机管道"
+                        Foreground="#CCD5EB"
+                        VerticalAlignment="Center"
+                        Margin="0,0,12,0" />
+                    <TextBox Grid.Column="1"
+                        Name="PipeNameBox"
+                        AutomationProperties.AutomationId="Sample.ConnectPipe"
+                        Text="{Binding PipeName, Mode=OneWay}"
+                        IsReadOnly="True"
+                        Background="#24314E"
+                        Foreground="White"
+                        BorderBrush="#3C4C6B"
+                        FontFamily="Cascadia Code, Consolas"
+                        Padding="12,9" />
+                    <Button Grid.Column="2"
+                        Content="复制名称"
+                        Click="CopyPipeClick"
+                        Margin="10,0,0,0"
+                        AutomationProperties.AutomationId="Sample.CopyPipe"
+                        Padding="15,8" />
+                    <TextBlock Grid.Column="3"
+                        Text="{Binding ProcessLabel}"
+                        Foreground="#A5B5DD"
+                        VerticalAlignment="Center"
+                        Margin="16,0,0,0" />
+                </Grid>
             </Grid>
-            <TextBox Name="CultureAmountInput" Width="280" HorizontalAlignment="Left" AutomationProperties.AutomationId="Sample.CultureAmountInput" />
-            <Button Content="源金额增加 1.25" Click="AdvanceCultureAmountClick" HorizontalAlignment="Left" AutomationProperties.AutomationId="Sample.AdvanceCultureAmount" />
-          </StackPanel>
         </Border>
-      </StackPanel>
-    </ScrollViewer>
 
-    <Border Grid.Row="2" Background="White" BorderBrush="#DFE5EF" BorderThickness="0,1,0,0" Padding="25,13">
-      <TextBlock Name="StatusText" Text="{Binding Status}" Foreground="#65718B" FontSize="12" TextWrapping="Wrap"
-                 AutomationProperties.AutomationId="Sample.Status" />
-    </Border>
-  </Grid>
+        <ScrollViewer Grid.Row="1"
+            HorizontalScrollBarVisibility="Disabled"
+            Padding="26,24">
+            <StackPanel Spacing="20">
+                <Border Background="#EAF0FF"
+                    CornerRadius="9"
+                    Padding="17,13">
+                    <TextBlock Text="使用方式：让 MCP 客户端连接当前应用，再查询 Visual / Logical 树、读取或修改目标控件属性。上方管道名可用于底层诊断连接。"
+                        Foreground="#354B93"
+                        TextWrapping="Wrap"
+                        LineHeight="21" />
+                </Border>
+
+                <Grid ColumnDefinitions="*,*"
+                    ColumnSpacing="20">
+                    <Border Classes="card">
+                        <StackPanel Spacing="15">
+                            <TextBlock Classes="section"
+                                Text="01 / 常见属性与数据绑定" />
+                            <TextBlock Classes="help"
+                                Text="这些命名控件可用于检查 Width、Margin、Background、IsEnabled 和文本等属性。" />
+                            <TextBox Name="UserNameInput"
+                                Text="{Binding UserName, Mode=TwoWay}"
+                                PlaceholderText="输入姓名"
+                                AutomationProperties.AutomationId="Sample.UserName" />
+                            <TextBlock Name="GreetingText"
+                                Text="{Binding Greeting}"
+                                TextWrapping="Wrap"
+                                Foreground="#354B93" />
+                            <Grid ColumnDefinitions="*,Auto">
+                                <CheckBox Name="PreviewToggle"
+                                    IsChecked="{Binding IsPreviewEnabled, Mode=TwoWay}"
+                                    Content="启用预览按钮"
+                                    AutomationProperties.AutomationId="Sample.Enabled" />
+                                <Button Grid.Column="1"
+                                    Name="PreviewButton"
+                                    Content="预览"
+                                    IsEnabled="{Binding IsPreviewEnabled}"
+                                    Click="PreviewClick"
+                                    Classes="primary"
+                                    AutomationProperties.AutomationId="Sample.PreviewButton" />
+                            </Grid>
+                            <Grid ColumnDefinitions="*,Auto"
+                                VerticalAlignment="Center">
+                                <Slider Name="ProgressSlider"
+                                    Minimum="0"
+                                    Maximum="100"
+                                    Value="{Binding Progress, Mode=TwoWay}"
+                                    AutomationProperties.AutomationId="Sample.Progress" />
+                                <TextBlock Grid.Column="1"
+                                    Text="{Binding Progress, StringFormat='{}{0:F0}%'}"
+                                    VerticalAlignment="Center"
+                                    Width="52"
+                                    TextAlignment="Right" />
+                            </Grid>
+                            <ProgressBar Name="ProgressPreview"
+                                Minimum="0"
+                                Maximum="100"
+                                Height="9"
+                                Value="{Binding Progress}"
+                                Foreground="#435DE7" />
+                            <ComboBox Name="ModeSelector"
+                                ItemsSource="{Binding Modes}"
+                                SelectedItem="{Binding SelectedMode, Mode=TwoWay}"
+                                HorizontalAlignment="Stretch"
+                                AutomationProperties.AutomationId="Sample.Mode" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="1"
+                        Classes="card">
+                        <StackPanel Spacing="15">
+                            <TextBlock Classes="section"
+                                Text="02 / 绑定与本地修改" />
+                            <TextBlock Classes="help"
+                                Text="通过诊断客户端修改下方 BoundText 的 Text，再更新绑定源，观察值和来源。清除诊断修改后，应重新显示绑定源的值。" />
+                            <Border Background="#F1F4FF"
+                                BorderBrush="#D6DFFF"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="18">
+                                <TextBlock Name="BoundText"
+                                    Text="{Binding BoundMessage}"
+                                    TextWrapping="Wrap"
+                                    FontSize="18"
+                                    FontWeight="SemiBold"
+                                    Foreground="#435DE7"
+                                    AutomationProperties.AutomationId="Sample.BoundText" />
+                            </Border>
+                            <Button Name="UpdateBindingButton"
+                                Content="更新绑定源"
+                                Click="UpdateSourceClick"
+                                HorizontalAlignment="Left"
+                                Classes="primary"
+                                AutomationProperties.AutomationId="Sample.UpdateBindingSource" />
+                            <Separator Margin="0,5" />
+                            <TextBlock Classes="help"
+                                Text="模板测试：展开 Expander，并在 Visual 树中查看按钮、输入框的模板子元素。Logical 树保留内容关系。" />
+                            <Expander Name="TemplateExpander"
+                                Header="展开模板与内容"
+                                IsExpanded="True"
+                                AutomationProperties.AutomationId="Sample.TemplateExpander">
+                                <Border Padding="0,13,0,0">
+                                    <TextBox Name="NestedTemplateInput"
+                                        Text="位于 Expander 内容中的 TextBox"
+                                        AutomationProperties.AutomationId="Sample.NestedInput" />
+                                </Border>
+                            </Expander>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <Grid ColumnDefinitions="*,*"
+                    ColumnSpacing="20">
+                    <Border Classes="card">
+                        <StackPanel Spacing="15">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Classes="section"
+                                    Text="03 / 动态控件树" />
+                                <TextBlock Grid.Column="1"
+                                    Text="{Binding DynamicCount, StringFormat='{}{0} 个节点'}"
+                                    Foreground="#65718B"
+                                    VerticalAlignment="Center" />
+                            </Grid>
+                            <TextBlock Classes="help"
+                                Text="添加或移除真实控件，检查树是否更新，以及已移除节点的远程句柄是否正确失效。" />
+                            <StackPanel Orientation="Horizontal"
+                                Spacing="9">
+                                <Button Content="添加节点"
+                                    Click="AddNodeClick"
+                                    Classes="primary"
+                                    AutomationProperties.AutomationId="Sample.AddNode" />
+                                <Button Content="移除末项"
+                                    Click="RemoveNodeClick"
+                                    AutomationProperties.AutomationId="Sample.RemoveNode" />
+                            </StackPanel>
+                            <StackPanel Name="DynamicChildren"
+                                Spacing="8"
+                                AutomationProperties.AutomationId="Sample.DynamicChildren" />
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="1"
+                        Classes="card">
+                        <StackPanel Spacing="15">
+                            <TextBlock Classes="section"
+                                Text="04 / 多窗口与弹出内容" />
+                            <TextBlock Classes="help"
+                                Text="打开另一个顶层窗口，验证根列表和跨窗口拾取。Flyout 可用于观察弹出层与主窗口树的差异。" />
+                            <Button Name="OpenWindowButton"
+                                Content="打开第二窗口"
+                                Click="OpenWindowClick"
+                                HorizontalAlignment="Left"
+                                Classes="primary"
+                                AutomationProperties.AutomationId="Sample.OpenWindow" />
+                            <Button Name="PopupButton"
+                                Content="显示 Flyout"
+                                HorizontalAlignment="Left"
+                                AutomationProperties.AutomationId="Sample.OpenPopup">
+                                <Button.Flyout>
+                                    <Flyout>
+                                        <StackPanel Name="SampleFlyoutContent"
+                                            Spacing="12"
+                                            Width="260">
+                                            <TextBlock Text="弹出内容也是检查目标"
+                                                FontWeight="SemiBold"
+                                                FontSize="16" />
+                                            <TextBox Name="PopupTextInput"
+                                                Text="尝试拾取这个输入框"
+                                                AutomationProperties.AutomationId="Sample.PopupInput" />
+                                            <CheckBox Content="弹出层复选框" />
+                                        </StackPanel>
+                                    </Flyout>
+                                </Button.Flyout>
+                            </Button>
+                            <Border Background="#F7F8FC"
+                                CornerRadius="8"
+                                Padding="16"
+                                Margin="0,4,0,0">
+                                <StackPanel Spacing="9">
+                                    <TextBlock Text="建议验证"
+                                        FontWeight="SemiBold"
+                                        Foreground="#18243C" />
+                                    <TextBlock Classes="help"
+                                        Text="• 展开与切换两种控件树&#10;• 修改、清除属性并观察绑定&#10;• 拾取命名控件及模板内容&#10;• 删除选中节点，再刷新属性&#10;• 断开连接后确认高亮被移除" />
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+                <Grid ColumnDefinitions="*,*"
+                    ColumnSpacing="20">
+                    <Border Classes="card">
+                        <StackPanel Spacing="14">
+                            <TextBlock Classes="section"
+                                Text="05 / 样式、绑定与资源" />
+                            <TextBlock Classes="help"
+                                Text="查询样式按钮的样式与绑定信息。切换 class 会改变命中样式；通过资源诊断接口可编辑 SampleAccentBrush 与 SampleResourceText。" />
+                            <Button Name="StyleTarget"
+                                Content="样式与 DynamicResource 目标"
+                                Classes="diagnosticTarget emphasized"
+                                HorizontalAlignment="Left"
+                                AutomationProperties.AutomationId="Sample.StyleTarget" />
+                            <Button Content="切换 emphasized class"
+                                Click="ToggleClassClick"
+                                HorizontalAlignment="Left"
+                                AutomationProperties.AutomationId="Sample.ToggleClass" />
+                            <Border Background="{DynamicResource SampleAccentBrush}"
+                                CornerRadius="7"
+                                Padding="14">
+                                <TextBlock Name="ResourcePreview"
+                                    Text="{DynamicResource SampleResourceText}"
+                                    Foreground="White"
+                                    TextWrapping="Wrap"
+                                    AutomationProperties.AutomationId="Sample.ResourcePreview" />
+                            </Border>
+                            <Button Content="应用主动更新资源"
+                                Click="ChangeResourceClick"
+                                HorizontalAlignment="Left"
+                                AutomationProperties.AutomationId="Sample.ChangeResource" />
+                            <TextBlock Classes="help"
+                                Text="绑定校验示例：输入负数或非整数，再选中输入框检查绑定表达式与校验错误。" />
+                            <TextBox Name="ValidationInput"
+                                Text="{Binding ValidatedCount, Mode=TwoWay}"
+                                AutomationProperties.AutomationId="Sample.ValidationInput" />
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="1"
+                        Classes="card">
+                        <StackPanel Spacing="14">
+                            <TextBlock Classes="section"
+                                Text="06 / 日志、事件与资产" />
+                            <TextBlock Classes="help"
+                                Text="通过诊断接口开始日志 / 事件捕获后，点下面按钮。事件名 Click 可观察路由，* 会捕获全部已注册事件。" />
+                            <WrapPanel>
+                                <Button Content="发送 Warning"
+                                    Click="EmitWarningClick"
+                                    Margin="0,0,8,8"
+                                    AutomationProperties.AutomationId="Sample.EmitWarning" />
+                                <Button Content="发送 Information"
+                                    Click="EmitInformationClick"
+                                    Margin="0,0,8,8"
+                                    AutomationProperties.AutomationId="Sample.EmitInformation" />
+                                <Button Content="后台发送 30 条"
+                                    Click="EmitBackgroundClick"
+                                    Margin="0,0,8,8"
+                                    AutomationProperties.AutomationId="Sample.EmitBackground" />
+                            </WrapPanel>
+                            <TextBlock Classes="help"
+                                Text="查询 AvaloniaDevTool.Sample 的资产，可读取 Assets/sample.json、sample.svg 的文本及 sample.png 的图片。单项预览限制为 1 MiB。" />
+                            <Image Source="/Assets/sample.png"
+                                Width="256"
+                                Height="128"
+                                Stretch="Fill"
+                                HorizontalAlignment="Left"
+                                AutomationProperties.AutomationId="Sample.AssetPreview" />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+                <Border Classes="card">
+                    <StackPanel Spacing="13">
+                        <TextBlock Classes="section"
+                            Text="07 / Meter 指标与保留窗口统计" />
+                        <TextBlock Classes="help"
+                            Text="通过诊断接口使用 Meter 名称 AvaloniaDevTool.Sample 开始采集，再点击按钮。Counter 记录原始 +1，Histogram 记录 12、18、27、40、95、15 ms 六个合成样本，ObservableGauge 持续给出队列深度。" />
+                        <Button Content="生成一组测试指标"
+                            Click="RecordMetricsClick"
+                            HorizontalAlignment="Left"
+                            Classes="primary"
+                            AutomationProperties.AutomationId="Sample.RecordMetrics" />
+                        <TextBlock Classes="help"
+                            Text="采集结果的 min / max / mean / p50 / p95 仅代表当前保留样本窗口，不能当作应用全生命周期统计。" />
+                        <Separator />
+                        <TextBlock Classes="section"
+                            Text="08 / 样式与资源性能" />
+                        <TextBlock Classes="help"
+                            Text="通过性能诊断接口开始采集后点击下方按钮，将实际创建并移除一个控件、切换样式类并查找已有和缺失资源。耗时来自框架活动，单位为微秒。" />
+                        <Button Content="生成样式与资源活动"
+                            Click="GenerateProfilerActivitiesClick"
+                            HorizontalAlignment="Left"
+                            Classes="primary"
+                            AutomationProperties.AutomationId="Sample.GenerateProfilerActivities" />
+                        <Separator />
+                        <TextBlock Classes="section"
+                            Text="09 / 结构化日志与嵌套资源" />
+                        <TextBlock Classes="help"
+                            Text="开始日志采集后点击按钮，按 Count=7 筛选并读取原始模板、scope、EventId、异常链和来源。查询本窗口资源时包含嵌套字典、筛选 DemoResource，可分页读取 125 个条目并比较重复键的实际 owner。" />
+                        <Button Content="发送结构化日志"
+                            Click="EmitStructuredLogsClick"
+                            HorizontalAlignment="Left"
+                            Classes="primary"
+                            AutomationProperties.AutomationId="Sample.EmitStructuredLogs" />
+                        <Separator />
+                        <TextBlock Classes="section"
+                            Text="10 / 回环 WebSocket 诊断" />
+                        <TextBlock Classes="help"
+                            Text="启动参数 --remote 开启回环监听，使用下方地址和独立令牌连接。同一 Agent 的管道与 WebSocket 共用一个会话；测试另一入口前请先断开。" />
+                        <TextBox Text="{Binding RemoteEndpoint, Mode=OneWay}"
+                            IsReadOnly="True"
+                            AutomationProperties.AutomationId="Sample.RemoteEndpoint" />
+                        <Button Content="复制本次连接令牌"
+                            Click="CopyRemoteTokenClick"
+                            IsEnabled="{Binding RemoteReady}"
+                            HorizontalAlignment="Left"
+                            AutomationProperties.AutomationId="Sample.CopyRemoteToken" />
+                        <Separator />
+                        <TextBlock Classes="section"
+                            Text="11 / 盒模型与渲染诊断" />
+                        <TextBlock Classes="help"
+                            Text="选择下方区域，通过高亮与测量诊断接口开启 Margin、Padding、信息、标尺与引导线。橙色在边界外，绿色从边框内开始；旋转后分区应随控件变换。渲染诊断使用 Avalonia 自身 FPS 与失效区域开关。" />
+                        <Button Content="旋转 / 复位盒模型"
+                            Click="ToggleBoxModelTransformClick"
+                            HorizontalAlignment="Left"
+                            AutomationProperties.AutomationId="Sample.ToggleBoxModelTransform" />
+                        <Border Name="BoxModelTarget"
+                            Width="360"
+                            Height="130"
+                            HorizontalAlignment="Left"
+                            Margin="24,12,36,18"
+                            Padding="22,14,16,10"
+                            BorderThickness="3"
+                            BorderBrush="#435DE7"
+                            Background="#EAF0FF"
+                            RenderTransformOrigin="50%,50%"
+                            AutomationProperties.AutomationId="Sample.BoxModelTarget">
+                            <TextBlock Text="Margin 24,12,36,18&#10;Border 3 · Padding 22,14,16,10"
+                                VerticalAlignment="Center"
+                                TextWrapping="Wrap" />
+                        </Border>
+                        <Separator />
+                        <TextBlock Classes="section"
+                            Text="12 / 绑定文化与源更新时机" />
+                        <TextBlock Classes="help"
+                            Text="两个文本读取同一 decimal，分别使用 fr-FR / en-US 和 N2。选择 CultureFrench 或 CultureEnglish，在样式绑定页核对 ConverterCulture、来源和 StringFormat；输入框失去焦点时更新源。" />
+                        <Grid ColumnDefinitions="*,*"
+                            ColumnSpacing="16">
+                            <StackPanel>
+                                <TextBlock Text="fr-FR" />
+                                <TextBlock Name="CultureFrench"
+                                    FontSize="22"
+                                    AutomationProperties.AutomationId="Sample.CultureFrench" />
+                            </StackPanel>
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="en-US" />
+                                <TextBlock Name="CultureEnglish"
+                                    FontSize="22"
+                                    AutomationProperties.AutomationId="Sample.CultureEnglish" />
+                            </StackPanel>
+                        </Grid>
+                        <TextBox Name="CultureAmountInput"
+                            Width="280"
+                            HorizontalAlignment="Left"
+                            AutomationProperties.AutomationId="Sample.CultureAmountInput" />
+                        <Button Content="源金额增加 1.25"
+                            Click="AdvanceCultureAmountClick"
+                            HorizontalAlignment="Left"
+                            AutomationProperties.AutomationId="Sample.AdvanceCultureAmount" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <Border Grid.Row="2"
+            Background="White"
+            BorderBrush="#DFE5EF"
+            BorderThickness="0,1,0,0"
+            Padding="25,13">
+            <TextBlock Name="StatusText"
+                Text="{Binding Status}"
+                Foreground="#65718B"
+                FontSize="12"
+                TextWrapping="Wrap"
+                AutomationProperties.AutomationId="Sample.Status" />
+        </Border>
+    </Grid>
 </Window>
-

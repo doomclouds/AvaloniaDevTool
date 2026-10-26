@@ -2,7 +2,46 @@
 
 当前验证目标是 Windows 完整界面交互和真实原生文件流程。解决方案现有22项目：9个生产、3个样例、10个测试/支撑。常规测试包含 Agent、Cli、Protocol、Previewer、Remote 与新增 NativeAutomation；AotSmoke 和真实消费/fixture 的身份另外保留。
 
-最新能力验证共580项：**579通过、0失败、1项Explicit未执行**。分项：Agent282、CLI118、Native127通过/1未执行、Previewer15、Protocol26、Remote11。22项目Debug/Release零警告零错误，340个输入无漂移，测试自有运行进程已清理。证据见 [capabilities-final](agent-tools/verification/2026-10-25-capabilities-final.json)，原始6份TRX在 `artifacts/agent-tools-ui-2026-10-25/capabilities-final`。本轮以[当前能力边界](agent-tools/architecture/current-agent-scope.md)为准，不包含业务判断、CI等已排除事项。
+## ReSharper 格式化后续批次
+
+2026-10-26，使用固定版本 ReSharper 和完整团队 DotSettings 格式化全仓库。最终集成 `-Check -IncludeAuxiliary` 通过：ReSharper 369 文件、0 待修改；辅助 Python、PowerShell、HTML/JSON 检查通过。338 个 C# 的 token、预处理分支和字符串运行值均等价，31 个 XML/AXAML/SVG/项目文件及 JSON 值等价；`.editorconfig` 的文件匹配范围扩展是明确的配置变化。
+
+本批次 22 项目 Debug 构建零警告零错误，针对性回归 **99/99 通过**（CLI 70、Protocol 26、Agent 路由 3）。这不是全部桌面用例的再次执行，不与下面历史批次累加。完整设置、格式命令、哈希及清理状态见[代码格式约定](code-style.md)和[格式化验证记录](architecture/formatting-2026-10-26.json)。历史验证清单保留原始源码指纹。
+
+## 本轮 HTTP MCP 与结构重构验证
+
+2026-10-26，22 项目 Debug/Release 均 **0 警告、0 错误**。本轮完成领域目录、Agent 同步路由、共享 managed 上下文和内网 HTTP 宿主，保留 stdio 与原有能力。摘要、原始 TRX 哈希、381 个源码输入指纹和发布包哈希见[验证清单](architecture/verification-2026-10-26.json)。
+
+| 验证批次 | 结果 | 解释 |
+| --- | --- | --- |
+| 完整 Debug 批次 | 652 项发现、651 项执行：643 通过、8 失败；1 项 Explicit 未执行 | 八项既有 OS 输入均被同一系统 PickerHost 前台阻挡，记录仍为失败 |
+| 最终源码的环境过滤复核 | 排除上述八项后，643 通过、0 失败；1 项 Explicit 未执行 | 排除名单保留在验证清单的完整批次失败列表中；原八项未因此变为通过 |
+| 前台环境恢复后的定向重测 | 8/8 通过 | PickerHost退出后，仅重跑原3项CLI与5项native失败用例；生产实现未变，历史批次不回写 |
+| 新增及迁移关联 CLI 检查 | 69/69 通过 | 参数、managed 代际、控制租约、HTTP、真实 native 模态/文件/PNG |
+| 完成审计补证 | 4/4 通过 | HTTP真实项目预览/资源/PNG/重载/回收；三类capture原始数据/损失/冻结/DELETE隔离 |
+| Agent 同步路由专项 | 3/3 通过，包含在 Agent 的 285 项中 | 74 条同步路由、23 条无参忽略 payload、Ordinal/null fallback |
+
+完整批次分项：Agent 285 通过，CLI 184 通过/3 失败，Native 122 通过/5 失败/1 Explicit 未执行，Previewer 15、Protocol 26、Remote 11 通过。最终环境过滤复核仍覆盖六个测试项目。HTTP 最后的取消回调异常路径整理发生在完整批次之后；最终源码由过滤复核与发布烟测确认，两个批次分别保留身份。
+
+原生输入的阻挡还通过独立 Computer Use 复现：向本任务自建 fixture 的正常点击也被 PickerHost 覆盖而拒绝。没有关闭归属不明窗口或弱化前台/进程校验。Native worker 九份代码与重构前逐段一致，只有位置改变。随后 PickerHost 退出，原八项在相同生产代码上定向复测8/8通过。该重测与原完整批次分开记录；加上环境过滤确认和4项补证，分批覆盖655个不同用例通过，另1项Explicit未执行，不声称这是单次整批结果。详见[当前限制](architecture/limitations.md)。
+
+## HTTP、Codex、WSL 与分发证据
+
+- 真实 HTTP SDK 客户端无 Token 连接，发现44项工具；跨请求附加/读写/PNG、双客户端 busy、detach、DELETE、旧节点与生命周期均验证。
+- Windows 真实 HTTP 闭环在 managed 调用停留于 MessageBoxW 时，通过同会话 native 应答，并完成 UTF-8 打开、保存、独立磁盘字节/hash、重新打开及 PNG。
+- 实际 Codex CLI 0.164.0 通过隔离配置对生产宿主与发布宿主发现44项工具。没有创建模型 thread/turn、没有模型调用、没有修改用户配置。
+- WSL Ubuntu-24.04 的标准库 Python 客户端经 mirrored localhost 访问 Windows 生产宿主通过；Windows 客户端到非回环接口也通过。两条路径覆盖发现/附加、树/搜索/属性、PNG 和真实 native 窗口。
+- WSL 的另一条非回环路径 initialize 成功、tools/list 200，但正文读取超时；原因未确定，未修改系统网络。它仍为未通过场景。独立两台物理电脑的 LAN 尚未现场验收。
+- Windows x64 framework-dependent 发布成功，包含 Previewer/worker/deps/runtimeconfig/第三方许可；发布目录通过同一 HTTP 烟测。交付 ZIP 约15.5 MiB，保留在 `artifacts/releases/AvaloniaDevTool-win-x64-lan-mcp.zip`。
+- WSL 没有额外安装 .NET SDK、第三方 Python 包或容器。临时源码探针已移除，独立探针数据/进程已清理；共享产物最初约10.8 GiB。任意目录/逐文件/单文件删除仍受自动审查拒绝（仅返回 blocked by policy）；独立审核允许的项目原生 dotnet clean 已按 Debug、Release、win-x64 清理 MSBuild 声明产物，没有改写 Clean target 或注入 FileWrites。当前 %TEMP%/AvaloniaDevTool-lan-development 仍有约611 MiB 未登记的副本、发布目录和结果，少量截图/工作记录也保留；清单见验证记录。测试应用、宿主和worker进程均已结束，未删除用户数据或全局缓存。
+
+完成审计后仅补充测试和兼容的夹具访问，生产实现未变；这些4项单列，不回填原完整批次的652项计数。
+
+HTTP 复现使用[标准库烟测脚本](../tests/scripts/Test-McpHttp.py)，被测机的启动与 Codex 标准配置见[内网部署](architecture/lan-mcp-design.md)。系统输入、框架 TextBox 临时覆盖和虚拟网络的限制见[当前限制](architecture/limitations.md)。
+
+## 2026-10-25 历史基线
+
+该历史能力验证共580项：**579通过、0失败、1项Explicit未执行**。分项：Agent282、CLI118、Native127通过/1未执行、Previewer15、Protocol26、Remote11。22项目Debug/Release零警告零错误，340个输入无漂移，测试自有运行进程已清理。证据见 [capabilities-final](agent-tools/verification/2026-10-25-capabilities-final.json)，原始6份TRX在 `artifacts/agent-tools-ui-2026-10-25/capabilities-final`。该历史批次以[当前能力边界](agent-tools/architecture/current-agent-scope.md)为准，不包含业务判断、CI等已排除事项。
 
 ## 修复阶段历史批次（417项）
 
@@ -61,7 +100,7 @@ dotnet test tests/AvaloniaDevTool.Cli.Tests/AvaloniaDevTool.Cli.Tests.csproj --f
 | 工程/目标 | 验证职责 |
 | --- | --- |
 | Agent.Tests | 实际Avalonia/Skia、UI线程、属性/绑定、资源范围、输入路由/capture和服务清理；InteractionInspectionTests覆盖新增输入合同 |
-| Cli.Tests | 生产CLI子进程 initialize/tools/list/tools/call，默认agent39和显式official16/extended62、会话身份、媒体/预览和完整交互编排 |
+| Cli.Tests | 生产CLI子进程 initialize/tools/list/tools/call，默认agent44和stdio显式official16/extended62，新增HTTP agent44、会话身份、媒体/预览和完整交互编排 |
 | NativeAutomation.Tests/Fixture | 独立Windows目标、UIA真实读回、owned modal、scope/start time/stale、worker有界失败/重附加、OS输入和路径preflight |
 | Protocol.Tests | 内部帧、分片/取消/断开、trace、源生成JSON及新输入DTO |
 | Previewer.Tests、PreviewFixture/Controls | 真实XAML、App上下文、独立库、重载/监视/错误保留和PNG |

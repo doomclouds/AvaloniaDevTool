@@ -26,8 +26,10 @@ public sealed class PreviewIntegrationTests
         Assert.Equal(files.XamlPath, options.XamlPath);
         Assert.Equal("preview-test", options.PipeName);
         Assert.False(options.Watch);
-        Assert.Throws<ArgumentException>(() => PreviewOptions.Parse(["--xaml", files.XamlPath, "--pipe", "../invalid"]));
-        Assert.Throws<ArgumentException>(() => PreviewOptions.Parse(["--xaml", files.XamlPath, "--xaml", files.XamlPath]));
+        Assert.Throws<ArgumentException>(() =>
+            PreviewOptions.Parse(["--xaml", files.XamlPath, "--pipe", "../invalid"]));
+        Assert.Throws<ArgumentException>(() =>
+            PreviewOptions.Parse(["--xaml", files.XamlPath, "--xaml", files.XamlPath]));
     }
 
     [AvaloniaFact]
@@ -51,7 +53,10 @@ public sealed class PreviewIntegrationTests
             Assert.True(output.Length > 100);
             Assert.Equal(new byte[] { 137, 80, 78, 71 }, output.ToArray()[..4]);
         }
-        finally { window.Close(); }
+        finally
+        {
+            window.Close();
+        }
     }
 
     [AvaloniaFact]
@@ -127,13 +132,15 @@ public sealed class PreviewIntegrationTests
         using var files = new TestFiles();
         files.Write(Markup("Original"));
         var calls = 0;
-        using var watcher = new PreviewFileWatcher(files.XamlPath, () => calls++,
+        using var watcher = new PreviewFileWatcher(files.XamlPath,
+            () => calls++,
             TimeSpan.FromMilliseconds(200));
         for (var index = 0; index < 6; index++)
         {
             files.Write(Markup("Burst " + index));
             await Task.Delay(15);
         }
+
         await WaitUntilAsync(() => calls > 0);
         await Task.Delay(250);
         Assert.Equal(1, calls);
@@ -210,14 +217,34 @@ public sealed class PreviewIntegrationTests
         using var files = new TestFiles();
         var path = Path.Combine(files.Root, "Incompatible.dll");
         var metadata = new MetadataBuilder();
-        metadata.AddModule(0, metadata.GetOrAddString("Incompatible.dll"), metadata.GetOrAddGuid(Guid.NewGuid()), default, default);
-        metadata.AddAssembly(metadata.GetOrAddString("Incompatible"), new Version(1, 0, 0, 0), default, default, default, default);
-        metadata.AddAssemblyReference(metadata.GetOrAddString("Avalonia.Controls"), new Version(99, 0, 0, 0),
-            default, default, default, default);
-        metadata.AddTypeDefinition(TypeAttributes.NotPublic, default, metadata.GetOrAddString("<Module>"), default,
-            MetadataTokens.FieldDefinitionHandle(1), MetadataTokens.MethodDefinitionHandle(1));
-        var pe = new ManagedPEBuilder(new PEHeaderBuilder(imageCharacteristics: Characteristics.ExecutableImage | Characteristics.Dll),
-            new MetadataRootBuilder(metadata), new BlobBuilder(), flags: CorFlags.ILOnly);
+        metadata.AddModule(0,
+            metadata.GetOrAddString("Incompatible.dll"),
+            metadata.GetOrAddGuid(Guid.NewGuid()),
+            default,
+            default);
+        metadata.AddAssembly(metadata.GetOrAddString("Incompatible"),
+            new Version(1, 0, 0, 0),
+            default,
+            default,
+            default,
+            default);
+        metadata.AddAssemblyReference(metadata.GetOrAddString("Avalonia.Controls"),
+            new Version(99, 0, 0, 0),
+            default,
+            default,
+            default,
+            default);
+        metadata.AddTypeDefinition(TypeAttributes.NotPublic,
+            default,
+            metadata.GetOrAddString("<Module>"),
+            default,
+            MetadataTokens.FieldDefinitionHandle(1),
+            MetadataTokens.MethodDefinitionHandle(1));
+        var pe = new ManagedPEBuilder(
+            new PEHeaderBuilder(imageCharacteristics: Characteristics.ExecutableImage | Characteristics.Dll),
+            new MetadataRootBuilder(metadata),
+            new BlobBuilder(),
+            flags: CorFlags.ILOnly);
         var content = new BlobBuilder();
         pe.Serialize(content);
         File.WriteAllBytes(path, content.ToArray());
@@ -242,7 +269,6 @@ public sealed class PreviewIntegrationTests
         Assert.Throws<ObjectDisposedException>(() => session.Reload());
     }
 
-
     [AvaloniaFact]
     public void Included_preview_sample_loads_resources_styles_bindings_and_design_dimensions()
     {
@@ -259,14 +285,18 @@ public sealed class PreviewIntegrationTests
             Assert.Equal("独立 XAML 源文件预览", root.FindControl<TextBlock>("PreviewBoundTitle")?.Text);
             Assert.Contains(root.FindControl<Button>("PreviewButton")!.Classes, item => item == "preview-action");
         }
-        finally { window.Close(); }
+        finally
+        {
+            window.Close();
+        }
     }
 
     [AvaloniaFact]
     public async Task Preview_window_agent_exposes_reloaded_document_through_the_existing_pipe_protocol()
     {
         using var files = new TestFiles();
-        files.Write("""<Border xmlns="https://github.com/avaloniaui"><TextBlock Name="PreviewValue" Text="First" /></Border>""");
+        files.Write(
+            """<Border xmlns="https://github.com/avaloniaui"><TextBlock Name="PreviewValue" Text="First" /></Border>""");
         using var session = new PreviewSession(new PreviewDocumentLoader(files.XamlPath),
             debounce: TimeSpan.FromMilliseconds(100));
         var window = new PreviewWindow(session, "preview-window-test");
@@ -280,20 +310,26 @@ public sealed class PreviewIntegrationTests
                     PipeName = "preview-rpc-" + Guid.NewGuid().ToString("N"),
                     TopLevelProvider = () => [window]
                 });
-            await using var pipe = new System.IO.Pipes.NamedPipeClientStream(".", agent.PipeName,
-                System.IO.Pipes.PipeDirection.InOut, System.IO.Pipes.PipeOptions.Asynchronous);
+            await using var pipe = new System.IO.Pipes.NamedPipeClientStream(".",
+                agent.PipeName,
+                System.IO.Pipes.PipeDirection.InOut,
+                System.IO.Pipes.PipeOptions.Asynchronous);
             await pipe.ConnectAsync(CancellationToken.None).WaitAsync(TimeSpan.FromSeconds(5));
             await using var peer = new AvaloniaDevTool.Protocol.RpcPeer(pipe);
             peer.Start();
             var first = await FindPreviewValueAsync(peer);
             Assert.Equal("First", first.Preview);
-            files.Write("""<Border xmlns="https://github.com/avaloniaui"><TextBlock Name="PreviewValue" Text="Second" /></Border>""");
+            files.Write(
+                """<Border xmlns="https://github.com/avaloniaui"><TextBlock Name="PreviewValue" Text="Second" /></Border>""");
             await WaitUntilAsync(() => session.SuccessfulLoads == 2);
             var second = await FindPreviewValueAsync(peer);
             Assert.Equal("Second", second.Preview);
             Assert.NotEqual(first.Id, second.Id);
         }
-        finally { window.Close(); }
+        finally
+        {
+            window.Close();
+        }
     }
 
     [AvaloniaFact]
@@ -307,14 +343,18 @@ public sealed class PreviewIntegrationTests
               <TextBlock Text="Window document" />
             </Window>
             """);
-        using var session = new PreviewSession(new PreviewDocumentLoader(files.XamlPath, typeof(PreviewBadge).Assembly.Location, project), watch: false);
+        using var session =
+            new PreviewSession(
+                new PreviewDocumentLoader(files.XamlPath, typeof(PreviewBadge).Assembly.Location, project),
+                watch: false);
         var host = new PreviewWindow(session, "window-notice-test");
         host.Show();
         try
         {
             var document = Assert.IsType<Window>(session.Content);
             Assert.True(document.IsVisible);
-            var notice = Assert.Single(host.GetLogicalDescendants().OfType<TextBlock>(), text => text.Name == "PreviewWindowNotice");
+            var notice = Assert.Single(host.GetLogicalDescendants().OfType<TextBlock>(),
+                text => text.Name == "PreviewWindowNotice");
             Assert.Equal("预览内容已在独立窗口显示：Detached preview target", notice.Text);
             Assert.True(notice.IsVisible);
             document.Close();
@@ -325,14 +365,19 @@ public sealed class PreviewIntegrationTests
             Assert.Equal("预览内容已在独立窗口显示：Detached preview target", notice.Text);
             files.Write(Markup("Embedded source"));
             Assert.True(session.Reload());
-            var viewport = Assert.Single(host.GetLogicalDescendants().OfType<ContentControl>(), control => control.Name == "PreviewDocumentHost");
+            var viewport = Assert.Single(host.GetLogicalDescendants().OfType<ContentControl>(),
+                control => control.Name == "PreviewDocumentHost");
             Assert.Same(session.Content, viewport.Content);
             Assert.DoesNotContain(host.GetLogicalDescendants(), control => ReferenceEquals(control, notice));
         }
-        finally { host.Close(); }
+        finally
+        {
+            host.Close();
+        }
     }
 
-    private static async Task<AvaloniaDevTool.Protocol.TreeNodeInfo> FindPreviewValueAsync(AvaloniaDevTool.Protocol.RpcPeer peer)
+    private static async Task<AvaloniaDevTool.Protocol.TreeNodeInfo> FindPreviewValueAsync(
+        AvaloniaDevTool.Protocol.RpcPeer peer)
     {
         var roots = await peer.InvokeAsync<AvaloniaDevTool.Protocol.TreeNodeInfo[]>(
             AvaloniaDevTool.Protocol.Methods.TreeRoots,
@@ -341,14 +386,19 @@ public sealed class PreviewIntegrationTests
         var visited = new HashSet<long>();
         while (pending.TryDequeue(out var node) && visited.Count < 200)
         {
-            if (!visited.Add(node.Id)) continue;
-            if (node.Name == "PreviewValue") return node;
-            if (!node.HasChildren) continue;
+            if (!visited.Add(node.Id))
+                continue;
+            if (node.Name == "PreviewValue")
+                return node;
+            if (!node.HasChildren)
+                continue;
             var children = await peer.InvokeAsync<AvaloniaDevTool.Protocol.TreeNodeInfo[]>(
                 AvaloniaDevTool.Protocol.Methods.TreeChildren,
                 new AvaloniaDevTool.Protocol.TreeChildrenRequest(node.Id, AvaloniaDevTool.Protocol.TreeKind.Logical));
-            foreach (var child in children) pending.Enqueue(child);
+            foreach (var child in children)
+                pending.Enqueue(child);
         }
+
         throw new InvalidOperationException("The source document was not reachable through the preview host Agent.");
     }
 
@@ -367,11 +417,14 @@ public sealed class PreviewIntegrationTests
 
     private sealed class TestFiles : IDisposable
     {
-        private static readonly string TestRoot = Path.GetFullPath(Path.Combine(Path.GetTempPath(), "AvaloniaDevTool.Previewer.Tests"));
+        private static readonly string TestRoot =
+            Path.GetFullPath(Path.Combine(Path.GetTempPath(), "AvaloniaDevTool.Previewer.Tests"));
+
         public string Root { get; } = Path.Combine(TestRoot, Guid.NewGuid().ToString("N"));
         public string XamlPath => Path.Combine(Root, "Preview.axaml");
         public TestFiles() => Directory.CreateDirectory(Root);
         public void Write(string content) => File.WriteAllText(XamlPath, content, new UTF8Encoding(false));
+
         public void Dispose()
         {
             var absolute = Path.GetFullPath(Root);
@@ -387,4 +440,3 @@ public sealed class PreviewBadge : Border
 {
     public PreviewBadge() => Child = new TextBlock { Text = "Custom assembly" };
 }
-

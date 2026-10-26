@@ -19,15 +19,18 @@ public static class Program
         {
             ready = window.IsVisible,
             processId = Environment.ProcessId,
-            agentReferenced = typeof(Program).Assembly.GetReferencedAssemblies().Any(assembly => assembly.Name == "AvaloniaDevTool.Agent")
+            agentReferenced = typeof(Program).Assembly.GetReferencedAssemblies()
+                .Any(assembly => assembly.Name == "AvaloniaDevTool.Agent")
         }));
         Console.Out.Flush();
         Console.ReadLine();
         window.Close();
     }
+
     public static AppBuilder BuildAvaloniaApp()
     {
-        if (!Design.IsDesignMode) throw new InvalidOperationException("The builder requires the real designer mode flag.");
+        if (!Design.IsDesignMode)
+            throw new InvalidOperationException("The builder requires the real designer mode flag.");
         Console.WriteLine("Target BuildAvaloniaApp stdout is deliberately noisy.");
         return AppBuilder.Configure<FixtureApp>().UsePlatformDetect();
     }
@@ -64,7 +67,8 @@ public sealed class FixtureBadge : Border
 {
     public FixtureBadge()
     {
-        if (!Design.IsDesignMode) throw new InvalidOperationException("Custom control constructor requires design mode.");
+        if (!Design.IsDesignMode)
+            throw new InvalidOperationException("Custom control constructor requires design mode.");
         Child = new TextBlock { Name = "CustomControlText", Text = "Built custom control" };
     }
 }

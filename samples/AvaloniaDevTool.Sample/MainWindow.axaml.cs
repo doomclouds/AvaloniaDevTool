@@ -36,6 +36,7 @@ public sealed partial class MainWindow : Window
             ViewModel.Status = "当前为设计预览，请从预览宿主复制连接管道。";
             return;
         }
+
         try
         {
             var clipboard = TopLevel.GetTopLevel(this)?.Clipboard;
@@ -76,13 +77,15 @@ public sealed partial class MainWindow : Window
 
     private void EmitWarningClick(object? sender, RoutedEventArgs e)
     {
-        Logger.TryGet(LogEventLevel.Warning, "Sample.Diagnostics")?.Log(this, "Sample warning {Sequence}", ++_logSequence);
+        Logger.TryGet(LogEventLevel.Warning, "Sample.Diagnostics")
+            ?.Log(this, "Sample warning {Sequence}", ++_logSequence);
         ViewModel.Status = "已发送一条 Warning 日志。请先通过诊断接口开始日志 / 事件捕获。";
     }
 
     private void EmitInformationClick(object? sender, RoutedEventArgs e)
     {
-        Logger.TryGet(LogEventLevel.Information, "Sample.Diagnostics")?.Log(this, "Sample information {Sequence}", ++_logSequence);
+        Logger.TryGet(LogEventLevel.Information, "Sample.Diagnostics")
+            ?.Log(this, "Sample information {Sequence}", ++_logSequence);
         ViewModel.Status = "已发送 Information 日志；最低级别设为 Information 后可观察。";
     }
 
@@ -99,11 +102,15 @@ public sealed partial class MainWindow : Window
             await Task.Run(() =>
             {
                 for (var index = 1; index <= 30; index++)
-                    Logger.TryGet(LogEventLevel.Warning, "Sample.Background")?.Log(null, "Background item {Index}", index);
+                    Logger.TryGet(LogEventLevel.Warning, "Sample.Background")
+                        ?.Log(null, "Background item {Index}", index);
             });
             ViewModel.Status = "已从后台线程发送 30 条 Warning 日志。";
         }
-        catch (Exception exception) { ViewModel.Status = $"日志发送失败：{exception.Message}"; }
+        catch (Exception exception)
+        {
+            ViewModel.Status = $"日志发送失败：{exception.Message}";
+        }
     }
 
     private void AddNodeClick(object? sender, RoutedEventArgs e) => AddDynamicNode();
@@ -159,7 +166,8 @@ public sealed partial class MainWindow : Window
     private void OpenWindowClick(object? sender, RoutedEventArgs e)
     {
         var id = _nextWindowId++;
-        var closeButton = new Button { Content = "关闭此窗口", HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left };
+        var closeButton = new Button
+            { Content = "关闭此窗口", HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left };
         var window = new Window
         {
             Name = $"SampleSecondaryWindow{id}",
@@ -189,4 +197,3 @@ public sealed partial class MainWindow : Window
         ViewModel.Status = $"已打开第二窗口 {id}；诊断客户端查询的根列表应包含此窗口。";
     }
 }
-
