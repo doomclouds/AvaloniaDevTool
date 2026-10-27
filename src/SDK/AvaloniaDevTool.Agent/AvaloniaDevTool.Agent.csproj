@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <ProjectReference
+            Include="../../Infrastructure/AvaloniaDevTool.Infrastructure.Avalonia/AvaloniaDevTool.Infrastructure.Avalonia.csproj" />
+        <InternalsVisibleTo Include="AvaloniaDevTool.Agent.Tests" />
+    </ItemGroup>
+</Project>

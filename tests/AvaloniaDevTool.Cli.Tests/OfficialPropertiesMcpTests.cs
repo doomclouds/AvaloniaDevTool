@@ -349,7 +349,7 @@ public sealed class OfficialPropertiesMcpTests
                     [
                         "exec", "--runtimeconfig", Path.ChangeExtension(assembly, ".runtimeconfig.json"), "--depsfile",
                         Path.ChangeExtension(assembly, ".deps.json"),
-                        typeof(Program).Assembly.Location, "mcp", "--profile", "official", "--pipe", agent.PipeName
+                        typeof(Program).Assembly.Location, "mcp", "--pipe", agent.PipeName
                     ],
                     ShutdownTimeout = TimeSpan.FromSeconds(5)
                 }));

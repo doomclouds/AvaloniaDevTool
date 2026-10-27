@@ -205,7 +205,10 @@ public sealed class OfficialTreeMcpTests
 
     private static DiagnosticsAgent Attach(Window window) => DiagnosticsAgent.Attach(Application.Current!,
         new DiagnosticsAgentOptions
-            { PipeName = "official-tree-" + Guid.NewGuid().ToString("N"), TopLevelProvider = () => [window] });
+        {
+            PipeName = DiagnosticsProtocol.PipePrefix + "official-tree-" + Guid.NewGuid().ToString("N"),
+            TopLevelProvider = () => [window]
+        });
 
     private static Task<McpClient> CreateClientAsync(string pipe)
     {
@@ -216,8 +219,7 @@ public sealed class OfficialTreeMcpTests
             Arguments =
             [
                 "exec", "--runtimeconfig", Path.ChangeExtension(assembly, ".runtimeconfig.json"), "--depsfile",
-                Path.ChangeExtension(assembly, ".deps.json"), typeof(Program).Assembly.Location, "mcp", "--profile",
-                "official", "--pipe", pipe
+                Path.ChangeExtension(assembly, ".deps.json"), typeof(Program).Assembly.Location, "mcp", "--pipe", pipe
             ],
             ShutdownTimeout = TimeSpan.FromSeconds(5)
         }));

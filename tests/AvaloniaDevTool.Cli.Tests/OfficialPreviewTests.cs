@@ -29,8 +29,9 @@ public sealed class OfficialPreviewTests
         var schema = Assert.Single(tools, tool => tool.Name == "attach-to-file").JsonSchema;
         Assert.Equal(new[] { "xamlFilePath", "xamlProjectPath" },
             schema.GetProperty("required").EnumerateArray().Select(value => value.GetString()));
-        Assert.Equal(3, schema.GetProperty("properties").EnumerateObject().Count());
-        Assert.False(schema.GetProperty("properties").GetProperty("build").GetProperty("default").GetBoolean());
+        Assert.Equal(new[] { "build", "xamlFilePath", "xamlProjectPath" },
+            schema.GetProperty("properties").EnumerateObject().Select(property => property.Name)
+                .Order(StringComparer.Ordinal));
         var before = File.GetLastWriteTimeUtc(files.Output);
         var attached = Read<PreviewAttachment>(await CallAsync(client, "attach-to-file", files.Arguments()));
         var pid = attached.Session.ProcessId;
@@ -207,7 +208,8 @@ public sealed class OfficialPreviewTests
                 TestContext.Current.CancellationToken);
             await Assert.ThrowsAnyAsync<OperationCanceledException>(async () => await pending);
             await WaitForExitAsync(pid);
-            Assert.Equal(original.Id, (await FindAsync(client, "SavedText")).Id);
+            var restored = await WaitForNodeAsync(client, "SavedText", node => node is not null);
+            Assert.Equal(original.Id, restored.Id);
             Assert.NotEqual(true, (await CallAsync(client, "props", new() { ["nodeId"] = original.Id })).IsError);
             using var previous = Process.GetProcessById(first.Session.ProcessId);
             Assert.False(previous.HasExited);
@@ -361,8 +363,6 @@ public sealed class OfficialPreviewTests
         };
         start.ArgumentList.Add(CliPath);
         start.ArgumentList.Add("mcp");
-        start.ArgumentList.Add("--profile");
-        start.ArgumentList.Add("official");
         start.Environment["AVDT_PREVIEW_HEADLESS"] = "true";
         foreach (var item in environment ?? [])
             start.Environment[item.Key] = item.Value;
@@ -376,7 +376,7 @@ public sealed class OfficialPreviewTests
         return McpClient.CreateAsync(new StdioClientTransport(new StdioClientTransportOptions
         {
             Command = "dotnet", Name = "official project preview",
-            Arguments = [CliPath, "mcp", "--profile", "official"], EnvironmentVariables = environment,
+            Arguments = [CliPath, "mcp"], EnvironmentVariables = environment,
             ShutdownTimeout = TimeSpan.FromSeconds(5)
         }));
     }
@@ -415,10 +415,24 @@ public sealed class OfficialPreviewTests
         timeout.CancelAfter(TimeSpan.FromSeconds(15));
         while (true)
         {
-            var call = await client.CallToolAsync("search",
-                new Dictionary<string, object?> { ["query"] = name },
-                cancellationToken: timeout.Token);
-            if (call.IsError == true && Text(call).Contains("stale_session", StringComparison.Ordinal))
+            CallToolResult call;
+            try
+            {
+                call = await client.CallToolAsync("search",
+                    new Dictionary<string, object?> { ["query"] = name },
+                    cancellationToken: timeout.Token);
+            }
+            catch (ModelContextProtocol.McpException error) when (
+                error.Message.Contains("machine_busy", StringComparison.Ordinal) ||
+                error.Message.Contains("stale_session", StringComparison.Ordinal))
+            {
+                await Task.Delay(50, timeout.Token);
+                continue;
+            }
+
+            if (call.IsError == true &&
+                (Text(call).Contains("stale_session", StringComparison.Ordinal) ||
+                 Text(call).Contains("machine_busy", StringComparison.Ordinal)))
             {
                 await Task.Delay(50, timeout.Token);
                 continue;

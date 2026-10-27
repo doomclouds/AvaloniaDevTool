@@ -260,11 +260,11 @@ public sealed class CompositionInspectionTests
             });
         await using var client = new DiagnosticsClient();
         await client.ConnectAsync(agent.PipeName);
-        var roots = await client.GetRootsAsync(TreeKind.Logical);
-        var host = Assert.Single(await client.GetChildrenAsync(roots[0].Id, TreeKind.Logical),
+        var roots = await client.Tree.GetRootsAsync(TreeKind.Logical);
+        var host = Assert.Single(await client.Tree.GetChildrenAsync(roots[0].Id, TreeKind.Logical),
             node => node.TypeName == typeof(Canvas).FullName);
-        var target = Assert.Single(await client.GetChildrenAsync(host.Id, TreeKind.Logical));
-        var pending = client.GetCompositionSnapshotAsync(target.Id);
+        var target = Assert.Single(await client.Tree.GetChildrenAsync(host.Id, TreeKind.Logical));
+        var pending = client.Rendering.GetCompositionSnapshotAsync(target.Id);
         var ticks = 0;
         while (!pending.IsCompleted && ticks++ < 100)
         {
@@ -277,7 +277,7 @@ public sealed class CompositionInspectionTests
         Assert.Equal(2, snapshot.Layers.Count);
         using var image = Decode(snapshot.Layers.Single(layer => layer.Name == "Red"));
         Assert.Equal(SKColors.Red, image.GetPixel(4, 4));
-        Assert.NotNull(await client.GetRootsAsync(TreeKind.Logical));
+        Assert.NotNull(await client.Tree.GetRootsAsync(TreeKind.Logical));
     }
 
     private static SKBitmap Decode(CompositionLayer layer) =>

@@ -26,7 +26,7 @@ public sealed class StructuredLoggingTests
             await using var agent = CreateAgent(window, source);
             await using var client = new DiagnosticsClient();
             await client.ConnectAsync(agent.PipeName);
-            await client.StartActivityAsync(new ActivityStartRequest(MinimumLogLevel: "Information",
+            await client.Activity.StartActivityAsync(new ActivityStartRequest(MinimumLogLevel: "Information",
                 LogFilter: new LogFilter("orders", "accepted", "Amount", "12")));
             Assert.True(source.HasSubscribers);
             await Task.Run(() =>
@@ -45,7 +45,7 @@ public sealed class StructuredLoggingTests
                     ],
                     Source: target));
             });
-            var entry = Assert.Single(await client.GetActivityAsync());
+            var entry = Assert.Single(await client.Activity.GetActivityAsync());
             Assert.Equal("Accepted 12.3 for A; (null); [UnsafeValue: unavailable]", entry.Message);
             Assert.NotNull(entry.ObjectId);
             var details = Assert.IsType<LogDetails>(entry.LogDetails);
@@ -55,13 +55,13 @@ public sealed class StructuredLoggingTests
             Assert.Equal("12.25", details.Parameters[0].Value);
             Assert.Equal(LogValueState.Null, details.Parameters[2].State);
             Assert.Equal(LogValueState.Unavailable, details.Parameters[3].State);
-            Assert.Equal(0, (await client.GetActivityStatusAsync()).DroppedCount);
-            var properties = await client.GetPropertiesAsync(entry.ObjectId!.Value);
+            Assert.Equal(0, (await client.Activity.GetActivityStatusAsync()).DroppedCount);
+            var properties = await client.Properties.GetPropertiesAsync(entry.ObjectId!.Value);
             Assert.Contains(properties, property => property.Name == "Name" && property.Value == "LogOrigin");
-            await client.StopActivityAsync();
+            await client.Activity.StopActivityAsync();
             Assert.False(source.HasSubscribers);
             source.Publish(new("Error", "Orders", "Accepted after stop", []));
-            Assert.Single(await client.GetActivityAsync());
+            Assert.Single(await client.Activity.GetActivityAsync());
         }
         finally
         {
@@ -82,7 +82,7 @@ public sealed class StructuredLoggingTests
             await using var agent = CreateAgent(window, provider);
             await using var client = new DiagnosticsClient();
             await client.ConnectAsync(agent.PipeName);
-            await client.StartActivityAsync(new ActivityStartRequest(MinimumLogLevel: "Verbose"));
+            await client.Activity.StartActivityAsync(new ActivityStartRequest(MinimumLogLevel: "Verbose"));
             var logger = factory.CreateLogger("Application.Orders");
             await Task.Run(() =>
             {
@@ -93,7 +93,8 @@ public sealed class StructuredLoggingTests
                         3,
                         "alice");
             });
-            var entry = Assert.Single(await client.GetActivityAsync(), item => item.Category == "Application.Orders");
+            var entry = Assert.Single(await client.Activity.GetActivityAsync(),
+                item => item.Category == "Application.Orders");
             Assert.Equal("Fatal", entry.Level);
             Assert.Equal("Save 3 for alice", entry.Message);
             var details = Assert.IsType<LogDetails>(entry.LogDetails);
@@ -105,7 +106,7 @@ public sealed class StructuredLoggingTests
             Assert.Equal("cannot save", details.Exception!.Message);
             Assert.Equal("inner", Assert.Single(details.Exception.InnerExceptions).Message);
             Assert.Equal("42", Assert.Single(Assert.Single(details.Scopes!).Parameters).Value);
-            await client.StopActivityAsync();
+            await client.Activity.StopActivityAsync();
             Assert.False(logger.IsEnabled(LogLevel.Warning));
         }
         finally

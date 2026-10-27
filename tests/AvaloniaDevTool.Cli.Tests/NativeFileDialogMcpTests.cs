@@ -476,27 +476,27 @@ public sealed partial class NativeFileDialogMcpTests
         await BringIntoView(client, "OpenPopupButton");
         Read<InputResult>(await Call(client, "ui-click", ("nodeId", await FindManaged(client, "OpenPopupButton"))));
         await WaitText(client, "PopupStatus", "Popup open");
-        Assert.Contains(Read<OfficialTreeSnapshot>(await Call(client, "tree", ("treeKind", "Visual"), ("depth", -1)))
+        Assert.Contains(Read<ControlTreeSnapshot>(await Call(client, "tree", ("treeKind", "Visual"), ("depth", -1)))
                 .Entries,
             entry => entry.Node.Name == "PopupActionButton");
         Read<InputResult>(await Call(client, "ui-click", ("nodeId", await FindManaged(client, "PopupActionButton"))));
         await WaitText(client, "PopupStatus", "Popup action invoked");
         Assert.DoesNotContain(
-            Read<OfficialTreeSnapshot>(await Call(client, "tree", ("treeKind", "Visual"), ("depth", -1))).Entries,
+            Read<ControlTreeSnapshot>(await Call(client, "tree", ("treeKind", "Visual"), ("depth", -1))).Entries,
             entry => entry.Node.Name == "PopupActionButton");
 
         await BringIntoView(client, "OpenFlyoutButton");
         Read<InputResult>(await Call(client, "ui-click", ("nodeId", await FindManaged(client, "OpenFlyoutButton"))));
         await WaitText(client, "FlyoutStatus", "Flyout open");
         var flyoutAction = await FindManaged(client, "FlyoutActionButton");
-        Assert.Contains(Read<OfficialTreeSnapshot>(await Call(client, "tree", ("treeKind", "Visual"), ("depth", -1)))
+        Assert.Contains(Read<ControlTreeSnapshot>(await Call(client, "tree", ("treeKind", "Visual"), ("depth", -1)))
                 .Entries,
             entry => entry.Node.Name == "FlyoutActionButton");
         Read<InputResult>(await Call(client, "ui-click", ("nodeId", flyoutAction)));
         await WaitText(client, "FlyoutStatus", "Flyout action invoked");
         Read<InputResult>(await Call(client, "ui-key-chord", ("nodeId", flyoutAction), ("keys", new[] { "Escape" })));
         Assert.DoesNotContain(
-            Read<OfficialTreeSnapshot>(await Call(client, "tree", ("treeKind", "Visual"), ("depth", -1))).Entries,
+            Read<ControlTreeSnapshot>(await Call(client, "tree", ("treeKind", "Visual"), ("depth", -1))).Entries,
             entry => entry.Node.Name == "FlyoutActionButton");
 
         await BringIntoView(client, "ContextMenuTarget");

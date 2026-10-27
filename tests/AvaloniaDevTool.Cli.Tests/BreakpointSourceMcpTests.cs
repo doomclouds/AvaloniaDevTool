@@ -27,15 +27,14 @@ public sealed class BreakpointSourceMcpTests
             await using var agent = DiagnosticsAgent.Attach(Application.Current!,
                 new DiagnosticsAgentOptions
                 {
-                    PipeName = "breakpoint-source-mcp-" + Guid.NewGuid().ToString("N"),
+                    PipeName = DiagnosticsProtocol.PipePrefix + "breakpoint-source-mcp-" + Guid.NewGuid().ToString("N"),
                     TopLevelProvider = () => [target]
                 });
             await using var client = await CreateClientAsync();
             var tools = await client.ListToolsAsync(cancellationToken: TestContext.Current.CancellationToken);
             var create = Assert.Single(tools, item => item.Name == "breakpoint-create");
             Assert.Contains("sourceObjectId", create.JsonSchema.ToString());
-            Read<SessionInfo>(await client.CallToolAsync("attach-to-app",
-                new Dictionary<string, object?> { ["pipeName"] = agent.PipeName }));
+            Read<ApplicationAttachmentResult>(await McpTestTarget.AttachAsync(client, agent.PipeName));
 
             async Task<long> Find(string name) => Assert.Single(Read<TreeSearchResult>(await client.CallToolAsync(
                 "search",
@@ -117,8 +116,7 @@ public sealed class BreakpointSourceMcpTests
             Arguments =
             [
                 "exec", "--runtimeconfig", Path.ChangeExtension(assembly, ".runtimeconfig.json"), "--depsfile",
-                Path.ChangeExtension(assembly, ".deps.json"), typeof(Program).Assembly.Location, "mcp", "--profile",
-                "extended"
+                Path.ChangeExtension(assembly, ".deps.json"), typeof(Program).Assembly.Location, "mcp"
             ],
             ShutdownTimeout = TimeSpan.FromSeconds(5)
         }));
@@ -129,7 +127,8 @@ public sealed class BreakpointSourceMcpTests
 
     private static T Read<T>(CallToolResult result)
     {
-        Assert.NotEqual(true, result.IsError);
+        Assert.False(result.IsError == true,
+            string.Join("\n", result.Content.OfType<TextContentBlock>().Select(block => block.Text)));
         var root = result.StructuredContent is { } structured
             ? JsonNode.Parse(JsonSerializer.Serialize(structured))
             : JsonNode.Parse(Text(result));

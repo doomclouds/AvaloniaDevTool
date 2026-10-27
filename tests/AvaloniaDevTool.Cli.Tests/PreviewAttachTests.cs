@@ -13,15 +13,14 @@ namespace AvaloniaDevTool.Cli.Tests;
 
 public sealed class PreviewAttachTests
 {
-    private static readonly string Repository = Metadata("PreviewRepositoryPath");
     private static string CliPath => Metadata("PreviewCliPath");
-    private static string AssemblyPath => Metadata("PreviewFixturePath");
 
     [Fact]
     public async Task
         Stdio_attach_previews_built_classful_project_resources_custom_controls_input_pixels_and_live_saves()
     {
         using var files = new FixtureFiles();
+        await files.BuildAsync();
         await using var client = await CreateClientAsync();
         var tools = await client.ListToolsAsync(cancellationToken: TestContext.Current.CancellationToken);
         Assert.Contains(tools, tool => tool.Name == "attach-to-file");
@@ -30,10 +29,10 @@ public sealed class PreviewAttachTests
         Assert.NotEqual(Environment.ProcessId, processId);
         try
         {
-            var tree = Read<ToolTreeSnapshot>(await CallAsync(client,
+            var tree = Read<ControlTreeSnapshot>(await CallAsync(client,
                 "tree",
-                new Dictionary<string, object?> { ["depth"] = -1, ["kind"] = "Logical" }));
-            Assert.Contains(Flatten(tree.Roots), node => node.Node.Name == "SavedText");
+                new Dictionary<string, object?> { ["depth"] = -1, ["treeKind"] = "Logical" }));
+            Assert.Contains(tree.Entries, entry => entry.Node.Name == "SavedText");
             Assert.Equal("Project App resource", (await SearchAsync(client, "ProjectResourceText")).Preview);
             Assert.Equal("Built custom control", (await SearchAsync(client, "CustomControlText")).Preview);
             Assert.Equal("Referenced assembly control", (await SearchAsync(client, "ReferencedControlText")).Preview);
@@ -41,7 +40,7 @@ public sealed class PreviewAttachTests
             var input = Read<InputResult>(await CallAsync(client,
                 "input",
                 new Dictionary<string, object?>
-                    { ["nodeId"] = editable.Id, ["kind"] = "Text", ["text"] = " appended" }));
+                    { ["nodeId"] = editable.Id, ["inputEvent"] = "Text", ["arg"] = " appended" }));
             Assert.True(input.Delivered);
             var properties = Read<PropertyInfoDto[]>(await CallAsync(client,
                 "props",
@@ -85,6 +84,7 @@ public sealed class PreviewAttachTests
     public async Task Window_root_uses_the_real_designer_and_mcp_shutdown_releases_its_process()
     {
         using var files = new FixtureFiles(window: true);
+        await files.BuildAsync();
         var client = await CreateClientAsync();
         int pid;
         try
@@ -99,11 +99,11 @@ public sealed class PreviewAttachTests
             await WaitForNodeAsync(client,
                 "PreviewStatusText",
                 node => node?.Preview?.Contains("第 2 次", StringComparison.Ordinal) == true);
-            var roots = Read<ToolTreeSnapshot>(await CallAsync(client,
+            var roots = Read<ControlTreeSnapshot>(await CallAsync(client,
                 "tree",
-                new Dictionary<string, object?> { ["depth"] = 0 }));
-            Assert.True(roots.Roots.Count >= 2);
-            Assert.Contains(roots.Roots, root => root.Node.Preview == "Window source saved");
+                new Dictionary<string, object?> { ["depth"] = 1 }));
+            Assert.True(roots.Entries.Count >= 2);
+            Assert.Contains(roots.Entries, entry => entry.Node.Preview == "Window source saved");
         }
         finally
         {
@@ -119,10 +119,10 @@ public sealed class PreviewAttachTests
         using var files = new FixtureFiles();
         await using var client = await CreateClientAsync();
         var missing = Arguments(files);
-        missing["assemblyPath"] = Path.Combine(files.Root, "not-built.dll");
         var missingResult = await CallAsync(client, "attach-to-file", missing);
         Assert.True(missingResult.IsError);
-        Assert.Contains("Build", Text(missingResult));
+        Assert.Contains("project_not_built", Text(missingResult));
+        await files.BuildAsync();
         files.Write(files.Initial.Replace("AvaloniaDevTool.PreviewFixture.FixtureView",
             "AvaloniaDevTool.PreviewFixture.AbsentClass",
             StringComparison.Ordinal));
@@ -133,9 +133,10 @@ public sealed class PreviewAttachTests
     }
 
     [Fact]
-    public async Task Style_and_resource_dictionary_use_the_official_design_preview_conversion()
+    public async Task Style_and_resource_dictionary_use_the_framework_design_preview_conversion()
     {
         using var files = new FixtureFiles();
+        await files.BuildAsync();
         files.Write("""
             <Style xmlns="https://github.com/avaloniaui" Selector="Button">
               <Design.PreviewWith><Button Name="StylePreview" Content="Style source preview" /></Design.PreviewWith>
@@ -161,15 +162,14 @@ public sealed class PreviewAttachTests
     }
 
     [Fact]
-    public async Task A_library_project_source_can_use_a_distinct_built_application_for_App_resources()
+    public async Task Referenced_library_controls_share_the_selected_projects_App_resources()
     {
         using var files = new FixtureFiles(referenced: true);
+        await files.BuildAsync();
         await using var client = await CreateClientAsync();
         var arguments = Arguments(files);
-        arguments["assemblyPath"] = Metadata("PreviewControlsPath");
-        arguments["applicationAssemblyPath"] = AssemblyPath;
         var attachment = Read<PreviewAttachment>(await CallAsync(client, "attach-to-file", arguments));
-        Assert.NotEqual(attachment.AssemblyPath, attachment.ApplicationAssemblyPath);
+        Assert.Equal(files.AssemblyPath, attachment.AssemblyPath);
         Assert.Equal("Project App resource", (await SearchAsync(client, "LibraryAppResource")).Preview);
     }
 
@@ -177,12 +177,11 @@ public sealed class PreviewAttachTests
     public async Task Startup_timeout_and_cancellation_kill_the_owned_blocked_child()
     {
         using var files = new FixtureFiles();
+        await files.BuildAsync();
         var pidPath = Path.Combine(files.Root, "child.pid");
         await using var client = await CreateClientAsync(new Dictionary<string, string?>
-            { ["AVDT_PREVIEW_TEST_PID"] = pidPath });
+            { ["AVDT_OFFICIAL_PREVIEW_BLOCK"] = pidPath });
         var arguments = Arguments(files);
-        arguments["applicationType"] = "AvaloniaDevTool.PreviewFixture.BlockingStartup";
-        arguments["timeoutSeconds"] = 1;
         var timeout = await CallAsync(client, "attach-to-file", arguments);
         Assert.True(timeout.IsError);
         Assert.Contains("preview_timeout", Text(timeout));
@@ -193,7 +192,6 @@ public sealed class PreviewAttachTests
                 '\n'));
         await WaitForExitAsync(pid);
         File.Delete(pidPath);
-        arguments["timeoutSeconds"] = 30;
         var requestId = new RequestId("cancel-owned-preview");
         var pending = client.SendRequestAsync(new JsonRpcRequest
             {
@@ -224,6 +222,7 @@ public sealed class PreviewAttachTests
     public async Task Attaching_to_an_external_app_never_gives_the_session_permission_to_kill_it()
     {
         using var files = new FixtureFiles();
+        await files.BuildAsync();
         var pipe = "avalonia-devtool-external-preview-" + Guid.NewGuid().ToString("N");
         var start = new ProcessStartInfo("dotnet")
         {
@@ -232,7 +231,8 @@ public sealed class PreviewAttachTests
         foreach (var argument in new[]
                  {
                      Path.Combine(Path.GetDirectoryName(CliPath)!, "previewer", "AvaloniaDevTool.Previewer.dll"),
-                     "--xaml", files.SourcePath, "--assembly", AssemblyPath, "--project", files.ProjectPath, "--pipe",
+                     "--xaml", files.SourcePath, "--assembly", files.AssemblyPath, "--project", files.ProjectPath,
+                     "--pipe",
                      pipe, "--headless"
                  })
             start.ArgumentList.Add(argument);
@@ -242,9 +242,7 @@ public sealed class PreviewAttachTests
         try
         {
             await using var client = await CreateClientAsync();
-            var attach = await CallAsync(client,
-                "attach-to-app",
-                new Dictionary<string, object?> { ["pipeName"] = pipe });
+            var attach = await AttachToAppAsync(client, pipe);
             Assert.NotEqual(true, attach.IsError);
             Assert.Equal("Project App resource", (await SearchAsync(client, "ProjectResourceText")).Preview);
             await CallAsync(client, "detach", new Dictionary<string, object?>());
@@ -265,6 +263,7 @@ public sealed class PreviewAttachTests
     public async Task Abrupt_owner_exit_releases_a_child_even_while_the_target_builder_is_blocked()
     {
         using var files = new FixtureFiles();
+        await files.BuildAsync();
         var pidPath = Path.Combine(files.Root, "orphan.pid");
         var start = new ProcessStartInfo("dotnet")
         {
@@ -273,9 +272,8 @@ public sealed class PreviewAttachTests
         };
         start.ArgumentList.Add(CliPath);
         start.ArgumentList.Add("mcp");
-        start.ArgumentList.Add("--profile");
-        start.ArgumentList.Add("extended");
-        start.Environment["AVDT_PREVIEW_TEST_PID"] = pidPath;
+        start.Environment["AVDT_OFFICIAL_PREVIEW_BLOCK"] = pidPath;
+        start.Environment["AVDT_PREVIEW_HEADLESS"] = "true";
         using var owner = Process.Start(start)!;
         var error = owner.StandardError.ReadToEndAsync(TestContext.Current.CancellationToken);
         try
@@ -294,7 +292,6 @@ public sealed class PreviewAttachTests
             Assert.NotNull(initialized?["result"]);
             await owner.StandardInput.WriteLineAsync("{\"jsonrpc\":\"2.0\",\"method\":\"notifications/initialized\"}");
             var arguments = Arguments(files);
-            arguments["applicationType"] = "AvaloniaDevTool.PreviewFixture.BlockingStartup";
             await owner.StandardInput.WriteLineAsync(JsonSerializer.Serialize(new
             {
                 jsonrpc = "2.0", id = 2, method = "tools/call", @params = new { name = "attach-to-file", arguments }
@@ -333,23 +330,42 @@ public sealed class PreviewAttachTests
 
     private static Dictionary<string, object?> Arguments(FixtureFiles files) => new()
     {
-        ["filePath"] = files.SourcePath, ["projectPath"] = files.ProjectPath, ["assemblyPath"] = AssemblyPath,
-        ["headless"] = true, ["timeoutSeconds"] = 20
+        ["xamlFilePath"] = files.SourcePath, ["xamlProjectPath"] = files.ProjectPath
     };
 
-    private static Task<McpClient> CreateClientAsync(Dictionary<string, string?>? environment = null) =>
-        McpClient.CreateAsync(
-            new StdioClientTransport(new StdioClientTransportOptions
-            {
-                Command = "dotnet", Name = "owned file preview", Arguments = [CliPath, "mcp", "--profile", "extended"],
-                EnvironmentVariables = environment, ShutdownTimeout = TimeSpan.FromSeconds(5)
-            }));
+    private static Task<McpClient> CreateClientAsync(Dictionary<string, string?>? environment = null)
+    {
+        environment ??= new();
+        environment["AVDT_PREVIEW_HEADLESS"] = "true";
+        return McpClient.CreateAsync(new StdioClientTransport(new StdioClientTransportOptions
+        {
+            Command = "dotnet", Name = "owned file preview", Arguments = [CliPath, "mcp"],
+            EnvironmentVariables = environment, ShutdownTimeout = TimeSpan.FromSeconds(5)
+        }));
+    }
+
+    private static async Task<CallToolResult> AttachToAppAsync(McpClient client, string pipe)
+    {
+        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+        timeout.CancelAfter(TimeSpan.FromSeconds(12));
+        while (true)
+        {
+            var applications = Read<ApplicationAttachmentResult>(await CallCancellableAsync(client,
+                "attach-to-app",
+                new(),
+                timeout.Token));
+            var target = applications.Applications.SingleOrDefault(application => application.PipeName == pipe);
+            if (target is not null)
+                return await CallCancellableAsync(client, "attach-to-app", new() { ["id"] = target.Id }, timeout.Token);
+            await Task.Delay(40, timeout.Token);
+        }
+    }
 
     private static async Task<TreeNodeInfo> SearchAsync(McpClient client, string name)
     {
         var search = Read<TreeSearchResult>(await CallAsync(client,
             "search",
-            new Dictionary<string, object?> { ["query"] = name, ["kind"] = "Logical" }));
+            new Dictionary<string, object?> { ["query"] = name, ["treeKind"] = "Logical" }));
         return Assert.Single(search.Matches, node => node.Name == name);
     }
 
@@ -362,7 +378,7 @@ public sealed class PreviewAttachTests
         {
             var result = Read<TreeSearchResult>(await CallCancellableAsync(client,
                 "search",
-                new Dictionary<string, object?> { ["query"] = name, ["kind"] = "Logical" },
+                new Dictionary<string, object?> { ["query"] = name, ["treeKind"] = "Logical" },
                 timeout.Token));
             var node = result.Matches.FirstOrDefault(node => node.Name == name);
             if (predicate(node))
@@ -405,45 +421,31 @@ public sealed class PreviewAttachTests
         return root!.Deserialize<T>(ProtocolJson.Options)!;
     }
 
-    private static IEnumerable<ToolTreeNode> Flatten(IEnumerable<ToolTreeNode> nodes) =>
-        nodes.SelectMany(node => new[] { node }.Concat(Flatten(node.Children)));
-
     private static string Metadata(string key) => Path.GetFullPath(typeof(PreviewAttachTests).Assembly
         .GetCustomAttributes<AssemblyMetadataAttribute>().Single(attribute => attribute.Key == key).Value!);
 
     private sealed class FixtureFiles : IDisposable
     {
-        private static readonly string TestRoot =
-            Path.Combine(Path.GetTempPath(), "AvaloniaDevTool.PreviewAttach.Tests");
-
-        public string Root { get; } = Path.Combine(TestRoot, Guid.NewGuid().ToString("N"));
+        private readonly OfficialPreviewTests.ProjectFiles _project = new();
+        public string Root => _project.Root;
         public string SourcePath { get; }
-        public string ProjectPath => Path.Combine(Root, "Fixture.csproj");
+        public string ProjectPath => _project.Project;
+        public string AssemblyPath => _project.Output;
         public string Initial { get; }
 
         public FixtureFiles(bool window = false, bool referenced = false)
         {
-            Directory.CreateDirectory(Root);
-            var file = referenced ? "ReferencedView.axaml" : window ? "FixtureWindow.axaml" : "FixtureView.axaml";
-            SourcePath = Path.Combine(Root, file);
-            Initial = File.ReadAllText(Path.Combine(Repository,
-                    "tests",
-                    referenced ? "AvaloniaDevTool.PreviewFixture.Controls" : "AvaloniaDevTool.PreviewFixture",
-                    file),
-                Encoding.UTF8);
-            File.WriteAllText(ProjectPath, "<Project Sdk=\"Microsoft.NET.Sdk\" />", Encoding.UTF8);
+            SourcePath = window ? Path.Combine(Root, "FixtureWindow.axaml") : _project.Source;
+            Initial = File.ReadAllText(SourcePath, Encoding.UTF8);
+            if (referenced)
+                Initial = Initial.Replace("<referenced:ReferencedBadge />",
+                    "<referenced:ReferencedBadge /><referenced:ReferencedView />",
+                    StringComparison.Ordinal);
             Write(Initial);
         }
 
+        public Task BuildAsync() => _project.BuildAsync();
         public void Write(string text) => File.WriteAllText(SourcePath, text, new UTF8Encoding(false));
-
-        public void Dispose()
-        {
-            var full = Path.GetFullPath(Root);
-            if (!full.StartsWith(Path.GetFullPath(TestRoot) + Path.DirectorySeparatorChar,
-                    StringComparison.OrdinalIgnoreCase))
-                throw new InvalidOperationException("Cleanup escaped the temporary test root.");
-            Directory.Delete(full, recursive: true);
-        }
+        public void Dispose() => _project.Dispose();
     }
 }

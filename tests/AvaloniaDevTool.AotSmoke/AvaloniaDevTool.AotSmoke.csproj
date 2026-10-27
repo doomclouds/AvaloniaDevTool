@@ -4,6 +4,7 @@
         <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
     </PropertyGroup>
     <ItemGroup>
-        <ProjectReference Include="../../src/AvaloniaDevTool.Client/AvaloniaDevTool.Client.csproj" />
+        <ProjectReference
+            Include="../../src/Infrastructure/AvaloniaDevTool.Infrastructure.Execution/AvaloniaDevTool.Infrastructure.Execution.csproj" />
     </ItemGroup>
 </Project>

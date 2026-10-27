@@ -56,24 +56,23 @@ public sealed class McpIntegrationTests
                     TopLevelProvider = () => [window]
                 });
             await using var client = await CreateClientAsync();
-            var attach = await client.CallToolAsync("attach-to-app",
-                new Dictionary<string, object?> { ["pipeName"] = agent.PipeName });
+            var attach = await McpTestTarget.AttachAsync(client, agent.PipeName);
             Assert.NotEqual(true, attach.IsError);
-            var merged = Read<ToolTreeSnapshot>(await client.CallToolAsync("tree",
+            var merged = Read<ControlTreeSnapshot>(await client.CallToolAsync("tree",
                 new Dictionary<string, object?>
-                    { ["kind"] = "Merged", ["depth"] = -1, ["includeTemplates"] = true }));
-            var logicalContent = Read<ToolTreeSnapshot>(await client.CallToolAsync("tree",
+                    { ["treeKind"] = "Merged", ["depth"] = -1 }));
+            var logicalContent = Read<ControlTreeSnapshot>(await client.CallToolAsync("tree",
                 new Dictionary<string, object?>
-                    { ["kind"] = "Merged", ["depth"] = -1, ["includeTemplates"] = false }));
-            Assert.False(merged.Truncated);
-            Assert.False(logicalContent.Truncated);
+                    { ["treeKind"] = "Logical", ["depth"] = -1 }));
+            Assert.NotEmpty(merged.Entries);
+            Assert.NotEmpty(logicalContent.Entries);
             Assert.True(merged.Visited > logicalContent.Visited);
-            Assert.Contains(Flatten(merged.Roots), item => item.Node.Role == TreeNodeRole.TemplateRoot);
-            Assert.DoesNotContain(Flatten(logicalContent.Roots), item => item.Node.Role == TreeNodeRole.TemplateRoot);
-            Assert.Contains(Flatten(logicalContent.Roots), item => item.Node.Name == "McpTarget");
+            Assert.Contains(merged.Entries, item => item.Node.Role == TreeNodeRole.TemplateRoot);
+            Assert.DoesNotContain(logicalContent.Entries, item => item.Node.Role == TreeNodeRole.TemplateRoot);
+            Assert.Contains(logicalContent.Entries, item => item.Node.Name == "McpTarget");
             var search = Read<TreeSearchResult>(await client.CallToolAsync("search",
                 new Dictionary<string, object?>
-                    { ["query"] = "McpTarget", ["kind"] = "Logical" }));
+                    { ["query"] = "McpTarget", }));
             var node = Assert.Single(search.Matches);
             var properties = Read<PropertyInfoDto[]>(await client.CallToolAsync("props",
                 new Dictionary<string, object?> { ["nodeId"] = node.Id }));
@@ -156,8 +155,7 @@ public sealed class McpIntegrationTests
                 });
             await using var client = await CreateClientAsync();
             Assert.NotEqual(true,
-                (await client.CallToolAsync("attach-to-app",
-                    new Dictionary<string, object?> { ["pipeName"] = agent.PipeName })).IsError);
+                (await McpTestTarget.AttachAsync(client, agent.PipeName)).IsError);
             var state = Read<ProfilerStatusDto>(await client.CallToolAsync("profiler-start",
                 new Dictionary<string, object?>
                     { ["categories"] = new[] { "ResourceLookup" }, ["filter"] = "McpProfiler." }));
@@ -217,13 +215,15 @@ public sealed class McpIntegrationTests
         {
             await using var agent = DiagnosticsAgent.Attach(Application.Current!,
                 new DiagnosticsAgentOptions
-                    { PipeName = "extended-mcp-" + Guid.NewGuid().ToString("N"), TopLevelProvider = () => [window] });
+                {
+                    PipeName = DiagnosticsProtocol.PipePrefix + "extended-mcp-" + Guid.NewGuid().ToString("N"),
+                    TopLevelProvider = () => [window]
+                });
             await using var client = await CreateClientAsync();
             Assert.NotEqual(true,
-                (await client.CallToolAsync("attach-to-app",
-                    new Dictionary<string, object?> { ["pipeName"] = agent.PipeName })).IsError);
+                (await McpTestTarget.AttachAsync(client, agent.PipeName)).IsError);
             var search = Read<TreeSearchResult>(await client.CallToolAsync("search",
-                new Dictionary<string, object?> { ["query"] = "ExtendedScope", ["kind"] = "Logical" }));
+                new Dictionary<string, object?> { ["query"] = "ExtendedScope", }));
             var id = Assert.Single(search.Matches).Id;
             var tree = Read<ResourceTreeSnapshot>(await client.CallToolAsync("resource-tree",
                 new Dictionary<string, object?> { ["nodeId"] = id }));
@@ -306,14 +306,14 @@ public sealed class McpIntegrationTests
             await using var agent = DiagnosticsAgent.Attach(Application.Current!,
                 new DiagnosticsAgentOptions
                 {
-                    PipeName = "overlay-route-mcp-" + Guid.NewGuid().ToString("N"), TopLevelProvider = () => [window]
+                    PipeName = DiagnosticsProtocol.PipePrefix + "overlay-route-mcp-" + Guid.NewGuid().ToString("N"),
+                    TopLevelProvider = () => [window]
                 });
             await using var client = await CreateClientAsync();
             Assert.NotEqual(true,
-                (await client.CallToolAsync("attach-to-app",
-                    new Dictionary<string, object?> { ["pipeName"] = agent.PipeName })).IsError);
+                (await McpTestTarget.AttachAsync(client, agent.PipeName)).IsError);
             var found = Read<TreeSearchResult>(await client.CallToolAsync("search",
-                new Dictionary<string, object?> { ["query"] = "McpOverlayTarget", ["kind"] = "Logical" }));
+                new Dictionary<string, object?> { ["query"] = "McpOverlayTarget", }));
             var id = Assert.Single(found.Matches).Id;
             var selector = Read<ElementSelectorResult>(await client.CallToolAsync("element-selector",
                 new Dictionary<string, object?> { ["nodeId"] = id }));
@@ -351,12 +351,12 @@ public sealed class McpIntegrationTests
             var click = Assert.Single(catalog.Events,
                 item => item.Name == "Click" && item.OwnerType == typeof(Button).FullName);
             var buttons = Read<TreeSearchResult>(await client.CallToolAsync("search",
-                new Dictionary<string, object?> { ["query"] = "McpRouteButton", ["kind"] = "Logical" }));
+                new Dictionary<string, object?> { ["query"] = "McpRouteButton", }));
             var buttonId = Assert.Single(buttons.Matches).Id;
             Assert.True(Read<ActivityStatus>(await client.CallToolAsync("events-start",
                     new Dictionary<string, object?> { ["eventIds"] = new[] { click.Id }, ["sourceNodeId"] = buttonId }))
                 .IsRunning);
-            Assert.True(Read<InputResult>(await client.CallToolAsync("input",
+            Assert.True(Read<InputResult>(await client.CallToolAsync("ui-input",
                 new Dictionary<string, object?> { ["nodeId"] = buttonId, ["kind"] = "Click" })).Delivered);
             var routes =
                 Read<EventRouteInfo[]>(await client.CallToolAsync("events-routes", new Dictionary<string, object?>()));
@@ -402,27 +402,26 @@ public sealed class McpIntegrationTests
                 });
             await using var client = await CreateClientAsync();
             Assert.NotEqual(true,
-                (await client.CallToolAsync("attach-to-app",
-                    new Dictionary<string, object?> { ["pipeName"] = agent.PipeName })).IsError);
+                (await McpTestTarget.AttachAsync(client, agent.PipeName)).IsError);
             var found = Read<TreeSearchResult>(await client.CallToolAsync("search",
-                new Dictionary<string, object?> { ["query"] = "McpInput", ["kind"] = "Logical" }));
+                new Dictionary<string, object?> { ["query"] = "McpInput", }));
             var inputId = Assert.Single(found.Matches).Id;
-            var text = Read<InputResult>(await client.CallToolAsync("input",
+            var text = Read<InputResult>(await client.CallToolAsync("ui-input",
                 new Dictionary<string, object?> { ["nodeId"] = inputId, ["kind"] = "Text", ["text"] = "abc" }));
             Assert.True(text.Delivered);
             Assert.Equal("abc", input.Text);
-            Assert.True(Read<InputResult>(await client.CallToolAsync("input",
+            Assert.True(Read<InputResult>(await client.CallToolAsync("ui-input",
                     new Dictionary<string, object?> { ["nodeId"] = inputId, ["kind"] = "KeyDown", ["key"] = "Back" }))
                 .Delivered);
             Assert.Equal("ab", input.Text);
             var buttons = Read<TreeSearchResult>(await client.CallToolAsync("search",
-                new Dictionary<string, object?> { ["query"] = "McpButton", ["kind"] = "Logical" }));
+                new Dictionary<string, object?> { ["query"] = "McpButton", }));
             var buttonId = Assert.Single(buttons.Matches).Id;
             var capture = Read<ActivityStatus>(await client.CallToolAsync("activity-start",
                 new Dictionary<string, object?>
                     { ["logs"] = false, ["events"] = true, ["sourceNodeId"] = buttonId }));
             Assert.True(capture.IsRunning);
-            Assert.True(Read<InputResult>(await client.CallToolAsync("input",
+            Assert.True(Read<InputResult>(await client.CallToolAsync("ui-input",
                 new Dictionary<string, object?> { ["nodeId"] = buttonId, ["kind"] = "Click" })).Delivered);
             Assert.Equal(1, clicks);
             var activity =
@@ -450,7 +449,7 @@ public sealed class McpIntegrationTests
             [
                 "exec", "--runtimeconfig", Path.ChangeExtension(testAssembly, ".runtimeconfig.json"),
                 "--depsfile", Path.ChangeExtension(testAssembly, ".deps.json"), typeof(Program).Assembly.Location,
-                "mcp", "--profile", "extended"
+                "mcp"
             ],
             ShutdownTimeout = TimeSpan.FromSeconds(5)
         });
@@ -459,16 +458,6 @@ public sealed class McpIntegrationTests
 
     private static string Text(CallToolResult result) =>
         string.Join("\n", result.Content.OfType<TextContentBlock>().Select(item => item.Text));
-
-    private static IEnumerable<ToolTreeNode> Flatten(IEnumerable<ToolTreeNode> nodes)
-    {
-        foreach (var node in nodes)
-        {
-            yield return node;
-            foreach (var child in Flatten(node.Children))
-                yield return child;
-        }
-    }
 
     private static T Read<T>(CallToolResult result)
     {

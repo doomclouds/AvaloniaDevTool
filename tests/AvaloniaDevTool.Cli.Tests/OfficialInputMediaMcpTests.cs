@@ -125,17 +125,17 @@ public sealed class OfficialInputMediaMcpTests
             await using var agent = Attach(window);
             await using var client = await CreateClientAsync(agent.PipeName);
             var id = await Find(client, "Application.Resources");
-            var app = Read<OfficialResourceSnapshot>(await Call(client, "resources"));
-            var zero = Read<OfficialResourceSnapshot>(await Call(client, "resources", ("nodeId", 0)));
+            var app = Read<ResourceInspectionResult>(await Call(client, "resources"));
+            var zero = Read<ResourceInspectionResult>(await Call(client, "resources", ("nodeId", 0)));
             Assert.Equal(0, app.NodeId);
             Assert.Contains(app.Entries, entry => entry.StringKey == key && entry.Value == "application");
             Assert.Equal(app.Entries.Where(entry => entry.StringKey == key),
                 zero.Entries.Where(entry => entry.StringKey == key));
             Assert.DoesNotContain(app.Entries, entry => entry.StringKey == key && entry.Value == "child");
-            var all = Read<OfficialResourceSnapshot>(await Call(client, "resources", ("nodeId", id)));
+            var all = Read<ResourceInspectionResult>(await Call(client, "resources", ("nodeId", id)));
             Assert.Equal(new[] { "child", "parent", "application" },
                 all.Entries.Where(entry => entry.StringKey == key).Select(entry => entry.Value));
-            var local = Read<OfficialResourceSnapshot>(await Call(client,
+            var local = Read<ResourceInspectionResult>(await Call(client,
                 "resources",
                 ("nodeId", id),
                 ("onlySelf", true)));
@@ -170,7 +170,7 @@ public sealed class OfficialInputMediaMcpTests
         {
             await using var agent = Attach(window);
             await using var client = await CreateClientAsync(agent.PipeName);
-            var result = Read<OfficialResourceSnapshot>(await Call(client,
+            var result = Read<ResourceInspectionResult>(await Call(client,
                 "resources",
                 ("nodeId", await Find(client, "BoundedResources")),
                 ("onlySelf", true)));
@@ -192,6 +192,9 @@ public sealed class OfficialInputMediaMcpTests
     public async Task Official_assets_return_full_verified_text_image_font_and_binary_resources()
     {
         _ = Assembly.Load("Avalonia.Fonts.Inter");
+        var fontSource = AssetLoader.GetAssets(new Uri("avares://Avalonia.Fonts.Inter/"), null)
+            .Where(uri => uri.AbsolutePath.EndsWith(".ttf", StringComparison.OrdinalIgnoreCase))
+            .OrderBy(uri => uri.AbsoluteUri, StringComparer.Ordinal).First();
         var window = new Window();
         window.Show();
         try
@@ -209,10 +212,13 @@ public sealed class OfficialInputMediaMcpTests
                 item => item.Uri.Contains("AvaloniaDevTool.Cli.Tests/Assets/official-binary.bin",
                     StringComparison.OrdinalIgnoreCase));
             var font = assets.First(item => item.AssemblyName == "Avalonia.Fonts.Inter" && item.Extension == ".ttf");
-            foreach (var (asset, mime) in new[]
+            foreach (var (asset, mime, sourceUri) in new[]
                      {
-                         (text, "text/plain"), (image, "image/png"), (font, "font/ttf"),
-                         (binary, "application/octet-stream")
+                         (text, "text/plain", new Uri("avares://AvaloniaDevTool.Cli.Tests/Assets/asset-long-utf8.txt")),
+                         (image, "image/png", new Uri("avares://AvaloniaDevTool.Cli.Tests/Assets/official-pixel.png")),
+                         (font, "font/ttf", fontSource),
+                         (binary, "application/octet-stream",
+                             new Uri("avares://AvaloniaDevTool.Cli.Tests/Assets/official-binary.bin"))
                      })
             {
                 var opened = await Call(client, "open-asset", ("assetUrl", asset.Uri));
@@ -223,7 +229,7 @@ public sealed class OfficialInputMediaMcpTests
                 Assert.Equal(asset.Uri, blob.Uri);
                 Assert.Equal(mime, blob.MimeType);
                 var actual = blob.DecodedData.ToArray();
-                using var source = AssetLoader.Open(new Uri(asset.Uri));
+                using var source = AssetLoader.Open(sourceUri);
                 using var expected = new MemoryStream();
                 source.CopyTo(expected);
                 Assert.Equal(expected.ToArray(), actual);
@@ -244,9 +250,9 @@ public sealed class OfficialInputMediaMcpTests
                     Assert.True(actual.Length > 1024 * 1024);
             }
 
-            Assert.Contains("unsupported_uri",
+            Assert.Contains("invalid_asset_uri",
                 Text(await Error(client, "open-asset", ("assetUrl", "file:///C:/Windows/win.ini"))));
-            Assert.Contains("asset_not_found",
+            Assert.Contains("invalid_asset_uri",
                 Text(await Error(client, "open-asset", ("assetUrl", "avares://NotLoaded/Missing.bin"))));
             await Error(client, "open-asset", ("assetUrl", text.Uri + "?query=1"));
             await Error(client, "open-asset", ("assetUrl", text.Uri + "#fragment"));
@@ -311,8 +317,7 @@ public sealed class OfficialInputMediaMcpTests
             Arguments =
             [
                 "exec", "--runtimeconfig", Path.ChangeExtension(assembly, ".runtimeconfig.json"), "--depsfile",
-                Path.ChangeExtension(assembly, ".deps.json"), typeof(Program).Assembly.Location, "mcp", "--profile",
-                "official", "--pipe", pipe
+                Path.ChangeExtension(assembly, ".deps.json"), typeof(Program).Assembly.Location, "mcp", "--pipe", pipe
             ],
             ShutdownTimeout = TimeSpan.FromSeconds(5)
         }));

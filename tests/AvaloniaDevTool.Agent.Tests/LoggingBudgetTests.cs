@@ -27,7 +27,7 @@ public sealed class LoggingBudgetTests
                 });
             await using var client = new DiagnosticsClient();
             await client.ConnectAsync(agent.PipeName);
-            await client.StartActivityAsync(new ActivityStartRequest());
+            await client.Activity.StartActivityAsync(new ActivityStartRequest());
             var text = string.Concat(Enumerable.Repeat("中\"\\\n\u0001", 210));
             await Task.Run(() =>
             {
@@ -41,7 +41,7 @@ public sealed class LoggingBudgetTests
                                 .Select(value => new KeyValuePair<string, object?>("P" + value, text))
                         ]));
             });
-            var history = await client.GetActivityAsync();
+            var history = await client.Activity.GetActivityAsync();
             Assert.NotEmpty(history);
             Assert.Equal("47", history[^1].LogDetails!.Parameters[0].Value);
             Assert.True(JsonSerializer.SerializeToUtf8Bytes(history, ProtocolJson.Options).Length <
@@ -49,18 +49,18 @@ public sealed class LoggingBudgetTests
             Assert.All(history,
                 entry => Assert.True(JsonSerializer.SerializeToUtf8Bytes(entry, ProtocolJson.Options).Length <=
                                      ActivityService.MaximumEntryBytes));
-            var status = await client.GetActivityStatusAsync();
+            var status = await client.Activity.GetActivityStatusAsync();
             Assert.InRange(status.BufferedBytes, 1, status.ByteBudget);
             Assert.Equal(ActivityService.BufferedByteBudget, status.ByteBudget);
             Assert.True(status.ByteEvictedCount > 0);
             Assert.True(status.DroppedCount >= status.ByteEvictedCount);
             Assert.True(status.BudgetTruncatedCount > 0);
             Assert.All(history, entry => Assert.True(entry.LogDetails!.ByteBudgetTruncated));
-            Assert.NotEmpty(await client.GetRootsAsync(TreeKind.Visual));
-            await client.StopActivityAsync();
-            await client.ClearActivityAsync();
-            Assert.Empty(await client.GetActivityAsync());
-            status = await client.GetActivityStatusAsync();
+            Assert.NotEmpty(await client.Tree.GetRootsAsync(TreeKind.Visual));
+            await client.Activity.StopActivityAsync();
+            await client.Activity.ClearActivityAsync();
+            Assert.Empty(await client.Activity.GetActivityAsync());
+            status = await client.Activity.GetActivityStatusAsync();
             Assert.Equal(0, status.BufferedBytes);
             Assert.Equal(0, status.ByteEvictedCount);
             Assert.Equal(0, status.BudgetTruncatedCount);

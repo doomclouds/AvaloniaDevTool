@@ -31,7 +31,12 @@ function Get-PowerShellSignature {
             $_.Kind -notin [System.Management.Automation.Language.TokenKind]::NewLine,
             [System.Management.Automation.Language.TokenKind]::EndOfInput
         } | ForEach-Object {
-            [ordered]@{ Kind = $_.Kind.ToString(); Text = $_.Extent.Text }
+            # A continuation token includes its physical newline. CRLF -> LF is
+            # formatting, while the backtick and every string token stay checked.
+            $tokenText = if ($_.Kind -eq [System.Management.Automation.Language.TokenKind]::LineContinuation) {
+                $_.Extent.Text.Replace("`r`n", "`n")
+            } else { $_.Extent.Text }
+            [ordered]@{ Kind = $_.Kind.ToString(); Text = $tokenText }
         })
     $structure = @($syntax.FindAll({ $true }, $true) | ForEach-Object {
             $depth = 0
@@ -65,7 +70,6 @@ try {
         (Join-Path $cacheRoot 'npm'), '--package=prettier@3.9.10', '--', 'prettier')
     $prettierFiles = @(
         'docs/architecture/overview.html',
-        'src/AvaloniaDevTool.Cli/Contracts/official-input-contracts.json',
         'samples/AvaloniaDevTool.Sample/Assets/sample.json',
         'global.json',
         'dotnet-tools.json',
@@ -82,11 +86,14 @@ try {
             -TrustRepository -AcceptLicense -ErrorAction Stop
     }
     Import-Module -Name $modulePath -Force -ErrorAction Stop
-    $powerShellFiles = @((Join-Path $repository 'tests/scripts/Test-NativeAot.ps1')) + @(
-        Get-ChildItem -LiteralPath $PSScriptRoot -Recurse -File |
-            Where-Object { $_.Extension -in '.ps1', '.psd1' } |
-            Select-Object -ExpandProperty FullName
-    )
+    $powerShellFiles = @(& git -c core.quotepath=false ls-files --cached --others --exclude-standard |
+            Sort-Object -Unique |
+            Where-Object {
+                [IO.Path]::GetExtension($_) -in '.ps1', '.psd1' -and
+                $_ -notmatch '(^|/)(bin|obj|artifacts|\.git|\.codegraph)/' -and
+                (Test-Path -LiteralPath $_ -PathType Leaf)
+            } |
+            ForEach-Object { Join-Path $repository $_ })
     $different = @()
     foreach ($file in ($powerShellFiles | Sort-Object -Unique)) {
         $before = Get-Content -Raw -Encoding utf8 -LiteralPath $file

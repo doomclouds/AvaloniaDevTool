@@ -24,7 +24,7 @@ flowchart TD
     UIA --> Picker
 ```
 
-实现入口：[`Program.cs`](../../../src/AvaloniaDevTool.Cli/Hosting/Program.cs)、[`AgentTools`](../../../src/AvaloniaDevTool.Cli/Tools/AgentTools.cs)、[`OfficialTools`](../../../src/AvaloniaDevTool.Cli/Tools/OfficialTools.cs)、[`NativeAutomationSession`](../../../src/AvaloniaDevTool.NativeAutomation/Sessions/NativeAutomationSession.cs) 和 [`NativeFileDialogController`](../../../src/AvaloniaDevTool.NativeAutomation/FileDialogs/NativeFileDialogController.cs)。具体工具参数见[交互功能说明](../features/agent-interaction.md)。
+实现入口：[`Program.cs`](../../../src/Hosts/AvaloniaDevTool.Cli/Hosting/Program.cs)、[`AgentTools`](../../../src/Infrastructure/AvaloniaDevTool.Infrastructure.Mcp/Tools/CapabilityToolRegistration.cs)、[`OfficialTools`](../../../src/Infrastructure/AvaloniaDevTool.Infrastructure.Mcp/Tools/CapabilityToolRegistration.cs)、[`NativeAutomationSession`](../../../src/Infrastructure/AvaloniaDevTool.Infrastructure.Execution/Native/Sessions/NativeAutomationSession.cs) 和 [`NativeFileDialogController`](../../../src/Domain/AvaloniaDevTool.Domain/FileDialogs/NativeFileDialogController.cs)。具体工具参数见[交互功能说明](../features/agent-interaction.md)。
 
 ## 并发和模态窗口
 
@@ -61,7 +61,7 @@ Windows worker 使用 FlaUI UIA3，通过独立 UTF-8 行式 IPC 与 facade 通�
 
 核对本页时，UIA pattern、native 枚举/检查、原生文件控制器及独立 `native-input` OS 输入路径已经接线到源码。修复阶段417项和当前常规统一回归均包含OS输入业务读回和真实MCP流程；不能把UIA SetValue或framework输入冒充OS输入，未覆盖分支仍保留。
 
-OS 输入覆盖节点局部坐标上的 Click/DoubleClick/RightClick/Move/Wheel/Text/KeyChord/Drag：先验证 session、PID/start time、owner 根和节点，再激活根窗口、核对实际前台窗口；drag 目标必须在同一根，不接受任意全桌面坐标。执行前拒绝已按住的物理鼠标/修饰键，检查路径采样点未被其他根窗口遮挡；按下与释放在同一 SendInput 批次，部分投递失败时按成功count推算前缀，并尽力逐项释放仍按下项；清理再次被OS拒绝时不保证恢复状态。Unicode Text 只表示 Unicode 注入，不宣称 IME 组合输入；pointer drag 不宣称文件或数据 DragDrop。`Injected` 和 `InputCount` 是投递证据，`ApplicationEffectVerified` 默认 false。实现见 [CLI 注册](../../../src/AvaloniaDevTool.Cli/Tools/Native/AgentTools.NativeInput.cs)、[合同](../../../src/AvaloniaDevTool.NativeAutomation/Contracts/NativeAutomationContracts.cs)及 [worker 输入](../../../src/AvaloniaDevTool.NativeAutomation.Worker/Input/NativeAutomationBackend.Input.cs)。当前实际效果和未覆盖分支分别按下方固定清单及最新批次记录，清理代码存在不代表已触发OS部分投递失败。
+OS 输入覆盖节点局部坐标上的 Click/DoubleClick/RightClick/Move/Wheel/Text/KeyChord/Drag：先验证 session、PID/start time、owner 根和节点，再激活根窗口、核对实际前台窗口；drag 目标必须在同一根，不接受任意全桌面坐标。执行前拒绝已按住的物理鼠标/修饰键，检查路径采样点未被其他根窗口遮挡；按下与释放在同一 SendInput 批次，部分投递失败时按成功count推算前缀，并尽力逐项释放仍按下项；清理再次被OS拒绝时不保证恢复状态。Unicode Text 只表示 Unicode 注入，不宣称 IME 组合输入；pointer drag 不宣称文件或数据 DragDrop。`Injected` 和 `InputCount` 是投递证据，`ApplicationEffectVerified` 默认 false。实现见 [CLI 注册](../../../src/Infrastructure/AvaloniaDevTool.Infrastructure.Mcp/Tools/Capabilities/NativeAutomationTools.cs)、[合同](../../../src/Contracts/AvaloniaDevTool.Contracts/Native/NativeAutomationContracts.cs)及 [worker 输入](../../../src/Infrastructure/AvaloniaDevTool.Infrastructure.Windows/Input/NativeInputService.cs)。当前实际效果和未覆盖分支分别按下方固定清单及最新批次记录，清理代码存在不代表已触发OS部分投递失败。
 
 ## 真实文件 I/O 验收目标
 

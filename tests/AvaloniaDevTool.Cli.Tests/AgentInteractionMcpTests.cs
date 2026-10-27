@@ -316,10 +316,10 @@ public sealed class AgentInteractionMcpTests
             RoutingStrategies.Bubble,
             handledEventsToo: true);
         Assert.NotEqual(true, (await Call(client, "detach")).IsError);
-        var apps = Read<OfficialAttachmentResult>(await Call(client, "attach-to-app"));
+        var apps = Read<ApplicationAttachmentResult>(await Call(client, "attach-to-app"));
         var application = Assert.Single(apps.Applications, app => app.PipeName == agent.PipeName);
         Assert.True(
-            Read<OfficialAttachmentResult>(await Call(client, "attach-to-app", ("id", application.Id))).Attached);
+            Read<ApplicationAttachmentResult>(await Call(client, "attach-to-app", ("id", application.Id))).Attached);
         var newButton = await Find(client, button.Name!);
         var newTarget = await Find(client, target.Name!);
         Assert.NotEqual(oldButton, newButton);

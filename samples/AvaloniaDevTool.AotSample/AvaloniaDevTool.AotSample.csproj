@@ -9,6 +9,6 @@
             Version="$(AvaloniaVersion)" />
         <PackageReference Include="Avalonia.Themes.Simple"
             Version="$(AvaloniaVersion)" />
-        <ProjectReference Include="../../src/AvaloniaDevTool.Agent/AvaloniaDevTool.Agent.csproj" />
+        <ProjectReference Include="../../src/SDK/AvaloniaDevTool.Agent/AvaloniaDevTool.Agent.csproj" />
     </ItemGroup>
 </Project>

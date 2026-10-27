@@ -15,7 +15,7 @@ namespace AvaloniaDevTool.Cli.Tests;
 public sealed class TreePagingMcpTests
 {
     [AvaloniaFact]
-    public async Task Stdio_direct_child_pages_expose_large_branches_continuations_changes_and_recursive_truncation()
+    public async Task Stdio_direct_child_pages_expose_large_branches_continuations_and_changes()
     {
         var panel = new StackPanel { Name = "McpPagedPanel" };
         var target = new Window { Content = panel };
@@ -26,14 +26,13 @@ public sealed class TreePagingMcpTests
         {
             await using var agent = Attach(target);
             await using var client = await CreateClientAsync();
-            Read<SessionInfo>(await client.CallToolAsync("attach-to-app",
-                new Dictionary<string, object?> { ["pipeName"] = agent.PipeName }));
+            Read<ApplicationAttachmentResult>(await McpTestTarget.AttachAsync(client, agent.PipeName));
             var tools = await client.ListToolsAsync();
             Assert.Contains(tools, tool => tool.Name == "tree-children");
             Assert.Contains(tools, tool => tool.Name == "template-parent-selector");
             var node = Assert.Single(Read<TreeSearchResult>(await client.CallToolAsync("search",
                 new Dictionary<string, object?>
-                    { ["query"] = "McpPagedPanel", ["kind"] = "Logical" })).Matches);
+                    { ["query"] = "McpPagedPanel", })).Matches);
             var page = Read<TreeChildrenPage>(await client.CallToolAsync("tree-children",
                 new Dictionary<string, object?>
                     { ["nodeId"] = node.Id, ["kind"] = "Logical", ["count"] = 1000 }));
@@ -54,24 +53,17 @@ public sealed class TreePagingMcpTests
 
             Assert.Equal(2305, all.Count);
             Assert.Equal(2305, all.Select(child => child.Id).Distinct().Count());
-            var pagedTree = Read<ToolTreeSnapshot>(await client.CallToolAsync("tree",
+            var pagedTree = Read<TreeChildrenPage>(await client.CallToolAsync("tree-children",
                 new Dictionary<string, object?>
                     { ["nodeId"] = node.Id, ["kind"] = "Logical", ["offset"] = 2300, ["count"] = 3 }));
-            Assert.Equal(2300, pagedTree.Page!.Offset);
-            Assert.True(pagedTree.Truncated);
-            Assert.True(pagedTree.Page.HasMore);
+            Assert.Equal(2300, pagedTree.Offset);
+            Assert.True(pagedTree.HasMore);
             Assert.Equal(all.Skip(2300).Take(3).Select(child => child.Id),
-                pagedTree.Roots.Single().Children.Select(child => child.Node.Id));
-            var recursive = Read<ToolTreeSnapshot>(await client.CallToolAsync("tree",
-                new Dictionary<string, object?>
-                    { ["nodeId"] = node.Id, ["kind"] = "Logical", ["maxNodes"] = 5, ["depth"] = -1 }));
-            Assert.True(recursive.Truncated);
-            Assert.Equal(5, recursive.Visited);
-            Assert.Null(recursive.Page);
+                pagedTree.Children.Select(child => child.Id));
             panel.Children.Add(new Border());
             var stale = await client.CallToolAsync("tree-children",
                 new Dictionary<string, object?>
-                    { ["nodeId"] = node.Id, ["kind"] = "Logical", ["cursor"] = pagedTree.Page.NextCursor });
+                    { ["nodeId"] = node.Id, ["kind"] = "Logical", ["cursor"] = pagedTree.NextCursor });
             Assert.True(stale.IsError);
             Assert.Contains("cursor_invalidated", Text(stale));
             var invalid = await client.CallToolAsync("tree-children",
@@ -104,11 +96,10 @@ public sealed class TreePagingMcpTests
         {
             await using var agent = Attach(target);
             await using var client = await CreateClientAsync();
-            Read<SessionInfo>(await client.CallToolAsync("attach-to-app",
-                new Dictionary<string, object?> { ["pipeName"] = agent.PipeName }));
+            Read<ApplicationAttachmentResult>(await McpTestTarget.AttachAsync(client, agent.PipeName));
             var part = Assert.Single(Read<TreeSearchResult>(await client.CallToolAsync("search",
                 new Dictionary<string, object?>
-                    { ["query"] = "McpTemplatePart", ["kind"] = "Merged" })).Matches);
+                    { ["query"] = "McpTemplatePart", ["searchTemplates"] = true })).Matches);
             var partSelector = Read<ElementSelectorResult>(await client.CallToolAsync("element-selector",
                 new Dictionary<string, object?> { ["nodeId"] = part.Id }));
             var ownerSelector = Read<TemplateParentSelectorResult>(
@@ -138,7 +129,10 @@ public sealed class TreePagingMcpTests
 
     private static DiagnosticsAgent Attach(Window target) => DiagnosticsAgent.Attach(Application.Current!,
         new DiagnosticsAgentOptions
-            { PipeName = "tree-pages-mcp-" + Guid.NewGuid().ToString("N"), TopLevelProvider = () => [target] });
+        {
+            PipeName = DiagnosticsProtocol.PipePrefix + "tree-pages-mcp-" + Guid.NewGuid().ToString("N"),
+            TopLevelProvider = () => [target]
+        });
 
     private static Task<McpClient> CreateClientAsync()
     {
@@ -149,8 +143,7 @@ public sealed class TreePagingMcpTests
             Arguments =
             [
                 "exec", "--runtimeconfig", Path.ChangeExtension(assembly, ".runtimeconfig.json"), "--depsfile",
-                Path.ChangeExtension(assembly, ".deps.json"), typeof(Program).Assembly.Location, "mcp", "--profile",
-                "extended"
+                Path.ChangeExtension(assembly, ".deps.json"), typeof(Program).Assembly.Location, "mcp"
             ],
             ShutdownTimeout = TimeSpan.FromSeconds(5)
         }));

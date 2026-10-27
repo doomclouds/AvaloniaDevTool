@@ -23,16 +23,27 @@ namespace AvaloniaDevTool.Cli.Tests;
 
 public sealed class HttpMcpIntegrationTests
 {
-    private static readonly string[] AgentToolNames =
+    internal static readonly string[] ExecutionToolNames =
     [
-        "attach-to-app", "attach-to-file", "detach", "tree", "ancestors", "search", "props", "set-prop",
-        "styles", "pseudo-class", "resources", "assets", "open-asset", "screenshot", "input", "action",
-        "ui-input", "ui-click", "ui-key-chord", "ui-drag", "ui-text-selection", "ui-select-item",
-        "ui-control-action", "ui-wait", "ui-screenshot", "native-windows", "native-tree", "native-find",
-        "native-inspect", "native-action", "native-action-status", "native-input", "native-screenshot",
-        "file-dialogs", "file-dialog-inspect", "file-dialog-set-paths", "file-dialog-set-filter",
-        "file-dialog-accept", "file-dialog-cancel", "file-dialog-overwrite", "file-dialog-wait",
-        "capture-start", "capture-status", "capture-stop"
+        "action", "activity", "activity-start", "activity-stop", "ancestors",
+        "assets", "attach-to-app", "attach-to-file", "breakpoint-create",
+        "breakpoint-remove", "breakpoint-update", "breakpoints", "capture-start", "capture-status",
+        "capture-stop", "composition", "detach", "element-metadata", "element-selector",
+        "events-catalog", "events-routes", "events-start", "events-status", "export-asset",
+        "file-dialog-accept", "file-dialog-cancel", "file-dialog-inspect", "file-dialog-overwrite",
+        "file-dialog-set-filter",
+        "file-dialog-set-paths", "file-dialog-wait", "file-dialogs", "follow-focus", "input",
+        "layout", "metrics", "metrics-clear", "metrics-start", "metrics-stop",
+        "native-action", "native-action-status", "native-find", "native-input", "native-inspect",
+        "native-screenshot", "native-tree", "native-windows", "object", "open-asset",
+        "overlay", "overlay-clear", "overlay-set", "popup-freeze", "popup-freeze-resume",
+        "popup-freeze-set", "profiler", "profiler-clear", "profiler-start", "profiler-stop",
+        "props", "pseudo-class", "renderer-diagnostics", "renderer-diagnostics-set", "renderer-diagnostics-stop",
+        "reset-resource", "resource-entry", "resource-query", "resource-tree", "resources",
+        "screenshot", "search", "set-brush", "set-prop", "set-resource",
+        "styles", "template-parent-selector", "tree", "tree-children", "tree-release",
+        "ui-click", "ui-control-action", "ui-drag", "ui-input", "ui-key-chord",
+        "ui-screenshot", "ui-select-item", "ui-text-selection", "ui-wait"
     ];
 
     private static string CliPath => typeof(HttpMcpIntegrationTests).Assembly
@@ -58,13 +69,13 @@ public sealed class HttpMcpIntegrationTests
             var client = connection.Client;
 
             var catalog = await client.ListToolsAsync(cancellationToken: token);
-            Assert.Equal(AgentToolNames.Order(StringComparer.Ordinal),
+            Assert.Equal(ExecutionToolNames.Order(StringComparer.Ordinal),
                 catalog.Select(tool => tool.Name).Order(StringComparer.Ordinal));
             Assert.False(string.IsNullOrWhiteSpace(client.SessionId));
             var sessionId = client.SessionId;
             await AttachAsync(client, agent.PipeName, token);
 
-            var tree = Read<OfficialTreeSnapshot>(await Call(client, "tree", token, ("depth", -1)));
+            var tree = Read<ControlTreeSnapshot>(await Call(client, "tree", token, ("depth", -1)));
             var textId = Assert.Single(tree.Entries, entry => entry.Node.Name == text.Name).Node.Id;
             var pixelId = Assert.Single(tree.Entries, entry => entry.Node.Name == pixels.Name).Node.Id;
             Assert.Equal("http baseline", await TextPropertyAsync(client, textId, token));
@@ -104,7 +115,7 @@ public sealed class HttpMcpIntegrationTests
             var detached = await Call(client, "props", token, ("nodeId", textId));
             Error(detached, "not_connected");
             Assert.Equal(sessionId, client.SessionId);
-            Assert.Equal(44, (await client.ListToolsAsync(cancellationToken: token)).Count);
+            Assert.Equal(ExecutionToolNames.Length, (await client.ListToolsAsync(cancellationToken: token)).Count);
         }
         finally
         {
@@ -129,7 +140,8 @@ public sealed class HttpMcpIntegrationTests
             Assert.False(string.IsNullOrWhiteSpace(first.Client.SessionId));
             Assert.False(string.IsNullOrWhiteSpace(second.Client.SessionId));
             Assert.NotEqual(first.Client.SessionId, second.Client.SessionId);
-            Assert.Equal(44, (await second.Client.ListToolsAsync(cancellationToken: token)).Count);
+            Assert.Equal(ExecutionToolNames.Length,
+                (await second.Client.ListToolsAsync(cancellationToken: token)).Count);
             var secondTargetId = await DiscoverAsync(second.Client, agent.PipeName, token);
             Assert.False(agent.IsConnected);
 
@@ -146,7 +158,8 @@ public sealed class HttpMcpIntegrationTests
             Error(await Call(second.Client, "attach-to-app", token, ("id", secondTargetId)), "controller_busy");
             Error(await Call(second.Client, "tree", token), "controller_busy");
             Assert.Equal("first owner", text.Text);
-            Assert.Equal(44, (await second.Client.ListToolsAsync(cancellationToken: token)).Count);
+            Assert.Equal(ExecutionToolNames.Length,
+                (await second.Client.ListToolsAsync(cancellationToken: token)).Count);
             Assert.Equal(secondTargetId, await DiscoverAsync(second.Client, agent.PipeName, token));
 
             var firstSessionId = first.Client.SessionId;
@@ -203,27 +216,6 @@ public sealed class HttpMcpIntegrationTests
         }
     }
 
-    [Theory]
-    [InlineData("official", 16)]
-    [InlineData("extended", 62)]
-    public async Task Historical_profiles_remain_stdio_only(string profile, int expectedTools)
-    {
-        using var timeout = TestTimeout();
-        var token = timeout.Token;
-        await using (var stdio = await McpClient.CreateAsync(new StdioClientTransport(new StdioClientTransportOptions
-                         {
-                             Command = "dotnet", Arguments = [CliPath, "mcp", "--profile", profile],
-                             Name = "HTTP profile boundary", ShutdownTimeout = TimeSpan.FromSeconds(5)
-                         }),
-                         cancellationToken: token))
-            Assert.Equal(expectedTools, (await stdio.ListToolsAsync(cancellationToken: token)).Count);
-
-        await using var rejected = HttpHost.StartProcess(null, profile);
-        await rejected.Process.WaitForExitAsync(token).WaitAsync(TimeSpan.FromSeconds(15), token);
-        Assert.Equal(2, rejected.Process.ExitCode);
-        Assert.Contains("profile", (await rejected.Errors).ToLowerInvariant());
-    }
-
     private static CancellationTokenSource TestTimeout()
     {
         var timeout = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
@@ -241,7 +233,7 @@ public sealed class HttpMcpIntegrationTests
 
     private static async Task<long> DiscoverAsync(McpClient client, string pipe, CancellationToken token)
     {
-        var listed = Read<OfficialAttachmentResult>(await Call(client, "attach-to-app", token));
+        var listed = Read<ApplicationAttachmentResult>(await Call(client, "attach-to-app", token));
         Assert.False(listed.Attached);
         return Assert.Single(listed.Applications, application => application.PipeName == pipe).Id;
     }
@@ -249,7 +241,7 @@ public sealed class HttpMcpIntegrationTests
     private static async Task AttachAsync(McpClient client, string pipe, CancellationToken token)
     {
         var id = await DiscoverAsync(client, pipe, token);
-        var attached = Read<OfficialAttachmentResult>(await Call(client, "attach-to-app", token, ("id", id)));
+        var attached = Read<ApplicationAttachmentResult>(await Call(client, "attach-to-app", token, ("id", id)));
         Assert.True(attached.Attached);
         Assert.Equal(Environment.ProcessId, attached.Session!.ProcessId);
     }
@@ -387,7 +379,6 @@ public sealed class HttpMcpIntegrationTests
         }
 
         public static HttpHost StartProcess(string? pipe,
-            string? profile = null,
             IReadOnlyDictionary<string, string>? environment = null)
         {
             var listener = new TcpListener(IPAddress.Loopback, 0);
@@ -406,15 +397,18 @@ public sealed class HttpMcpIntegrationTests
             Directory.CreateDirectory(directory);
             try
             {
-                var start = new ProcessStartInfo("dotnet")
+                var executable = Environment.GetEnvironmentVariable("AVDT_TEST_CLI_EXECUTABLE");
+                var start = new ProcessStartInfo(executable ?? "dotnet")
                 {
                     UseShellExecute = false, CreateNoWindow = true, WindowStyle = ProcessWindowStyle.Hidden,
                     RedirectStandardOutput = true, RedirectStandardError = true, WorkingDirectory = directory,
                     StandardOutputEncoding = Encoding.UTF8, StandardErrorEncoding = Encoding.UTF8
                 };
+                if (executable is null)
+                    start.ArgumentList.Add(CliPath);
                 foreach (var argument in new[]
                          {
-                             CliPath, "mcp", "--transport", "http", "--listen", "127.0.0.1", "--port",
+                             "serve", "--listen", "127.0.0.1", "--port",
                              port.ToString(System.Globalization.CultureInfo.InvariantCulture)
                          })
                     start.ArgumentList.Add(argument);
@@ -422,12 +416,6 @@ public sealed class HttpMcpIntegrationTests
                 {
                     start.ArgumentList.Add("--pipe");
                     start.ArgumentList.Add(pipe);
-                }
-
-                if (profile is not null)
-                {
-                    start.ArgumentList.Add("--profile");
-                    start.ArgumentList.Add(profile);
                 }
 
                 if (environment is not null)

@@ -26,24 +26,24 @@ public sealed class RemoteIntegrationTests
         await client.ConnectRemoteAsync(target.Server.Endpoint, target.Token);
         Assert.Equal(DiagnosticsProtocol.Version, client.Session!.ProtocolVersion);
         var firstSession = client.Session.SessionId;
-        var root = Assert.Single(await client.GetRootsAsync(TreeKind.Logical));
-        var node = (await client.GetChildrenAsync(root.Id, TreeKind.Logical)).Single(value =>
+        var root = Assert.Single(await client.Tree.GetRootsAsync(TreeKind.Logical));
+        var node = (await client.Tree.GetChildrenAsync(root.Id, TreeKind.Logical)).Single(value =>
             value.Name == "RemoteMessage");
-        var property = (await client.GetPropertiesAsync(node.Id)).Single(value => value.Name == "Text");
+        var property = (await client.Properties.GetPropertiesAsync(node.Id)).Single(value => value.Name == "Text");
         Assert.Equal("Original", property.Value);
         var changed = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-        client.PropertiesChanged += _ => changed.TrySetResult();
-        await client.SetPropertyAsync(node.Id, property.Id, "Remote edit");
+        client.Properties.PropertiesChanged += _ => changed.TrySetResult();
+        await client.Properties.SetPropertyAsync(node.Id, property.Id, "Remote edit");
         Assert.Equal("Remote edit", target.Text.Text);
         await changed.Task.WaitAsync(TimeSpan.FromSeconds(5));
-        Assert.Contains(await client.GetPropertiesAsync(node.Id),
+        Assert.Contains(await client.Properties.GetPropertiesAsync(node.Id),
             value => value.Name == "Text" && value.Value == "Remote edit");
         await client.DisconnectAsync();
         await WaitUntilAsync(() => !target.Agent.IsConnected);
         Assert.Equal("Original", target.Text.Text);
         await client.ConnectRemoteAsync(target.Server.Endpoint, target.Token);
         Assert.NotEqual(firstSession, client.Session!.SessionId);
-        Assert.Single(await client.GetRootsAsync(TreeKind.Visual));
+        Assert.Single(await client.Tree.GetRootsAsync(TreeKind.Visual));
     }
 
     [AvaloniaFact]
@@ -84,16 +84,16 @@ public sealed class RemoteIntegrationTests
         await using var remote = new DiagnosticsClient();
         await Assert.ThrowsAsync<WebSocketException>(() =>
             remote.ConnectRemoteAsync(target.Server.Endpoint, target.Token));
-        Assert.Single(await pipeClient.GetRootsAsync(TreeKind.Logical));
+        Assert.Single(await pipeClient.Tree.GetRootsAsync(TreeKind.Logical));
         await pipeClient.DisconnectAsync();
         await WaitUntilAsync(() => !target.Agent.IsConnected);
         await remote.ConnectRemoteAsync(target.Server.Endpoint, target.Token);
         await Assert.ThrowsAnyAsync<Exception>(() => pipeClient.ConnectAsync(target.Agent.PipeName));
-        Assert.Single(await remote.GetRootsAsync(TreeKind.Logical));
+        Assert.Single(await remote.Tree.GetRootsAsync(TreeKind.Logical));
         await remote.DisconnectAsync();
         await WaitUntilAsync(() => !target.Agent.IsConnected);
         await pipeClient.ConnectAsync(target.Agent.PipeName);
-        Assert.Single(await pipeClient.GetRootsAsync(TreeKind.Logical));
+        Assert.Single(await pipeClient.Tree.GetRootsAsync(TreeKind.Logical));
     }
 
     [AvaloniaTheory]
@@ -118,7 +118,7 @@ public sealed class RemoteIntegrationTests
         await WaitUntilAsync(() => !target.Agent.IsConnected);
         await using var client = new DiagnosticsClient();
         await client.ConnectRemoteAsync(target.Server.Endpoint, target.Token);
-        Assert.Single(await client.GetRootsAsync(TreeKind.Logical));
+        Assert.Single(await client.Tree.GetRootsAsync(TreeKind.Logical));
     }
 
     [AvaloniaFact]
@@ -161,7 +161,7 @@ public sealed class RemoteIntegrationTests
         await Assert.ThrowsAsync<WebSocketException>(() =>
             socket.ConnectAsync(target.Server.Endpoint, CancellationToken.None));
         await client.ConnectAsync(target.Agent.PipeName);
-        Assert.Single(await client.GetRootsAsync(TreeKind.Logical));
+        Assert.Single(await client.Tree.GetRootsAsync(TreeKind.Logical));
     }
 
     [AvaloniaFact]

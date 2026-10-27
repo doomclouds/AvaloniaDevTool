@@ -143,7 +143,9 @@ internal static class NativeFileFilterTimingFixture
             else if (root == Id("dialog"))
             {
                 nodes = DialogTree();
-                truncated = ++_dialogReads == configuration.TruncatedDialogRead;
+                _dialogReads++;
+                // Negative selects a persistent incomplete provider response for polling tests.
+                truncated = configuration.TruncatedDialogRead < 0 || _dialogReads == configuration.TruncatedDialogRead;
                 if (truncated)
                     _truncatedDialogReads++;
             }
@@ -252,7 +254,7 @@ internal static class NativeFileFilterTimingFixture
             {
                 actions = _actions, comboReads = _comboReads, open = _open,
                 filterValue = _filterValue, actionStatusReads = _actionStatusReads, dialogReads = _dialogReads,
-                truncatedDialogReads = _truncatedDialogReads
+                truncatedDialogReads = _truncatedDialogReads, fileName = _filename
             });
 
         private void WriteState(string filename, object value)

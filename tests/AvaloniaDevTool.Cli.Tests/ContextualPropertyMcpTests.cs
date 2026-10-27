@@ -14,7 +14,7 @@ namespace AvaloniaDevTool.Cli.Tests;
 public sealed class ContextualPropertyMcpTests
 {
     [AvaloniaFact]
-    public async Task Stdio_props_context_filter_and_explicit_CLR_opt_in_preserve_legacy_defaults()
+    public async Task Stdio_props_context_filter_and_explicit_CLR_opt_in_leave_CLR_getters_opt_in()
     {
         var probe = new Probe { Name = "McpContextTarget" };
         Grid.SetRow(probe, 2);
@@ -24,7 +24,10 @@ public sealed class ContextualPropertyMcpTests
         {
             await using var agent = DiagnosticsAgent.Attach(Application.Current!,
                 new DiagnosticsAgentOptions
-                    { PipeName = "context-mcp-" + Guid.NewGuid().ToString("N"), TopLevelProvider = () => [window] });
+                {
+                    PipeName = DiagnosticsProtocol.PipePrefix + "context-mcp-" + Guid.NewGuid().ToString("N"),
+                    TopLevelProvider = () => [window]
+                });
             var assembly = typeof(ContextualPropertyMcpTests).Assembly.Location;
             await using var client = await McpClient.CreateAsync(new StdioClientTransport(
                 new StdioClientTransportOptions
@@ -33,16 +36,14 @@ public sealed class ContextualPropertyMcpTests
                     Arguments =
                     [
                         "exec", "--runtimeconfig", Path.ChangeExtension(assembly, ".runtimeconfig.json"), "--depsfile",
-                        Path.ChangeExtension(assembly, ".deps.json"), typeof(Program).Assembly.Location, "mcp",
-                        "--profile", "extended"
+                        Path.ChangeExtension(assembly, ".deps.json"), typeof(Program).Assembly.Location, "mcp"
                     ],
                     ShutdownTimeout = TimeSpan.FromSeconds(5)
                 }));
             Assert.NotEqual(true,
-                (await client.CallToolAsync("attach-to-app",
-                    new Dictionary<string, object?> { ["pipeName"] = agent.PipeName })).IsError);
+                (await McpTestTarget.AttachAsync(client, agent.PipeName)).IsError);
             var found = Read<TreeSearchResult>(await client.CallToolAsync("search",
-                new Dictionary<string, object?> { ["query"] = probe.Name, ["kind"] = "Logical" }));
+                new Dictionary<string, object?> { ["query"] = probe.Name, }));
             var id = Assert.Single(found.Matches).Id;
             var all = Read<PropertyInfoDto[]>(await client.CallToolAsync("props",
                 new Dictionary<string, object?> { ["nodeId"] = id, ["propertyNames"] = new[] { "Row", "LazyClr" } }));

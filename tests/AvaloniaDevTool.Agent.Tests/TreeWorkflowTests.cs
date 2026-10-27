@@ -23,22 +23,22 @@ public sealed class TreeWorkflowTests
     {
         var panel = new StackPanel { Name = "ObservedPanel", Children = { new TextBlock { Name = "First" } } };
         await using var target = await Target.CreateAsync(panel);
-        var node = (await target.Client.SearchTreeAsync(new("ObservedPanel", TreeKind.Visual))).Matches.Single();
-        await target.Client.GetChildrenAsync(node.Id, TreeKind.Visual);
+        var node = (await target.Client.Tree.SearchTreeAsync(new("ObservedPanel", TreeKind.Visual))).Matches.Single();
+        await target.Client.Tree.GetChildrenAsync(node.Id, TreeKind.Visual);
         var invalidations = 0;
-        target.Client.TreeInvalidated += change =>
+        target.Client.Tree.TreeInvalidated += change =>
         {
             if (change.ParentId == node.Id)
                 Interlocked.Increment(ref invalidations);
         };
         panel.Children.Add(new TextBlock { Name = "Second" });
         await WaitUntilAsync(() => Volatile.Read(ref invalidations) > 0);
-        await target.Client.ReleaseTreeAsync([node.Id], TreeKind.Visual);
+        await target.Client.Tree.ReleaseTreeAsync([node.Id], TreeKind.Visual);
         var releasedCount = Volatile.Read(ref invalidations);
         panel.Children.Add(new TextBlock { Name = "Third" });
         await Task.Delay(400);
         Assert.Equal(releasedCount, Volatile.Read(ref invalidations));
-        Assert.Equal(3, (await target.Client.GetChildrenAsync(node.Id, TreeKind.Visual)).Count);
+        Assert.Equal(3, (await target.Client.Tree.GetChildrenAsync(node.Id, TreeKind.Visual)).Count);
         panel.Children.RemoveAt(0);
         await WaitUntilAsync(() => Volatile.Read(ref invalidations) > releasedCount);
     }
@@ -50,17 +50,19 @@ public sealed class TreeWorkflowTests
             await Target.CreateAsync(new Border { Name = "OverlayTarget", Width = 100, Height = 50 });
         var layer = Assert.IsType<AdornerLayer>(AdornerLayer.GetAdornerLayer(target.Window));
         target.Window.UpdateLayout();
-        var element = (await target.Client.SearchTreeAsync(new("OverlayTarget", TreeKind.Visual))).Matches.Single();
-        var layerNode = (await target.Client.SearchTreeAsync(new("AdornerLayer", TreeKind.Visual))).Matches.Single();
-        await target.Client.GetChildrenAsync(layerNode.Id, TreeKind.Visual);
+        var element = (await target.Client.Tree.SearchTreeAsync(new("OverlayTarget", TreeKind.Visual))).Matches
+            .Single();
+        var layerNode =
+            (await target.Client.Tree.SearchTreeAsync(new("AdornerLayer", TreeKind.Visual))).Matches.Single();
+        await target.Client.Tree.GetChildrenAsync(layerNode.Id, TreeKind.Visual);
         var invalidations = 0;
-        target.Client.TreeInvalidated += change =>
+        target.Client.Tree.TreeInvalidated += change =>
         {
             if (change.ParentId == layerNode.Id)
                 Interlocked.Increment(ref invalidations);
         };
-        await target.Client.HighlightAsync(element.Id);
-        await target.Client.HighlightAsync(null);
+        await target.Client.Selection.HighlightAsync(element.Id);
+        await target.Client.Selection.HighlightAsync(null);
         await Task.Delay(300);
         Assert.Equal(0, Volatile.Read(ref invalidations));
         var businessChild = new Border { Name = "ApplicationAdorner" };
@@ -102,15 +104,16 @@ public sealed class TreeWorkflowTests
                 });
             await using var client = new DiagnosticsClient();
             await client.ConnectAsync(agent.PipeName);
-            var panelNode = (await client.SearchTreeAsync(new("RemovedRootPanel", TreeKind.Logical))).Matches.Single();
-            await client.GetChildrenAsync(panelNode.Id, TreeKind.Logical);
-            await client.GetPropertiesAsync(panelNode.Id);
-            Assert.Equal(1, (await client.ReleaseTreeAsync([], TreeKind.Logical)).ObservedBranches);
+            var panelNode = (await client.Tree.SearchTreeAsync(new("RemovedRootPanel", TreeKind.Logical))).Matches
+                .Single();
+            await client.Tree.GetChildrenAsync(panelNode.Id, TreeKind.Logical);
+            await client.Properties.GetPropertiesAsync(panelNode.Id);
+            Assert.Equal(1, (await client.Tree.ReleaseTreeAsync([], TreeKind.Logical)).ObservedBranches);
             includeRoot = false;
-            Assert.Empty(await client.GetRootsAsync(TreeKind.Logical));
-            Assert.Equal(0, (await client.ReleaseTreeAsync([], TreeKind.Logical)).ObservedBranches);
+            Assert.Empty(await client.Tree.GetRootsAsync(TreeKind.Logical));
+            Assert.Equal(0, (await client.Tree.ReleaseTreeAsync([], TreeKind.Logical)).ObservedBranches);
             var notified = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-            client.PropertiesChanged += change =>
+            client.Properties.PropertiesChanged += change =>
             {
                 if (change.ObjectId == panelNode.Id)
                     notified.TrySetResult();
@@ -134,30 +137,31 @@ public sealed class TreeWorkflowTests
         var badName = new TextBlock { Name = "unsafe.name" };
         var panel = new StackPanel { Children = { first, duplicate, templated, badName } };
         await using var target = await Target.CreateAsync(panel);
-        var all = (await target.Client.SearchTreeAsync(new("", TreeKind.Visual, MaxResults: 500))).Matches;
+        var all = (await target.Client.Tree.SearchTreeAsync(new("", TreeKind.Visual, MaxResults: 500))).Matches;
         var selected = all.Single(node => node.Name == "StablePart");
-        var selector = await target.Client.GetElementSelectorAsync(selected.Id);
+        var selector = await target.Client.Tree.GetElementSelectorAsync(selected.Id);
         Assert.True(selector.Supported, selector.Detail);
         Assert.Equal("TextBlock#StablePart.primary", selector.Selector);
         Assert.True(selector.IsUnique);
-        var metadata = await target.Client.GetElementMetadataAsync(selected.Id);
+        var metadata = await target.Client.Tree.GetElementMetadataAsync(selected.Id);
         Assert.Equal(target.Client.Session!.SessionId, metadata.SessionId);
         Assert.Equal(selected.Id, metadata.ObjectId);
         Assert.Equal(["primary"], metadata.Classes);
         var anonymous = all.First(node => node.TypeName == typeof(TextBlock).FullName && node.Name is null);
-        var ambiguous = await target.Client.GetElementSelectorAsync(anonymous.Id);
+        var ambiguous = await target.Client.Tree.GetElementSelectorAsync(anonymous.Id);
         Assert.True(ambiguous.Supported, ambiguous.Detail);
         Assert.False(ambiguous.IsUnique);
         Assert.True(ambiguous.MatchCount >= 2);
         var chrome = all.Single(node => node.Name == "Chrome");
-        var templateSelector = await target.Client.GetElementSelectorAsync(chrome.Id);
+        var templateSelector = await target.Client.Tree.GetElementSelectorAsync(chrome.Id);
         Assert.True(templateSelector.Supported, templateSelector.Detail);
         Assert.Contains("/template/", templateSelector.Selector);
         Assert.True(templateSelector.IsUnique);
-        Assert.False((await target.Client.GetElementSelectorAsync(all.Single(node => node.Name == "unsafe.name").Id))
+        Assert.False(
+            (await target.Client.Tree.GetElementSelectorAsync(all.Single(node => node.Name == "unsafe.name").Id))
             .Supported);
         first.Classes.Add("unsafe.class");
-        Assert.False((await target.Client.GetElementSelectorAsync(selected.Id)).Supported);
+        Assert.False((await target.Client.Tree.GetElementSelectorAsync(selected.Id)).Supported);
     }
 
     [AvaloniaFact]
@@ -171,8 +175,9 @@ public sealed class TreeWorkflowTests
         Assert.Equal(0, scroll.Offset.Y);
         using var before = Capture(target.Window);
         Assert.Equal(0, RedPixels(before));
-        var node = (await target.Client.SearchTreeAsync(new("BelowViewport", TreeKind.Visual))).Matches.Single();
-        Assert.True((await target.Client.PerformElementActionAsync(node.Id, ElementAction.BringIntoView)).Succeeded);
+        var node = (await target.Client.Tree.SearchTreeAsync(new("BelowViewport", TreeKind.Visual))).Matches.Single();
+        Assert.True((await target.Client.Input.PerformElementActionAsync(node.Id, ElementAction.BringIntoView))
+            .Succeeded);
         await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Background);
         target.Window.UpdateLayout();
         Assert.True(scroll.Offset.Y > 700, $"Scroll offset was {scroll.Offset.Y}.");

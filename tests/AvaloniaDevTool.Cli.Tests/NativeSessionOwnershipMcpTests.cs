@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using AvaloniaDevTool.Cli.Catalog;
 using AvaloniaDevTool.NativeAutomation;
 using AvaloniaDevTool.Protocol;
 using Microsoft.Win32.SafeHandles;
@@ -113,9 +114,10 @@ public sealed class NativeSessionOwnershipMcpTests
 
     private static async Task AttachAsync(StdioMcp mcp, SampleProcess sample)
     {
-        var applications = (await mcp.CallAsync("attach-to-app")).Read<OfficialAttachmentResult>();
+        var applications = (await mcp.CallAsync("attach-to-app")).Read<ApplicationAttachmentResult>();
         var application = Assert.Single(applications.Applications, candidate => candidate.PipeName == sample.PipeName);
-        var attached = (await mcp.CallAsync("attach-to-app", ("id", application.Id))).Read<OfficialAttachmentResult>();
+        var attached =
+            (await mcp.CallAsync("attach-to-app", ("id", application.Id))).Read<ApplicationAttachmentResult>();
         Assert.True(attached.Attached);
         Assert.Equal(sample.Identity.ProcessId, attached.Session!.ProcessId);
     }
@@ -276,12 +278,13 @@ public sealed class NativeSessionOwnershipMcpTests
                 "mcp"));
             try
             {
-                await owner.RequestAsync("initialize",
+                var initialized = await owner.RequestAsync("initialize",
                     new
                     {
-                        protocolVersion = "2025-06-18", capabilities = new { },
+                        protocolVersion = ExecutionProtocol.Version, capabilities = new { },
                         clientInfo = new { name = "Native session ownership MCP tests", version = "1" }
                     });
+                Assert.Equal(ExecutionProtocol.Version, initialized.GetProperty("protocolVersion").GetString());
                 await owner.WriteAsync(new { jsonrpc = "2.0", method = "notifications/initialized" });
                 return owner;
             }
@@ -326,12 +329,24 @@ public sealed class NativeSessionOwnershipMcpTests
         {
             AssertRunning(owned.Identity);
             var children = SnapshotChildren(owned.Identity.ProcessId);
-            var child = Assert.Single(children,
-                entry => string.Equals(entry.ExecutableFile, "dotnet.exe", StringComparison.OrdinalIgnoreCase));
+            var workerDirectory = Path.Combine(Path.GetDirectoryName(Metadata("PreviewCliPath"))!, "native-worker");
+            var executable = Path.Combine(workerDirectory, "AvaloniaDevTool.NativeAutomation.Worker.exe");
+            var usesAppHost = File.Exists(executable);
+            var expectedName = usesAppHost ? Path.GetFileName(executable) : "dotnet.exe";
+            var matches = children.Where(entry => string.Equals(entry.ExecutableFile,
+                expectedName,
+                StringComparison.OrdinalIgnoreCase)).ToArray();
+            Assert.True(matches.Length == 1,
+                $"Expected one {expectedName} child of owned host {owned.Identity.ProcessId}; " +
+                $"observed {string.Join(", ", children.Select(entry => $"{entry.ProcessId}:{entry.ExecutableFile}"))}.");
+            var child = Assert.Single(matches);
             using var process = Process.GetProcessById((int)child.ProcessId);
             var identity = CaptureIdentity(process);
             Assert.True(identity.StartTimeUtcTicks >= owned.Identity.StartTimeUtcTicks);
-            Assert.Equal("dotnet.exe", Path.GetFileName(identity.ExecutablePath), ignoreCase: true);
+            if (usesAppHost)
+                Assert.Equal(Path.GetFullPath(executable), identity.ExecutablePath, ignoreCase: true);
+            else
+                Assert.Equal("dotnet.exe", Path.GetFileName(identity.ExecutablePath), ignoreCase: true);
             Assert.True(File.Exists(Path.Combine(Path.GetDirectoryName(Metadata("PreviewCliPath"))!,
                 "native-worker",
                 "AvaloniaDevTool.NativeAutomation.Worker.dll")));
@@ -346,9 +361,8 @@ public sealed class NativeSessionOwnershipMcpTests
             {
                 if (!HasExited(owned.Identity))
                 {
-                    if (SnapshotChildren(owned.Identity.ProcessId).Any(entry =>
-                            string.Equals(entry.ExecutableFile, "dotnet.exe", StringComparison.OrdinalIgnoreCase)))
-                        CaptureWorker();
+                    // The body captures and verifies each worker identity. Teardown must not rediscover a worker
+                    // that can legitimately exit between two snapshots and mask the original test outcome.
                     owned.Process.StandardInput.Close();
                     using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
                     try

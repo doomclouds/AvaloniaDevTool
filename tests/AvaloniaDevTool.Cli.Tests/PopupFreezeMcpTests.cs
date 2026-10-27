@@ -32,7 +32,8 @@ public sealed class PopupFreezeMcpTests
             await using var agent = DiagnosticsAgent.Attach(Application.Current!,
                 new DiagnosticsAgentOptions
                 {
-                    PipeName = "popup-freeze-mcp-" + Guid.NewGuid().ToString("N"), TopLevelProvider = () => [window]
+                    PipeName = DiagnosticsProtocol.PipePrefix + "popup-freeze-mcp-" + Guid.NewGuid().ToString("N"),
+                    TopLevelProvider = () => [window]
                 });
             await using var client = await CreateClientAsync();
             var tools = await client.ListToolsAsync(cancellationToken: TestContext.Current.CancellationToken);
@@ -40,8 +41,7 @@ public sealed class PopupFreezeMcpTests
             Assert.Contains(tools, tool => tool.Name == "popup-freeze-resume");
             var set = Assert.Single(tools, tool => tool.Name == "popup-freeze-set");
             Assert.Contains("rootId", set.JsonSchema.ToString());
-            Read<SessionInfo>(await client.CallToolAsync("attach-to-app",
-                new Dictionary<string, object?> { ["pipeName"] = agent.PipeName }));
+            Read<ApplicationAttachmentResult>(await McpTestTarget.AttachAsync(client, agent.PipeName));
             var status =
                 Read<PopupFreezeStatusDto>(
                     await client.CallToolAsync("popup-freeze", new Dictionary<string, object?>()));
@@ -80,8 +80,7 @@ public sealed class PopupFreezeMcpTests
             Arguments =
             [
                 "exec", "--runtimeconfig", Path.ChangeExtension(assembly, ".runtimeconfig.json"), "--depsfile",
-                Path.ChangeExtension(assembly, ".deps.json"), typeof(Program).Assembly.Location, "mcp", "--profile",
-                "extended"
+                Path.ChangeExtension(assembly, ".deps.json"), typeof(Program).Assembly.Location, "mcp"
             ],
             ShutdownTimeout = TimeSpan.FromSeconds(5)
         }));

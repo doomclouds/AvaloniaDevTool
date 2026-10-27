@@ -17,6 +17,56 @@ public sealed class NativeFileFilterTimingTests
     public static bool IsWindows => OperatingSystem.IsWindows();
 
     [Fact(SkipUnless = nameof(IsWindows),
+        Skip = "The synthetic provider exercises wait discovery without creating windows.")]
+    public async Task Waiting_for_an_identifiable_dialog_retries_a_transient_truncated_read_without_any_action()
+    {
+        await using var worker = await TimingWorker.StartAsync(exposeOptions: false, truncatedDialogRead: 1);
+        var controller = new NativeFileDialogController(worker.Session);
+        var original = Assert.Single(await worker.Session.GetWindowsAsync(Token));
+
+        var found = await controller.WaitForDialogAsync(timeoutMs: 1000, cancellationToken: Token);
+
+        Assert.Equal(original.NodeId, found.DialogId);
+        Assert.Equal("Open", found.State);
+        Assert.Equal("timing.txt", found.PathInputValue);
+        Assert.False(found.ApplicationIoVerified);
+        worker.AssertOsProcessRunning();
+        Assert.True(worker.Session.IsAvailable);
+        var trace = await worker.ReadTraceAsync();
+        Assert.Equal(2, trace.DialogReads);
+        Assert.Equal(1, trace.TruncatedDialogReads);
+        Assert.True(trace.Open);
+        Assert.Equal("timing.txt", trace.FileName);
+        Assert.Empty(trace.Actions);
+    }
+
+    [Fact(SkipUnless = nameof(IsWindows),
+        Skip = "The synthetic provider exercises persistent incomplete discovery without creating windows.")]
+    public async Task A_persistently_truncated_wait_preserves_its_reason_at_the_deadline_and_keeps_the_session_alive()
+    {
+        await using var worker = await TimingWorker.StartAsync(exposeOptions: false, truncatedDialogRead: -1);
+        var controller = new NativeFileDialogController(worker.Session);
+        var original = Assert.Single(await worker.Session.GetWindowsAsync(Token));
+        var timer = Stopwatch.StartNew();
+
+        var error = await Assert.ThrowsAsync<NativeAutomationException>(() =>
+            controller.WaitForDialogAsync(timeoutMs: 250, cancellationToken: Token));
+
+        Assert.Equal("file_dialog_tree_truncated", error.Code);
+        Assert.Contains("incomplete", error.Message);
+        Assert.InRange(timer.Elapsed, TimeSpan.FromMilliseconds(250), TimeSpan.FromSeconds(5));
+        worker.AssertOsProcessRunning();
+        Assert.True(worker.Session.IsAvailable);
+        Assert.Equal(original.NodeId, Assert.Single(await worker.Session.GetWindowsAsync(Token)).NodeId);
+        var trace = await worker.ReadTraceAsync();
+        Assert.True(trace.DialogReads > 1);
+        Assert.Equal(trace.DialogReads, trace.TruncatedDialogReads);
+        Assert.True(trace.Open);
+        Assert.Equal("timing.txt", trace.FileName);
+        Assert.Empty(trace.Actions);
+    }
+
+    [Fact(SkipUnless = nameof(IsWindows),
         Skip = "The synthetic provider checks a transient truncated tree without creating windows.")]
     public async Task A_transient_incomplete_dialog_read_retries_the_same_identity_before_cancelling_exactly_once()
     {
@@ -246,7 +296,8 @@ public sealed class NativeFileFilterTimingTests
         string FilterValue,
         int ActionStatusReads,
         int DialogReads,
-        int TruncatedDialogReads);
+        int TruncatedDialogReads,
+        string FileName);
 
     private sealed class TimingWorker(NativeAutomationSession session, ProcessIdentity identity, string directory)
         : IAsyncDisposable
@@ -360,7 +411,27 @@ public sealed class NativeFileFilterTimingTests
                 !Path.GetFileName(resolved).StartsWith(prefix, StringComparison.Ordinal) ||
                 !Guid.TryParseExact(Path.GetFileName(resolved)[prefix.Length..], "N", out _))
                 throw new InvalidOperationException("Refusing to delete an unowned synthetic filter directory.");
-            Directory.Delete(resolved, recursive: true);
+            // Process exit can become observable before Windows releases the mapped image,
+            // and file scanners may briefly retain a handle. Preserve all test assertions;
+            // only retry deletion of this already-validated, test-owned directory.
+            var cleanup = Stopwatch.StartNew();
+            while (true)
+            {
+                try
+                {
+                    if (Directory.Exists(resolved))
+                        Directory.Delete(resolved, recursive: true);
+                    return;
+                }
+                catch (IOException) when (cleanup.Elapsed < TimeSpan.FromSeconds(5))
+                {
+                    Thread.Sleep(50);
+                }
+                catch (UnauthorizedAccessException) when (cleanup.Elapsed < TimeSpan.FromSeconds(5))
+                {
+                    Thread.Sleep(50);
+                }
+            }
         }
     }
 

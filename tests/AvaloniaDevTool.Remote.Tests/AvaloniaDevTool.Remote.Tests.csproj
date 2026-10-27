@@ -18,7 +18,8 @@
             Version="$(AvaloniaVersion)" />
         <PackageReference Include="Avalonia.Skia"
             Version="$(AvaloniaVersion)" />
-        <ProjectReference Include="../../src/AvaloniaDevTool.Remote/AvaloniaDevTool.Remote.csproj" />
-        <ProjectReference Include="../../src/AvaloniaDevTool.Client/AvaloniaDevTool.Client.csproj" />
+        <ProjectReference Include="../../src/Extensions/AvaloniaDevTool.Remote/AvaloniaDevTool.Remote.csproj" />
+        <ProjectReference
+            Include="../../src/Infrastructure/AvaloniaDevTool.Infrastructure.Execution/AvaloniaDevTool.Infrastructure.Execution.csproj" />
     </ItemGroup>
 </Project>

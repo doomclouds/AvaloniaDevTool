@@ -10,9 +10,9 @@
             Version="$(AvaloniaVersion)" />
         <PackageReference Include="Avalonia.Fonts.Inter"
             Version="$(AvaloniaVersion)" />
-        <ProjectReference Include="../../src/AvaloniaDevTool.Agent/AvaloniaDevTool.Agent.csproj" />
-        <ProjectReference Include="../../src/AvaloniaDevTool.Logging/AvaloniaDevTool.Logging.csproj" />
-        <ProjectReference Include="../../src/AvaloniaDevTool.Remote/AvaloniaDevTool.Remote.csproj" />
+        <ProjectReference Include="../../src/SDK/AvaloniaDevTool.Agent/AvaloniaDevTool.Agent.csproj" />
+        <ProjectReference Include="../../src/Extensions/AvaloniaDevTool.Logging/AvaloniaDevTool.Logging.csproj" />
+        <ProjectReference Include="../../src/Extensions/AvaloniaDevTool.Remote/AvaloniaDevTool.Remote.csproj" />
     </ItemGroup>
     <ItemGroup>
         <AvaloniaResource Include="Assets/**" />

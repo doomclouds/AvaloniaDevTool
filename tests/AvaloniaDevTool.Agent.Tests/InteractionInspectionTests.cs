@@ -376,28 +376,29 @@ public sealed class InteractionInspectionTests
         await client.ConnectAsync(agent.PipeName);
 
         async Task<long> Id(string name) =>
-            Assert.Single((await client.SearchTreeAsync(new(name, TreeKind.Visual))).Matches).Id;
+            Assert.Single((await client.Tree.SearchTreeAsync(new(name, TreeKind.Visual))).Matches).Id;
 
         var textId = await Id(text.Name!);
-        await client.SendKeyChordAsync(new(textId, ["A"], ["Control"]));
+        await client.Input.SendKeyChordAsync(new(textId, ["A"], ["Control"]));
         Assert.Equal("Before", text.SelectedText);
-        var selection = await client.SelectTextAsync(new(textId, ReplacementText: "After"));
+        var selection = await client.Input.SelectTextAsync(new(textId, ReplacementText: "After"));
         Assert.True(selection.Replaced);
         Assert.Equal("After", text.Text);
         var clicks = 0;
         button.Click += (_, _) => clicks++;
         var buttonId = await Id(button.Name!);
-        await client.ClickAsync(new(buttonId, 2));
-        await client.PerformControlActionAsync(new(buttonId, ControlAction.Invoke));
+        await client.Input.ClickAsync(new(buttonId, 2));
+        await client.Input.PerformControlActionAsync(new(buttonId, ControlAction.Invoke));
         Assert.Equal(3, clicks);
         Assert.Equal("On",
-            (await client.PerformControlActionAsync(new(await Id(check.Name!), ControlAction.Toggle))).ToggleState);
+            (await client.Input.PerformControlActionAsync(new(await Id(check.Name!), ControlAction.Toggle)))
+            .ToggleState);
         Assert.True(check.IsChecked);
-        Assert.Equal(1, (await client.SelectItemAsync(new(await Id(list.Name!), 1))).SelectedIndex);
+        Assert.Equal(1, (await client.Input.SelectItemAsync(new(await Id(list.Name!), 1))).SelectedIndex);
         Assert.Equal("Second", list.SelectedItem);
         Point? release = null;
         source.PointerReleased += (_, e) => release = e.GetPosition(fixture.Window);
-        await client.DragAsync(new(await Id(source.Name!), await Id(target.Name!), TargetX: 20, TargetY: 25));
+        await client.Input.DragAsync(new(await Id(source.Name!), await Id(target.Name!), TargetX: 20, TargetY: 25));
         Assert.Equal(target.TranslatePoint(new Point(20, 25), fixture.Window), release);
     }
 

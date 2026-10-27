@@ -41,11 +41,12 @@ public sealed class ContextualPropertyTests
         {
             await using var scope = await Scope.Create(window);
             var id = await scope.Find("PlainChild");
-            var legacy = await scope.Client.GetPropertiesAsync(id);
+            var legacy = await scope.Client.Properties.GetPropertiesAsync(id);
             Assert.Contains(legacy, row => row.Id == "Avalonia.Controls.Grid:Row" && row.Value == "3");
             Assert.False(Assert.Single(legacy, row => row.Id == "Avalonia.Controls.Grid:Row").Presentation!.Context!
                 .IsApplicable);
-            var contextual = await scope.Client.GetPropertiesAsync(new PropertiesRequest(id, Contextual: true));
+            var contextual =
+                await scope.Client.Properties.GetPropertiesAsync(new PropertiesRequest(id, Contextual: true));
             Assert.DoesNotContain(contextual,
                 row => row.Id is "Avalonia.Controls.Grid:Row" or "Avalonia.Controls.Canvas:Left"
                     or "Avalonia.Controls.DockPanel:Dock" or "Avalonia.Controls.RelativePanel:AlignLeftWithPanel");
@@ -59,7 +60,8 @@ public sealed class ContextualPropertyTests
                          ("RelativeChild", "Avalonia.Controls.RelativePanel:AlignLeftWithPanel")
                      })
             {
-                var rows = await scope.Client.GetPropertiesAsync(new PropertiesRequest(await scope.Find(item.Item1),
+                var rows = await scope.Client.Properties.GetPropertiesAsync(new PropertiesRequest(
+                    await scope.Find(item.Item1),
                     Contextual: true));
                 Assert.True(Assert.Single(rows, row => row.Id == item.Item2).Presentation!.Context!.IsApplicable);
             }
@@ -82,10 +84,10 @@ public sealed class ContextualPropertyTests
         {
             await using var scope = await Scope.Create(window);
             var id = await scope.Find("MovingChild");
-            var before = await scope.Client.GetPropertiesAsync(new PropertiesRequest(id, Contextual: true));
+            var before = await scope.Client.Properties.GetPropertiesAsync(new PropertiesRequest(id, Contextual: true));
             Assert.Contains(before, row => row.Id == "Avalonia.Controls.Grid:Row");
             var changed = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-            scope.Client.PropertiesChanged += notification =>
+            scope.Client.Properties.PropertiesChanged += notification =>
             {
                 if (notification.ObjectId == id)
                     changed.TrySetResult();
@@ -93,12 +95,13 @@ public sealed class ContextualPropertyTests
             grid.Children.Remove(child);
             canvas.Children.Add(child);
             await changed.Task.WaitAsync(TimeSpan.FromSeconds(3));
-            var after = await scope.Client.GetPropertiesAsync(new PropertiesRequest(id, Contextual: true));
+            var after = await scope.Client.Properties.GetPropertiesAsync(new PropertiesRequest(id, Contextual: true));
             Assert.DoesNotContain(after, row => row.Id == "Avalonia.Controls.Grid:Row");
             Assert.Contains(after, row => row.Id == "Avalonia.Controls.Canvas:Left");
             Assert.Equal(id, await scope.Find("MovingChild"));
             canvas.Children.Remove(child);
-            var detached = await scope.Client.GetPropertiesAsync(new PropertiesRequest(id, Contextual: true));
+            var detached =
+                await scope.Client.Properties.GetPropertiesAsync(new PropertiesRequest(id, Contextual: true));
             Assert.DoesNotContain(detached,
                 row => row.Id is "Avalonia.Controls.Grid:Row" or "Avalonia.Controls.Canvas:Left");
         }
@@ -129,7 +132,7 @@ public sealed class ContextualPropertyTests
             Assert.IsType<Grid>(part.GetVisualParent());
             Assert.Same(button, part.TemplatedParent);
             await using var scope = await Scope.Create(window);
-            var rows = await scope.Client.GetPropertiesAsync(
+            var rows = await scope.Client.Properties.GetPropertiesAsync(
                 new PropertiesRequest(await scope.Find("GridTemplatePart", TreeKind.Visual), Contextual: true));
             var context = Assert.Single(rows, row => row.Id == "Avalonia.Controls.Grid:Row").Presentation!.Context!;
             Assert.True(context.IsApplicable);
@@ -160,7 +163,7 @@ public sealed class ContextualPropertyTests
         }
 
         public async Task<long> Find(string name, TreeKind kind = TreeKind.Logical) => Assert
-            .Single((await Client.SearchTreeAsync(new(name, kind))).Matches, node => node.Name == name).Id;
+            .Single((await Client.Tree.SearchTreeAsync(new(name, kind))).Matches, node => node.Name == name).Id;
 
         public async ValueTask DisposeAsync()
         {

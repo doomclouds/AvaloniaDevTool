@@ -14,7 +14,7 @@
             PrivateAssets="all" />
         <PackageReference Include="Avalonia.Headless.XUnit"
             Version="$(AvaloniaVersion)" />
-        <ProjectReference Include="../../src/AvaloniaDevTool.Previewer/AvaloniaDevTool.Previewer.csproj" />
+        <ProjectReference Include="../../src/Hosts/AvaloniaDevTool.Previewer/AvaloniaDevTool.Previewer.csproj" />
     </ItemGroup>
     <ItemGroup>
         <None Include="../../samples/AvaloniaDevTool.Sample/Previews/PreviewCard.axaml"

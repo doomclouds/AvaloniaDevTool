@@ -516,11 +516,11 @@ public sealed class OverlayTests
             });
         await using var client = new DiagnosticsClient();
         await client.ConnectAsync(agent.PipeName);
-        var root = Assert.Single(await client.GetRootsAsync(TreeKind.Visual));
+        var root = Assert.Single(await client.Tree.GetRootsAsync(TreeKind.Visual));
         var selected =
-            Assert.Single((await client.SearchTreeAsync(new("ClientOverlaySubject", TreeKind.Visual))).Matches);
-        var before = await client.CaptureElementAsync(root.Id);
-        var configured = await client.ConfigureOverlayAsync(new OverlayOptions(ShowMargin: true,
+            Assert.Single((await client.Tree.SearchTreeAsync(new("ClientOverlaySubject", TreeKind.Visual))).Matches);
+        var before = await client.Rendering.CaptureElementAsync(root.Id);
+        var configured = await client.Overlays.ConfigureOverlayAsync(new OverlayOptions(ShowMargin: true,
                 ShowPadding: true,
                 ShowInfo: true,
                 ShowRulers: true,
@@ -528,16 +528,16 @@ public sealed class OverlayTests
             selected.Id);
         Assert.Equal(selected.Id, configured.ObjectId);
         Assert.Equal("ClientOverlaySubject", configured.Info!.Name);
-        Assert.True((await client.GetOverlaySnapshotAsync()).Options.ShowRulers);
-        Assert.Empty((await client.SearchTreeAsync(new("HighlightAdorner", TreeKind.Visual))).Matches);
-        var layout = await client.GetLayoutSnapshotAsync(root.Id);
+        Assert.True((await client.Overlays.GetOverlaySnapshotAsync()).Options.ShowRulers);
+        Assert.Empty((await client.Tree.SearchTreeAsync(new("HighlightAdorner", TreeKind.Visual))).Matches);
+        var layout = await client.Layout.GetLayoutSnapshotAsync(root.Id);
         Assert.DoesNotContain(layout.Layers,
             layer => layer.TypeName.Contains(nameof(HighlightAdorner), StringComparison.Ordinal));
-        var after = await client.CaptureElementAsync(root.Id);
+        var after = await client.Rendering.CaptureElementAsync(root.Id);
         Assert.Equal(before.PngBase64, after.PngBase64);
-        Assert.True((await client.GetOverlaySnapshotAsync()).IsActive);
-        await client.HighlightAsync(null);
-        Assert.False((await client.GetOverlaySnapshotAsync()).IsActive);
+        Assert.True((await client.Overlays.GetOverlaySnapshotAsync()).IsActive);
+        await client.Selection.HighlightAsync(null);
+        Assert.False((await client.Overlays.GetOverlaySnapshotAsync()).IsActive);
     }
 
     [AvaloniaFact]

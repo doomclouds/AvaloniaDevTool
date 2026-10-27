@@ -359,8 +359,8 @@ public sealed class PopupFreezeTests
                     { PipeName = "popup-freeze-" + Guid.NewGuid().ToString("N"), TopLevelProvider = () => [window] });
             await using var client = new DiagnosticsClient();
             await client.ConnectAsync(agent.PipeName);
-            var root = Assert.Single((await client.GetPopupFreezeAsync()).Roots);
-            Assert.True((await client.SetPopupFreezeAsync(new(true, root.RootId))).IsActive);
+            var root = Assert.Single((await client.Popups.GetPopupFreezeAsync()).Roots);
+            Assert.True((await client.Popups.SetPopupFreezeAsync(new(true, root.RootId))).IsActive);
             Assert.False(popup.IsLightDismissEnabled);
             await client.DisconnectAsync();
             using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));

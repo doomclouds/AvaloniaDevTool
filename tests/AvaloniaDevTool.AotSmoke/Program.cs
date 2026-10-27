@@ -62,9 +62,9 @@ try
     var notifications = new ConcurrentQueue<long>();
     var picking = new ConcurrentQueue<bool>();
     var selections = new ConcurrentQueue<long>();
-    client.PropertiesChanged += value => notifications.Enqueue(value.ObjectId);
-    client.PickingChanged += value => picking.Enqueue(value.IsPicking);
-    client.SelectionChanged += value => selections.Enqueue(value.ObjectId);
+    client.Properties.PropertiesChanged += value => notifications.Enqueue(value.ObjectId);
+    client.Selection.PickingChanged += value => picking.Enqueue(value.IsPicking);
+    client.Selection.SelectionChanged += value => selections.Enqueue(value.ObjectId);
     TreeNodeInfo? status = null;
     TreeNodeInfo? button = null;
     long rootId = 0;
@@ -72,7 +72,7 @@ try
     {
         TreeNodeInfo? kindStatus = null;
         TreeNodeInfo? kindButton = null;
-        var roots = await client.GetRootsAsync(kind, timeout.Token);
+        var roots = await client.Tree.GetRootsAsync(kind, timeout.Token);
         if (roots.Count != 1 || roots[0].Name != "AotWindow")
             throw new InvalidOperationException($"Unexpected {kind} roots.");
         rootId = roots[0].Id;
@@ -87,7 +87,7 @@ try
             if (node.Name == "AotButton")
                 kindButton = node;
             if (node.HasChildren)
-                foreach (var child in await client.GetChildrenAsync(node.Id, kind, timeout.Token))
+                foreach (var child in await client.Tree.GetChildrenAsync(node.Id, kind, timeout.Token))
                     queue.Enqueue(child);
         }
 
@@ -98,20 +98,21 @@ try
         report.Add($"PASS {kind} tree, {seen.Count} nodes");
     }
 
-    var panel = (await client.SearchTreeAsync(new TreeSearchRequest("AotPanel", TreeKind.Logical), timeout.Token))
+    var panel = (await client.Tree.SearchTreeAsync(new TreeSearchRequest("AotPanel", TreeKind.Logical), timeout.Token))
         .Matches.Single();
     var firstPage =
-        await client.GetChildrenPageAsync(panel.Id, TreeKind.Logical, count: 1, cancellationToken: timeout.Token);
+        await client.Tree.GetChildrenPageAsync(panel.Id, TreeKind.Logical, count: 1, cancellationToken: timeout.Token);
     if (firstPage.Children.Count != 1 || firstPage.TotalCount != 3 || !firstPage.HasMore ||
         firstPage.NextCursor is null)
         throw new InvalidOperationException("The first bounded child page did not describe the consumer panel.");
     report.Add("PASS bounded tree.children-page first page and continuation metadata");
-    var popupStatus = await client.GetPopupFreezeAsync(timeout.Token);
+    var popupStatus = await client.Popups.GetPopupFreezeAsync(timeout.Token);
     if (popupStatus.IsActive || popupStatus.Popups.Count != 0 || popupStatus.Roots.All(root => root.RootId != rootId))
         throw new InvalidOperationException("Popup-freeze status did not describe the consumer's unfrozen root.");
     report.Add("PASS popup-freeze read-only status and generated DTO metadata");
-    var allProperties = await client.GetPropertiesAsync(status!.Id, timeout.Token);
-    var properties = await client.GetPropertiesAsync(new PropertiesRequest(status.Id, Contextual: true), timeout.Token);
+    var allProperties = await client.Properties.GetPropertiesAsync(status!.Id, timeout.Token);
+    var properties =
+        await client.Properties.GetPropertiesAsync(new PropertiesRequest(status.Id, Contextual: true), timeout.Token);
     if (properties.Any(property => property.Presentation?.Context?.IsApplicable == false) ||
         properties.Any(property => allProperties.All(original => original.Id != property.Id)))
         throw new InvalidOperationException(
@@ -122,39 +123,42 @@ try
         property.Name == "Text" && property.DeclaringType == "Avalonia.Controls.TextBlock");
     if (text.Value != "Native diagnostics ready" || !text.CanEdit || text.CanClear)
         throw new InvalidOperationException($"Unexpected baseline Text: {text}");
-    await client.SetPropertyAsync(status.Id, text.Id, "Edited over the native wire", timeout.Token);
+    await client.Properties.SetPropertyAsync(status.Id, text.Id, "Edited over the native wire", timeout.Token);
     var changed =
-        (await client.GetPropertiesAsync(status.Id, timeout.Token)).Single(property => property.Id == text.Id);
+        (await client.Properties.GetPropertiesAsync(status.Id, timeout.Token)).Single(property =>
+            property.Id == text.Id);
     if (changed.Value != "Edited over the native wire" || !changed.CanClear ||
         changed.ValueSource != "DiagnosticOverride")
         throw new InvalidOperationException("The diagnostic property override was not applied.");
     await WaitUntilAsync(() => notifications.Contains(status.Id), timeout.Token);
-    await client.ClearPropertyAsync(status.Id, text.Id, timeout.Token);
+    await client.Properties.ClearPropertyAsync(status.Id, text.Id, timeout.Token);
     var restored =
-        (await client.GetPropertiesAsync(status.Id, timeout.Token)).Single(property => property.Id == text.Id);
+        (await client.Properties.GetPropertiesAsync(status.Id, timeout.Token)).Single(property =>
+            property.Id == text.Id);
     if (restored.Value != text.Value || restored.ValueSource != text.ValueSource || restored.CanClear)
         throw new InvalidOperationException("Clearing did not restore the original styled value and priority.");
     report.Add("PASS property read/write/notification/clear restores original Style value");
-    var image = await client.CaptureElementAsync(rootId, timeout.Token);
+    var image = await client.Rendering.CaptureElementAsync(rootId, timeout.Token);
     var png = Convert.FromBase64String(image.PngBase64);
     if (image.Width <= 0 || image.Height <= 0 ||
         !png.AsSpan(0, 8).SequenceEqual(new byte[] { 137, 80, 78, 71, 13, 10, 26, 10 }))
         throw new InvalidOperationException("Screenshot did not contain a valid PNG.");
     await File.WriteAllBytesAsync(Path.Combine(output, "native-consumer.png"), png, timeout.Token);
     report.Add($"PASS screenshot {image.Width}x{image.Height}, {png.Length} bytes");
-    await client.SetPickingAsync(true, timeout.Token);
+    await client.Selection.SetPickingAsync(true, timeout.Token);
     await WaitUntilAsync(() => picking.Contains(true), timeout.Token);
-    var input = await client.SendInputAsync(new InputRequest(button!.Id, InputKind.Click), timeout.Token);
+    var input = await client.Input.SendInputAsync(new InputRequest(button!.Id, InputKind.Click), timeout.Token);
     if (!input.Delivered)
         throw new InvalidOperationException(input.Detail);
     await WaitUntilAsync(() => selections.Contains(button.Id) && picking.Contains(false), timeout.Token);
     report.Add("PASS picking start, routed pointer selection, automatic stop notifications");
-    await client.SetPropertyAsync(status.Id, text.Id, "Restore on session disconnect", timeout.Token);
+    await client.Properties.SetPropertyAsync(status.Id, text.Id, "Restore on session disconnect", timeout.Token);
     await client.DisconnectAsync();
     await client.ConnectAsync(pipe, timeout.Token);
-    var reconnected = await client.SearchTreeAsync(new TreeSearchRequest("AotStatus", TreeKind.Logical), timeout.Token);
+    var reconnected =
+        await client.Tree.SearchTreeAsync(new TreeSearchRequest("AotStatus", TreeKind.Logical), timeout.Token);
     var reconnectedText =
-        (await client.GetPropertiesAsync(reconnected.Matches.Single().Id, timeout.Token)).Single(property =>
+        (await client.Properties.GetPropertiesAsync(reconnected.Matches.Single().Id, timeout.Token)).Single(property =>
             property.Id == text.Id);
     if (reconnectedText.Value != text.Value || reconnectedText.CanClear)
         throw new InvalidOperationException("A reconnect did not preserve the restored target state.");

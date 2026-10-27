@@ -1,4 +1,60 @@
-# 自研 Agent / MCP 测试与验证
+# 0.1.0 测试与实物验证
+
+本轮为能力对象拆分、全解决方案分层、唯一MCP合同、本地/HTTP执行器、单exe与用户目录安装的验收。当前29项目、15生产；没有旧profile、类型转发SDK或平铺客户端API。下面旧批次均为历史记录，不与本轮计数累加。
+
+## 构建和格式
+
+完整Debug solution单线程构建已通过，0警告0错误。ReSharper检查369个编译/结构文件无待修改；Black26.10.1、Prettier3.9.10、PSScriptAnalyzer1.25.0验证通过，新增打包/安装/构建脚本纳入辅助格式范围。最后修复另按所属文件格式化。
+
+## 功能回归与保留的失败证据
+
+| 批次 | 结果 | 范围 |
+| --- | --- | --- |
+| Agent能力与生命周期 | 287/287通过 | 树、属性/绑定/覆盖、资源、输入、诊断；含新增能力清理隔离 |
+| Protocol当前合同 | 30/30通过 | 源生成DTO与集合、RPC、客户端消费；含4项旧响应/旧通知跨重连隔离 |
+| Previewer | 15/15通过 | 文档、项目上下文、重载、失败保留与渲染 |
+| Remote底层SDK扩展 | 11/11通过 | 可选WebSocket能力，不是用户MCP远端入口 |
+| Native最终完整回归 | 137/137通过；另1项Explicit未执行 | 真实UIA/OS、文件弹窗、输入、身份与清理；含10项游标到达确认规则 |
+| CLI首批唯一目录全量 | 190项：185通过、5失败 | 冷启动握手、opaque资产期望、预览depth/取消及worker测试清理暴露问题，失败记录保留 |
+| CLI首批修复精准回归 | 17/17通过 | 上述5处及协议探测、scope错误同步、新网关切换/图片 |
+| CLI完整复核 | 193项：191通过、2失败 | 一项测试过度依赖SDK异常文字；一项真实picker刚出现时树暂不完整 |
+| CLI最后精准复测 | 6/6通过 | 两项协议协商测试及4项实际文件读写失败流程；修复的是wire断言和等待期的只读瞬态重试 |
+| FileDialog等待合成回归 | 新增2项red→green，相关3项通过 | 首次截断后完整、持续截断到期限仍拒绝；同session、0动作、慢RPC不被poll期限取消 |
+| 安装脚本 | 隔离检查通过 | WhatIf、首次/幂等、版本保留、同版本不同内容拒绝、错误hash拒绝、锁定入口回滚、用户环境未修改 |
+
+这些表项分别说明实际运行批次：没有把失败批次回写成0失败，也没有把精准重跑称为再次完整执行。原生早期并发桌面批次出现光标干扰与临时映像文件清理失败；改为独占验证、只读等待一次move到达、测试owned目录有界清理后，最终137项通过。
+
+原始TRX位于`artifacts/test-results/0.1.0/`及本轮Temp专项目录。Native Explicit精确HWND复用压力测试未作为常规回归自动运行。
+
+## 协议、媒体与真实进程
+
+MCP2.3默认客户端先discover2026、探测超时后在同连接initialize；服务端可能已经依据_meta切到2026，导致初始化拒绝。0.1.0在生产统一配置明确2025-11-25，HTTP执行器同样使用该已验证合同；外部与内部hop不共用元数据。新增wire回归使用默认未pin客户端和延迟响应，hard-pin不支持版本明确拒绝；检查真实wire支持版本而非SDK异常消息排版。
+
+网关真实stdio→HTTP→stdio验证固定目录、旧节点拒绝、失败预览保留原引用、断线不回本机/不重放、PNG解码后尺寸/颜色和元数据。图片不是文件路径，原始采集/自定义JSON不能被误当句柄重写。
+
+可见演示通过本机Console附加AutomationSample PID13572，输入`HTTP MCP demo 0.1.0`、点击三次、提交并回读`Clicks=3`及提交文本，HTTP截图为840×645的实际多色PNG。演示程序已正常关闭以释放构建锁，证据在`artifacts/visible-console-demo/`。
+
+## 单文件分发验收
+
+打包工程与最终EXE分别验证。早期实物冷解包发现Windows对已提取整树MoveDirectory的AccessDenied；FirstChance三次确认，未通过延长重试掩盖。当前改为payload独占锁内直接提取、逐文件验证后最后写manifest commit marker；中断或不完整不启动，下一次修复。暖缓存临时读锁直接保留原IO错误，不误当损坏并删除正在使用的目录。
+
+提交标记、8并发、中断/完整性/路径边界和真实目录锁等包装专项16/16通过。最终实物的SHA、内嵌文件、冷/热耗时、无PATH dotnet、stdio89/HTTP88、父进程退出回收及真实EXE隔离安装结果，以最终验证报告追加记录；中间快照不代表最终交付。
+
+完整校验成本不隐藏：一次中间热校验曾耗时43秒，另一次24.6秒。MCP配置示例预留120秒启动时间，不以专项证明所有机器启动性能。物理LAN、防火墙、其他交互桌面以及未安装运行时的干净Windows环境需另外实测；本机HTTP和隐藏PATH dotnet不能等价替代这些证据。
+
+## 最终实物记录
+
+最终分发文件：`artifacts/package/win-x64/AvaloniaDevTool.exe`，版本0.1.0，214,722,986字节，SHA-256：`fcc906227a4ba558f167b64c34231e2596b6843f56b0cc72c6033f4c497ea860`。独立Packaging工程生成，目录只有这个EXE；payload为`2cd75a08fa56c2ede23275209072fbba8324b5355ccbb7c110debbeb5e999955`，861个文件，不含旧Client/NativeAutomation/Protocol兼容程序集。
+
+真实EXE的两项网关E2E全部通过（22秒）：实际exe启动stdio网关和HTTP Console，检查本地/HTTP/返回本地、真实PNG尺寸/像素/元数据、旧节点、失败选择和断线不重放。最后bootstrap按同一源码重新发布，整个EXE SHA逐字节相同，因此该证据对应最终文件。
+
+完整CLI批次与精准复测按testName取最新结果，193个唯一测试均有通过结果；这是一份跨批次只读汇总，不声称另外执行了一次完整193项：`artifacts/verification/cli-latest-0.1.0.json`。所有原失败TRX继续保留。
+
+分发及安装字节校验报告：`artifacts/bundle-release-0.1.0/report.json`，版本/文件/SHA索引：`artifacts/verification/release-0.1.0.json`，编译输入：`artifacts/verification/source-0.1.0.json`。安装检查在隔离路径运行，未修改用户PATH或HOME；实际用户安装由安装脚本显式执行。
+
+---
+
+## 历史批次（2026-10-26及以前）
 
 当前验证目标是 Windows 完整界面交互和真实原生文件流程。解决方案现有22项目：9个生产、3个样例、10个测试/支撑。常规测试包含 Agent、Cli、Protocol、Previewer、Remote 与新增 NativeAutomation；AotSmoke 和真实消费/fixture 的身份另外保留。
 

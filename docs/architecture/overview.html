@@ -3,1355 +3,286 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>AvaloniaDevTool 架构导航</title>
+    <title>AvaloniaDevTool 能力域与分层</title>
     <style>
       :root {
-        color-scheme: light;
-        --ink: #172033;
-        --muted: #556174;
-        --line: #dce2ea;
-        --paper: #fff;
-        --soft: #f4f6f9;
-        --blue: #245dc1;
-        --blue-soft: #edf3ff;
-        --orange: #9a5b13;
-        --orange-soft: #fff5e6;
-        --green: #1e6c52;
+        color-scheme: light dark;
+        --paper: light-dark(#fff, #14181e);
+        --ink: light-dark(#202833, #e0e6ef);
+        --line: light-dark(#d8dfe8, #374150);
+        --soft: light-dark(#f1f5fa, #202832);
+        --link: light-dark(#245dc1, #8eb7ff);
       }
       * {
         box-sizing: border-box;
       }
       body {
         margin: 0;
-        background: var(--soft);
+        background: var(--paper);
         color: var(--ink);
         font:
-          16px/1.65 'Segoe UI',
+          16px/1.65 system-ui,
           'Microsoft YaHei',
           sans-serif;
       }
-      button,
-      a {
-        -webkit-tap-highlight-color: transparent;
-      }
-      button {
-        font: inherit;
-      }
-      a {
-        color: var(--blue);
-        text-underline-offset: 3px;
-        overflow-wrap: anywhere;
-      }
-      button:focus-visible,
-      a:focus-visible {
-        outline: 3px solid #3977df;
-        outline-offset: 4px;
-      }
-      .shell {
-        max-width: 1220px;
+      main {
+        max-width: 1120px;
         margin: auto;
-        padding: 28px 30px 46px;
-      }
-      header {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 24px;
-        margin-bottom: 22px;
-      }
-      .eyebrow {
-        font-size: 14px;
-        color: var(--muted);
-        margin: 0 0 4px;
+        padding: 28px 22px 64px;
       }
       h1 {
         font-size: 30px;
         line-height: 1.3;
-        margin: 0 0 10px;
-        letter-spacing: -0.6px;
       }
-      header p {
-        margin: 0;
-        max-width: 780px;
-        color: var(--muted);
+      h2 {
+        margin-top: 40px;
+        font-size: 22px;
       }
-      .doc-links {
-        display: flex;
-        gap: 14px;
-        flex-wrap: wrap;
-        margin-top: 12px;
-        font-size: 14px;
-      }
-      .stamp {
-        white-space: nowrap;
-        color: var(--muted);
-        font-size: 14px;
-        padding-top: 4px;
-      }
-      .tabs {
-        display: flex;
-        gap: 6px;
-        padding: 5px;
-        background: #e8edf4;
-        border-radius: 12px;
-        margin-bottom: 18px;
-        width: fit-content;
-        max-width: 100%;
-      }
-      .tab {
-        border: 0;
-        background: transparent;
-        color: var(--muted);
-        padding: 10px 20px;
-        border-radius: 8px;
-        cursor: pointer;
-        min-height: 46px;
-        white-space: nowrap;
-      }
-      .tab[aria-selected='true'] {
-        background: var(--paper);
-        color: var(--ink);
-        box-shadow: 0 1px 5px #25324b15;
-        font-weight: 600;
-      }
-      [hidden] {
-        display: none !important;
-      }
-      .sheet {
-        background: var(--paper);
-        border: 1px solid var(--line);
-        border-radius: 14px;
-        padding: 24px;
-      }
-      .view-heading {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        margin-bottom: 14px;
-      }
-      .view-heading h2 {
-        margin: 0;
-        font-size: 21px;
-        line-height: 1.4;
-      }
-      .state {
-        font-size: 14px;
-        padding: 3px 10px;
-        background: var(--blue-soft);
-        color: var(--blue);
-        border-radius: 5px;
-        white-space: normal;
-        max-width: 100%;
-      }
-      .state.proposed {
-        background: var(--orange-soft);
-        color: var(--orange);
-      }
-      .lead {
-        margin: 0 0 16px;
-        color: var(--muted);
-      }
-      .legend {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px 24px;
-        font-size: 14px;
-        color: var(--muted);
-        margin: 12px 0 0;
-      }
-      .legend span {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-      .sample-line {
-        width: 32px;
-        border-top: 2px solid var(--blue);
-        display: inline-block;
-      }
-      .sample-line.native {
-        border-color: var(--orange);
-      }
-      .sample-line.owned {
-        border-color: var(--muted);
-        border-top-style: dashed;
-      }
-      .diagram {
-        width: 100%;
-        height: auto;
-        display: block;
-      }
-      .diagram text {
-        font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
-        fill: var(--ink);
-        font-size: 16px;
-      }
-      .diagram .small {
-        font-size: 14px;
-        fill: var(--muted);
-      }
-      .diagram .title {
-        font-size: 18px;
-        font-weight: 600;
-      }
-      .diagram .process {
-        fill: #fafbfd;
-        stroke: #cbd4e0;
-        stroke-width: 1.5;
-      }
-      .diagram .node {
-        fill: #fff;
-        stroke: #dce2ea;
-        stroke-width: 1.4;
-      }
-      .diagram .blue-node {
-        fill: #edf3ff;
-        stroke: #bed0ed;
-        stroke-width: 1.4;
-      }
-      .diagram .orange-node {
-        fill: #fff5e6;
-        stroke: #e6cba5;
-        stroke-width: 1.4;
-      }
-      .diagram .link {
-        fill: none;
-        stroke: var(--blue);
-        stroke-width: 2;
-      }
-      .diagram .native-link {
-        fill: none;
-        stroke: var(--orange);
-        stroke-width: 2;
-      }
-      .diagram .owned-link {
-        fill: none;
-        stroke: var(--muted);
-        stroke-width: 1.8;
-        stroke-dasharray: 6 5;
-      }
-      .diagram .compile {
-        fill: none;
-        stroke: #56667d;
-        stroke-width: 1.8;
-      }
-      .notes {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 20px;
-        margin-top: 22px;
-        padding-top: 18px;
-        border-top: 1px solid var(--line);
-      }
-      .notes h3 {
-        font-size: 16px;
-        margin: 0 0 5px;
-      }
-      .notes p {
-        margin: 0;
-        color: var(--muted);
-        font-size: 14px;
-      }
-      .notes code {
-        font-size: 14px;
-      }
-      code {
-        font-family: Consolas, 'Cascadia Code', monospace;
+      a {
+        color: var(--link);
         overflow-wrap: anywhere;
-        font-size: 0.93em;
+      }
+      nav {
+        display: flex;
+        gap: 18px;
+        flex-wrap: wrap;
+        margin: 20px 0 28px;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 16px 0;
+      }
+      td,
+      th {
+        padding: 12px 10px;
+        border-bottom: 1px solid var(--line);
+        text-align: left;
+        vertical-align: top;
+      }
+      th {
+        font-weight: 600;
+      }
+      code,
+      pre {
+        font-family: Consolas, monospace;
       }
       pre {
-        margin: 12px 0 0;
         white-space: pre-wrap;
         overflow-wrap: anywhere;
         background: var(--soft);
-        padding: 14px 16px;
-        border-radius: 8px;
-        font-size: 14px;
-        line-height: 1.8;
+        padding: 18px;
       }
-      .mobile-flow {
-        display: none;
+      .flow {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
       }
-      .flow-step {
-        padding: 15px 16px;
+      .lane {
+        padding: 18px;
         border: 1px solid var(--line);
-        border-radius: 9px;
-        margin-bottom: 10px;
       }
-      .flow-step h3 {
-        font-size: 16px;
-        margin: 0 0 4px;
-      }
-      .flow-step p {
-        font-size: 14px;
-        margin: 0;
-        color: var(--muted);
-      }
-      .flow-arrow {
-        font-size: 14px;
-        color: var(--blue);
-        margin: 4px 0 10px 16px;
-      }
-      .dependency-mobile {
-        display: none;
-      }
-      .dependency-row {
+      .step {
         padding: 10px 0;
+      }
+      .arrow {
+        text-align: center;
+        font-size: 22px;
+      }
+      summary {
+        font-weight: 600;
+        cursor: pointer;
+      }
+      details {
+        padding: 12px 0;
         border-bottom: 1px solid var(--line);
       }
-      .dependency-row strong {
-        display: block;
-        font-size: 16px;
-      }
-      .dependency-row span {
-        font-size: 14px;
-        color: var(--muted);
-      }
-      .inline-note {
-        padding: 12px 16px;
-        background: var(--soft);
-        margin-top: 16px;
-        border-left: 3px solid #b7c6db;
-        font-size: 14px;
-      }
-      .domain-layout {
-        display: grid;
-        grid-template-columns: 240px minmax(0, 1fr);
-        gap: 24px;
-      }
-      .domain-list {
-        display: grid;
-        align-content: start;
-        gap: 7px;
-      }
-      .domain-button {
-        border: 1px solid var(--line);
-        background: var(--paper);
-        text-align: left;
-        color: var(--ink);
-        border-radius: 8px;
-        padding: 10px 13px;
-        cursor: pointer;
-        min-height: 46px;
-        font-size: 16px;
-      }
-      .domain-button[aria-pressed='true'] {
-        background: var(--blue-soft);
-        border-color: #a6bfe5;
-        color: var(--blue);
-        font-weight: 600;
-      }
-      .domain-detail {
-        min-width: 0;
-      }
-      .domain-detail h3 {
-        font-size: 23px;
-        margin: 0 0 6px;
-      }
-      .domain-detail .scope {
-        margin: 0 0 18px;
-        color: var(--muted);
-      }
-      .detail-label {
-        font-size: 14px;
-        color: var(--muted);
-        margin: 18px 0 6px;
-      }
-      .file-list {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        display: grid;
-        gap: 7px;
-      }
-      .file-list a {
-        font-size: 14px;
-      }
-      .path-block {
-        font-size: 14px;
-        background: var(--soft);
-        padding: 11px 14px;
-        border-radius: 7px;
-        overflow-wrap: anywhere;
-      }
-      .reading {
-        margin: 6px 0 0;
-        padding-left: 24px;
-      }
-      .reading li {
-        margin-bottom: 7px;
-      }
-      .change-note {
-        font-size: 14px;
-        padding-top: 15px;
-        margin-top: 18px;
-        border-top: 1px solid var(--line);
-      }
-      .rule {
-        margin: 22px 0 0;
-        padding: 14px 16px;
-        background: var(--orange-soft);
-        font-size: 14px;
-        border-radius: 8px;
-      }
-      .footer {
-        font-size: 14px;
-        color: var(--muted);
-        margin: 18px 2px 0;
-      }
-      .lan-layout {
-        display: grid;
-        grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
-        gap: 24px;
-        align-items: start;
-      }
-      .lan-config {
-        min-width: 0;
-      }
-      .lan-config article + article {
-        margin-top: 20px;
-        padding-top: 18px;
-        border-top: 1px solid var(--line);
-      }
-      .lan-config h3 {
-        font-size: 16px;
-        margin: 0 0 5px;
-      }
-      .lan-config p {
-        font-size: 14px;
-        color: var(--muted);
-        margin: 0;
-      }
-      .lan-config pre {
-        margin-top: 8px;
-      }
-      .lan-terms {
-        margin: 20px 0 0;
-        display: grid;
-        grid-template-columns: 145px minmax(0, 1fr);
-        font-size: 14px;
-      }
-      .lan-terms dt,
-      .lan-terms dd {
-        margin: 0;
-        padding: 11px 0;
-        border-top: 1px solid var(--line);
-      }
-      .lan-terms dt {
-        font-weight: 600;
-        padding-right: 16px;
-      }
-      .lan-terms dd {
-        overflow-wrap: anywhere;
-      }
-      .lan-diagram text {
-        font-size: 16px;
-      }
-      .lan-diagram .small {
-        font-size: 16px;
-      }
-      .lan-diagram .title {
-        font-size: 18px;
-      }
-      @media (max-width: 1140px) {
-        .desktop-diagram {
-          display: none;
-        }
-        .mobile-flow,
-        .dependency-mobile {
-          display: block;
-        }
-        .notes {
+      @media (max-width: 650px) {
+        .flow {
           grid-template-columns: 1fr;
         }
-        .shell {
-          padding: 22px 22px 36px;
+        main {
+          padding: 20px 14px;
         }
-        .stamp {
-          display: none;
-        }
-        .domain-layout {
-          grid-template-columns: 210px minmax(0, 1fr);
-        }
-        .lan-layout {
-          grid-template-columns: 1fr;
-        }
-      }
-      @media (max-width: 660px) {
-        .shell {
-          padding: 18px 14px 30px;
-        }
-        header {
-          margin-bottom: 18px;
+        td,
+        th {
+          padding: 8px 5px;
         }
         h1 {
           font-size: 25px;
-        }
-        .tabs {
-          display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          width: 100%;
-          gap: 2px;
-        }
-        .tab {
-          padding: 9px 8px;
-          font-size: 14px;
-          white-space: normal;
-        }
-        .sheet {
-          padding: 18px 15px;
-        }
-        .view-heading {
-          align-items: flex-start;
-          flex-direction: column;
-          gap: 6px;
-        }
-        .view-heading h2 {
-          font-size: 20px;
-        }
-        .domain-layout {
-          grid-template-columns: 1fr;
-          gap: 20px;
-        }
-        .domain-list {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 7px;
-        }
-        .domain-button {
-          font-size: 14px;
-          padding: 10px;
-        }
-        .domain-detail h3 {
-          font-size: 21px;
-        }
-        .doc-links {
-          gap: 8px 14px;
-        }
-        .notes {
-          gap: 16px;
-        }
-        .legend {
-          gap: 8px 15px;
-        }
-        .lan-terms {
-          grid-template-columns: 1fr;
-        }
-        .lan-terms dt {
-          padding-bottom: 3px;
-        }
-        .lan-terms dd {
-          padding-top: 0;
-          border-top: 0;
-        }
-      }
-      @media (prefers-reduced-motion: no-preference) {
-        button {
-          transition:
-            background-color 0.15s,
-            border-color 0.15s;
-        }
-      }
-      @media print {
-        body {
-          background: white;
-        }
-        .shell {
-          max-width: none;
-          padding: 0;
-        }
-        .tabs,
-        .stamp {
-          display: none;
-        }
-        [role='tabpanel'] {
-          display: block !important;
-          margin-bottom: 24px;
-        }
-        .sheet {
-          border: 0;
-          padding: 12px 0;
-          break-inside: avoid;
-        }
-        .desktop-diagram {
-          display: block;
-        }
-        .mobile-flow,
-        .dependency-mobile {
-          display: none;
-        }
-        .domain-layout {
-          display: block;
-        }
-        .domain-list {
-          display: none;
-        }
-        .doc-links a {
-          color: var(--ink);
         }
       }
     </style>
   </head>
   <body>
-    <main class="shell">
-      <header>
-        <div>
-          <p class="eyebrow">AvaloniaDevTool / 架构导航</p>
-          <h1>从工具调用到目标应用</h1>
-          <p>先看运行边界，再看项目依赖，最后沿能力域找到扩展位置。</p>
-          <nav class="doc-links" aria-label="架构文档">
-            <a href="../architecture.md">项目总览</a>
-            <a href="refactoring-blueprint.md">结构与重构记录</a>
-            <a href="extending-tools.md">新增工具指南</a>
-            <a href="lan-mcp-design.md">内网 MCP 部署</a>
-          </nav>
+    <main>
+      <h1>AvaloniaDevTool 能力域与分层</h1>
+      <p>
+        一个 MCP 配置、默认本机、指定 IP 切换执行电脑。整个解决方案统一分层，能力对象独立拥有状态，远端 Console
+        复用相同执行目录。此页离线可读，源码与构建关系以链接文档和 csproj 为准。
+      </p>
+      <nav>
+        <a href="#execution">执行关系</a><a href="#layers">项目分层</a><a href="#capabilities">十个能力域</a
+        ><a href="#ownership">对象所有权</a><a href="#delivery">单 exe 与安装</a
+        ><a href="../architecture.md">完整类图</a><a href="project-inventory.md">项目依赖清单</a>
+      </nav>
+      <h2 id="execution">唯一 stdio MCP，两种内部执行路径</h2>
+      <div class="step"><strong>Codex → stdio → 统一网关</strong>：外部目录固定，机器选择不改变用户工具参数。</div>
+      <div class="flow">
+        <div class="lane">
+          <strong>默认本机</strong>
+          <div class="arrow">↓</div>
+          <div>LocalExecutor → 本机执行服务</div>
+          <div class="arrow">↓</div>
+          <div>本机 Agent / NativeWorker / Previewer</div>
         </div>
-        <div class="stamp">源码基线 · 2026-10-26</div>
-      </header>
-
-      <div class="tabs" role="tablist" aria-label="架构视图">
-        <button class="tab" id="tab-runtime" role="tab" aria-controls="view-runtime" aria-selected="true" tabindex="0">
-          运行全景
-        </button>
-        <button
-          class="tab"
-          id="tab-dependencies"
-          role="tab"
-          aria-controls="view-dependencies"
-          aria-selected="false"
-          tabindex="-1"
-        >
-          项目依赖
-        </button>
-        <button
-          class="tab"
-          id="tab-extension"
-          role="tab"
-          aria-controls="view-extension"
-          aria-selected="false"
-          tabindex="-1"
-        >
-          扩展导航
-        </button>
-        <button class="tab" id="tab-lan" role="tab" aria-controls="view-lan" aria-selected="false" tabindex="-1">
-          内网部署
-        </button>
+        <div class="lane">
+          <strong>指定 IP（含 127.0.0.1）</strong>
+          <div class="arrow">↓</div>
+          <div>HttpExecutor → HTTP MCP → serve Console</div>
+          <div class="arrow">↓</div>
+          <div>该电脑的 Agent / NativeWorker / Previewer</div>
+        </div>
       </div>
+      <p>
+        Console 只直接执行，不再次选择机器。图片以实际 image 内容与元数据返回，路径属于执行电脑。回环测试必须经过完整
+        HTTP，不能优化为 LocalExecutor。
+      </p>
+      <pre>
+AvaloniaDevTool.exe mcp       ← Codex 自动启动
+AvaloniaDevTool.exe serve     ← 被测电脑运行，默认 7443/mcp
+select-machine {}            ← 本机
+select-machine {"ip":"192.168.1.50"} ← 指定电脑</pre>
+      <h2 id="layers">29 项目中的 15 个生产项目按全局层次组织</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>层</th>
+            <th>项目</th>
+            <th>职责</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Contracts</td>
+            <td>Contracts</td>
+            <td>中立 DTO、错误、native/图片合同和诊断客户端端口</td>
+          </tr>
+          <tr>
+            <td>Domain</td>
+            <td>Domain</td>
+            <td>文件选择流程、诊断变更所有权等真实状态规则</td>
+          </tr>
+          <tr>
+            <td>Application</td>
+            <td>Application</td>
+            <td>跨来源采集编排，通过端口调用实际客户端</td>
+          </tr>
+          <tr>
+            <td>Infrastructure</td>
+            <td>Rpc / Execution / Avalonia / Windows / Mcp</td>
+            <td>通信、客户端能力、目标框架、Windows 平台及 MCP 适配</td>
+          </tr>
+          <tr>
+            <td>SDK</td>
+            <td>Agent</td>
+            <td>真实接入入口；Client/Native旧兼容SDK与类型转发已删除</td>
+          </tr>
+          <tr>
+            <td>Hosts</td>
+            <td>Cli / Previewer / NativeAutomation.Worker</td>
+            <td>控制台与隔离进程入口、依赖组装</td>
+          </tr>
+          <tr>
+            <td>Extensions</td>
+            <td>Logging / Remote</td>
+            <td>可选日志及旧 Agent WebSocket 接入</td>
+          </tr>
+          <tr>
+            <td>Packaging</td>
+            <td>Packaging</td>
+            <td>完整自包含发布材料、单文件 bootstrap、缓存及子进程所有权</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        控制台不编译引用 Avalonia/UIA。Agent 不引用 MCP/执行宿主。Windows 原生依赖留在 worker。打包关系不是编译引用，RPC
+        使用真实 Infrastructure.Rpc 程序集身份。
+      </p>
+      <h2 id="capabilities">能力域及主要状态</h2>
+      <details open>
+        <summary>目标与会话</summary>
+        <p>选择和附加目标、控制范围、切换及结束。网关持机器范围，执行端持应用范围，旧句柄不能跨范围复用。</p>
+      </details>
+      <details>
+        <summary>结构与对象检查</summary>
+        <p>树、搜索、祖先、分页、对象下钻；TreeInspectionService 拥有 MergedTree、分支观察与版本。</p>
+      </details>
+      <details>
+        <summary>属性与样式</summary>
+        <p>属性、绑定、样式、伪类、临时覆盖和恢复；属性服务拥有覆盖、预览租约和上下文，样式服务拥有伪类状态。</p>
+      </details>
+      <details>
+        <summary>资源与资产</summary>
+        <p>资源字典查询和临时编辑；嵌入资产查看与完整导出。二者保留独立语义和数据。</p>
+      </details>
+      <details>
+        <summary>框架交互</summary>
+        <p>文本、键鼠、拖动、选择、动作与等待。操作回执不等于应用业务成功。</p>
+      </details>
+      <details>
+        <summary>原生自动化</summary>
+        <p>共享 NativeTargetRuntime，独立 Query / Action / Input，节点和窗口身份只在执行端维护。</p>
+      </details>
+      <details>
+        <summary>文件选择对话</summary>
+        <p>Domain 文件弹窗流程通过 INativeAutomationTarget 复用 native；维护路径、过滤器、确认、取消、覆盖与状态。</p>
+      </details>
+      <details>
+        <summary>图像与视觉诊断</summary>
+        <p>managed/native PNG、布局、合成、覆盖层和弹层冻结。图片内容和尺寸/坐标/限制一起返回，不做视觉验收。</p>
+      </details>
+      <details>
+        <summary>运行诊断</summary>
+        <p>
+          日志、事件、Metrics、Profiler、断点及采集。CaptureCoordinator 协调来源，mutation tracker
+          防止停止别人后来启动的监听。
+        </p>
+      </details>
+      <details>
+        <summary>XAML 预览</summary>
+        <p>从项目上下文创建可调试目标；保存重载，失败保留最后成功画面，成功内容替换使相应旧节点失效。</p>
+      </details>
+      <h2 id="ownership">组合入口与能力对象</h2>
+      <pre>
+GatewaySession → 当前执行器 + GatewayHandleRegistry + NativeOperationTracker
+ToolSession    → 当前客户端 + 发现 + NativeSessionOwner + 采集协调 + OwnedPreview
+DiagnosticsClient → Connection + 17 个能力客户端（旧平铺 API 已删除）
+AgentSession   → 树 / 属性 / 样式 / 选择 / 截图 / 诊断服务 + 公共身份/观察
+NativeBackend  → Query / Action / Input / Screenshot + 共享目标运行时</pre>
+      <p>
+        生产手写 partial 已移除，JSON 源生成 partial 保留。切换忙时拒绝，不堵塞 native
+        回答模态；失联不回退本机，修改请求不自动重放。每个能力释放自己的临时状态，组合根只协调顺序。
+      </p>
+      <h2 id="delivery">单 exe 分发与用户目录版本安装</h2>
+      <pre>
+独立发布 Console、Previewer、NativeWorker 的自包含目录
+  → 压缩 + 文件清单 / SHA-256
+  → Packaging 内嵌资源
+  → AvaloniaDevTool.exe
+  → 校验缓存并按需启动内部进程</pre>
+      <p>用户只分发一个 exe；运行时允许缓存文件和多个进程。用户工程评估/构建仍需 SDK，目标应用仍需接入 Agent。</p>
+      <pre>
+pwsh -File build/Build-Bundle.ps1 -Version 0.1.0
+pwsh -File tools/Install-AvaloniaDevTool.ps1 -PackagePath .\artifacts\package\win-x64\AvaloniaDevTool.exe -Version 0.1.0
 
-      <section class="sheet" id="view-runtime" role="tabpanel" aria-labelledby="tab-runtime">
-        <div class="view-heading">
-          <h2>两条执行通道，共用当前附加目标</h2>
-          <span class="state">现状 · 已有实现</span>
-        </div>
-        <p class="lead">Agent 在目标进程内访问 Avalonia；Windows worker 在独立进程内访问 UIA 和 OS 输入。</p>
-        <svg
-          class="diagram desktop-diagram"
-          viewBox="0 0 1020 590"
-          role="img"
-          aria-labelledby="runtime-title runtime-desc"
-        >
-          <title id="runtime-title">AvaloniaDevTool 运行全景</title>
-          <desc id="runtime-desc">
-            MCP 客户端通过标准 stdio 或 HTTP MCP 调用独立 CLI 宿主。CLI 中的 Client 通过本机内部 RPC 连接目标应用内
-            Agent。NativeAutomation 通过另一条本机 IPC 连接独立 Windows worker。CLI 启动并回收 Previewer，Previewer
-            内使用同样的 Agent。
-          </desc>
-          <defs>
-            <marker
-              id="runtime-blue"
-              viewBox="0 0 10 10"
-              refX="9"
-              refY="5"
-              markerWidth="7"
-              markerHeight="7"
-              orient="auto-start-reverse"
-            >
-              <path d="M0 0L10 5L0 10z" fill="#245dc1" />
-            </marker>
-            <marker
-              id="runtime-orange"
-              viewBox="0 0 10 10"
-              refX="9"
-              refY="5"
-              markerWidth="7"
-              markerHeight="7"
-              orient="auto-start-reverse"
-            >
-              <path d="M0 0L10 5L0 10z" fill="#9a5b13" />
-            </marker>
-            <marker
-              id="runtime-gray"
-              viewBox="0 0 10 10"
-              refX="9"
-              refY="5"
-              markerWidth="7"
-              markerHeight="7"
-              orient="auto"
-            >
-              <path d="M0 0L10 5L0 10z" fill="#556174" />
-            </marker>
-          </defs>
-          <text x="240" y="24" text-anchor="middle" class="title">MCP 客户端</text>
-          <path d="M240 35V80" class="link" marker-end="url(#runtime-blue)" />
-          <text x="256" y="61" class="small">标准 MCP · stdio / HTTP</text>
-          <rect x="25" y="80" width="430" height="250" rx="13" class="process" />
-          <text x="45" y="112" class="title">CLI 进程</text>
-          <text x="435" y="112" text-anchor="end" class="small">AvaloniaDevTool.Cli</text>
-          <rect x="45" y="130" width="390" height="49" rx="7" class="node" />
-          <text x="240" y="160" text-anchor="middle">MCP 工具入口与输入输出转换</text>
-          <rect x="45" y="195" width="185" height="49" rx="7" class="node" />
-          <text x="137" y="225" text-anchor="middle">ToolSession 编排</text>
-          <rect x="250" y="195" width="185" height="49" rx="7" class="blue-node" />
-          <text x="342" y="225" text-anchor="middle">Client 类型化调用</text>
-          <rect x="45" y="263" width="390" height="47" rx="7" class="orange-node" />
-          <text x="240" y="293" text-anchor="middle">NativeAutomation · 原生会话 / 文件弹窗</text>
-          <rect x="570" y="80" width="425" height="250" rx="13" class="process" />
-          <text x="590" y="112" class="title">用户 Avalonia 应用进程</text>
-          <rect x="590" y="130" width="385" height="49" rx="7" class="blue-node" />
-          <text x="782" y="160" text-anchor="middle">Agent SDK · 接受内部 RPC</text>
-          <rect x="590" y="195" width="385" height="49" rx="7" class="node" />
-          <text x="782" y="225" text-anchor="middle">UI 线程调度 / 会话 / 对象身份</text>
-          <rect x="590" y="263" width="385" height="47" rx="7" class="node" />
-          <text x="782" y="293" text-anchor="middle">树 · 属性 · 资源 · 输入 · 原始诊断</text>
-          <path
-            d="M435 219H505V154H590"
-            class="link"
-            marker-start="url(#runtime-blue)"
-            marker-end="url(#runtime-blue)"
-          />
-          <text x="466" y="147" class="small">命名管道</text>
-          <text x="466" y="169" class="small">内部 RPC</text>
-          <rect x="25" y="425" width="430" height="135" rx="13" class="process" />
-          <text x="45" y="457" class="title">Windows worker 进程</text>
-          <text x="45" y="489">UIA3 / 目标所属窗口 / 受限 OS 输入</text>
-          <text x="45" y="521" class="small">独立请求门；超时后回收自己的 worker</text>
-          <path
-            d="M240 310V425"
-            class="native-link"
-            marker-start="url(#runtime-orange)"
-            marker-end="url(#runtime-orange)"
-          />
-          <text x="255" y="370" class="small">独立 UTF-8 IPC</text>
-          <rect x="570" y="425" width="425" height="135" rx="13" class="process" />
-          <text x="590" y="457" class="title">Previewer 进程</text>
-          <text x="590" y="489">加载项目资源与 XAML，内置同款 Agent</text>
-          <text x="590" y="521" class="small">成功重载后，旧控件节点 ID 失效</text>
-          <path d="M455 286H540V491H570" class="owned-link" marker-end="url(#runtime-gray)" />
-          <text x="457" y="358" class="small">启动 / 回收</text>
-          <path d="M435 232H514V447H570" class="link" marker-end="url(#runtime-blue)" />
-          <text x="573" y="394" class="small">文件附加时，Client 改连预览内 Agent</text>
-        </svg>
-        <div class="mobile-flow">
-          <article class="flow-step">
-            <h3>1. MCP 客户端 → CLI 进程</h3>
-            <p>
-              标准 stdio / HTTP MCP 调用工具；CLI 管理当前目标，转换参数和返回内容。目标操作仍在宿主所在电脑本地执行。
-            </p>
-          </article>
-          <div class="flow-arrow">managed 通道：Client ⇄ 命名管道 RPC</div>
-          <article class="flow-step">
-            <h3>2. 目标应用内 Agent</h3>
-            <p>UI 线程调度 → 会话与对象身份 → 树、属性、资源、输入和诊断服务。</p>
-          </article>
-          <div class="flow-arrow">native 通道：NativeAutomation ⇄ 独立 IPC</div>
-          <article class="flow-step">
-            <h3>3. 独立 Windows worker</h3>
-            <p>UIA、owned 窗口和 OS 输入。请求门独立，managed 等待模态弹窗时仍可操作弹窗。</p>
-          </article>
-          <article class="flow-step">
-            <h3>4. 文件附加 → Previewer 进程</h3>
-            <p>CLI 启动并回收预览；预览加载项目与 XAML、挂载同款 Agent，Client 改连此 Agent。</p>
-          </article>
-        </div>
-        <div class="legend">
-          <span><i class="sample-line"></i>调用 / 内部 RPC</span
-          ><span><i class="sample-line native"></i>native 独立 IPC</span
-          ><span><i class="sample-line owned"></i>进程所有权</span>
-        </div>
-        <div class="notes">
-          <div>
-            <h3>两种目标入口</h3>
-            <p>
-              已有应用：应用挂载 Agent → MCP 宿主 → 附加目标。文件预览：MCP 宿主 → attach-to-file → 自建
-              Previewer，无需预先启动消费应用。
-            </p>
-          </div>
-          <div>
-            <h3>可选接入</h3>
-            <p>Remote 将 WebSocket 接到同一 Agent 会话；Logging 适配应用日志源。两者均为可选依赖。</p>
-          </div>
-          <div>
-            <h3>释放范围</h3>
-            <p>断开清理本会话的覆盖、监听、流和自建进程；外部附加的应用由用户拥有。</p>
-          </div>
-        </div>
-      </section>
-
-      <section class="sheet" id="view-dependencies" role="tabpanel" aria-labelledby="tab-dependencies" hidden>
-        <div class="view-heading">
-          <h2>9 个生产项目，编译引用与进程分发分开看</h2>
-          <span class="state">现状 · csproj 直接依赖</span>
-        </div>
-        <p class="lead">箭头 A → B 表示 A 引用 B。6 个类库承载能力，3 个可执行项目提供宿主和隔离进程。</p>
-        <svg
-          class="diagram desktop-diagram"
-          viewBox="0 0 1020 600"
-          role="img"
-          aria-labelledby="dependency-title dependency-desc"
-        >
-          <title id="dependency-title">9 个生产项目的直接依赖</title>
-          <desc id="dependency-desc">
-            CLI 编译引用 Client 与 NativeAutomation；Client 和 Agent 引用 Protocol；Worker 引用
-            NativeAutomation；Previewer、Remote 和 Logging 引用 Agent。CLI 还构建分发 Previewer 和条件 Windows
-            worker，这两条虚线不是编译引用。
-          </desc>
-          <defs>
-            <marker
-              id="dependency-arrow"
-              viewBox="0 0 10 10"
-              refX="9"
-              refY="5"
-              markerWidth="7"
-              markerHeight="7"
-              orient="auto"
-            >
-              <path d="M0 0L10 5L0 10z" fill="#56667d" />
-            </marker>
-            <marker
-              id="dependency-build"
-              viewBox="0 0 10 10"
-              refX="9"
-              refY="5"
-              markerWidth="7"
-              markerHeight="7"
-              orient="auto"
-            >
-              <path d="M0 0L10 5L0 10z" fill="#9a5b13" />
-            </marker>
-          </defs>
-          <path d="M290 75H410" class="compile" marker-end="url(#dependency-arrow)" />
-          <path d="M290 90L410 185" class="compile" marker-end="url(#dependency-arrow)" />
-          <path d="M290 185H410" class="compile" marker-end="url(#dependency-arrow)" />
-          <path d="M290 295L410 405" class="compile" marker-end="url(#dependency-arrow)" />
-          <path d="M290 405H410" class="compile" marker-end="url(#dependency-arrow)" />
-          <path d="M290 515L410 420" class="compile" marker-end="url(#dependency-arrow)" />
-          <path d="M640 75L790 257" class="compile" marker-end="url(#dependency-arrow)" />
-          <path d="M640 405L790 287" class="compile" marker-end="url(#dependency-arrow)" />
-          <path d="M82 112V148" class="native-link" stroke-dasharray="6 5" marker-end="url(#dependency-build)" />
-          <path d="M40 75H17V515H40" class="native-link" stroke-dasharray="6 5" marker-end="url(#dependency-build)" />
-          <a href="../../src/AvaloniaDevTool.Cli/AvaloniaDevTool.Cli.csproj">
-            <rect x="40" y="38" width="250" height="74" rx="8" class="blue-node" />
-            <text x="60" y="68" class="title">Cli</text>
-            <text x="60" y="94" class="small">Exe · MCP 宿主</text>
-          </a>
-          <a href="../../src/AvaloniaDevTool.NativeAutomation.Worker/AvaloniaDevTool.NativeAutomation.Worker.csproj">
-            <rect x="40" y="148" width="250" height="74" rx="8" class="orange-node" />
-            <text x="60" y="178" class="title">NativeAutomation.Worker</text>
-            <text x="60" y="204" class="small">Exe · Windows 隔离执行</text>
-          </a>
-          <a href="../../src/AvaloniaDevTool.Remote/AvaloniaDevTool.Remote.csproj">
-            <rect x="40" y="258" width="250" height="74" rx="8" class="node" />
-            <text x="60" y="288" class="title">Remote</text>
-            <text x="60" y="314" class="small">类库 · 可选 WebSocket 接入</text>
-          </a>
-          <a href="../../src/AvaloniaDevTool.Logging/AvaloniaDevTool.Logging.csproj">
-            <rect x="40" y="368" width="250" height="74" rx="8" class="node" />
-            <text x="60" y="398" class="title">Logging</text>
-            <text x="60" y="424" class="small">类库 · 可选 ILogger 适配</text>
-          </a>
-          <a href="../../src/AvaloniaDevTool.Previewer/AvaloniaDevTool.Previewer.csproj">
-            <rect x="40" y="478" width="250" height="74" rx="8" class="blue-node" />
-            <text x="60" y="508" class="title">Previewer</text>
-            <text x="60" y="534" class="small">Exe · 设计期预览宿主</text>
-          </a>
-          <a href="../../src/AvaloniaDevTool.Client/AvaloniaDevTool.Client.csproj">
-            <rect x="410" y="38" width="230" height="74" rx="8" class="node" />
-            <text x="430" y="68" class="title">Client</text>
-            <text x="430" y="94" class="small">类库 · 类型化 RPC 客户端</text>
-          </a>
-          <a href="../../src/AvaloniaDevTool.NativeAutomation/AvaloniaDevTool.NativeAutomation.csproj">
-            <rect x="410" y="148" width="230" height="74" rx="8" class="node" />
-            <text x="430" y="178" class="title">NativeAutomation</text>
-            <text x="430" y="204" class="small">类库 · facade / worker IPC</text>
-          </a>
-          <a href="../../src/AvaloniaDevTool.Agent/AvaloniaDevTool.Agent.csproj">
-            <rect x="410" y="368" width="230" height="74" rx="8" class="node" />
-            <text x="430" y="398" class="title">Agent</text>
-            <text x="430" y="424" class="small">类库 · 目标进程内 SDK</text>
-          </a>
-          <a href="../../src/AvaloniaDevTool.Protocol/AvaloniaDevTool.Protocol.csproj">
-            <rect x="790" y="235" width="205" height="80" rx="8" class="node" />
-            <text x="810" y="265" class="title">Protocol</text>
-            <text x="810" y="292" class="small">类库 · 契约 / RPC / JSON</text>
-          </a>
-          <text x="335" y="570" class="small">实线：编译引用</text>
-          <text x="590" y="570" class="small">橙色虚线：CLI 构建并复制运行资产</text>
-        </svg>
-        <div class="dependency-mobile">
-          <div class="dependency-row">
-            <strong>Cli · Exe</strong
-            ><span>编译 → Client、NativeAutomation；构建分发 → Previewer、条件 Windows worker</span>
-          </div>
-          <div class="dependency-row"><strong>Client · 类库</strong><span>编译 → Protocol</span></div>
-          <div class="dependency-row"><strong>Agent · 类库</strong><span>编译 → Protocol</span></div>
-          <div class="dependency-row">
-            <strong>Protocol · 类库</strong><span>无项目引用；保持与 Avalonia、MCP、Windows UIA 解耦</span>
-          </div>
-          <div class="dependency-row">
-            <strong>NativeAutomation · 类库</strong><span>无项目引用；管理原生会话和独立 worker IPC</span>
-          </div>
-          <div class="dependency-row">
-            <strong>NativeAutomation.Worker · Exe</strong><span>编译 → NativeAutomation；Windows UIA / OS 实现</span>
-          </div>
-          <div class="dependency-row"><strong>Previewer · Exe</strong><span>编译 → Agent</span></div>
-          <div class="dependency-row">
-            <strong>Remote · 类库</strong><span>编译 → Agent；可选 ASP.NET Core 依赖</span>
-          </div>
-          <div class="dependency-row">
-            <strong>Logging · 类库</strong><span>编译 → Agent；可选 Microsoft.Extensions.Logging 依赖</span>
-          </div>
-        </div>
-        <div class="inline-note">
-          <code>ReferenceOutputAssembly=false</code> 表示 CLI 不把 Previewer / worker 当作编译引用；二者仍须构建并分发到
-          <code>previewer/</code> 和 <code>native-worker/</code>。Windows worker 按宿主和目标 RID 条件选择。
-        </div>
-        <div class="notes">
-          <div>
-            <h3>构建整个解决方案</h3>
-            <pre>dotnet build AvaloniaDevTool.slnx</pre>
-          </div>
-          <div>
-            <h3>运行已接入 Agent 的目标</h3>
-            <pre>dotnet run --project samples/AvaloniaDevTool.AutomationSample -- --pipe avalonia-devtool-demo</pre>
-          </div>
-          <div>
-            <h3>本机 stdio：由客户端启动</h3>
-            <pre>
-dotnet src/AvaloniaDevTool.Cli/bin/Debug/net10.0/AvaloniaDevTool.Cli.dll mcp --pipe avalonia-devtool-demo</pre>
-          </div>
-        </div>
-        <p class="footer">
-          构建和运行命令从仓库根目录执行。HTTP 模式由执行电脑先运行服务，客户端按 URL 连接，见内网部署视图。当前是 .NET
-          10 / Avalonia 12.1.4；原生执行还需要本机 Windows 交互桌面。
-        </p>
-      </section>
-
-      <section class="sheet" id="view-extension" role="tabpanel" aria-labelledby="tab-extension" hidden>
-        <div class="view-heading">
-          <h2>先找到能力域，再选择扩展层</h2>
-          <span class="state">现状 · 按领域归档</span>
-        </div>
-        <p class="lead">
-          生产文件已按领域归目录，managed 调用上下文已独立。AgentTools / OfficialTools / InspectorTools
-          聚合壳继续承载现有工具契约，新增能力沿对应领域扩展。
-        </p>
-        <div class="domain-layout">
-          <div class="domain-list" role="group" aria-label="选择能力域"></div>
-          <article class="domain-detail" aria-live="polite" aria-atomic="true"></article>
-        </div>
-        <p class="rule">
-          新增组合工具只复用已有 Client 能力；新增目标内能力才需要契约、JSON 元数据、Agent 实现和 Client 方法。Windows
-          native 继续走独立 worker；同仓库扩展采用编译时注册。
-        </p>
-      </section>
-      <section class="sheet" id="view-lan" role="tabpanel" aria-labelledby="tab-lan" hidden>
-        <div class="view-heading">
-          <h2>B 上的 Codex，调用 A 上的完整执行宿主</h2>
-          <span class="state">已实现 · 本机 / WSL 验证</span>
-        </div>
-        <p class="lead">
-          B 通过标准 HTTP MCP 发送工具调用；Client、原生 worker、预览和 Avalonia SDK 全部留在 A 执行。独立双机网络待验。
-        </p>
-        <div class="lan-layout">
-          <div>
-            <svg
-              class="diagram lan-diagram desktop-diagram"
-              viewBox="0 0 640 650"
-              role="img"
-              aria-labelledby="lan-title lan-desc"
-            >
-              <title id="lan-title">Codex 电脑 B 与 Windows 执行电脑 A 的内网部署方式</title>
-              <desc id="lan-desc">
-                电脑 B 上的 Codex 通过标准 HTTP MCP 的 mcp 端点连接电脑 A 上已运行的执行宿主。A 宿主内含 Client 和
-                NativeAutomation，Client 通过本机命名管道连接应用内 Agent，NativeAutomation 通过本机 IPC 连接
-                worker。Previewer 按需在 A 启动，内置 Agent。HTTP 服务已实现，示例 IP 可替换；本机和 WSL
-                已有验证，独立双机网络仍待验。
-              </desc>
-              <defs>
-                <marker
-                  id="lan-blue"
-                  viewBox="0 0 10 10"
-                  refX="9"
-                  refY="5"
-                  markerWidth="7"
-                  markerHeight="7"
-                  orient="auto-start-reverse"
-                >
-                  <path d="M0 0L10 5L0 10z" fill="#245dc1" />
-                </marker>
-                <marker
-                  id="lan-orange"
-                  viewBox="0 0 10 10"
-                  refX="9"
-                  refY="5"
-                  markerWidth="7"
-                  markerHeight="7"
-                  orient="auto-start-reverse"
-                >
-                  <path d="M0 0L10 5L0 10z" fill="#9a5b13" />
-                </marker>
-                <marker
-                  id="lan-gray"
-                  viewBox="0 0 10 10"
-                  refX="9"
-                  refY="5"
-                  markerWidth="7"
-                  markerHeight="7"
-                  orient="auto"
-                >
-                  <path d="M0 0L10 5L0 10z" fill="#556174" />
-                </marker>
-              </defs>
-              <rect x="20" y="15" width="600" height="110" rx="12" class="process" />
-              <text x="40" y="49" class="title">电脑 B · Codex</text>
-              <text x="40" y="80">加载 config.toml 的 URL 条目，自动连接 A</text>
-              <text x="40" y="106" class="small">不在 B 上启动 CLI / worker / Previewer</text>
-              <path d="M320 125V200" class="link" marker-start="url(#lan-blue)" marker-end="url(#lan-blue)" />
-              <text x="340" y="157">HTTP 标准 MCP</text>
-              <text x="340" y="181" class="small">/mcp · 内网地址可配置</text>
-              <rect x="20" y="200" width="600" height="430" rx="12" class="process" />
-              <text x="40" y="234" class="title">电脑 A · Windows 用户交互桌面</text>
-              <rect x="40" y="252" width="560" height="94" rx="8" class="blue-node" />
-              <text x="60" y="282" class="title">完整 MCP 执行宿主</text>
-              <text x="60" y="313">Tools / 会话编排 / Client / NativeAutomation</text>
-              <path d="M170 346V400" class="link" marker-start="url(#lan-blue)" marker-end="url(#lan-blue)" />
-              <text x="64" y="379" class="small">本地管道 RPC</text>
-              <path
-                d="M470 346V400"
-                class="native-link"
-                marker-start="url(#lan-orange)"
-                marker-end="url(#lan-orange)"
-              />
-              <text x="488" y="379" class="small">本地 IPC</text>
-              <rect x="40" y="400" width="260" height="80" rx="8" class="node" />
-              <text x="60" y="432" class="title">Avalonia 应用</text>
-              <text x="60" y="459">Agent SDK / UI 线程</text>
-              <rect x="340" y="400" width="260" height="80" rx="8" class="orange-node" />
-              <text x="360" y="432" class="title">Windows worker</text>
-              <text x="360" y="459">目标所属窗口 / UIA / OS</text>
-              <path d="M320 346V530" class="owned-link" marker-end="url(#lan-gray)" />
-              <text x="345" y="512" class="small">A 宿主启动 / 回收</text>
-              <rect x="40" y="530" width="560" height="70" rx="8" class="node" />
-              <text x="60" y="559" class="title">Previewer · 按需创建，内置同款 Agent</text>
-              <text x="60" y="585">Client 通过本地管道连接其 Agent</text>
-            </svg>
-            <div class="mobile-flow">
-              <article class="flow-step">
-                <h3>电脑 B · Codex</h3>
-                <p>
-                  加载 config.toml 的 MCP URL 条目，自动连接 A 已运行的服务，无需手工连接工具；不在 B 启动 CLI、worker
-                  或 Previewer。
-                </p>
-              </article>
-              <div class="flow-arrow">内网 HTTP 标准 MCP → A 的 /mcp</div>
-              <article class="flow-step">
-                <h3>电脑 A · 完整执行宿主</h3>
-                <p>同一 Windows 用户交互桌面内运行 Tools、会话编排、Client 与 NativeAutomation。</p>
-              </article>
-              <div class="flow-arrow">Client ⇄ A 本机命名管道 RPC</div>
-              <article class="flow-step">
-                <h3>A 上的 Avalonia 应用 + Agent SDK</h3>
-                <p>目标对象和 UI 操作在应用进程内执行。</p>
-              </article>
-              <article class="flow-step">
-                <h3>A 上的 worker 与 Previewer</h3>
-                <p>原生操作经独立本地 IPC；需要文件预览时由 A 启动 Previewer，并通过管道连接其 Agent。</p>
-              </article>
-            </div>
-          </div>
-          <div class="lan-config">
-            <article>
-              <h3>1. A：监听地址和端口</h3>
-              <p>在 A 已构建或发布的 CLI 目录运行。监听 IP 和端口均可配置，请将示例 IP 替换为 A 的实际地址。</p>
-              <pre><code>dotnet AvaloniaDevTool.Cli.dll mcp --transport http --listen 192.168.1.50 --port 7443</code></pre>
-            </article>
-            <article>
-              <h3>2. B：Codex 的服务 URL</h3>
-              <p>
-                与其他 MCP 相同，Codex 加载标准 <code>config.toml</code> 的 URL 条目后自动连接 A
-                已运行的服务，无需手工连接工具。URL 中的 IP 和端口须与 A 的可访问地址匹配。
-              </p>
-              <pre><code>[mcp_servers.avalonia_testpc]
-url = "http://192.168.1.50:7443/mcp"</code></pre>
-              <p>本阶段不设 Token，也不配置 <code>command</code> 或 <code>args</code>。</p>
-            </article>
-            <article>
-              <h3>3. 工具：照常描述目标与动作</h3>
-              <p>MCP 连接完成后，先附加 A 上的应用，再调用 tree、props、ui-click。工具参数不重复传 IP。</p>
-              <pre><code>attach-to-app {}
-→ 用返回的应用 id 附加
-→ tree {}
-→ props / ui-click</code></pre>
-              <p>服务 URL 选择执行电脑；attach 选择该电脑上的目标应用，节点和路径由 A 解释。</p>
-            </article>
-          </div>
-        </div>
-        <dl class="lan-terms">
-          <dt>listen</dt>
-          <dd>
-            A 的本地绑定地址。示例 <code>192.168.1.50</code> 可配置；<code>0.0.0.0</code> 表示监听 A 的所有 IPv4
-            网卡，不能填写为 Codex 的访问 URL。
-          </dd>
-          <dt>访问 URL</dt>
-          <dd>
-            B 能访问的 A 地址、端口和路径，例如
-            <code>http://192.168.1.50:7443/mcp</code>。这里是可替换的配置示例，不表示该 IP 已有常驻服务。示例端口 7443
-            不表示自动启用 HTTPS，协议由 URL 的 <code>http://</code> 确定。
-          </dd>
-          <dt>路径与执行桌面</dt>
-          <dd>
-            XAML、项目、构建输出和文件路径均位于 A；宿主、目标应用及 worker 在 A 的同一 Windows 用户交互桌面执行。
-          </dd>
-          <dt>Session 与 Token</dt>
-          <dd>
-            允许多个 HTTP 协议会话，同时只有一个桌面控制租约；发现和列工具不占桌面，attach
-            或首次目标操作取得控制，detach 释放控制。Session 管理资源生命周期，不是认证 Token；本阶段不配置 Token。
-          </dd>
-          <dt>实现状态</dt>
-          <dd>
-            HTTP /mcp、监听参数、会话与控制租约已实现；HTTP 固定提供 agent 目录 44 项工具，stdio 保留现有历史
-            profiles。详见 <a href="lan-mcp-design.md">内网 MCP 部署</a>。
-          </dd>
-          <dt>验证范围</dt>
-          <dd>
-            已验证本机 HTTP 的真实模态并发、文件字节/hash、重新打开与 PNG，以及 WSL 协议互通。WSL
-            非回环地址访问仍有失败记录；独立双机网络待验。完整条件与结果见 <a href="../testing.md">测试记录</a>。
-          </dd>
-        </dl>
-      </section>
-      <p class="footer">
-        阅读顺序：运行全景 → 项目依赖 →
-        扩展导航；双机接入方案见内网部署。契约、资源所有权、迁移阶段和验证细节见配套文档。
+%USERPROFILE%\.local\share\avalonia-devtool\versions\&lt;版本&gt;\AvaloniaDevTool.exe
+%USERPROFILE%\.local\bin\AvaloniaDevTool.exe  ← 用户 PATH 稳定入口</pre>
+      <p>
+        <a href="../packaging-and-installation.md">打包与安装细节</a> · <a href="../mcp.md">MCP 使用</a> ·
+        <a href="extending-tools.md">扩展能力</a> · <a href="runtime-contracts.md">运行合同</a> ·
+        <a href="../testing.md">本轮测试记录</a>
       </p>
     </main>
-    <script>
-      const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
-      function selectTab(tab, focus) {
-        tabs.forEach((item) => {
-          const selected = item === tab;
-          item.setAttribute('aria-selected', String(selected));
-          item.tabIndex = selected ? 0 : -1;
-          document.getElementById(item.getAttribute('aria-controls')).hidden = !selected;
-        });
-        if (focus) tab.focus();
-      }
-      tabs.forEach((tab, index) => {
-        tab.addEventListener('click', () => selectTab(tab, false));
-        tab.addEventListener('keydown', (event) => {
-          let next = index;
-          if (event.key === 'ArrowRight') next = (index + 1) % tabs.length;
-          else if (event.key === 'ArrowLeft') next = (index + tabs.length - 1) % tabs.length;
-          else if (event.key === 'Home') next = 0;
-          else if (event.key === 'End') next = tabs.length - 1;
-          else return;
-          event.preventDefault();
-          selectTab(tabs[next], true);
-        });
-      });
-      if (window.location.hash === '#lan') selectTab(document.getElementById('tab-lan'), false);
-      const domains = [
-        {
-          name: '树与搜索',
-          scope: '树形态、节点元数据、selector、分页、分支观察和搜索。',
-          files: [
-            ['CLI 树工具', 'AvaloniaDevTool.Cli/Tools/Tree/OfficialTools.Tree.cs'],
-            ['目标内树实现', 'AvaloniaDevTool.Agent/Features/Tree/AgentSession.OfficialTree.cs'],
-            ['分页与观察', 'AvaloniaDevTool.Agent/Features/Tree/AgentSession.TreeWorkflows.cs'],
-          ],
-          target: 'Cli/Tools/Tree → Client/Features/Tree → Agent/Features/Tree；DTO 归 Protocol/Contracts/Tree。',
-          read: [
-            '先看工具参数和输出，再看对应 Client 方法。',
-            '查看树遍历、完整性和分页失效规则。',
-            '确认新结果复用同一对象注册表及对外节点代际。',
-          ],
-          reuse: '复用对象身份、UI 调度、调用保护；树遍历预算和观察订阅由 Tree 模块管理。',
-        },
-        {
-          name: '属性与样式',
-          scope: '属性、绑定来源、上下文属性、样式、值转换和临时覆盖。',
-          files: [
-            ['属性工具入口', 'AvaloniaDevTool.Cli/Tools/Properties/OfficialTools.Properties.cs'],
-            ['XAML 与覆盖实现', 'AvaloniaDevTool.Agent/Features/Properties/AgentSession.OfficialProperties.cs'],
-            [
-              '属性表示与编辑器信息',
-              'AvaloniaDevTool.Agent/Features/Properties/Presentation/PropertyPresentationAdapter.cs',
-            ],
-          ],
-          target:
-            'Cli/Tools/Properties 承载属性和样式入口；Client/Features 与 Agent/Features 下分 Properties、Styles，值展示归 Properties/Presentation，预览 lease 和覆盖记录归 Properties。',
-          read: [
-            '区分赋 null、清除覆盖和普通文本赋值。',
-            '查看值转换成功后才替换覆盖的顺序。',
-            '检查 reset、断开和应用后续修改时如何恢复。',
-          ],
-          reuse: '复用节点解析；保留绑定和可撤销覆盖。不能以无条件写回初值替代恢复规则。',
-        },
-        {
-          name: '资源与资产',
-          scope: '资源来源与条目、临时资源编辑、资产预览和完整导出。',
-          files: [
-            ['资源服务', 'AvaloniaDevTool.Agent/Features/Resources/ResourceInspectionService.cs'],
-            ['资产导出与流管理', 'AvaloniaDevTool.Agent/Features/Assets/AssetExportService.cs'],
-            ['资源与媒体工具', 'AvaloniaDevTool.Cli/Tools/Resources/OfficialTools.InputMedia.cs'],
-          ],
-          target:
-            'Cli/Tools/{Resources,Assets} → Client/Features/{Resources,Assets} → Agent/Features/{Resources,Assets}；资源修改记录归 Resources，流、hash 和过期回收归 Assets。',
-          read: [
-            '确认需要资源查询、资产预览还是完整读取。',
-            '查看来源、键身份、字节限制和截断状态。',
-            '新增导出句柄时明确关闭、过期和断开的释放路径。',
-          ],
-          reuse: '通用 RPC 只限制消息帧；资源冲突和资产字节预算仍属于各自功能域。',
-        },
-        {
-          name: '框架输入',
-          scope: '指针、键盘、选择、控件动作与焦点；在 Avalonia 框架内执行。',
-          files: [
-            ['框架输入工具', 'AvaloniaDevTool.Cli/Tools/Input/AgentTools.Interaction.cs'],
-            ['类型化输入调用', 'AvaloniaDevTool.Client/Features/Input/DiagnosticsClient.Input.cs'],
-            ['输入实现', 'AvaloniaDevTool.Agent/Features/Input/InputInspectionService.Interactions.cs'],
-          ],
-          target: 'Cli/Tools/Input → Client/Features/Input → Agent/Features/Input。',
-          read: [
-            '先判断框架输入还是 Windows OS 输入。',
-            '核对目标节点、焦点和 provider 动作条件。',
-            '验证实际控件状态，而不只看操作投递回执。',
-          ],
-          reuse: '框架输入复用 managed 调用上下文；不把 native 请求并入同一个调用门。',
-        },
-        {
-          name: '截图',
-          scope: '真实 PNG、局部区域、坐标空间、尺寸和预算。',
-          files: [
-            ['ui-screenshot 入口', 'AvaloniaDevTool.Cli/Tools/Rendering/AgentTools.Screenshot.cs'],
-            ['截图类型化调用', 'AvaloniaDevTool.Client/Features/Rendering/DiagnosticsClient.Screenshots.cs'],
-            ['目标内渲染实现', 'AvaloniaDevTool.Agent/Features/Rendering/AgentSession.Screenshot.cs'],
-          ],
-          target:
-            'Cli/Tools/Rendering → Client/Features/Rendering → Agent/Features/Rendering；DTO 归 Protocol/Contracts/Rendering，native 截图继续归 NativeAutomation.Worker/Capture。',
-          read: [
-            '沿 ui-screenshot 的入口、Client、RPC、Agent 路由读取。',
-            '区分控件局部 DIP 与 native 物理像素。',
-            '检查 bitmap 释放、PNG 限制及真实像素断言。',
-          ],
-          reuse: '只负责截图规则与媒体格式；连接、节点代际、UI 调度和 RPC 都复用已有机制。',
-        },
-        {
-          name: '原始诊断',
-          scope: 'Logs/Events、Metrics、样式与资源 Profiler、Breakpoints 和同连接采集编排。',
-          files: [
-            ['采集编排与所有权', 'AvaloniaDevTool.Cli/Capture/ToolSession.Capture.cs'],
-            ['Metrics 服务', 'AvaloniaDevTool.Agent/Features/Diagnostics/Metrics/MetricsService.cs'],
-            ['Profiler 服务', 'AvaloniaDevTool.Agent/Features/Diagnostics/Profiler/ProfilerService.cs'],
-          ],
-          target:
-            'Agent/Features/Diagnostics 下分 Activity、Metrics、Profiler、Breakpoints；Cli/Capture/ToolSession.Capture.cs 编排自己拥有的采集，独立 ManagedToolContext 归 Cli/Sessions。',
-          read: [
-            '查看每类服务的 start、stop、clear 和 snapshot 区别。',
-            '检查监听器线程、缓冲容量、损失计数。',
-            '确认停止操作仍持有同一连接及本次采集所有权。',
-          ],
-          reuse: 'Capture 复用当前 DiagnosticsClient；不能另建连接，也不能停止后来由其他调用者启动的监听。',
-        },
-        {
-          name: '视觉诊断',
-          scope: '布局、合成采集、覆盖层、渲染开关、弹层冻结和拾取。',
-          files: [
-            ['覆盖层服务', 'AvaloniaDevTool.Agent/Features/Overlays/OverlayService.cs'],
-            ['渲染状态', 'AvaloniaDevTool.Agent/Features/Rendering/RendererDiagnosticsService.cs'],
-            ['弹层冻结', 'AvaloniaDevTool.Agent/Features/Popups/PopupFreezeService.cs'],
-          ],
-          target:
-            'Agent/Features 下分 Layout、Rendering、Overlays、Popups、Selection；Client/Features 按对应领域组织，CLI 适配入口位于 Tools/Rendering、Overlays、Popups 和 Runtime。',
-          read: [
-            '检查哪些操作读状态，哪些临时修改 UI。',
-            '确认 UI 与渲染线程的执行边界。',
-            '查看窗口关闭和会话结束时的有条件恢复。',
-          ],
-          reuse: '诊断覆盖层应被业务树和截图排除；临时状态由相应服务恢复。',
-        },
-        {
-          name: 'CLR 对象观察',
-          scope: '公共成员、集合分页和复杂值的只读下钻。',
-          files: [
-            ['对象观察工具', 'AvaloniaDevTool.Cli/Tools/Runtime/InspectorTools.Runtime.cs'],
-            ['类型化调用', 'AvaloniaDevTool.Client/Features/Runtime/DiagnosticsClient.Runtime.cs'],
-            ['目标内对象观察', 'AvaloniaDevTool.Agent/Features/Runtime/RuntimeInspectionService.cs'],
-          ],
-          target:
-            'Cli/Tools/Runtime → Client/Features/Runtime → Agent/Features/Runtime；DTO 归 Protocol/Contracts/Runtime，仍共用会话对象身份。',
-          read: [
-            '先看只读成员和集合请求的边界。',
-            '查看分页、深度、返回值与弱 ID 表示。',
-            '区分 UI 对象 getter 与可安全后台读取的数据。',
-          ],
-          reuse: '不因 getter 是只读就移到 Task.Run；取消不能强行终止已经执行的同步 getter。',
-        },
-        {
-          name: '原生窗口与文件',
-          scope: '目标所属 Windows 窗口、UIA、OS 输入及真实公共文件弹窗。',
-          files: [
-            ['原生会话与 worker IPC', 'AvaloniaDevTool.NativeAutomation/Sessions/NativeAutomationSession.cs'],
-            ['文件弹窗控制器', 'AvaloniaDevTool.NativeAutomation/FileDialogs/NativeFileDialogController.cs'],
-            ['Windows 执行实现', 'AvaloniaDevTool.NativeAutomation.Worker/Sessions/NativeAutomationBackend.cs'],
-          ],
-          target:
-            'NativeAutomation 内分 Contracts、Sessions、Worker、FileDialogs；Worker 的 Sessions/NativeAutomationBackend 承载 UIA 树与动作，独立辅助代码归 Hosting、Identity、Windows、Input、Capture、Coordinates。',
-          read: [
-            '先确认已附加本地进程的 PID 与启动时间。',
-            '核对 owner、窗口与节点身份，再执行动作。',
-            '工具结果与应用实际文件读写结果分开验证。',
-          ],
-          reuse: '保留独立 worker、原生节点域和请求门；超时回收自己启动的 worker。',
-        },
-        {
-          name: '会话与预览',
-          scope: '发现、附加、切换、断开、项目评估、预览加载和热重载。',
-          files: [
-            ['会话协调入口', 'AvaloniaDevTool.Cli/Sessions/ToolSession.cs'],
-            ['项目评估与构建', 'AvaloniaDevTool.Cli/Preview/ToolSession.ProjectPreview.cs'],
-            ['预览加载与重载', 'AvaloniaDevTool.Previewer/Sessions/PreviewSession.cs'],
-          ],
-          target:
-            'Cli/Sessions 放 ToolSession、ManagedToolContext 和 HTTP 会话/控制租约，Cli/Connections 管发现，Cli/Preview 管预览编排；Previewer 内分 Hosting、Projects、Documents、Sessions、Watching、Presentation，控制管道生命周期仍由 Hosting/Program.cs 承载。',
-          read: [
-            '区分外部附加应用与本工具自建的预览。',
-            '查看启动握手、构建失败和目标切换。',
-            '确认重载内容代际、父进程失联和释放顺序。',
-          ],
-          reuse: '会话协调器决定何时连接；Client 实现如何连接。Previewer 自己拥有 loader 与 watcher。',
-        },
-      ];
-      const domainList = document.querySelector('.domain-list');
-      const domainDetail = document.querySelector('.domain-detail');
-      function showDomain(index) {
-        const item = domains[index];
-        Array.from(domainList.children).forEach((button, i) =>
-          button.setAttribute('aria-pressed', String(i === index)),
-        );
-        domainDetail.innerHTML = `<h3>${item.name}</h3><p class="scope">${item.scope}</p><p class="detail-label">现有代码 · 可以从这里读起</p><ul class="file-list">${item.files.map(([label, path]) => `<li><a href="../../src/${path}">${label} · ${path}</a></li>`).join('')}</ul><p class="detail-label">当前归属</p><div class="path-block">${item.target}</div><p class="detail-label">阅读与扩展顺序</p><ol class="reading">${item.read.map((text) => `<li>${text}</li>`).join('')}</ol><p class="change-note">${item.reuse}</p>`;
-      }
-      domains.forEach((item, index) => {
-        const button = document.createElement('button');
-        button.className = 'domain-button';
-        button.type = 'button';
-        button.textContent = item.name;
-        button.setAttribute('aria-pressed', String(index === 0));
-        button.addEventListener('click', () => showDomain(index));
-        domainList.appendChild(button);
-      });
-      showDomain(0);
-    </script>
   </body>
 </html>

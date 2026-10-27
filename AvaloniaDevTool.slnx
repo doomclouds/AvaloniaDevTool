@@ -4,16 +4,40 @@
         <Project Path="samples/AvaloniaDevTool.Sample/AvaloniaDevTool.Sample.csproj" />
         <Project Path="samples/AvaloniaDevTool.AotSample/AvaloniaDevTool.AotSample.csproj" />
     </Folder>
-    <Folder Name="/src/">
-        <Project Path="src/AvaloniaDevTool.NativeAutomation/AvaloniaDevTool.NativeAutomation.csproj" />
-        <Project Path="src/AvaloniaDevTool.NativeAutomation.Worker/AvaloniaDevTool.NativeAutomation.Worker.csproj" />
-        <Project Path="src/AvaloniaDevTool.Agent/AvaloniaDevTool.Agent.csproj" />
-        <Project Path="src/AvaloniaDevTool.Cli/AvaloniaDevTool.Cli.csproj" />
-        <Project Path="src/AvaloniaDevTool.Client/AvaloniaDevTool.Client.csproj" />
-        <Project Path="src/AvaloniaDevTool.Logging/AvaloniaDevTool.Logging.csproj" />
-        <Project Path="src/AvaloniaDevTool.Previewer/AvaloniaDevTool.Previewer.csproj" />
-        <Project Path="src/AvaloniaDevTool.Protocol/AvaloniaDevTool.Protocol.csproj" />
-        <Project Path="src/AvaloniaDevTool.Remote/AvaloniaDevTool.Remote.csproj" />
+    <Folder Name="/src/Contracts/">
+        <Project Path="src/Contracts/AvaloniaDevTool.Contracts/AvaloniaDevTool.Contracts.csproj" />
+    </Folder>
+    <Folder Name="/src/Domain/">
+        <Project Path="src/Domain/AvaloniaDevTool.Domain/AvaloniaDevTool.Domain.csproj" />
+    </Folder>
+    <Folder Name="/src/Application/">
+        <Project Path="src/Application/AvaloniaDevTool.Application/AvaloniaDevTool.Application.csproj" />
+    </Folder>
+    <Folder Name="/src/Infrastructure/">
+        <Project
+            Path="src/Infrastructure/AvaloniaDevTool.Infrastructure.Avalonia/AvaloniaDevTool.Infrastructure.Avalonia.csproj" />
+        <Project
+            Path="src/Infrastructure/AvaloniaDevTool.Infrastructure.Execution/AvaloniaDevTool.Infrastructure.Execution.csproj" />
+        <Project Path="src/Infrastructure/AvaloniaDevTool.Infrastructure.Mcp/AvaloniaDevTool.Infrastructure.Mcp.csproj" />
+        <Project Path="src/Infrastructure/AvaloniaDevTool.Infrastructure.Rpc/AvaloniaDevTool.Infrastructure.Rpc.csproj" />
+        <Project
+            Path="src/Infrastructure/AvaloniaDevTool.Infrastructure.Windows/AvaloniaDevTool.Infrastructure.Windows.csproj" />
+    </Folder>
+    <Folder Name="/src/SDK/">
+        <Project Path="src/SDK/AvaloniaDevTool.Agent/AvaloniaDevTool.Agent.csproj" />
+    </Folder>
+    <Folder Name="/src/Hosts/">
+        <Project Path="src/Hosts/AvaloniaDevTool.Cli/AvaloniaDevTool.Cli.csproj" />
+        <Project
+            Path="src/Hosts/AvaloniaDevTool.NativeAutomation.Worker/AvaloniaDevTool.NativeAutomation.Worker.csproj" />
+        <Project Path="src/Hosts/AvaloniaDevTool.Previewer/AvaloniaDevTool.Previewer.csproj" />
+    </Folder>
+    <Folder Name="/src/Extensions/">
+        <Project Path="src/Extensions/AvaloniaDevTool.Logging/AvaloniaDevTool.Logging.csproj" />
+        <Project Path="src/Extensions/AvaloniaDevTool.Remote/AvaloniaDevTool.Remote.csproj" />
+    </Folder>
+    <Folder Name="/src/Packaging/">
+        <Project Path="src/Packaging/AvaloniaDevTool.Packaging/AvaloniaDevTool.Packaging.csproj" />
     </Folder>
     <Folder Name="/tests/">
         <Project Path="tests/AvaloniaDevTool.NativeAutomation.Tests/AvaloniaDevTool.NativeAutomation.Tests.csproj" />
@@ -26,5 +50,59 @@
         <Project Path="tests/AvaloniaDevTool.PreviewFixture.Controls/AvaloniaDevTool.PreviewFixture.Controls.csproj" />
         <Project Path="tests/AvaloniaDevTool.Protocol.Tests/AvaloniaDevTool.Protocol.Tests.csproj" />
         <Project Path="tests/AvaloniaDevTool.Remote.Tests/AvaloniaDevTool.Remote.Tests.csproj" />
+        <Project Path="tests/AvaloniaDevTool.Packaging.Tests/AvaloniaDevTool.Packaging.Tests.csproj" />
+    </Folder>
+    <Folder Name="/tools/">
+        <File Path="tools/Format-Auxiliary.ps1" />
+        <File Path="tools/Format-Code.ps1" />
+        <File Path="tools/Install-AvaloniaDevTool.ps1" />
+        <File Path="tools/PSScriptAnalyzerSettings.psd1" />
+        <File Path="tools/Build-Solution.ps1" />
+        <File Path="src/Packaging/AvaloniaDevTool.Packaging/Build-Bundle.ps1" />
+    </Folder>
+    <Folder Name="/docs/">
+        <File Path="docs/architecture.md" />
+        <File Path="docs/assets.md" />
+        <File Path="docs/binding-diagnostics.md" />
+        <File Path="docs/breakpoints.md" />
+        <File Path="docs/code-style.md" />
+        <File Path="docs/composition-capture.md" />
+        <File Path="docs/contextual-properties.md" />
+        <File Path="docs/events.md" />
+        <File Path="docs/implementation-status.md" />
+        <File Path="docs/input.md" />
+        <File Path="docs/layout-3d.md" />
+        <File Path="docs/logging.md" />
+        <File Path="docs/mcp.md" />
+        <File Path="docs/merged-tree.md" />
+        <File Path="docs/metrics.md" />
+        <File Path="docs/native-aot.md" />
+        <File Path="docs/object-browser.md" />
+        <File Path="docs/overlays.md" />
+        <File Path="docs/popup-freeze.md" />
+        <File Path="docs/preview-attach.md" />
+        <File Path="docs/previewer.md" />
+        <File Path="docs/profiler.md" />
+        <File Path="docs/properties.md" />
+        <File Path="docs/protocol-monitor.md" />
+        <File Path="docs/remote-transport.md" />
+        <File Path="docs/renderer-diagnostics.md" />
+        <File Path="docs/resources.md" />
+        <File Path="docs/testing.md" />
+        <File Path="docs/tree-workflows.md" />
+        <File Path="docs/packaging-and-installation.md" />
+    </Folder>
+    <Folder Name="/Solution Items/">
+        <File Path="README.md" />
+        <File Path="Directory.Build.props" />
+        <File Path="global.json" />
+        <File Path=".editorconfig" />
+        <File Path=".gitignore" />
+        <File Path="dotnet-tools.json" />
+        <File Path="AvaloniaDevTool.slnx.DotSettings" />
+        <File Path="pyproject.toml" />
+    </Folder>
+    <Folder Name="/build/">
+        <File Path="build/Build-Bundle.ps1" />
     </Folder>
 </Solution>

@@ -1,155 +1,100 @@
-# AvaloniaDevTool
+# AvaloniaDevTool 0.1.0
 
-AvaloniaDevTool 提供自研 Avalonia 应用内 Agent 和独立 MCP 宿主，支持本机 stdio 与内网 HTTP，当前使用 .NET 10、Avalonia 12.1.4。默认 `agent` profile 提供 **44 项工具**：canonical 16、`ui-*` 9、`native-*` 8、`file-dialog-*` 8、`capture-*` 3。能力包括通用界面操作、控件树/属性/状态、真实 Windows 文件弹窗、控件/窗口/区域 PNG，以及原始 metrics、样式/资源 Profiler、logs/events。
+AvaloniaDevTool 为 Avalonia 应用提供控件检查、临时调试修改、界面交互、Windows 原生窗口与文件弹窗、PNG、原始诊断采集和 XAML 文件预览。目标应用引用 Agent SDK；调用方负责业务流程、业务判断和测试断言。
 
-产品提供操作和数据，调用方负责业务关联、业务判断及自己的流程编排。代表性业务脚本只用于研发验证；不提供业务断言引擎、视觉比对、性能阈值、发版门禁或 CI 平台。当前边界见 [Agent 范围](docs/agent-tools/architecture/current-agent-scope.md)，实现与验证结果见 [实现状态](docs/implementation-status.md) 和 [测试记录](docs/testing.md)，工具数和测试数均不表示产品完成率。
+**一个 MCP 配置，默认本机，指定 IP 切换执行电脑。** `mcp` 是 Codex 启动的 stdio 网关；`serve` 是被测电脑运行的 HTTP 执行 Console。两者复用同一套能力和执行工具。普通终端不提供 `tree/click` 等直接业务子命令。
 
-## 理解架构与扩展
+## 安装与单 exe 分发
 
-先看[离线架构图](docs/architecture/overview.html)，再读[项目架构导航](docs/architecture.md)：运行进程、项目依赖、领域职责、启动流程和源码阅读路径都从这里进入。
-
-- [项目清单与依赖](docs/architecture/project-inventory.md)：22 个项目、编译引用、构建分发和测试支撑。
-- [结构与重构记录](docs/architecture/refactoring-blueprint.md)：实际目录、领域划分、资源所有权和本轮迁移结果。
-- [工具扩展指南](docs/architecture/extending-tools.md)：复用已有能力、新增 RPC、native 能力和框架适配的完整路径。
-- [内网双机 MCP 部署](docs/architecture/lan-mcp-design.md)：Codex 与 Avalonia 分处两台电脑，HTTP 无 Token、IP/端口参数和控制会话边界。
-
-源码已按领域目录归位，共享调用上下文与会话生命周期独立。旧公开工具聚合类保留兼容，HTTP 首版使用 agent 目录，stdio 保留三种 profile。
-
-代码格式由解决方案级 ReSharper `.DotSettings` 统一管理，固定工具版本、全量格式化命令及检查方式见[代码格式约定](docs/code-style.md)。
-
-## Codex 与被测电脑分开运行
-
-被测电脑 A 在完整 CLI 分发目录中运行宿主，并保持与目标应用相同的用户交互桌面：
+独立的 [Packaging 工程](src/Packaging/AvaloniaDevTool.Packaging/AvaloniaDevTool.Packaging.csproj) 将控制台、Previewer、Windows worker 的自包含发布资产嵌入 `AvaloniaDevTool.exe`。运行时校验、缓存解包并按需启动隔离子进程，不要求用户分别部署内部 DLL。
 
 ```powershell
-dotnet AvaloniaDevTool.Cli.dll mcp --transport http --listen 192.168.1.50 --port 7443
+pwsh -File src/Packaging/AvaloniaDevTool.Packaging/Build-Bundle.ps1 -Version 0.1.0
+pwsh -File tools/Install-AvaloniaDevTool.ps1 -PackagePath .\artifacts\package\win-x64\AvaloniaDevTool.exe -Version 0.1.0
 ```
 
-Codex 电脑 B 和其他 MCP 一样，通过标准配置加载连接，无需 Token：
+安装目录为 `%USERPROFILE%\.local\share\avalonia-devtool\versions\<版本>`；稳定入口为 `%USERPROFILE%\.local\bin\AvaloniaDevTool.exe`。脚本更新用户级 PATH 和 `AVALONIA_DEVTOOL_HOME`，保留旧版本，校验失败或入口锁定时不会切换到损坏的命令。已有终端或 Codex 可能需要重新启动以读取新环境。
+
+完整命令、校验和回滚行为见 [打包与安装](docs/packaging-and-installation.md)。单 exe 指工具分发文件；运行时仍会释放内部资产并启动多个进程。工具运行自包含，用户工程评估和构建仍需要 .NET SDK。
+
+## Codex 只配置一次
+
+将路径换成实际用户目录：
 
 ```toml
-[mcp_servers.avalonia_testpc]
-url = "http://192.168.1.50:7443/mcp"
+[mcp_servers.avalonia]
+command = 'C:\Users\a\.local\bin\AvaloniaDevTool.exe'
+args = ["mcp"]
+startup_timeout_sec = 120
 ```
 
-将示例 IP 替换为 A 的实际地址。HTTP 连接后，用 `attach-to-app {}` 发现 A 的诊断端点，再用本次返回的应用 `id` 附加；应用须引用 Agent 并在 Avalonia 初始化后调用 `DiagnosticsAgent.Attach`。URL 选择电脑，应用 id 选择程序，nodeId 选择控件。
+0.1.0 只提供一套当前能力合同；网关在统一执行工具目录上增加 `select-machine`。选择机器不改变外部工具目录：
 
-A 的框架依赖式宿主需要 ASP.NET Core Runtime；native worker 还需要 Windows Desktop Runtime。文件预览的 MSBuild 评估和构建另需 .NET 10 SDK。安装 SDK 的开发机器通常已具备这些环境。完整分发保留 `previewer/`、`native-worker/` 和依赖文件，不能只复制 CLI DLL。构建、启动与关联流程见[部署说明](docs/architecture/lan-mcp-design.md)。
-
-## 快速运行
-
-需要 .NET 10 SDK；可见 Sample 和预览窗口还需要桌面环境。在仓库根目录构建：
-
-```powershell
-dotnet build AvaloniaDevTool.slnx
+```text
+select-machine {}                           默认／切回本机
+select-machine {"ip":"192.168.1.50"}        选择远端 Console
+attach-to-app {}                            发现所选电脑的应用
+attach-to-app {"id":<本次发现返回的id>}       附加应用
 ```
 
-先在一个终端运行真实测试目标：
+选择机器后重新发现和附加应用。旧节点、弹窗、采集等句柄不能跨执行会话使用；远端失联不回退本机，也不自动重发可能已经执行的动作。
 
-```powershell
-dotnet run --project samples/AvaloniaDevTool.AutomationSample -- --pipe avalonia-devtool-demo
+## 被测电脑启动 Console
+
+在目标用户的交互桌面中运行：
+
+```cmd
+AvaloniaDevTool.exe serve
 ```
 
-AutomationSample 是通用能力的研发验证目标，Debug/Release 均启用本项目 Agent，覆盖实际多窗口、模态、弹层、选择、滚动、拖动和真实平台 StorageProvider 文件读写。可选 `--test-root`、`--ready-file`、`--result-file` 便于隔离测试数据和核对内容/hash；详情见[样例说明](samples/AvaloniaDevTool.AutomationSample/README.md)。再由 MCP 客户端启动已构建的服务：
+`serve` 默认监听 IPv4 接口的 `7443/mcp`；需要指定网卡时使用 `--listen IP`。当前为无 Token 内网模式。目标应用、Console 和原生 worker 应处于同一可交互用户桌面。详见 [本地与远端使用](docs/mcp.md) 和 [双机执行关系](docs/architecture/lan-mcp-design.md)。
 
-```powershell
-dotnet src/AvaloniaDevTool.Cli/bin/Debug/net10.0/AvaloniaDevTool.Cli.dll mcp --pipe avalonia-devtool-demo
-```
+本机也能验证 HTTP 路径：启动一个 Console，调用 `select-machine {"ip":"127.0.0.1"}`。显式提供回环 IP 仍使用 HttpExecutor；本地和 HTTP 测试顺序运行以避免争用目标。
 
-省略 `--profile` 等同 `--profile agent`。标准输出只承载 MCP，日志写入标准错误；客户端宜直接运行 DLL，避免 `dotnet run` 的构建输出混入 stdio。省略 `--pipe` 时，先调用 `attach-to-app {}` 发现本地目标，再用返回的 `id` 附加；该 ID 不是约定的操作系统 PID。MCP 附加不需要 F12，单个 Agent 同时接受一个诊断连接。详细启动配置和调用示例见 [MCP](docs/mcp.md)。
+## 能力域
 
-## 工具与预览
-
-| 范围 | 默认 agent 工具 |
+| 能力域 | 主要能力 |
 | --- | --- |
-| 会话 | `attach-to-app`、`attach-to-file`、`detach` |
-| 树和搜索 | `tree`、`ancestors`、`search` |
-| 属性和样式 | `props`、`set-prop`、`styles`、`pseudo-class` |
-| 资源和媒体 | `resources`、`assets`、`open-asset`、`screenshot` |
-| 交互 | `input`、`action` |
-| 框架交互与截图 9 项 | `ui-input`、`ui-click`、`ui-key-chord`、`ui-drag`、`ui-text-selection`、`ui-select-item`、`ui-control-action`、`ui-wait`、`ui-screenshot` |
-| Windows 原生 8 项 | `native-windows`、`native-tree`、`native-find`、`native-inspect`、`native-action`、`native-action-status`、`native-input`、`native-screenshot` |
-| 文件弹窗 8 项 | `file-dialogs`、`file-dialog-inspect`、`file-dialog-set-paths`、`file-dialog-set-filter`、`file-dialog-accept`、`file-dialog-cancel`、`file-dialog-overwrite`、`file-dialog-wait` |
-| 同连接原始采集 3 项 | `capture-start`、`capture-status`、`capture-stop` |
+| 目标与会话 | 发现、附加、切换、断开及控制范围 |
+| 结构与对象检查 | 树、搜索、祖先、分页、对象下钻 |
+| 属性与样式 | 属性、绑定、样式、伪类、临时覆盖和恢复 |
+| 资源与资产 | 运行资源查询与编辑、嵌入资产查看与导出 |
+| 框架交互 | 文本、键鼠、拖动、选择、控件动作和条件等待 |
+| 原生自动化 | 原生窗口、UIA、OS 输入和异步动作状态 |
+| 文件选择对话 | 路径、过滤器、确认、取消与覆盖提示 |
+| 图像与视觉诊断 | managed/native PNG、布局、合成、覆盖层与弹层冻结 |
+| 运行诊断 | 日志、事件、Metrics、Profiler、断点与原始采集 |
+| XAML 预览 | 项目上下文、构建、文件预览、重载与失败恢复 |
 
-前五行是 canonical 16，显式 `--profile official` 仅注册这组兼容工具。`ui-*` 使用当前 Avalonia 数值节点；native/file-dialog 使用独立字符串 ID，仅操作已附加本地进程及 owned 窗口。native 不占 managed 调用 gate，允许 managed 调用等待模态时继续处理系统弹窗。详情见 [Agent 交互](docs/agent-tools/features/agent-interaction.md)。
+图像随 MCP 结果返回，不以远端磁盘路径代替。文件路径始终属于当前执行电脑；文件弹窗关闭、输入投递或原生动作回执不自动证明应用业务成功。
 
-`ui-screenshot` 捕获控件及局部 DIP 区域，可指定输出缩放；`native-screenshot` 捕获限定窗口/节点的物理像素区域，使用 PrintWindow，不激活窗口或替换为桌面截图。两者返回 PNG image 和元数据，原生 GPU/受保护等表面可能不完整。`capture-*` 复用当前目标连接，返回原始诊断快照、损失和错误，停止后冻结，不评价业务或性能是否通过。
+## 应用接入
 
-`attach-to-file` 接收 `xamlFilePath`、`xamlProjectPath` 和可选 `build=false`。它从真实 MSBuild 项目上下文解析产物，`build=true` 先构建，随后启动本项目 Previewer；保存 XAML 后可重载，更新后应重新 `tree/search` 获取节点。Previewer 是该工具的必要运行和分发依赖，不能随 GUI 删除。项目选择、进程清理和支持边界见 [文件预览](docs/agent-tools/features/preview.md)。
-
-旧诊断扩展保留在显式 `--profile extended`，工具目录为旧 **62 项**。它与 official 是两套独立契约，**不是官方工具的兼容超集**；同名工具的参数和行为可能不同，例如旧 `set-prop` 使用 JSON null 清覆盖，官方入口使用字符串 `"null"` / `"unset"`，文件附加参数也不同。Remote、日志、指标、Profiler、断点、几何等保留的服务能力不计入官方 16 项分母，使用前以该 profile 的 `tools/list` 为准。
-
-## 在自己的应用中接入
-
-核心接入点是 `AvaloniaDevTool.Agent`。源码消费时引用该项目，在 Avalonia 初始化完成后附加，并在应用退出时释放：
+引用 [Agent SDK](src/SDK/AvaloniaDevTool.Agent/AvaloniaDevTool.Agent.csproj)，在 Avalonia 初始化完成后调用并保存实例：
 
 ```csharp
-using Avalonia;
-using Avalonia.Controls.ApplicationLifetimes;
-using AvaloniaDevTool.Agent;
-
-public partial class App : Application
+_diagnostics = DiagnosticsAgent.Attach(this, new DiagnosticsAgentOptions
 {
-#if DEBUG
-    private DiagnosticsAgent? _diagnostics;
-#endif
-
-    public override void OnFrameworkInitializationCompleted()
-    {
-        if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
-        {
-            desktop.MainWindow = new MainWindow();
-#if DEBUG
-            _diagnostics = DiagnosticsAgent.Attach(this, new DiagnosticsAgentOptions
-            {
-                ApplicationName = "My Avalonia App",
-                PipeName = $"avalonia-devtool-{Environment.ProcessId}"
-            });
-            desktop.Exit += (_, _) => _diagnostics?.Dispose();
-#endif
-        }
-
-        base.OnFrameworkInitializationCompleted();
-    }
-}
+    ApplicationName = "My Avalonia App"
+});
 ```
 
-本项目 Agent 不要求安装原版 DeveloperTools。默认管道限制当前用户；对象访问进入目标 UI 线程，临时诊断覆盖在断开时释放。可选 `AvaloniaDevTool.Logging` 接入 Microsoft.Extensions.Logging，`AvaloniaDevTool.Remote` 提供扩展 Native WebSocket 传输，核心 Agent 不依赖这两者。内部协议、对象身份与释放职责见 [架构](docs/architecture.md)。
+在应用退出时释放。外部附加的应用不会被 detach 终止；工具只清理自己的临时修改、监听、自建预览与 worker。
 
-## 项目结构
+`attach-to-file` 用于 XAML 设计预览，按需启动内部 Previewer。仅操作已经运行的应用时无需启动预览器。预览目标继续复用普通检查、交互和采集能力，见 [预览说明](docs/agent-tools/features/preview.md)。
 
-解决方案当前包含 **22 个项目**：9 个生产项目、3 个消费样例、10 个测试或测试支撑项目。
+## 源码与验证
 
-| 项目 | 职责 |
-| --- | --- |
-| `src/AvaloniaDevTool.Agent` | 目标内 SDK、Avalonia 对象访问与诊断服务 |
-| `src/AvaloniaDevTool.Client` | 类型化客户端、连接、请求与通知 |
-| `src/AvaloniaDevTool.Protocol` | DTO、内部 RPC、JSON 源生成元数据 |
-| `src/AvaloniaDevTool.Cli` | 独立 stdio MCP，默认 agent / 显式 official、extended profile |
-| `src/AvaloniaDevTool.NativeAutomation` | net10.0 跨平台 facade、native 会话和真实文件弹窗状态机 |
-| `src/AvaloniaDevTool.NativeAutomation.Worker` | net10.0-windows7.0 隔离进程，Windows UIA3 和 OS 输入 |
-| `src/AvaloniaDevTool.Previewer` | 文件附加所需的独立设计期预览宿主 |
-| `src/AvaloniaDevTool.Logging`、`src/AvaloniaDevTool.Remote` | 可选日志适配和远程传输扩展 |
-| `samples/AvaloniaDevTool.AutomationSample` | 桌面交互、真实 OS picker 和 UTF-8 文档读写的研发验证目标 |
-| `samples/AvaloniaDevTool.Sample`、`samples/AvaloniaDevTool.AotSample` | 绑定/资源等 SDK 回归目标和最小 AOT 消费目标；Sample 默认仅 Debug 启用 Agent |
-| `tests/AvaloniaDevTool.Agent.Tests`、`.Cli.Tests`、`.Protocol.Tests` | 目标内服务、真实 stdio MCP 和协议回归 |
-| `tests/AvaloniaDevTool.Previewer.Tests`、`.Remote.Tests` | 预览宿主与远程传输回归 |
-| `tests/AvaloniaDevTool.PreviewFixture`、`.PreviewFixture.Controls` | 真实 classful 预览应用和独立控件库 |
-| `tests/AvaloniaDevTool.AotSmoke` | 独立 Client 对实际发布目标的消费验证 |
-| `tests/AvaloniaDevTool.NativeAutomation.Tests`、`.NativeAutomation.Fixture` | Windows native 底层、路径预检、owned modal、OS 输入与进程隔离目标 |
+解决方案统一按 `Contracts / Domain / Application / Infrastructure / SDK / Hosts / Extensions / Packaging` 分层。能力对象拥有自己的状态与生命周期，调用方直接使用当前能力 API；未发版的旧 SDK 壳、类型转发、平铺 API 和 profile 已移除。JSON 源生成所需的 partial 保留。
 
-## 验证和文档
+```powershell
+dotnet build AvaloniaDevTool.slnx -m:1
+```
 
-[测试说明](docs/testing.md) 区分专项、统一批次、真实进程、像素断言和桌面观察；专项通过不能代替最终统一回归。已有真实控件、WinForms/UIA、CommonItemDialog 和 stdio MCP 的 PNG 证据；native 几何单测只验证坐标与预算，不算运行截图验证。历史批次不挪作本轮结果。
+- [架构与类图](docs/architecture.md)、[项目依赖清单](docs/architecture/project-inventory.md)、[重构记录](docs/architecture/refactoring-blueprint.md)。
+- [MCP 使用](docs/mcp.md)、[工具扩展](docs/architecture/extending-tools.md)、[运行契约](docs/architecture/runtime-contracts.md)。
+- [测试记录](docs/testing.md)、[实现状态](docs/implementation-status.md)、[当前能力边界](docs/agent-tools/architecture/current-agent-scope.md)。
 
-Windows native 仅支持本机交互桌面及可验证 owner 范围，拒绝 remote transport；非 Windows RID 不打包 Windows worker。macOS/Linux 原生后端、IME 候选/组合输入和系统文件/数据 DragDrop 不在本轮范围。完整 CPU 调用栈与内存分配剖析交由其他工具；本项目 Profiler 仅采样式/资源活动。
+Windows native 通过执行电脑上的本地 worker 完成。可选 Agent WebSocket 接入是另一条内部传输，其 native 限制不影响统一网关的 HTTP 执行链。
 
-用户不做原版 DeveloperTools 授权运行等价对照；它不列为当前待完成项，也不是自研 Agent 的运行前置条件。官方 schema/运行语义资料保留为兼容研究。独立 Inspector GUI、XamlMcp 只读后端及专属测试已经退出本分支，历史桌面基线位于 `main/fa1c623`。
-
-- [官方能力与证据](docs/agent-tools/research/official-capabilities.md)、[输入声明差距的历史基线](docs/agent-tools/research/schema-parity.md)、[范围与依赖](docs/agent-tools/architecture/scope-and-dependencies.md)。
-- [树与搜索](docs/agent-tools/tree-search.md)、[属性、样式和操作](docs/agent-tools/features/properties.md)、[输入、资源和媒体](docs/agent-tools/features/input-media.md)、[文件预览](docs/agent-tools/features/preview.md)。
-- [实现状态](docs/implementation-status.md)、[测试](docs/testing.md)、[架构](docs/architecture.md)、[MCP](docs/mcp.md)。
-- [当前 Agent 范围](docs/agent-tools/architecture/current-agent-scope.md)、[自动化能力与研发验证](docs/agent-tools/architecture/automation-and-acceptance.md)。
-- [完整 UI 自动化与固定验收清单](docs/agent-tools/architecture/complete-ui-automation.md)、[Agent 交互工具](docs/agent-tools/features/agent-interaction.md)、[连接与兼容契约](docs/agent-tools/features/connection.md)。
-- 保留的扩展服务说明包括 [日志](docs/logging.md)、[远程传输](docs/remote-transport.md)、[Native AOT](docs/native-aot.md)、[资源](docs/resources.md)、[资产](docs/assets.md)；这些文档的旧 GUI 操作和历史测试证据均有范围标识。
+当前不提供业务脚本语言、断言引擎、视觉比对、性能阈值或发布门禁。脚本可作为标准 MCP 客户端编排工具，结果和证据解释由调用方负责。

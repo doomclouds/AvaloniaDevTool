@@ -2,11 +2,11 @@
 
 补充：同名附加属性（例如TextSearch.Text）会随控件类型初始化注册。完整props仍保留全部属性；按裸名称过滤/设置时，当前SDK通过HasClrWrapper标记优先选择目标的实际CLR包装属性，明确owner-qualified ID仍可访问同名附加属性。没有唯一包装时继续报歧义，不任意取第一项。原始Client完整属性集合不保证Name唯一，调用方应按Id识别。
 
-核对目标为 [官方 2.2.3 能力基准](../research/official-capabilities.md) 的 PROPS01–02、SET01–04、STYLES01–03、PSEUDO01–03、ACT01–04。下述为本项目经过运行验证的行为；原版尚没有取得对应 `tools/call` 成功采样，因此返回 DTO、覆盖优先级及省略参数的具体动作不能标成原版行为已确认。
+本页描述0.1.0当前属性、样式与临时修改合同。旧工具schema对照和兼容profile已退出实现；公开接口使用当前能力目录。
 
 ## 输入与实际行为
 
-| 工具 | 官方输入 | 本项目行为 |
+| 工具 | 输入 | 行为 |
 | --- | --- | --- |
 | `props` | `nodeId`，`propertyNames=null` | 返回目标的真实 Avalonia 注册属性、有效值和来源；省略/null 返回全部，名单按名称或 owner-qualified ID 精确过滤。名单内 null 被忽略，空名单返回空数组。默认不运行任意 CLR getter。 |
 | `set-prop` | `nodeId,propertyName,value:string,isXamlValue=false` | 普通文本按目标类型转换；名称歧义要求使用 `props` 的 ID。只修改可撤销的 styled/attached 属性，不使用 CLR setter 代替框架属性系统。 |

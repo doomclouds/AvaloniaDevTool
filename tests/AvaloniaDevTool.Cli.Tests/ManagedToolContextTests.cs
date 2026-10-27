@@ -89,14 +89,14 @@ public sealed class ManagedToolContextTests
         var allocator = new NodeGenerationAllocator();
         await using var firstSession = new ToolSession(agent.PipeName);
         var firstContext = new ManagedToolContext(firstSession, allocator);
-        var firstOfficial = new OfficialTools(firstSession, firstContext);
+        var firstOfficial = new StructureTools(firstSession, firstContext);
         var firstNode = Assert.Single((await firstOfficial.Search(fixture.Button.Name!, searchTemplates: true)).Matches)
             .Id;
-        var firstTools = new AgentTools(firstSession, firstContext);
+        var firstTools = new FrameworkInteractionTools(firstSession, firstContext);
         var clicks = 0;
         fixture.Button.Click += (_, _) => clicks++;
         Assert.True((await firstTools.UiClick(firstNode)).Delivered);
-        Assert.True((await new AgentTools(firstSession, firstOfficial).UiClick(firstNode)).Delivered);
+        Assert.True((await new FrameworkInteractionTools(firstSession, firstContext).UiClick(firstNode)).Delivered);
         Assert.Equal(2, clicks);
         var waited = await firstTools.UiWait(fixture.Button.Name!,
             "Equals",
@@ -104,19 +104,19 @@ public sealed class ManagedToolContextTests
             "Managed target");
         Assert.Equal(firstNode, waited.NodeId);
 
-        await firstOfficial.Detach();
+        await new TargetTools(firstSession, firstContext).Detach();
         await using var secondSession = new ToolSession(agent.PipeName);
         var secondContext = new ManagedToolContext(secondSession, allocator);
-        var secondOfficial = new OfficialTools(secondSession, secondContext);
+        var secondOfficial = new StructureTools(secondSession, secondContext);
         var secondNode = Assert
             .Single((await secondOfficial.Search(fixture.Button.Name!, searchTemplates: true)).Matches).Id;
 
         Assert.NotEqual(firstNode, secondNode);
         var stale = await Assert.ThrowsAsync<McpException>(() =>
-            new AgentTools(secondSession, secondContext).UiClick(firstNode));
+            new FrameworkInteractionTools(secondSession, secondContext).UiClick(firstNode));
         Assert.Contains("stale_node", stale.Message);
         Assert.Equal(2, clicks);
-        Assert.True((await new AgentTools(secondSession, secondContext).UiClick(secondNode)).Delivered);
+        Assert.True((await new FrameworkInteractionTools(secondSession, secondContext).UiClick(secondNode)).Delivered);
         Assert.Equal(3, clicks);
     }
 
@@ -128,7 +128,7 @@ public sealed class ManagedToolContextTests
         await using var agent = fixture.Attach(() => Interlocked.Read(ref generation));
         await using var session = new ToolSession(agent.PipeName);
         var context = new ManagedToolContext(session);
-        var official = new OfficialTools(session, context);
+        var official = new StructureTools(session, context);
         var previous = Assert.Single((await official.Search(fixture.Button.Name!, searchTemplates: true)).Matches).Id;
 
         var staleCall = await Assert.ThrowsAsync<McpException>(() => context.WithClientAsync(CancellationToken.None,
@@ -141,7 +141,8 @@ public sealed class ManagedToolContextTests
         var current = Assert.Single((await official.Search(fixture.Button.Name!, searchTemplates: true)).Matches).Id;
         Assert.NotEqual(previous, current);
         var staleNode =
-            await Assert.ThrowsAsync<McpException>(() => new AgentTools(session, context).UiClick(previous));
+            await Assert.ThrowsAsync<McpException>(() =>
+                new FrameworkInteractionTools(session, context).UiClick(previous));
         Assert.Contains("stale_node", staleNode.Message);
 
         await context.WithClientAsync(CancellationToken.None,
@@ -165,7 +166,7 @@ public sealed class ManagedToolContextTests
         await using var secondAgent = fixture.Attach();
         await using var session = new ToolSession(firstAgent.PipeName);
         var context = new ManagedToolContext(session);
-        var official = new OfficialTools(session, context);
+        var official = new StructureTools(session, context);
         var previous = Assert.Single((await official.Search(fixture.Button.Name!, searchTemplates: true)).Matches).Id;
 
         var staleCall = await Assert.ThrowsAsync<McpException>(() => context.WithClientAsync(CancellationToken.None,
@@ -177,7 +178,9 @@ public sealed class ManagedToolContextTests
         Assert.Contains("stale_session", staleCall.Message);
         var current = Assert.Single((await official.Search(fixture.Button.Name!, searchTemplates: true)).Matches).Id;
         Assert.NotEqual(previous, current);
-        Assert.Contains("stale_node", (await Assert.ThrowsAsync<McpException>(() => official.Props(previous))).Message);
+        Assert.Contains("stale_node",
+            (await Assert.ThrowsAsync<McpException>(() => new PropertyStyleTools(session, context).Props(previous)))
+            .Message);
     }
 
     private sealed class TargetFixture : IDisposable

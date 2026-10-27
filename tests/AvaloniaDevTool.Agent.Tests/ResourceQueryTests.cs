@@ -244,21 +244,22 @@ public sealed class ResourceQueryTests
                     { PipeName = "resource-query-" + Guid.NewGuid().ToString("N"), TopLevelProvider = () => [window] });
             await using var client = new DiagnosticsClient();
             await client.ConnectAsync(agent.PipeName);
-            var rootNode = Assert.Single(await client.GetRootsAsync(TreeKind.Logical));
-            var node = Assert.Single(await client.GetChildrenAsync(rootNode.Id, TreeKind.Logical),
+            var rootNode = Assert.Single(await client.Tree.GetRootsAsync(TreeKind.Logical));
+            var node = Assert.Single(await client.Tree.GetChildrenAsync(rootNode.Id, TreeKind.Logical),
                 item => item.Name == "WireResources");
-            var tree = await client.QueryResourceTreeAsync(new(node.Id));
+            var tree = await client.Resources.QueryResourceTreeAsync(new(node.Id));
             var root = Assert.Single(tree.Roots, item => item.Name.Contains("WireResources", StringComparison.Ordinal));
-            var page = await client.QueryResourceEntriesAsync(new(root.Id, IncludeNested: true, Limit: 1));
+            var page = await client.Resources.QueryResourceEntriesAsync(new(root.Id, IncludeNested: true, Limit: 1));
             Assert.True(page.HasMore);
-            var nested = await client.QueryResourceEntriesAsync(new(root.Id, IncludeNested: true, KeyFilter: "共享"));
+            var nested =
+                await client.Resources.QueryResourceEntriesAsync(new(root.Id, IncludeNested: true, KeyFilter: "共享"));
             var row = Assert.Single(nested.Entries);
             Assert.Equal("原值", row.Value);
             Assert.NotEqual(root.Id, row.OwnerDictionaryId);
-            await client.SetResourceAsync(row.OwnerDictionaryId, row.StringKey!, "新值");
+            await client.Resources.SetResourceAsync(row.OwnerDictionaryId, row.StringKey!, "新值");
             Assert.Equal("新值",
-                (await client.ReadResourceEntryAsync(new(row.OwnerDictionaryId, row.KeyObjectId))).Value);
-            await client.ResetResourceAsync(row.OwnerDictionaryId, row.StringKey!);
+                (await client.Resources.ReadResourceEntryAsync(new(row.OwnerDictionaryId, row.KeyObjectId))).Value);
+            await client.Resources.ResetResourceAsync(row.OwnerDictionaryId, row.StringKey!);
             Assert.Equal("原值", merged["共享键"]);
         }
         finally

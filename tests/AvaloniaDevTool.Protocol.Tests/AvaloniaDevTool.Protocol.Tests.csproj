@@ -12,7 +12,9 @@
             Version="4.0.1">
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <ProjectReference Include="../../src/AvaloniaDevTool.Protocol/AvaloniaDevTool.Protocol.csproj" />
-        <ProjectReference Include="../../src/AvaloniaDevTool.Client/AvaloniaDevTool.Client.csproj" />
+        <ProjectReference
+            Include="../../src/Infrastructure/AvaloniaDevTool.Infrastructure.Rpc/AvaloniaDevTool.Infrastructure.Rpc.csproj" />
+        <ProjectReference
+            Include="../../src/Infrastructure/AvaloniaDevTool.Infrastructure.Execution/AvaloniaDevTool.Infrastructure.Execution.csproj" />
     </ItemGroup>
 </Project>

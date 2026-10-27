@@ -1,5 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-    <ItemGroup>
-        <ProjectReference Include="../AvaloniaDevTool.Protocol/AvaloniaDevTool.Protocol.csproj" />
-    </ItemGroup>
-</Project>

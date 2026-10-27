@@ -1,5 +1,0 @@
-<Project Sdk="Microsoft.NET.Sdk">
-    <PropertyGroup>
-        <Description>Process-scoped Windows UI Automation client with an isolated native worker.</Description>
-    </PropertyGroup>
-</Project>

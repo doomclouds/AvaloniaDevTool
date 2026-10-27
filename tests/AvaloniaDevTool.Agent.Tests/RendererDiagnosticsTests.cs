@@ -162,9 +162,10 @@ public sealed class RendererDiagnosticsTests
                 });
             await using var client = new DiagnosticsClient();
             await client.ConnectAsync(agent.PipeName);
-            var state = await client.GetRendererDiagnosticsAsync();
+            var state = await client.Rendering.GetRendererDiagnosticsAsync();
             var root = Assert.Single(state.Windows);
-            var applied = await client.SetRendererDiagnosticsAsync(new(root.WindowId, RendererOverlayFlags.Fps));
+            var applied =
+                await client.Rendering.SetRendererDiagnosticsAsync(new(root.WindowId, RendererOverlayFlags.Fps));
             Assert.True(applied.IsActive);
             Assert.Equal(RendererOverlayFlags.Fps, Assert.Single(applied.Windows).AddedFlags);
             await client.DisconnectAsync();

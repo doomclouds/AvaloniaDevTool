@@ -30,7 +30,7 @@ public sealed class BrushEditorRpcTests
         Assert.Equal(PropertyEditorKind.Brush, property.Presentation!.Editor);
         var before = Pixel(target.Background!);
         var green = property.Presentation.Brush! with { Stops = [new("Lime", 0), new("Lime", 1)] };
-        await scope.Client.SetBrushAsync(new(scope.Id, property.Id, green));
+        await scope.Client.Properties.SetBrushAsync(new(scope.Id, property.Id, green));
         var after = Pixel(target.Background!);
         Assert.True(after[1] > 240 && before[1] < 10);
         Assert.NotSame(original, target.Background);
@@ -39,9 +39,9 @@ public sealed class BrushEditorRpcTests
         var latest = new SolidColorBrush(Colors.Yellow);
         model.Value = latest;
         Assert.IsType<LinearGradientBrush>(target.Background);
-        await scope.Client.ClearPropertyAsync(scope.Id, property.Id);
+        await scope.Client.Properties.ClearPropertyAsync(scope.Id, property.Id);
         Assert.Same(latest, target.Background);
-        await scope.Client.SetBrushAsync(new(scope.Id, property.Id, green));
+        await scope.Client.Properties.SetBrushAsync(new(scope.Id, property.Id, green));
         var newest = new SolidColorBrush(Colors.Cyan);
         model.Value = newest;
         await scope.Client.DisposeAsync();
@@ -70,7 +70,7 @@ public sealed class BrushEditorRpcTests
                 67,
                 "1,0,0,1,2,3",
                 "50%, 50%");
-            await scope.Client.SetBrushAsync(new(scope.Id, id, draft));
+            await scope.Client.Properties.SetBrushAsync(new(scope.Id, id, draft));
             var read = (await scope.Property()).Presentation!.Brush!;
             Assert.Equal(kind, read.Kind);
             Assert.Equal(0.7, read.Opacity);
@@ -131,7 +131,7 @@ public sealed class BrushEditorRpcTests
                  })
         {
             var error = await Assert.ThrowsAsync<RpcException>(() =>
-                scope.Client.SetBrushAsync(new(scope.Id, property.Id, invalid)));
+                scope.Client.Properties.SetBrushAsync(new(scope.Id, property.Id, invalid)));
             Assert.Equal("conversion_failed", error.Code);
             Assert.Same(original, target.Background);
         }
@@ -140,8 +140,8 @@ public sealed class BrushEditorRpcTests
         Assert.False((await scope.Property()).CanEdit);
         Assert.Equal("unsupported_type",
             (await Assert.ThrowsAsync<RpcException>(() =>
-                scope.Client.SetBrushAsync(new(scope.Id, property.Id, new(BrushKind.Solid))))).Code);
-        Assert.Single(await scope.Client.GetRootsAsync(TreeKind.Logical));
+                scope.Client.Properties.SetBrushAsync(new(scope.Id, property.Id, new(BrushKind.Solid))))).Code);
+        Assert.Single(await scope.Client.Tree.GetRootsAsync(TreeKind.Logical));
     }
 
     private static byte[] Pixel(IBrush brush)
@@ -194,7 +194,7 @@ public sealed class BrushEditorRpcTests
         public long Id => id;
 
         public async Task<PropertyInfoDto> Property() =>
-            (await client.GetPropertiesAsync(id)).Single(property => property.Name == "Background");
+            (await client.Properties.GetPropertiesAsync(id)).Single(property => property.Name == "Background");
 
         public static async Task<Scope> Create(Border target)
         {
@@ -205,8 +205,8 @@ public sealed class BrushEditorRpcTests
                     { PipeName = "avdt-brush-" + Guid.NewGuid().ToString("N"), TopLevelProvider = () => [window] });
             var client = new DiagnosticsClient();
             await client.ConnectAsync(agent.PipeName);
-            var root = Assert.Single(await client.GetRootsAsync(TreeKind.Logical));
-            var node = (await client.GetChildrenAsync(root.Id, TreeKind.Logical)).Single(child =>
+            var root = Assert.Single(await client.Tree.GetRootsAsync(TreeKind.Logical));
+            var node = (await client.Tree.GetChildrenAsync(root.Id, TreeKind.Logical)).Single(child =>
                 child.Name == target.Name);
             return new Scope(window, agent, client, node.Id);
         }

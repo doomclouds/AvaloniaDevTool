@@ -12,9 +12,10 @@
         <PackageReference Include="xunit.runner.visualstudio"
             Version="4.0.1"
             PrivateAssets="all" />
-        <ProjectReference Include="../../src/AvaloniaDevTool.NativeAutomation/AvaloniaDevTool.NativeAutomation.csproj" />
         <ProjectReference
-            Include="../../src/AvaloniaDevTool.NativeAutomation.Worker/AvaloniaDevTool.NativeAutomation.Worker.csproj"
+            Include="../../src/Infrastructure/AvaloniaDevTool.Infrastructure.Execution/AvaloniaDevTool.Infrastructure.Execution.csproj" />
+        <ProjectReference
+            Include="../../src/Hosts/AvaloniaDevTool.NativeAutomation.Worker/AvaloniaDevTool.NativeAutomation.Worker.csproj"
             ReferenceOutputAssembly="false"
             SkipGetTargetFrameworkProperties="true"
             Condition="'$(OS)' == 'Windows_NT'" />
@@ -25,21 +26,25 @@
             Condition="'$(OS)' == 'Windows_NT'" />
     </ItemGroup>
     <ItemGroup>
-        <Compile Include="../../src/AvaloniaDevTool.NativeAutomation.Worker/Coordinates/NativeCoordinateSpace.cs"
-            Link="NativeWorker/NativeCoordinateSpace.cs" />
-        <Compile Include="../../src/AvaloniaDevTool.NativeAutomation.Worker/Identity/NativeWindowLifetimeMonitor.cs"
-            Link="NativeWorker/NativeWindowLifetimeMonitor.cs" />
         <Compile
-            Include="../../src/AvaloniaDevTool.NativeAutomation.Worker/Input/NativeAutomationBackend.InputBatch.cs"
-            Link="NativeWorker/NativeAutomationBackend.InputBatch.cs" />
-        <Compile Include="../../src/AvaloniaDevTool.NativeAutomation.Worker/Capture/NativeScreenshotGeometry.cs"
+            Include="../../src/Infrastructure/AvaloniaDevTool.Infrastructure.Windows/Coordinates/NativeCoordinateSpace.cs"
+            Link="NativeWorker/NativeCoordinateSpace.cs" />
+        <Compile
+            Include="../../src/Infrastructure/AvaloniaDevTool.Infrastructure.Windows/Identity/NativeWindowLifetimeMonitor.cs"
+            Link="NativeWorker/NativeWindowLifetimeMonitor.cs" />
+        <Compile Include="../../src/Infrastructure/AvaloniaDevTool.Infrastructure.Windows/Input/NativeInputBatch.cs"
+            Link="NativeWorker/NativeInputBatch.cs" />
+        <Compile Include="../../src/Infrastructure/AvaloniaDevTool.Infrastructure.Windows/Input/NativeCursorArrival.cs"
+            Link="NativeWorker/NativeCursorArrival.cs" />
+        <Compile
+            Include="../../src/Infrastructure/AvaloniaDevTool.Infrastructure.Windows/Capture/NativeScreenshotGeometry.cs"
             Link="NativeWorker/NativeScreenshotGeometry.cs" />
     </ItemGroup>
     <Target Name="RecordNativeFixturePaths"
         BeforeTargets="GetAssemblyAttributes"
         Condition="'$(OS)' == 'Windows_NT'">
         <MSBuild
-            Projects="../../src/AvaloniaDevTool.NativeAutomation.Worker/AvaloniaDevTool.NativeAutomation.Worker.csproj;../AvaloniaDevTool.NativeAutomation.Fixture/AvaloniaDevTool.NativeAutomation.Fixture.csproj"
+            Projects="../../src/Hosts/AvaloniaDevTool.NativeAutomation.Worker/AvaloniaDevTool.NativeAutomation.Worker.csproj;../AvaloniaDevTool.NativeAutomation.Fixture/AvaloniaDevTool.NativeAutomation.Fixture.csproj"
             Targets="GetTargetPath"
             Properties="Configuration=$(Configuration);TargetFramework=net10.0-windows7.0">
             <Output TaskParameter="TargetOutputs"

@@ -20,9 +20,9 @@
             Version="$(AvaloniaVersion)" />
         <PackageReference Include="Avalonia.Fonts.Inter"
             Version="$(AvaloniaVersion)" />
-        <ProjectReference Include="../../src/AvaloniaDevTool.Cli/AvaloniaDevTool.Cli.csproj" />
-        <ProjectReference Include="../../src/AvaloniaDevTool.Agent/AvaloniaDevTool.Agent.csproj" />
-        <ProjectReference Include="../../src/AvaloniaDevTool.Remote/AvaloniaDevTool.Remote.csproj" />
+        <ProjectReference Include="../../src/Hosts/AvaloniaDevTool.Cli/AvaloniaDevTool.Cli.csproj" />
+        <ProjectReference Include="../../src/SDK/AvaloniaDevTool.Agent/AvaloniaDevTool.Agent.csproj" />
+        <ProjectReference Include="../../src/Extensions/AvaloniaDevTool.Remote/AvaloniaDevTool.Remote.csproj" />
         <ProjectReference Include="../AvaloniaDevTool.PreviewFixture/AvaloniaDevTool.PreviewFixture.csproj"
             ReferenceOutputAssembly="false" />
         <ProjectReference
@@ -31,7 +31,7 @@
     </ItemGroup>
     <Target Name="RecordPreviewTestBuildLocations"
         BeforeTargets="GetAssemblyAttributes">
-        <MSBuild Projects="../../src/AvaloniaDevTool.Cli/AvaloniaDevTool.Cli.csproj"
+        <MSBuild Projects="../../src/Hosts/AvaloniaDevTool.Cli/AvaloniaDevTool.Cli.csproj"
             Targets="GetTargetPath"
             Properties="Configuration=$(Configuration);TargetFramework=$(TargetFramework)">
             <Output TaskParameter="TargetOutputs"

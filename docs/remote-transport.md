@@ -1,6 +1,6 @@
 # Native HTTP/WebSocket 远程传输
 
-> 范围说明：本文保留 Agent/Client 扩展服务的协议、预算、恢复和历史验证资料。文中 Inspector 界面、操作和旧阶段结果仅适用于完整桌面基线 `main/fa1c623`，不代表当前分支 GUI 或统一回归；当前默认 agent 的 44 项目录与 canonical 兼容合同以 [官方能力基准](agent-tools/research/official-capabilities.md) 和对应功能文档为准。扩展入口须显式使用 `--profile extended`，并以该目录的 `tools/list` 确认参数。
+> 范围说明：本页描述可选Agent WebSocket SDK扩展，不是用户MCP的第二条远端入口。0.1.0用户使用stdio网关、select-machine和远端Console；没有profile或attach-to-remote工具。文中Inspector界面与旧测试批次仅作历史资料，当前使用与验证见[MCP](mcp.md)和[测试说明](testing.md)。
 
 当前 Codex 的完整双机接入使用 [Cli 的内网 HTTP MCP](architecture/lan-mcp-design.md)，端点为 `/mcp`，按当前要求无 Token。本页 `/diagnostics` 是可选的内部 RPC WebSocket，原有 Token/TLS 规则保持。扩展 MCP 的环境凭据入口见 [MCP](mcp.md)；旧 Inspector 遮罩输入和启动步骤可从 `fa1c623:docs/remote-inspector.md` 查看，当前分支不再提供该界面。
 

@@ -84,27 +84,28 @@ public sealed class AgentCaptureMcpTests
         switch (running)
         {
             case "metrics":
-                await client.StartMetricsAsync(new MetricsStartRequest(MeterNames: [meter.Name]), Token);
+                await client.Metrics.StartMetricsAsync(new MetricsStartRequest(MeterNames: [meter.Name]), Token);
                 counter.Add(17);
                 break;
             case "profiler":
-                await client.StartProfilerAsync(new ProfilerStartRequest(Categories: [ProfilerCategory.ResourceLookup]),
+                await client.Profiler.StartProfilerAsync(
+                    new ProfilerStartRequest(Categories: [ProfilerCategory.ResourceLookup]),
                     Token);
                 fixture.EmitResourceLookup("PreflightPreserved");
                 break;
             case "activity":
-                await client.StartActivityAsync(new ActivityStartRequest(MinimumLogLevel: "Error"), Token);
+                await client.Activity.StartActivityAsync(new ActivityStartRequest(MinimumLogLevel: "Error"), Token);
                 Log("Preflight retained activity", LogEventLevel.Error);
                 break;
         }
 
-        var beforeMetrics = await client.GetMetricsSnapshotAsync(Token);
-        var beforeProfiler = await client.GetProfilerSnapshotAsync(Token);
-        var beforeActivity = await client.GetActivityStatusAsync(Token);
+        var beforeMetrics = await client.Metrics.GetMetricsSnapshotAsync(Token);
+        var beforeProfiler = await client.Profiler.GetProfilerSnapshotAsync(Token);
+        var beforeActivity = await client.Activity.GetActivityStatusAsync(Token);
         await Assert.ThrowsAsync<McpException>(() => tools.StartCapture(cancellationToken: Token));
-        var afterMetrics = await client.GetMetricsSnapshotAsync(Token);
-        var afterProfiler = await client.GetProfilerSnapshotAsync(Token);
-        var afterActivity = await client.GetActivityStatusAsync(Token);
+        var afterMetrics = await client.Metrics.GetMetricsSnapshotAsync(Token);
+        var afterProfiler = await client.Profiler.GetProfilerSnapshotAsync(Token);
+        var afterActivity = await client.Activity.GetActivityStatusAsync(Token);
         Assert.Equal(running == "metrics", afterMetrics.Status.IsRunning);
         Assert.Equal(running == "profiler", afterProfiler.Status.IsRunning);
         Assert.Equal(running == "activity", afterActivity.IsRunning);
@@ -116,7 +117,7 @@ public sealed class AgentCaptureMcpTests
             afterProfiler.Samples.Select(sample => sample.Sequence));
         Assert.Equal(beforeActivity.MinimumLogLevel, afterActivity.MinimumLogLevel);
         if (running == "activity")
-            Assert.Contains(await client.GetActivityAsync(Token),
+            Assert.Contains(await client.Activity.GetActivityAsync(Token),
                 entry => entry.Message == "Preflight retained activity");
     }
 
@@ -145,9 +146,9 @@ public sealed class AgentCaptureMcpTests
             "invalid-meter-filter" => tools.StartCapture(meterNames: [""], cancellationToken: Token),
             _ => throw new InvalidOperationException(invalid)
         });
-        Assert.False((await client.GetMetricsStatusAsync(Token)).IsRunning);
-        Assert.False((await client.GetProfilerStatusAsync(Token)).IsRunning);
-        Assert.False((await client.GetActivityStatusAsync(Token)).IsRunning);
+        Assert.False((await client.Metrics.GetMetricsStatusAsync(Token)).IsRunning);
+        Assert.False((await client.Profiler.GetProfilerStatusAsync(Token)).IsRunning);
+        Assert.False((await client.Activity.GetActivityStatusAsync(Token)).IsRunning);
     }
 
     [AvaloniaFact]
@@ -188,7 +189,7 @@ public sealed class AgentCaptureMcpTests
         var client = await session.GetAsync(Token);
         await Assert.ThrowsAsync<McpException>(() => tools.StatusCapture(first.CaptureId, Token));
         await Assert.ThrowsAsync<McpException>(() => tools.StopCapture(first.CaptureId, Token));
-        var remaining = await client.GetMetricsStatusAsync(Token);
+        var remaining = await client.Metrics.GetMetricsStatusAsync(Token);
         Assert.True(remaining.IsRunning);
         Assert.Equal(next.Metrics!.Status.CaptureId, remaining.CaptureId);
         Assert.Equal("stopped", (await tools.StopCapture(next.CaptureId, Token)).State);
@@ -212,14 +213,14 @@ public sealed class AgentCaptureMcpTests
         switch (service)
         {
             case "metrics":
-                await client.StartMetricsAsync(new MetricsStartRequest(MeterNames: ["ExternalOwner"]), Token);
+                await client.Metrics.StartMetricsAsync(new MetricsStartRequest(MeterNames: ["ExternalOwner"]), Token);
                 break;
             case "profiler":
-                await client.StartProfilerAsync(new ProfilerStartRequest(Filter: "ExternalOwner"), Token);
+                await client.Profiler.StartProfilerAsync(new ProfilerStartRequest(Filter: "ExternalOwner"), Token);
                 break;
             // Identical settings also constitute a new owner's capture.
             case "activity":
-                await client.StartActivityAsync(new ActivityStartRequest(EventName: "Click"), Token);
+                await client.Activity.StartActivityAsync(new ActivityStartRequest(EventName: "Click"), Token);
                 break;
         }
 
@@ -228,9 +229,9 @@ public sealed class AgentCaptureMcpTests
         Assert.NotEmpty(stopped.Issues);
         Assert.True(service switch
         {
-            "metrics" => (await client.GetMetricsStatusAsync(Token)).IsRunning,
-            "profiler" => (await client.GetProfilerStatusAsync(Token)).IsRunning,
-            "activity" => (await client.GetActivityStatusAsync(Token)).IsRunning,
+            "metrics" => (await client.Metrics.GetMetricsStatusAsync(Token)).IsRunning,
+            "profiler" => (await client.Profiler.GetProfilerStatusAsync(Token)).IsRunning,
+            "activity" => (await client.Activity.GetActivityStatusAsync(Token)).IsRunning,
             _ => false
         });
     }
@@ -300,13 +301,14 @@ public sealed class AgentCaptureMcpTests
         await using var endpoint = new FaultEndpoint();
         await using var session = new ToolSession(endpoint.PipeName);
         var client = await session.GetAsync(Token);
-        await client.StartMetricsAsync(new MetricsStartRequest(), Token);
-        var expected = client.GetDiagnosticMutationEpoch(DiagnosticCaptureService.Metrics);
-        var replacement = await client.StartMetricsAsync(new MetricsStartRequest(), Token);
-        var error = await Assert.ThrowsAsync<RpcException>(() => client.RunOwnedDiagnosticMutationAsync(
-            DiagnosticCaptureService.Metrics,
-            expected,
-            () => client.StopMetricsAsync(Token)));
+        await client.Metrics.StartMetricsAsync(new MetricsStartRequest(), Token);
+        var expected = ((IDiagnosticCaptureClient)client).GetDiagnosticMutationEpoch(DiagnosticCaptureService.Metrics);
+        var replacement = await client.Metrics.StartMetricsAsync(new MetricsStartRequest(), Token);
+        var error = await Assert.ThrowsAsync<RpcException>(() =>
+            ((IDiagnosticCaptureClient)client).RunOwnedDiagnosticMutationAsync(
+                DiagnosticCaptureService.Metrics,
+                expected,
+                () => client.Metrics.StopMetricsAsync(Token)));
         Assert.Equal("capture_ownership_lost", error.Code);
         Assert.DoesNotContain(MetricsMethods.Stop, endpoint.Requests);
         Assert.True(endpoint.Metrics.IsRunning);
@@ -319,15 +321,16 @@ public sealed class AgentCaptureMcpTests
         await using var endpoint = new FaultEndpoint();
         await using var session = new ToolSession(endpoint.PipeName);
         var client = await session.GetAsync(Token);
-        var expected = client.GetDiagnosticMutationEpoch(DiagnosticCaptureService.Metrics);
+        var expected = ((IDiagnosticCaptureClient)client).GetDiagnosticMutationEpoch(DiagnosticCaptureService.Metrics);
         var responseReady =
             new TaskCompletionSource<MetricsStatusDto>(TaskCreationOptions.RunContinuationsAsynchronously);
         var releaseResponse = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-        var original = client.RunOwnedDiagnosticMutationAsync(DiagnosticCaptureService.Metrics,
+        var original = ((IDiagnosticCaptureClient)client).RunOwnedDiagnosticMutationAsync(
+            DiagnosticCaptureService.Metrics,
             expected,
             async () =>
             {
-                var response = await client.StartMetricsAsync(new MetricsStartRequest(), Token);
+                var response = await client.Metrics.StartMetricsAsync(new MetricsStartRequest(), Token);
                 responseReady.TrySetResult(response);
                 await releaseResponse.Task.WaitAsync(Token);
                 return response;
@@ -335,17 +338,19 @@ public sealed class AgentCaptureMcpTests
         try
         {
             var first = await responseReady.Task.WaitAsync(TimeSpan.FromSeconds(5), Token);
-            var replacement = await client.StartMetricsAsync(new MetricsStartRequest(), Token)
+            var replacement = await client.Metrics.StartMetricsAsync(new MetricsStartRequest(), Token)
                 .WaitAsync(TimeSpan.FromSeconds(5), Token);
             Assert.False(original.IsCompleted);
             Assert.NotEqual(first.CaptureId, replacement.CaptureId);
-            Assert.Equal(expected + 2, client.GetDiagnosticMutationEpoch(DiagnosticCaptureService.Metrics));
+            Assert.Equal(expected + 2,
+                ((IDiagnosticCaptureClient)client).GetDiagnosticMutationEpoch(DiagnosticCaptureService.Metrics));
             releaseResponse.TrySetResult();
             Assert.Equal(first.CaptureId, (await original).CaptureId);
-            var error = await Assert.ThrowsAsync<RpcException>(() => client.RunOwnedDiagnosticMutationAsync(
-                DiagnosticCaptureService.Metrics,
-                expected + 1,
-                () => client.StopMetricsAsync(Token)));
+            var error = await Assert.ThrowsAsync<RpcException>(() =>
+                ((IDiagnosticCaptureClient)client).RunOwnedDiagnosticMutationAsync(
+                    DiagnosticCaptureService.Metrics,
+                    expected + 1,
+                    () => client.Metrics.StopMetricsAsync(Token)));
             Assert.Equal("capture_ownership_lost", error.Code);
             Assert.DoesNotContain(MetricsMethods.Stop, endpoint.Requests);
             Assert.True(endpoint.Metrics.IsRunning);
@@ -357,7 +362,7 @@ public sealed class AgentCaptureMcpTests
         }
     }
 
-    private static AgentTools CreateTools(ToolSession session) => new(session, new OfficialTools(session));
+    private static CaptureTools CreateTools(ToolSession session) => new(session, new ManagedToolContext(session));
 
     private static Meter NewMeter() => new("Capture.Tests." + Guid.NewGuid().ToString("N"));
 

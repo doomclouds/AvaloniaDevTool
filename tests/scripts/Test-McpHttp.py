@@ -160,8 +160,8 @@ def tool_value(result):
 def smoke(client, pipe, inspect_native):
     initialization = client.initialize()
     catalog = client.rpc("tools/list")["tools"]
-    if len(catalog) != 44:
-        raise RuntimeError("Expected 44 agent tools; received {}.".format(len(catalog)))
+    if len(catalog) != 88:
+        raise RuntimeError("Expected 88 execution tools; received {}.".format(len(catalog)))
     required = {"attach-to-app", "tree", "search", "props", "ui-screenshot", "native-windows", "capture-start"}
     if not required.issubset({tool["name"] for tool in catalog}):
         raise RuntimeError("The default agent catalog is missing required tools.")

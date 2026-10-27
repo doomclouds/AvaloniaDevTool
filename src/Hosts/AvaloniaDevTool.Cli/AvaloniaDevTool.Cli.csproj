@@ -1,0 +1,86 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+    </PropertyGroup>
+    <PropertyGroup>
+        <BuildNativeWorker
+            Condition="'$(BuildNativeWorker)' == '' and '$(RuntimeIdentifier)' == '' and '$(OS)' == 'Windows_NT'">true</BuildNativeWorker>
+        <BuildNativeWorker
+            Condition="'$(BuildNativeWorker)' == '' and $([System.String]::Copy('$(RuntimeIdentifier)').StartsWith('win'))">true</BuildNativeWorker>
+        <BuildNativeWorker Condition="'$(BuildNativeWorker)' == ''">false</BuildNativeWorker>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference
+            Include="../AvaloniaDevTool.NativeAutomation.Worker/AvaloniaDevTool.NativeAutomation.Worker.csproj"
+            ReferenceOutputAssembly="false"
+            SkipGetTargetFrameworkProperties="true"
+            Condition="'$(BuildNativeWorker)' == 'true'" />
+        <ProjectReference Include="../AvaloniaDevTool.Previewer/AvaloniaDevTool.Previewer.csproj"
+            ReferenceOutputAssembly="false" />
+    </ItemGroup>
+    <Target Name="CopyPreviewHost"
+        AfterTargets="Build">
+        <MSBuild Projects="../AvaloniaDevTool.Previewer/AvaloniaDevTool.Previewer.csproj"
+            Targets="GetTargetPath"
+            Properties="Configuration=$(Configuration);TargetFramework=$(TargetFramework)">
+            <Output TaskParameter="TargetOutputs"
+                ItemName="PreviewHostTarget" />
+        </MSBuild>
+        <PropertyGroup>
+            <PreviewHostOutput>@(PreviewHostTarget-&gt;'%(RootDir)%(Directory)')</PreviewHostOutput>
+        </PropertyGroup>
+        <ItemGroup>
+            <PreviewHostFiles Include="$(PreviewHostOutput)**/*"
+                Exclude="$(PreviewHostOutput)**/*.pdb" />
+        </ItemGroup>
+        <Copy SourceFiles="@(PreviewHostFiles)"
+            DestinationFiles="@(PreviewHostFiles-&gt;'$(OutDir)previewer/%(RecursiveDir)%(Filename)%(Extension)')"
+            SkipUnchangedFiles="true" />
+    </Target>
+    <ItemGroup></ItemGroup>
+    <Target Name="PublishPreviewHost"
+        AfterTargets="Publish">
+        <ItemGroup>
+            <PublishedPreviewFiles Include="$(OutDir)previewer/**/*" />
+        </ItemGroup>
+        <Copy SourceFiles="@(PublishedPreviewFiles)"
+            DestinationFiles="@(PublishedPreviewFiles-&gt;'$(PublishDir)previewer/%(RecursiveDir)%(Filename)%(Extension)')"
+            SkipUnchangedFiles="true" />
+    </Target>
+    <Target Name="CopyNativeWorker"
+        AfterTargets="Build"
+        Condition="'$(BuildNativeWorker)' == 'true'">
+        <MSBuild Projects="../AvaloniaDevTool.NativeAutomation.Worker/AvaloniaDevTool.NativeAutomation.Worker.csproj"
+            Targets="GetTargetPath"
+            Properties="Configuration=$(Configuration);TargetFramework=net10.0-windows7.0">
+            <Output TaskParameter="TargetOutputs"
+                ItemName="NativeWorkerTarget" />
+        </MSBuild>
+        <PropertyGroup>
+            <NativeWorkerOutput>@(NativeWorkerTarget-&gt;'%(RootDir)%(Directory)')</NativeWorkerOutput>
+        </PropertyGroup>
+        <ItemGroup>
+            <NativeWorkerFiles Include="$(NativeWorkerOutput)**/*"
+                Exclude="$(NativeWorkerOutput)**/*.pdb" />
+        </ItemGroup>
+        <Copy SourceFiles="@(NativeWorkerFiles)"
+            DestinationFiles="@(NativeWorkerFiles-&gt;'$(OutDir)native-worker/%(RecursiveDir)%(Filename)%(Extension)')"
+            SkipUnchangedFiles="true" />
+    </Target>
+    <Target Name="PublishNativeWorker"
+        AfterTargets="Publish"
+        Condition="'$(BuildNativeWorker)' == 'true'">
+        <ItemGroup>
+            <PublishedNativeWorkerFiles Include="$(OutDir)native-worker/**/*" />
+        </ItemGroup>
+        <Copy SourceFiles="@(PublishedNativeWorkerFiles)"
+            DestinationFiles="@(PublishedNativeWorkerFiles-&gt;'$(PublishDir)native-worker/%(RecursiveDir)%(Filename)%(Extension)')"
+            SkipUnchangedFiles="true" />
+    </Target>
+    <ItemGroup>
+        <ProjectReference
+            Include="../../Infrastructure/AvaloniaDevTool.Infrastructure.Mcp/AvaloniaDevTool.Infrastructure.Mcp.csproj" />
+        <ProjectReference
+            Include="../../Infrastructure/AvaloniaDevTool.Infrastructure.Execution/AvaloniaDevTool.Infrastructure.Execution.csproj" />
+    </ItemGroup>
+</Project>

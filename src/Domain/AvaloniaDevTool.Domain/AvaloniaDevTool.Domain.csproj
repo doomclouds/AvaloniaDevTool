@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <ProjectReference Include="../../Contracts/AvaloniaDevTool.Contracts/AvaloniaDevTool.Contracts.csproj" />
+    </ItemGroup>
+</Project>

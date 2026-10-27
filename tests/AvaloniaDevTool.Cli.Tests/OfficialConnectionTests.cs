@@ -19,34 +19,14 @@ public sealed class OfficialConnectionTests
     private static string CliPath => typeof(OfficialConnectionTests).Assembly
         .GetCustomAttributes<AssemblyMetadataAttribute>().Single(item => item.Key == "PreviewCliPath").Value!;
 
-    private static string Repository => Path.GetFullPath(typeof(OfficialConnectionTests).Assembly
-        .GetCustomAttributes<AssemblyMetadataAttribute>().Single(item => item.Key == "PreviewRepositoryPath").Value!);
-
     [Fact]
-    public async Task Declared_official_contracts_match_all_fifteen_captured_schemas_and_validate_before_binding()
+    public async Task Current_catalog_lists_all_capabilities_and_validates_arguments_before_binding()
     {
         await using var client = await CreateClient();
         using var raw = await RawToolsList();
         var tools = raw.RootElement.GetProperty("result").GetProperty("tools").EnumerateArray().ToArray();
-        using var captured = JsonDocument.Parse(File.ReadAllText(
-            Path.Combine(Repository, "docs/agent-tools/research/official-mcp-2.2.3-schema.json"),
-            Encoding.UTF8));
-        Assert.Equal(16, tools.Length);
-        foreach (var expected in captured.RootElement.GetProperty("toolsList").GetProperty("result")
-                     .GetProperty("tools").EnumerateArray())
-        {
-            var name = expected.GetProperty("name").GetString();
-            var wire = Assert.Single(tools, item => item.GetProperty("name").GetString() == name);
-            Assert.True(JsonElement.DeepEquals(Strip(expected.GetProperty("inputSchema")),
-                    Strip(wire.GetProperty("inputSchema"))),
-                name);
-            Assert.False(wire.TryGetProperty("outputSchema", out _));
-            if (expected.TryGetProperty("annotations", out var annotations))
-                Assert.True(JsonElement.DeepEquals(annotations, wire.GetProperty("annotations")), name);
-            else
-                Assert.False(wire.TryGetProperty("annotations", out _), name);
-            Assert.True(JsonElement.DeepEquals(expected.GetProperty("execution"), wire.GetProperty("execution")), name);
-        }
+        Assert.Equal(HttpMcpIntegrationTests.ExecutionToolNames.Append("select-machine").Order(StringComparer.Ordinal),
+            tools.Select(tool => tool.GetProperty("name").GetString()).Order(StringComparer.Ordinal));
 
         foreach (var invalid in new[]
                  {
@@ -68,10 +48,10 @@ public sealed class OfficialConnectionTests
         await using var alpha = await ExternalTarget.Start("Alpha");
         await using var beta = await ExternalTarget.Start("Beta");
         await using var client = await CreateClient();
-        OfficialAttachmentResult listed = null!;
+        ApplicationAttachmentResult listed = null!;
         await Until(async () =>
         {
-            listed = Read<OfficialAttachmentResult>(await Call(client,
+            listed = Read<ApplicationAttachmentResult>(await Call(client,
                 "attach-to-app",
                 new Dictionary<string, object?>()));
             return listed.Applications.Any(app => app.PipeName == alpha.Pipe) &&
@@ -83,7 +63,7 @@ public sealed class OfficialConnectionTests
         Assert.NotEqual(first.Id, second.Id);
         Assert.NotEqual(alpha.Process.Id, first.Id);
         Assert.NotEqual(beta.Process.Id, second.Id);
-        var attached = Read<OfficialAttachmentResult>(await Call(client,
+        var attached = Read<ApplicationAttachmentResult>(await Call(client,
             "attach-to-app",
             new Dictionary<string, object?> { ["id"] = first.Id }));
         Assert.True(attached.Attached);
@@ -96,7 +76,7 @@ public sealed class OfficialConnectionTests
                     "props",
                     new Dictionary<string, object?> { ["nodeId"] = oldNode.Id, ["propertyNames"] = new[] { "Text" } }))
                 .Single().Value);
-        var switched = Read<OfficialAttachmentResult>(await Call(client,
+        var switched = Read<ApplicationAttachmentResult>(await Call(client,
             "attach-to-app",
             new Dictionary<string, object?> { ["id"] = second.Id }));
         Assert.Equal(beta.Process.Id, switched.Session!.ProcessId);
@@ -142,7 +122,7 @@ public sealed class OfficialConnectionTests
                     "12.1.4",
                     99)));
         await using var client = await CreateClient();
-        var apps = Read<OfficialAttachmentResult>(
+        var apps = Read<ApplicationAttachmentResult>(
             await Call(client, "attach-to-app", new Dictionary<string, object?>()));
         var id = apps.Applications.Single(app => app.PipeName == pipe).Id;
         var pending = Call(client, "attach-to-app", new Dictionary<string, object?> { ["id"] = id });
@@ -163,7 +143,7 @@ public sealed class OfficialConnectionTests
         try
         {
             await using var client = await CreateClient(pipe);
-            var absent = Read<OfficialAttachmentResult>(await Call(client, "attach-to-app", new()));
+            var absent = Read<ApplicationAttachmentResult>(await Call(client, "attach-to-app", new()));
             Assert.DoesNotContain(absent.Applications, app => app.PipeName == pipe);
             Assert.Contains("DiagnosticsAgent.Attach", absent.Guidance);
             var failed = await Call(client, "props", new() { ["nodeId"] = 0 });
@@ -172,7 +152,7 @@ public sealed class OfficialConnectionTests
             Assert.Contains("DiagnosticsAgent.Attach", Text(failed));
             await using var agent = DiagnosticsAgent.Attach(Avalonia.Application.Current!,
                 new() { PipeName = pipe, TopLevelProvider = () => [window] });
-            await Until(async () => Read<OfficialAttachmentResult>(await Call(client, "attach-to-app", new()))
+            await Until(async () => Read<ApplicationAttachmentResult>(await Call(client, "attach-to-app", new()))
                 .Applications.Any(app => app.PipeName == pipe));
             var matches = Read<TreeSearchResult>(await Call(client, "search", new() { ["query"] = "UnstartedTarget" }));
             Assert.Single(matches.Matches);
@@ -207,7 +187,7 @@ public sealed class OfficialConnectionTests
             Assert.Equal(process.Id, ready.RootElement.GetProperty("processId").GetInt32());
             var pipe = DiagnosticsProtocol.PipePrefix + process.Id;
             await using var client = await CreateClient(pipe);
-            var absent = Read<OfficialAttachmentResult>(await Call(client, "attach-to-app", new()));
+            var absent = Read<ApplicationAttachmentResult>(await Call(client, "attach-to-app", new()));
             Assert.DoesNotContain(absent.Applications, app => app.PipeName == pipe);
             Assert.Contains("AvaloniaDevTool.Agent", absent.Guidance);
             var result = await Call(client, "props", new() { ["nodeId"] = 0 });
@@ -247,7 +227,7 @@ public sealed class OfficialConnectionTests
             UseShellExecute = false, CreateNoWindow = true, RedirectStandardInput = true, RedirectStandardOutput = true,
             RedirectStandardError = true
         };
-        foreach (var arg in new[] { CliPath, "mcp", "--profile", "official" })
+        foreach (var arg in new[] { CliPath, "mcp" })
             start.ArgumentList.Add(arg);
         using var process = Process.Start(start)!;
         var errors = process.StandardError.ReadToEndAsync(token);
@@ -270,9 +250,12 @@ public sealed class OfficialConnectionTests
         try
         {
             await process.StandardInput.WriteLineAsync(
-                "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-06-18\",\"capabilities\":{},\"clientInfo\":{\"name\":\"wire-contract-test\",\"version\":\"1\"}}}");
+                "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2025-11-25\",\"capabilities\":{},\"clientInfo\":{\"name\":\"wire-contract-test\",\"version\":\"1\"}}}");
             await process.StandardInput.FlushAsync(token);
             using var initialized = await Response(1);
+            Assert.False(initialized.RootElement.TryGetProperty("error", out _), initialized.RootElement.GetRawText());
+            Assert.Equal(AvaloniaDevTool.Cli.Catalog.ExecutionProtocol.Version,
+                initialized.RootElement.GetProperty("result").GetProperty("protocolVersion").GetString());
             await process.StandardInput.WriteLineAsync(
                 "{\"jsonrpc\":\"2.0\",\"method\":\"notifications/initialized\"}");
             await process.StandardInput.WriteLineAsync(
@@ -302,26 +285,11 @@ public sealed class OfficialConnectionTests
             {
                 Command = "dotnet",
                 Arguments = pipe is null
-                    ? [CliPath, "mcp", "--profile", "official"]
-                    : [CliPath, "mcp", "--profile", "official", "--pipe", pipe],
+                    ? [CliPath, "mcp"]
+                    : [CliPath, "mcp", "--pipe", pipe],
                 ShutdownTimeout = TimeSpan.FromSeconds(5), Name = "Official connection tests"
             }),
         cancellationToken: TestContext.Current.CancellationToken);
-
-    private static JsonElement Strip(JsonElement value)
-    {
-        JsonNode? Walk(JsonNode? node)
-        {
-            if (node is JsonObject obj)
-                return new JsonObject(obj.Where(item => item.Key is not ("description" or "title" or "examples"))
-                    .Select(item => KeyValuePair.Create(item.Key, Walk(item.Value))));
-            if (node is JsonArray array)
-                return new JsonArray(array.Select(Walk).ToArray());
-            return node?.DeepClone();
-        }
-
-        return JsonSerializer.SerializeToElement(Walk(JsonNode.Parse(value.GetRawText())));
-    }
 
     private static string Text(CallToolResult value) =>
         string.Join("\n", value.Content.OfType<TextContentBlock>().Select(item => item.Text));

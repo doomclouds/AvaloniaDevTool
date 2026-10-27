@@ -23,8 +23,9 @@
             Version="$(AvaloniaVersion)" />
         <PackageReference Include="Avalonia.Skia"
             Version="$(AvaloniaVersion)" />
-        <ProjectReference Include="../../src/AvaloniaDevTool.Agent/AvaloniaDevTool.Agent.csproj" />
-        <ProjectReference Include="../../src/AvaloniaDevTool.Client/AvaloniaDevTool.Client.csproj" />
-        <ProjectReference Include="../../src/AvaloniaDevTool.Logging/AvaloniaDevTool.Logging.csproj" />
+        <ProjectReference Include="../../src/SDK/AvaloniaDevTool.Agent/AvaloniaDevTool.Agent.csproj" />
+        <ProjectReference
+            Include="../../src/Infrastructure/AvaloniaDevTool.Infrastructure.Execution/AvaloniaDevTool.Infrastructure.Execution.csproj" />
+        <ProjectReference Include="../../src/Extensions/AvaloniaDevTool.Logging/AvaloniaDevTool.Logging.csproj" />
     </ItemGroup>
 </Project>

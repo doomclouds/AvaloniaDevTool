@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <AssemblyName>AvaloniaDevTool</AssemblyName>
+        <RootNamespace>AvaloniaDevTool.Packaging</RootNamespace>
+        <SourceRoot Condition="'$(SourceRoot)' == ''">$([MSBuild]::GetDirectoryNameOfFileAbove('$(MSBuildThisFileDirectory)', 'Directory.Build.props'))</SourceRoot>
+        <PublishSingleFile>true</PublishSingleFile>
+        <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+        <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+        <DebugType>embedded</DebugType>
+        <DebugSymbols>true</DebugSymbols>
+    </PropertyGroup>
+    <ItemGroup>
+        <InternalsVisibleTo Include="AvaloniaDevTool.Packaging.Tests" />
+        <EmbeddedResource Include="$(BundlePayloadPath)"
+            LogicalName="AvaloniaDevTool.Packaging.bundle.zip"
+            Condition="'$(BundlePayloadPath)' != '' and Exists('$(BundlePayloadPath)')" />
+        <EmbeddedResource Include="$(BundleManifestPath)"
+            LogicalName="AvaloniaDevTool.Packaging.bundle.json"
+            Condition="'$(BundleManifestPath)' != '' and Exists('$(BundleManifestPath)')" />
+    </ItemGroup>
+    <Target Name="ValidateBundleInputs"
+        BeforeTargets="PrepareForPublish">
+        <Error Condition="'$(RuntimeIdentifier)' == ''"
+            Text="A Windows RuntimeIdentifier is required. Use Build-Bundle.ps1." />
+        <Error Condition="!Exists('$(BundlePayloadPath)') or !Exists('$(BundleManifestPath)')"
+            Text="BundlePayloadPath and BundleManifestPath must name the prepared bundle. Use Build-Bundle.ps1." />
+    </Target>
+</Project>

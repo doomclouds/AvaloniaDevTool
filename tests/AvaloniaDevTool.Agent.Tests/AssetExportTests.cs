@@ -65,10 +65,10 @@ public sealed class AssetExportTests
             await using var agent = Attach(window);
             await using var client = new DiagnosticsClient();
             await client.ConnectAsync(agent.PipeName);
-            var asset = (await client.GetAssetsAsync()).Single(item =>
+            var asset = (await client.Assets.GetAssetsAsync()).Single(item =>
                 item.Uri.Contains("AvaloniaDevTool.Agent.Tests/Assets/asset-long-utf8.txt",
                     StringComparison.OrdinalIgnoreCase));
-            var preview = await client.OpenAssetAsync(asset.Uri);
+            var preview = await client.Assets.OpenAssetAsync(asset.Uri);
             Assert.True(preview.IsTruncated);
             Assert.Equal(1024 * 1024, preview.ByteLength);
             Assert.True(preview.TotalByteLength > preview.ByteLength);
@@ -78,7 +78,7 @@ public sealed class AssetExportTests
             original.CopyTo(expected);
             using var destination = new MemoryStream();
             var progress = new List<AssetExportProgress>();
-            var result = await client.ExportAssetAsync(asset.Uri,
+            var result = await client.Assets.ExportAssetAsync(asset.Uri,
                 destination,
                 new InlineProgress(value => progress.Add(value)));
             Assert.Equal(expected.ToArray(), destination.ToArray());
@@ -106,14 +106,14 @@ public sealed class AssetExportTests
             await using var agent = Attach(window);
             await using var client = new DiagnosticsClient();
             await client.ConnectAsync(agent.PipeName);
-            var uri = (await client.GetAssetsAsync()).Single(item =>
+            var uri = (await client.Assets.GetAssetsAsync()).Single(item =>
                 item.Uri.Contains("AvaloniaDevTool.Agent.Tests/Assets/asset-long-utf8.txt",
                     StringComparison.OrdinalIgnoreCase)).Uri;
             for (var i = 0; i < 3; i++)
             {
                 using var cancel = new CancellationTokenSource();
                 using var bytes = new MemoryStream();
-                await Assert.ThrowsAnyAsync<OperationCanceledException>(() => client.ExportAssetAsync(uri,
+                await Assert.ThrowsAnyAsync<OperationCanceledException>(() => client.Assets.ExportAssetAsync(uri,
                     bytes,
                     new InlineProgress(value =>
                     {
@@ -124,13 +124,13 @@ public sealed class AssetExportTests
                 Assert.InRange(bytes.Length, 1, AssetExportMethods.ChunkBytes);
             }
 
-            await Assert.ThrowsAsync<IOException>(() => client.ExportAssetAsync(uri, new FailingDestination()));
+            await Assert.ThrowsAsync<IOException>(() => client.Assets.ExportAssetAsync(uri, new FailingDestination()));
             var path = Path.Combine(folder, "existing.txt");
             await File.WriteAllTextAsync(path, "original", Encoding.UTF8);
-            await Assert.ThrowsAsync<IOException>(() => client.ExportAssetToFileAsync(uri, path));
+            await Assert.ThrowsAsync<IOException>(() => client.Assets.ExportAssetToFileAsync(uri, path));
             Assert.Equal("original", await File.ReadAllTextAsync(path, Encoding.UTF8));
             Assert.Single(Directory.GetFiles(folder));
-            var saved = await client.ExportAssetToFileAsync(uri, path, overwrite: true);
+            var saved = await client.Assets.ExportAssetToFileAsync(uri, path, overwrite: true);
             Assert.Equal(saved.ByteLength, new FileInfo(path).Length);
             Assert.Equal(saved.Sha256,
                 Convert.ToHexString(SHA256.HashData(await File.ReadAllBytesAsync(path))).ToLowerInvariant());

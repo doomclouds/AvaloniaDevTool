@@ -48,44 +48,44 @@ public sealed class PopupRootDiscoveryTests
                     { PipeName = "flyout-roots-" + Guid.NewGuid().ToString("N"), TopLevelProvider = () => [window] });
             await using var client = new DiagnosticsClient();
             await client.ConnectAsync(agent.PipeName);
-            Assert.Single(await client.GetRootsAsync(TreeKind.Visual));
+            Assert.Single(await client.Tree.GetRootsAsync(TreeKind.Visual));
             button.Focus();
-            await client.SetFollowFocusAsync(true);
+            await client.Selection.SetFollowFocusAsync(true);
             flyout.Popup.ShouldUseOverlayLayer = false;
             flyout.ShowAt(button);
             window.UpdateLayout();
             var popupRoot = Assert.IsType<PopupRoot>(TopLevel.GetTopLevel(first));
             Assert.DoesNotContain(flyout.Popup, window.GetLogicalDescendants().OfType<Popup>());
             Assert.Contains(flyout.Popup, window.OpenedPopups);
-            var roots = await client.GetRootsAsync(TreeKind.Visual);
+            var roots = await client.Tree.GetRootsAsync(TreeKind.Visual);
             Assert.Equal(2, roots.Count);
             Assert.DoesNotContain(roots, root => root.Name == "UnrelatedWindow");
-            Assert.Empty((await client.SearchTreeAsync(new("UnrelatedPopupInput", TreeKind.Visual))).Matches);
-            var checkbox = (await client.SearchTreeAsync(new("FlyoutCheckbox", TreeKind.Visual))).Matches.Single();
+            Assert.Empty((await client.Tree.SearchTreeAsync(new("UnrelatedPopupInput", TreeKind.Visual))).Matches);
+            var checkbox = (await client.Tree.SearchTreeAsync(new("FlyoutCheckbox", TreeKind.Visual))).Matches.Single();
             var selected = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-            client.SelectionChanged += change =>
+            client.Selection.SelectionChanged += change =>
             {
                 if (change.ObjectId == checkbox.Id)
                     selected.TrySetResult();
             };
             Assert.True(second.Focus());
             await selected.Task.WaitAsync(TimeSpan.FromSeconds(3));
-            await client.HighlightAsync(checkbox.Id);
-            var overlay = await client.GetOverlaySnapshotAsync();
+            await client.Selection.HighlightAsync(checkbox.Id);
+            var overlay = await client.Overlays.GetOverlaySnapshotAsync();
             Assert.True(overlay.IsVisible);
             Assert.Equal(checkbox.Id, overlay.ObjectId);
-            var path = await client.GetAncestorsAsync(checkbox.Id, TreeKind.Visual);
+            var path = await client.Tree.GetAncestorsAsync(checkbox.Id, TreeKind.Visual);
             Assert.Contains(roots, root => root.Id == path[0].Id);
-            await client.GetChildrenAsync(path[0].Id, TreeKind.Visual);
+            await client.Tree.GetChildrenAsync(path[0].Id, TreeKind.Visual);
             nestedFlyout.ShowAt(nestedAnchor);
             Assert.Contains(nestedFlyout.Popup, flyout.Popup.OpenedPopups);
-            Assert.Equal(3, (await client.GetRootsAsync(TreeKind.Visual)).Count);
-            Assert.Single((await client.SearchTreeAsync(new("NestedFlyoutInput", TreeKind.Visual))).Matches);
+            Assert.Equal(3, (await client.Tree.GetRootsAsync(TreeKind.Visual)).Count);
+            Assert.Single((await client.Tree.SearchTreeAsync(new("NestedFlyoutInput", TreeKind.Visual))).Matches);
             nestedFlyout.Hide();
-            Assert.Equal(2, (await client.GetRootsAsync(TreeKind.Visual)).Count);
+            Assert.Equal(2, (await client.Tree.GetRootsAsync(TreeKind.Visual)).Count);
             flyout.Hide();
-            Assert.Single(await client.GetRootsAsync(TreeKind.Visual));
-            Assert.Equal(0, (await client.ReleaseTreeAsync([], TreeKind.Visual)).ObservedBranches);
+            Assert.Single(await client.Tree.GetRootsAsync(TreeKind.Visual));
+            Assert.Equal(0, (await client.Tree.ReleaseTreeAsync([], TreeKind.Visual)).ObservedBranches);
             GC.KeepAlive(popupRoot);
         }
         finally

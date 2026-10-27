@@ -141,7 +141,7 @@ public sealed class AgentScreenshotMcpTests
             await using var client = await CreateClientAsync(agent.PipeName);
             var id = await Find(client, target.Name!);
             var resources =
-                Read<OfficialResourceSnapshot>(await Call(client, "resources", ("nodeId", id), ("onlySelf", true)));
+                Read<ResourceInspectionResult>(await Call(client, "resources", ("nodeId", id), ("onlySelf", true)));
             var dictionaryId = Assert.Single(resources.Entries, item => item.StringKey == "ScreenshotProbeResource")
                 .OwnerDictionaryId;
             await Error(client, "unsupported_object", ("nodeId", dictionaryId));
@@ -266,7 +266,7 @@ public sealed class AgentScreenshotMcpTests
     public async Task Direct_screenshot_rejects_nonfinite_arguments_before_json_serialization(double value)
     {
         await using var session = new ToolSession(null);
-        var tools = new AgentTools(session, new ManagedToolContext(session));
+        var tools = new VisualCaptureTools(session, new ManagedToolContext(session));
         var scaleError = await Assert.ThrowsAsync<McpException>(() =>
             tools.UiScreenshot(1, scale: value, cancellationToken: TestContext.Current.CancellationToken));
         Assert.Contains("invalid_scale", scaleError.Message);

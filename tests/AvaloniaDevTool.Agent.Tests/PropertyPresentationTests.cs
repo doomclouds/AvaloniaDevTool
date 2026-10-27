@@ -19,13 +19,13 @@ public sealed class PropertyPresentationTests
     {
         var probe = new FailingProbe(new InvalidOperationException(new string('错', 900_000))) { Name = "Probe" };
         await using var scope = await Scope.Create(probe);
-        var properties = await scope.Client.GetPropertiesIncludingClrAsync(scope.Id);
+        var properties = await scope.Client.Properties.GetPropertiesIncludingClrAsync(scope.Id);
         var failed = properties.Single(property => property.Name == nameof(FailingProbe.FailingValue));
         Assert.Equal("Unavailable", failed.ValueSource);
         Assert.NotNull(failed.Error);
         Assert.InRange(failed.Error.Length, 1, 2048);
         Assert.Contains("[truncated]", failed.Error);
-        Assert.Single(await scope.Client.GetRootsAsync(TreeKind.Logical));
+        Assert.Single(await scope.Client.Tree.GetRootsAsync(TreeKind.Logical));
     }
 
     [AvaloniaFact]
@@ -36,14 +36,14 @@ public sealed class PropertyPresentationTests
             Name = "Probe", Photo = new FailingImage(new InvalidOperationException(new string('图', 900_000)))
         };
         await using var scope = await Scope.Create(probe);
-        var photo = (await scope.Client.GetPropertiesIncludingClrAsync(scope.Id)).Single(property =>
+        var photo = (await scope.Client.Properties.GetPropertiesIncludingClrAsync(scope.Id)).Single(property =>
             property.Name == nameof(FailingProbe.Photo));
-        var preview = await scope.Client.GetPropertyPreviewAsync(Request(photo, scope.Id));
+        var preview = await scope.Client.Properties.GetPropertyPreviewAsync(Request(photo, scope.Id));
         Assert.Equal(PropertyPreviewStatus.NotAvailable, preview.Status);
         Assert.NotNull(preview.Message);
         Assert.InRange(preview.Message.Length, 1, 2048);
         Assert.Contains("[truncated]", preview.Message);
-        Assert.Single(await scope.Client.GetRootsAsync(TreeKind.Logical));
+        Assert.Single(await scope.Client.Tree.GetRootsAsync(TreeKind.Logical));
     }
 
     [AvaloniaFact]
@@ -52,16 +52,16 @@ public sealed class PropertyPresentationTests
         var failure = new UnsafeException();
         var probe = new FailingProbe(failure) { Name = "Probe", Photo = new FailingImage(failure) };
         await using var scope = await Scope.Create(probe);
-        var properties = await scope.Client.GetPropertiesIncludingClrAsync(scope.Id);
+        var properties = await scope.Client.Properties.GetPropertiesIncludingClrAsync(scope.Id);
         Assert.Contains("override unavailable",
             properties.Single(property => property.Name == nameof(FailingProbe.FailingValue)).Error);
-        var preview = await scope.Client.GetPropertyPreviewAsync(
+        var preview = await scope.Client.Properties.GetPropertyPreviewAsync(
             Request(properties.Single(property => property.Name == nameof(FailingProbe.Photo)), scope.Id));
         Assert.Equal(PropertyPreviewStatus.NotAvailable, preview.Status);
         Assert.Contains("override unavailable", preview.Message);
         Assert.Equal(0, failure.MessageCalls);
         Assert.Equal(0, failure.BaseExceptionCalls);
-        Assert.Single(await scope.Client.GetRootsAsync(TreeKind.Logical));
+        Assert.Single(await scope.Client.Tree.GetRootsAsync(TreeKind.Logical));
     }
 
     [AvaloniaFact]
@@ -74,17 +74,17 @@ public sealed class PropertyPresentationTests
             deep = new InvalidOperationException("Wrapper", deep);
         var probe = new FailingProbe(deep) { Name = "Probe", Photo = new FailingImage(aggregate) };
         await using var scope = await Scope.Create(probe);
-        var properties = await scope.Client.GetPropertiesIncludingClrAsync(scope.Id);
+        var properties = await scope.Client.Properties.GetPropertiesIncludingClrAsync(scope.Id);
         Assert.Contains("[truncated]",
             properties.Single(property => property.Name == nameof(FailingProbe.FailingValue)).Error);
-        var preview = await scope.Client.GetPropertyPreviewAsync(
+        var preview = await scope.Client.Properties.GetPropertyPreviewAsync(
             Request(properties.Single(property => property.Name == nameof(FailingProbe.Photo)), scope.Id));
         Assert.Equal(PropertyPreviewStatus.NotAvailable, preview.Status);
         Assert.Contains("AggregateException", preview.Message);
         Assert.Contains("64", preview.Message);
         Assert.InRange(preview.Message!.Length, 1, 2048);
         Assert.Equal(0, child.MessageCalls);
-        Assert.Single(await scope.Client.GetRootsAsync(TreeKind.Logical));
+        Assert.Single(await scope.Client.Tree.GetRootsAsync(TreeKind.Logical));
     }
 
     [AvaloniaFact]
@@ -92,10 +92,10 @@ public sealed class PropertyPresentationTests
     {
         var probe = new PresentationProbe { Name = "Probe" };
         await using var scope = await Scope.Create(probe);
-        var ordinary = await scope.Client.GetPropertiesAsync(scope.Id);
+        var ordinary = await scope.Client.Properties.GetPropertiesAsync(scope.Id);
         Assert.Equal(0, probe.GetterCalls);
         Assert.DoesNotContain(ordinary, property => property.Presentation?.MemberKind == "CLR");
-        var extended = await scope.Client.GetPropertiesIncludingClrAsync(scope.Id);
+        var extended = await scope.Client.Properties.GetPropertiesIncludingClrAsync(scope.Id);
         Assert.Equal(1, probe.GetterCalls);
         Assert.Contains(extended,
             property => property.Name == nameof(PresentationProbe.ExplicitGetter) &&
@@ -107,7 +107,7 @@ public sealed class PropertyPresentationTests
     {
         var probe = new PresentationProbe { Name = "Probe" };
         await using var scope = await Scope.Create(probe);
-        var properties = await scope.Client.GetPropertiesIncludingClrAsync(scope.Id);
+        var properties = await scope.Client.Properties.GetPropertiesIncludingClrAsync(scope.Id);
         var widths = properties.Where(property => property.Name == "Width").ToArray();
         Assert.Equal(2, widths.Length);
         Assert.Contains(widths,
@@ -125,7 +125,8 @@ public sealed class PropertyPresentationTests
                         property.Value!.Contains(nameof(ToStringBomb)));
         Assert.Equal(0, probe.Opaque.ToStringCalls);
         Assert.DoesNotContain(properties, property => property.Name == "Item");
-        await Assert.ThrowsAsync<RpcException>(() => scope.Client.SetPropertyAsync(scope.Id, note.Id, "Forbidden"));
+        await Assert.ThrowsAsync<RpcException>(() =>
+            scope.Client.Properties.SetPropertyAsync(scope.Id, note.Id, "Forbidden"));
         Assert.Equal("Read only here", probe.Note);
     }
 
@@ -134,7 +135,7 @@ public sealed class PropertyPresentationTests
     {
         var probe = new PresentationProbe { Name = "Probe", Background = new ImageBrush() };
         await using var scope = await Scope.Create(probe);
-        var properties = await scope.Client.GetPropertiesIncludingClrAsync(scope.Id);
+        var properties = await scope.Client.Properties.GetPropertiesIncludingClrAsync(scope.Id);
         Assert.Equal(PropertyEditorKind.Color,
             properties.Single(property => property.Name == nameof(PresentationProbe.Tint)).Presentation?.Editor);
         var flags = properties.Single(property => property.Name == nameof(PresentationProbe.Options));
@@ -145,7 +146,8 @@ public sealed class PropertyPresentationTests
         Assert.Equal(PropertyEditorKind.ReadOnly, brush.Presentation?.Editor);
         Assert.False(brush.CanEdit);
         Assert.NotEmpty(brush.Presentation!.Notice!);
-        await Assert.ThrowsAsync<RpcException>(() => scope.Client.SetPropertyAsync(scope.Id, brush.Id, "Red"));
+        await Assert.ThrowsAsync<RpcException>(() =>
+            scope.Client.Properties.SetPropertyAsync(scope.Id, brush.Id, "Red"));
         Assert.IsType<ImageBrush>(probe.Background);
     }
 
@@ -158,11 +160,11 @@ public sealed class PropertyPresentationTests
         var probe = new PresentationProbe
             { Name = "Probe", Photo = source, Shape = new RectangleGeometry(new Rect(10, 20, 30, 40)) };
         await using var scope = await Scope.Create(probe);
-        var properties = await scope.Client.GetPropertiesIncludingClrAsync(scope.Id);
+        var properties = await scope.Client.Properties.GetPropertiesIncludingClrAsync(scope.Id);
         var photo = properties.Single(property => property.Name == nameof(PresentationProbe.Photo));
         var shape = properties.Single(property => property.Name == nameof(PresentationProbe.Shape));
         Assert.Equal(PropertyPreviewKind.Image, photo.Presentation?.Preview);
-        var image = await scope.Client.GetPropertyPreviewAsync(Request(photo, scope.Id, 16, 16));
+        var image = await scope.Client.Properties.GetPropertyPreviewAsync(Request(photo, scope.Id, 16, 16));
         Assert.Equal(PropertyPreviewStatus.Available, image.Status);
         Assert.Equal(16, image.Width);
         Assert.Equal(8, image.Height);
@@ -170,7 +172,7 @@ public sealed class PropertyPresentationTests
         Assert.Equal(255, imagePixel[3]);
         Assert.True(imagePixel[0] == 255 || imagePixel[2] == 255);
         Assert.Equal(0, imagePixel[1]);
-        var geometry = await scope.Client.GetPropertyPreviewAsync(Request(shape, scope.Id, 30, 40));
+        var geometry = await scope.Client.Properties.GetPropertyPreviewAsync(Request(shape, scope.Id, 30, 40));
         Assert.Equal(PropertyPreviewStatus.Available, geometry.Status);
         Assert.Equal(30, geometry.Width);
         Assert.Equal(40, geometry.Height);
@@ -181,12 +183,12 @@ public sealed class PropertyPresentationTests
         Assert.Equal(new Rect(10, 20, 30, 40), probe.Shape.Bounds);
         probe.Photo = new DrawingImage();
         Assert.Equal(PropertyPreviewStatus.Stale,
-            (await scope.Client.GetPropertyPreviewAsync(Request(photo, scope.Id))).Status);
+            (await scope.Client.Properties.GetPropertyPreviewAsync(Request(photo, scope.Id))).Status);
         Assert.Equal(PropertyPreviewStatus.InvalidValue,
-            (await scope.Client.GetPropertyPreviewAsync(Request(shape, scope.Id, 900, 16))).Status);
-        _ = await scope.Client.GetPropertiesIncludingClrAsync(scope.Id);
+            (await scope.Client.Properties.GetPropertyPreviewAsync(Request(shape, scope.Id, 900, 16))).Status);
+        _ = await scope.Client.Properties.GetPropertiesIncludingClrAsync(scope.Id);
         Assert.Equal(PropertyPreviewStatus.Stale,
-            (await scope.Client.GetPropertyPreviewAsync(Request(shape, scope.Id))).Status);
+            (await scope.Client.Properties.GetPropertyPreviewAsync(Request(shape, scope.Id))).Status);
     }
 
     [AvaloniaFact]
@@ -194,9 +196,9 @@ public sealed class PropertyPresentationTests
     {
         var probe = new PresentationProbe { Name = "Probe", Photo = new DrawingImage() };
         await using var scope = await Scope.Create(probe);
-        var photo = (await scope.Client.GetPropertiesIncludingClrAsync(scope.Id)).Single(property =>
+        var photo = (await scope.Client.Properties.GetPropertiesIncludingClrAsync(scope.Id)).Single(property =>
             property.Name == nameof(PresentationProbe.Photo));
-        var result = await scope.Client.GetPropertyPreviewAsync(Request(photo, scope.Id));
+        var result = await scope.Client.Properties.GetPropertyPreviewAsync(Request(photo, scope.Id));
         Assert.Equal(PropertyPreviewStatus.NotAvailable, result.Status);
         Assert.Null(result.Base64);
         Assert.NotEmpty(result.Message!);
@@ -208,7 +210,7 @@ public sealed class PropertyPresentationTests
         var probe = new PresentationProbe { Name = "Probe" };
         var weak = AssignImage(probe);
         await using var scope = await Scope.Create(probe);
-        var photo = (await scope.Client.GetPropertiesIncludingClrAsync(scope.Id)).Single(property =>
+        var photo = (await scope.Client.Properties.GetPropertiesIncludingClrAsync(scope.Id)).Single(property =>
             property.Name == nameof(PresentationProbe.Photo));
         probe.Photo = new DrawingImage();
         GC.Collect();
@@ -216,7 +218,7 @@ public sealed class PropertyPresentationTests
         GC.Collect();
         Assert.False(weak.TryGetTarget(out _));
         Assert.Equal(PropertyPreviewStatus.Stale,
-            (await scope.Client.GetPropertyPreviewAsync(Request(photo, scope.Id))).Status);
+            (await scope.Client.Properties.GetPropertyPreviewAsync(Request(photo, scope.Id))).Status);
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
@@ -354,8 +356,8 @@ public sealed class PropertyPresentationTests
                     { PipeName = "avdt-property-" + Guid.NewGuid().ToString("N"), TopLevelProvider = () => [window] });
             var client = new DiagnosticsClient();
             await client.ConnectAsync(agent.PipeName);
-            var root = Assert.Single(await client.GetRootsAsync(TreeKind.Logical));
-            var node = (await client.GetChildrenAsync(root.Id, TreeKind.Logical)).Single(child =>
+            var root = Assert.Single(await client.Tree.GetRootsAsync(TreeKind.Logical));
+            var node = (await client.Tree.GetChildrenAsync(root.Id, TreeKind.Logical)).Single(child =>
                 child.Name == content.Name);
             return new Scope(window, agent, client, node.Id);
         }

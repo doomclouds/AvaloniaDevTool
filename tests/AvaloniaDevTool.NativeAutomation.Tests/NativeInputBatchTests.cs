@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 using Xunit;
-using static AvaloniaDevTool.NativeAutomation.Worker.NativeAutomationBackend;
+using static AvaloniaDevTool.NativeAutomation.Worker.NativeInputBatch;
 
 namespace AvaloniaDevTool.NativeAutomation.Tests;
 

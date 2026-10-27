@@ -24,23 +24,12 @@ public sealed class AgentInteractionBoundaryMcpTests
         .GetCustomAttributes<AssemblyMetadataAttribute>().Single(item => item.Key == "PreviewCliPath").Value!;
 
     [Fact]
-    public async Task Default_stdio_tools_list_has_exactly_the_44_independent_agent_tool_names()
+    public async Task Stdio_tools_list_has_the_single_complete_execution_catalog_and_machine_selection()
     {
         await using var client = await CreateClientAsync();
         var tools = await client.ListToolsAsync(cancellationToken: TestContext.Current.CancellationToken);
-        string[] expected =
-        [
-            "action", "ancestors", "assets", "attach-to-app", "attach-to-file", "detach",
-            "capture-start", "capture-status", "capture-stop",
-            "file-dialog-accept", "file-dialog-cancel", "file-dialog-inspect", "file-dialog-overwrite",
-            "file-dialog-set-filter", "file-dialog-set-paths", "file-dialog-wait", "file-dialogs",
-            "input", "native-action", "native-action-status", "native-find", "native-input", "native-inspect",
-            "native-tree", "native-windows", "native-screenshot", "open-asset", "props", "pseudo-class", "resources",
-            "screenshot",
-            "search", "set-prop", "styles", "tree", "ui-click", "ui-control-action", "ui-drag", "ui-input",
-            "ui-key-chord", "ui-select-item", "ui-text-selection", "ui-wait", "ui-screenshot"
-        ];
-        Assert.Equal(44, tools.Count);
+        var expected = HttpMcpIntegrationTests.ExecutionToolNames.Append("select-machine").ToArray();
+        Assert.Equal(expected.Length, tools.Count);
         Assert.Equal(expected.Order(StringComparer.Ordinal),
             tools.Select(tool => tool.Name).Order(StringComparer.Ordinal));
     }
@@ -439,8 +428,8 @@ public sealed class AgentInteractionBoundaryMcpTests
         Read<TreeSearchResult>(await Call(client, "search", ("query", name), ("searchTemplates", true))).Matches,
         item => item.Name == name).Id;
 
-    private static async Task<OfficialTreeSnapshot> Tree(McpClient client) =>
-        Read<OfficialTreeSnapshot>(await Call(client, "tree", ("treeKind", "Visual"), ("depth", -1)));
+    private static async Task<ControlTreeSnapshot> Tree(McpClient client) =>
+        Read<ControlTreeSnapshot>(await Call(client, "tree", ("treeKind", "Visual"), ("depth", -1)));
 
     private static string Text(CallToolResult result) =>
         string.Join("\n", result.Content.OfType<TextContentBlock>().Select(block => block.Text));

@@ -397,8 +397,8 @@ public sealed class ProfilerIntegrationTests
             var notification =
                 new TaskCompletionSource<ProfilerSamplesAddedNotification>(TaskCreationOptions
                     .RunContinuationsAsynchronously);
-            client.ProfilerSamplesAdded += payload => notification.TrySetResult(payload);
-            var started = await client.StartProfilerAsync(new ProfilerStartRequest(Categories:
+            client.Profiler.ProfilerSamplesAdded += payload => notification.TrySetResult(payload);
+            var started = await client.Profiler.StartProfilerAsync(new ProfilerStartRequest(Categories:
                 [ProfilerCategory.ResourceLookup],
                 Filter: "ProfilerClient",
                 NotificationIntervalMs: 50));
@@ -407,13 +407,14 @@ public sealed class ProfilerIntegrationTests
             var notified = await notification.Task.WaitAsync(TimeSpan.FromSeconds(5));
             Assert.Equal("ProfilerClientKey", Assert.Single(notified.Samples).Key);
             Assert.True(Assert.Single(notified.Samples).IsMatch);
-            Assert.Equal(started.CaptureId, (await client.GetProfilerStatusAsync()).CaptureId);
-            var stopped = await client.StopProfilerAsync();
+            Assert.Equal(started.CaptureId, (await client.Profiler.GetProfilerStatusAsync()).CaptureId);
+            var stopped = await client.Profiler.StopProfilerAsync();
             Assert.False(stopped.IsRunning);
-            Assert.Single((await client.GetProfilerSnapshotAsync()).Samples);
-            await client.ClearProfilerAsync();
-            Assert.Empty((await client.GetProfilerSnapshotAsync()).Samples);
-            await client.StartProfilerAsync(new ProfilerStartRequest(Categories: [ProfilerCategory.ResourceLookup]));
+            Assert.Single((await client.Profiler.GetProfilerSnapshotAsync()).Samples);
+            await client.Profiler.ClearProfilerAsync();
+            Assert.Empty((await client.Profiler.GetProfilerSnapshotAsync()).Samples);
+            await client.Profiler.StartProfilerAsync(new ProfilerStartRequest(Categories:
+                [ProfilerCategory.ResourceLookup]));
             var source = (ActivitySource)typeof(AvaloniaObject).Assembly.GetType("Avalonia.Diagnostics.Diagnostic")!
                 .GetField("s_activitySource", BindingFlags.Static | BindingFlags.NonPublic)!.GetValue(null)!;
             Assert.True(source.HasListeners());

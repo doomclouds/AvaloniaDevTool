@@ -45,10 +45,10 @@ public sealed class HttpNativeMcpTests
             var client = connection.Client;
             var sessionId = client.SessionId;
             Assert.False(string.IsNullOrWhiteSpace(sessionId));
-            var discovered = Read<OfficialAttachmentResult>(await Call(client, "attach-to-app", token));
+            var discovered = Read<ApplicationAttachmentResult>(await Call(client, "attach-to-app", token));
             var target = Assert.Single(discovered.Applications, application => application.PipeName == sample.PipeName);
             var attached =
-                Read<OfficialAttachmentResult>(await Call(client, "attach-to-app", token, ("id", target.Id)));
+                Read<ApplicationAttachmentResult>(await Call(client, "attach-to-app", token, ("id", target.Id)));
             Assert.True(attached.Attached);
             Assert.Equal(sample.ProcessId, attached.Session!.ProcessId);
 

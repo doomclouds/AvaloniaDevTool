@@ -34,7 +34,10 @@ public sealed class Phase7McpTests
         {
             await using var agent = DiagnosticsAgent.Attach(Application.Current!,
                 new DiagnosticsAgentOptions
-                    { PipeName = "phase7-mcp-" + Guid.NewGuid().ToString("N"), TopLevelProvider = () => [target] });
+                {
+                    PipeName = DiagnosticsProtocol.PipePrefix + "phase7-mcp-" + Guid.NewGuid().ToString("N"),
+                    TopLevelProvider = () => [target]
+                });
             await using var client = await CreateClientAsync();
             var tools = await client.ListToolsAsync(cancellationToken: TestContext.Current.CancellationToken);
             var metricsStart = Assert.Single(tools, tool => tool.Name == "metrics-start");
@@ -46,8 +49,7 @@ public sealed class Phase7McpTests
                 Assert.Contains(parameter, metricsStart.JsonSchema.ToString());
             Assert.Contains(tools, tool => tool.Name == "metrics-clear");
             Assert.Contains(tools, tool => tool.Name == "set-brush");
-            Read<SessionInfo>(await client.CallToolAsync("attach-to-app",
-                new Dictionary<string, object?> { ["pipeName"] = agent.PipeName }));
+            Read<ApplicationAttachmentResult>(await McpTestTarget.AttachAsync(client, agent.PipeName));
             var started = Read<MetricsStatusDto>(await client.CallToolAsync("metrics-start",
                 new Dictionary<string, object?>
                 {
@@ -98,7 +100,7 @@ public sealed class Phase7McpTests
 
             var nodeId = Assert.Single(Read<TreeSearchResult>(await client.CallToolAsync("search",
                 new Dictionary<string, object?>
-                    { ["query"] = edited.Name, ["kind"] = "Logical" })).Matches).Id;
+                    { ["query"] = edited.Name, })).Matches).Id;
 
             async Task<PropertyInfoDto> Background() => Assert.Single(Read<PropertyInfoDto[]>(
                 await client.CallToolAsync("props",
@@ -137,7 +139,7 @@ public sealed class Phase7McpTests
             Assert.NotEqual(true,
                 (await client.CallToolAsync("set-prop",
                     new Dictionary<string, object?>
-                        { ["nodeId"] = nodeId, ["propertyName"] = property.Id, ["value"] = null })).IsError);
+                        { ["nodeId"] = nodeId, ["propertyName"] = property.Id, ["value"] = "unset" })).IsError);
             Assert.Same(original, edited.Background);
             Assert.Equal(Colors.Red.ToString(), (await Background()).Presentation!.Brush!.Stops![0].Color);
             var allCleared =
@@ -165,8 +167,7 @@ public sealed class Phase7McpTests
             Arguments =
             [
                 "exec", "--runtimeconfig", Path.ChangeExtension(assembly, ".runtimeconfig.json"), "--depsfile",
-                Path.ChangeExtension(assembly, ".deps.json"), typeof(Program).Assembly.Location, "mcp", "--profile",
-                "extended"
+                Path.ChangeExtension(assembly, ".deps.json"), typeof(Program).Assembly.Location, "mcp"
             ],
             ShutdownTimeout = TimeSpan.FromSeconds(5)
         }));
