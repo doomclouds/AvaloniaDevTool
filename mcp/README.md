@@ -1,6 +1,6 @@
-# AvaloniaDevTool 0.1.0
+# AvaloniaDevTool 0.1.1
 
-AvaloniaDevTool 为 Avalonia 应用提供控件检查、临时调试修改、界面交互、Windows 原生窗口与文件弹窗、PNG、原始诊断采集和 XAML 文件预览。目标应用引用 Agent SDK；调用方负责业务流程、业务判断和测试断言。
+AvaloniaDevTool 为 Avalonia 应用提供控件检查、临时调试修改、界面交互、Windows 原生窗口与文件弹窗、PNG、原始诊断采集和 XAML 文件预览。默认入口和初始化方式见插件根 README。Windows x64/.NET 10 的受支持 Avalonia 进程可以原生热附加，无需目标引用 Agent SDK；主动 SDK 接入仍可用于自定义宿主。调用方负责业务流程、业务判断和测试断言。
 
 **一个 MCP 配置，默认本机，指定 IP 切换执行电脑。** `mcp` 是 Codex 启动的 stdio 网关；`serve` 是被测电脑运行的 HTTP 执行 Console。两者复用同一套能力和执行工具。普通终端不提供 `tree/click` 等直接业务子命令。
 

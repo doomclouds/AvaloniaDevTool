@@ -70,6 +70,10 @@ public sealed class GatewayMcpIntegrationTests
             Success(selected);
             Assert.Equal("remote", Read<MachineSelection>(selected).Mode);
             Assert.Equal("127.0.0.1", Read<MachineSelection>(selected).Machine);
+            // EOF closes the transport before the Agent's queued UI-thread cleanup completes.
+            var disconnectDeadline = DateTime.UtcNow.AddSeconds(2);
+            while (local.IsConnected && DateTime.UtcNow < disconnectDeadline)
+                await Task.Delay(10, token);
             Assert.False(local.IsConnected);
             await AttachAsync(gateway, remote.PipeName, token);
             var stale = await Call(gateway, "ui-click", token, ("nodeId", localId));

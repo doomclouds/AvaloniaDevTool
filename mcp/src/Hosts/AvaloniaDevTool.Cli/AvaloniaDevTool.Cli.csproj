@@ -10,6 +10,8 @@
         <BuildNativeWorker Condition="'$(BuildNativeWorker)' == ''">false</BuildNativeWorker>
     </PropertyGroup>
     <ItemGroup>
+        <ProjectReference Include="../AvaloniaDevTool.Bootstrap/AvaloniaDevTool.Bootstrap.csproj"
+                          ReferenceOutputAssembly="false" />
         <ProjectReference
             Include="../AvaloniaDevTool.NativeAutomation.Worker/AvaloniaDevTool.NativeAutomation.Worker.csproj"
             ReferenceOutputAssembly="false"

@@ -3,6 +3,7 @@ using System.IO.Pipes;
 using System.Text;
 using System.Text.Json;
 using AvaloniaDevTool.Client;
+using AvaloniaDevTool.Client.Attachment;
 using AvaloniaDevTool.Protocol;
 using ModelContextProtocol;
 
@@ -39,6 +40,49 @@ public sealed class ToolSession : IAsyncDisposable
         _discovery.DiscoverApplications();
 
     public void RememberApplication(string pipe, SessionInfo info) => _discovery.RememberApplication(pipe, info);
+
+    public async Task<(SessionInfo Session, ProcessAttachmentInfo? Attachment)> AttachApplicationAsync(
+        ApplicationDescriptor target, CancellationToken cancellationToken)
+    {
+        var elapsed = Stopwatch.StartNew();
+        ProcessAttachmentInfo? attachment = null;
+        if (target.RequiresInjection)
+        {
+            if (target.ProcessId is not { } pid || target.StartTimeUtc is not { } start)
+                throw new McpException("process_identity_missing: Discover the process again before attaching.");
+            try { attachment = await WindowsAgentAttachment.EnsureAsync(pid, start, cancellationToken); }
+            catch (Exception error) when (error is IOException or InvalidOperationException or TimeoutException or
+                                          PlatformNotSupportedException or UnauthorizedAccessException or System.ComponentModel.Win32Exception)
+            {
+                throw new McpException(error.Message);
+            }
+        }
+        var session = await AttachAsync(target.PipeName, cancellationToken);
+        var identityMatches = target.ProcessId is not { } expectedPid || session.ProcessId == expectedPid;
+        if (identityMatches && target.ProcessId is { } checkedPid && target.StartTimeUtc is { } checkedStart)
+        {
+            try
+            {
+                using var process = Process.GetProcessById(checkedPid);
+                identityMatches = process.StartTime.ToUniversalTime() == checkedStart.UtcDateTime;
+            }
+            catch (Exception error) when (error is ArgumentException or InvalidOperationException or System.ComponentModel.Win32Exception)
+            {
+                identityMatches = false;
+            }
+        }
+        if (!identityMatches)
+        {
+            await DetachAsync();
+            throw new McpException("process_mismatch: The endpoint does not belong to the selected process.");
+        }
+        if (attachment is not null)
+            attachment = attachment with { AvaloniaVersion = session.AvaloniaVersion, TotalMilliseconds = elapsed.Elapsed.TotalMilliseconds };
+        else
+            attachment = new("existing-endpoint", target.RuntimeVersion ?? "unknown", session.AvaloniaVersion,
+                0, 0, elapsed.Elapsed.TotalMilliseconds, true);
+        return (session, attachment);
+    }
 
     private OwnedPreview? _preview;
 
@@ -145,12 +189,12 @@ public sealed class ToolSession : IAsyncDisposable
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
             throw new McpException(
-                "connection_timeout: The diagnostics endpoint did not respond within five seconds. Ensure the target is running, references AvaloniaDevTool.Agent, and calls DiagnosticsAgent.Attach after Avalonia startup; then list applications again.");
+                "connection_timeout: The diagnostics endpoint did not respond within five seconds. Confirm that the target is still running, then discover applications again. A native attachment may have completed; do not blindly repeat injection.");
         }
         catch (IOException error)
         {
             throw new McpException(
-                $"connection_failed: The diagnostics endpoint could not be opened. Ensure DiagnosticsAgent.Attach is running in the selected application, then list applications again. {error.Message}");
+                $"connection_failed: The diagnostics endpoint could not be opened. Discover the selected application again and check its attachment state. {error.Message}");
         }
     }
 

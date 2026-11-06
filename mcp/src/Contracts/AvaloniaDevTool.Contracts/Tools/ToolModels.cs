@@ -3,14 +3,16 @@ using System.Text.Json.Serialization;
 
 namespace AvaloniaDevTool.Cli;
 
-public sealed record ApplicationDescriptor(long Id, string Name, string PipeName, int? ProcessId);
+public sealed record ApplicationDescriptor(long Id, string Name, string PipeName, int? ProcessId,
+    DateTimeOffset? StartTimeUtc = null, bool RequiresInjection = false, string? RuntimeVersion = null);
 
 public sealed record ApplicationAttachmentResult(
     bool Attached,
     SessionInfo? Session,
     IReadOnlyList<ApplicationDescriptor> Applications,
     bool Truncated = false,
-    string? Guidance = null);
+    string? Guidance = null,
+    ProcessAttachmentInfo? Attachment = null);
 
 public sealed record AgentDragWaypoint(long NodeId, double X, double Y);
 

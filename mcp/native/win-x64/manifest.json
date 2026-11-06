@@ -1,0 +1,6 @@
+{
+  "sha256": "0b8c971fd11ea6a6156bfab20f58c082443ded54af141f4974d8012e7c87f391",
+  "architecture": "x64",
+  "file": "NativeBootstrap.dll",
+  "source": "../../experiments/hot-attach/NativeBootstrap.cpp"
+}

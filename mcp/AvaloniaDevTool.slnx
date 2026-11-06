@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="src/Hosts/AvaloniaDevTool.Bootstrap/AvaloniaDevTool.Bootstrap.csproj" />
     <Folder Name="/samples/">
         <Project Path="samples/AvaloniaDevTool.AutomationSample/AvaloniaDevTool.AutomationSample.csproj" />
         <Project Path="samples/AvaloniaDevTool.Sample/AvaloniaDevTool.Sample.csproj" />

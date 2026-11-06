@@ -1,4 +1,4 @@
-# 0.1.0 运行契约与边界
+# 0.1.1 运行契约与边界
 
 产品提供通用操作、图像和原始诊断事实。业务编排、文件实际读写校验、视觉解释、性能或发布判断由调用方负责。
 
@@ -6,7 +6,9 @@
 
 对外唯一MCP为stdio网关。mcp默认本机LocalExecutor；select-machine指定IP使用HttpExecutor，包括显式127.0.0.1。被测电脑运行serve，默认IPv4接口7443/mcp，可维护配置listen/port。未发版的profile、旧命令别名、旧聚合SDK/API兼容层已移除。
 
-Console、目标应用与Windows worker运行在执行电脑同一已登录用户交互桌面。HTTP当前为无Token内网模式；URL不能启动远端进程。目标应用在Avalonia初始化后Attach Agent，单个Agent同时接受一个诊断连接。
+Console、目标应用与Windows worker运行在执行电脑同一已登录用户交互桌面。HTTP当前为无Token内网模式；URL不能启动远端进程。目标可主动接入 SDK，也可由 attach-to-app 对所选 Windows x64/.NET 10/Avalonia 12.1.1 或 12.1.4 进程原生热附加。目标无需引用 Agent 或修改启动代码；单个 Agent 同时接受一个诊断连接。
+
+插件直接用 dotnet run --file 启动，初始化技能提前 build。原生 DLL 随插件提供并校验 SHA-256，托管引导只依赖基础运行时；匹配版本的 Agent 在执行电脑缓存中构建。附加核对 PID 和启动时间；原生执行超时不保证撤销，不自动重复注入。程序集可能保留到目标退出。
 
 网关与HTTP端各自协商MCP，不把外层stdio的_meta原样转给HTTP。目前内部HTTP客户端使用2025-11-25有状态协议，外部stdio独立协商。选择候选先核验目录、角色和scope元数据，不执行写操作。
 

@@ -834,6 +834,7 @@ namespace AvaloniaDevTool.Protocol;
 [JsonSerializable(typeof(List<global::AvaloniaDevTool.Cli.ApplicationDescriptor>))]
 [JsonSerializable(typeof(IReadOnlyList<global::AvaloniaDevTool.Cli.ApplicationDescriptor>))]
 [JsonSerializable(typeof(global::AvaloniaDevTool.Cli.ApplicationAttachmentResult))]
+[JsonSerializable(typeof(global::AvaloniaDevTool.Protocol.ProcessAttachmentInfo))]
 [JsonSerializable(typeof(global::AvaloniaDevTool.Cli.ApplicationAttachmentResult[]))]
 [JsonSerializable(typeof(List<global::AvaloniaDevTool.Cli.ApplicationAttachmentResult>))]
 [JsonSerializable(typeof(IReadOnlyList<global::AvaloniaDevTool.Cli.ApplicationAttachmentResult>))]

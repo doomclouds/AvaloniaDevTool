@@ -3,9 +3,10 @@
   "mcpServers": {
     "avalonia": {
       "type": "stdio",
-      "command": "pwsh",
-      "args": ["-NoProfile", "-NonInteractive", "-File", "${PLUGIN_ROOT}/mcp/Start-Mcp.ps1"],
-      "cwd": "${PLUGIN_ROOT}"
+      "command": "dotnet",
+      "args": ["run", "--file", "${PLUGIN_ROOT}/mcp/AvaloniaDevTool.cs", "--no-build", "--no-restore", "--configuration", "Release", "--", "mcp"],
+      "cwd": "${PLUGIN_ROOT}/mcp",
+      "env": { "DOTNET_NOLOGO": "1", "DOTNET_SKIP_FIRST_TIME_EXPERIENCE": "1" }
     }
   }
 }

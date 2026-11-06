@@ -5,6 +5,8 @@
     <ItemGroup>
         <EmbeddedResource Include="../../../../assets/avalonia.png"
                           LogicalName="AvaloniaDevTool.Icon.png" />
+        <EmbeddedResource Include="../../../../assets/avalonia-tool.png"
+                          LogicalName="AvaloniaDevTool.ToolIcon.png" />
         <ProjectReference
             Include="../AvaloniaDevTool.Infrastructure.Execution/AvaloniaDevTool.Infrastructure.Execution.csproj" />
         <ProjectReference Include="../../Application/AvaloniaDevTool.Application/AvaloniaDevTool.Application.csproj" />

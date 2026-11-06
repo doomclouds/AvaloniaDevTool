@@ -1,51 +1,55 @@
 ---
 name: avalonia-devtool
-description: 初始化、构建和使用 Avalonia DevTool MCP，检查或操作本机及远端 Avalonia 应用，包括目标发现、控件属性与样式、交互、截图和诊断。
+description: 使用 Avalonia DevTool 的 MCP 工具发现并原生热附加 Windows Avalonia 进程，检查控件、执行交互和截图，支持本机及远程电脑；首次使用先检查 .NET SDK 并构建 C# 单文件入口。
 ---
 
-插件根可从本技能目录向上两级确定。命令使用实际绝对路径，不依赖当前工作目录。参数、枚举和可选字段以本次 `tools/list` 为准；下文的 ID 都是发现返回的示例占位符，不是可以直接使用的值。
+本插件提供直接 MCP 工具。正常操作使用这些工具，不要先编写临时 CLI、Node 或 Python 客户端。MCP 工具尚未加载时先修复连接，不把“可通过手工脚本调用”当成宿主连接成功。
 
-## 首次使用与环境检查
+## 首次准备和启动
 
-首次安装、源码更新或 MCP 启动失败时，运行 `pwsh -NoProfile -File <插件根>/mcp/Prepare.ps1`。它检查 Windows x64、.NET 10 SDK，构建 `AvaloniaDevTool.cs` 及其引用的现有 CLI 项目。构建失败时据真实错误报告缺失环境，不自动安装 SDK、C++ 工具链或修改用户 Codex 配置。
+插件根为本技能目录的上两级。首次安装、版本更新或输出被清理后，执行 `pwsh -NoProfile -File <插件根>/mcp/Prepare.ps1`。它检查 Windows x64 和 .NET 10 SDK，执行 build，不执行自包含 publish。核对 SdkVersion、EntryAssembly、RuntimeRoot 和 Reused；失败时报告真实环境错误，不自动安装 SDK 或修改用户 Codex 配置。排查损坏输出时加 `-Force`。
 
-核对 `SdkVersion`、`EntryAssembly`、`RuntimeRoot` 和 `Reused`。成功后才写入用户缓存的就绪记录；源码或 SDK 变化后重新构建，排查损坏缓存时使用 `-Force`。工具使用共享 .NET，不执行自包含 publish；项目源码随插件提供，NuGet 恢复及本机编译会产生缓存。
+MCP 的正式启动命令是 `dotnet run --file <插件根>/mcp/AvaloniaDevTool.cs --no-build --no-restore --configuration Release -- mcp`，工作目录为 `<插件根>/mcp`。`mcp.json` 已声明此命令，无需 PowerShell 包装或手工拼接 DLL 路径。首次 build 属于准备流程，不在 stdio 协议中输出构建日志。
 
-验证 MCP 初始化、工具列表和 `attach-to-app {}` 只读发现。没有目标时空列表也可以证明发现调用成功，不能据此声称热附加通过。工具未出现在当前聊天时，区分直接 MCP 验证与宿主安装状态。`mcp/Start-Mcp.ps1` 在没有有效缓存时也会调用准备步骤，构建日志写 stderr，stdout 留给 MCP 协议。
+SDK 会生成缓存及工程 bin/obj；这些文件只在执行电脑构建，不随 Git 分发。Windows x64 原生引导 DLL 随插件提供，正常使用无需安装 C++ 工具链。首次附加某个受支持的 Avalonia 版本时，会在本机缓存中构建匹配的 Agent，可能比后续附加慢。
 
-环境检查、构建、MCP 连接和真实目标附加分别报告。热附加原型按 `../../mcp/experiments/hot-attach/README.md` 执行，仅操作本任务的验证目标；本技能不授权修改目标工程、注入未选择的进程或写入禅道。
+初始化后检查 tools/list、工具图标和 `attach-to-app {}`。空列表只证明发现调用成功，不能证明热附加成功。若宿主提示初始化失败，检查实际启动命令、准备输出和启动日志；工具目录在当前聊天缺失时，不得声称已经通过直接工具调用完成。
 
-## 本机
+## 本机发现与原生附加
 
-1. `select-machine {}` 选择本机；`attach-to-app {}` 发现应用，再以返回的 `id` 调用 `attach-to-app {"id": ID}`。应用 ID 不能假定等于 PID。
-2. 用 `tree {"depth": 3}` 读取有限深度的树，用 `search {"query": "控件名称"}` 缩小范围。不要先读取整个应用的无限深度树；分页时查看截断、游标和剩余项。
-3. 对返回的节点使用 `props`、`styles`、`ancestors`、`element-metadata`。`object` 只对实际返回的对象 ID 下钻；getter 可能执行目标代码，记录每项失败。
-4. 需要操作时使用 `ui-click`、`ui-input`、`ui-select-item` 或 `action`。操作回执后回读相关属性、树或截图，不能把输入已投递解释成业务已成功。
-5. 使用 `screenshot` 或 `ui-screenshot` 取得 MCP 图像内容；检查实际区域、尺寸和限制。`native-screenshot` 与框架截图的坐标空间不同。
-6. `set-prop` 用于临时调试覆盖；按当前工具合同用 `unset` 释放覆盖，字符串 `null` 表示真正的 null 值。结束时 `detach {}`，释放会话临时修改，不终止外部应用。
+1. `select-machine {}` 选择本机。
+2. `attach-to-app {}` 列出 Agent 端点和 Windows 桌面 CoreCLR 候选。以 processId、名称及 startTimeUtc 核对用户选定的程序。
+3. 将本次返回的 **id** 传给 `attach-to-app {"id": ID}`。id 是发现标识，不能用 PID 替代。`requiresInjection=true` 表示需要原生引导；工具会确认 Avalonia 版本、加载匹配 Agent 并连接管道，不需要目标引用 Agent、修改接入代码、重新编译或重启。
+4. 只有结果 attached=true 且 session 指向预期进程时才开始操作。attachment 返回构建、注入和总耗时；existing-endpoint 表示复用已经存在的端点。
 
-当前正式 `attach-to-app` 仍连接 Agent 端点。零引用、零接入代码的热附加正在 `mcp/experiments/hot-attach/` 独立验证，未正式接入工具前不要声称可以直接按 PID 注入任意程序，也不要为此改目标工程。
+当前原生附加范围是 Windows x64、.NET 10 CoreCLR、Avalonia 12.1.1/12.1.4。候选进程不保证是 Avalonia；不支持的目标会明确失败。其他平台仍可连接已有的 Agent 端点，不能据此宣称支持其原生热附加。NativeAOT、自包含单文件和其他版本没有在本次支持范围内。
 
-## 远端
+## 检查、操作与确认
 
-远端执行电脑也需要插件源码、PowerShell 7、.NET 10 SDK。首次在那里运行 `mcp/Prepare.ps1`；在目标用户的交互桌面启动：
+先用 `tree {"depth":3}` 读取有限结构；需要模板中的按钮时使用 `search` 的 searchTemplates=true，或对已知子树读取 Visual。按实际类型、name、preview 选择控件，不猜测节点 ID。大树使用 tree-children 分页并核对截断及游标。
 
-```powershell
-pwsh -NoProfile -File <远端插件根>/mcp/Start-Mcp.ps1 serve
+`props`、`styles`、`ancestors`、`element-metadata` 用于读取状态；`object` 只对实际返回的对象 ID 下钻。getter 可能执行目标代码，逐项报告失败。
+
+交互使用 `ui-click`、`ui-input`、`ui-key-chord`、`ui-select-item`、`action` 等当前目录中的工具。只读的自定义编辑器应使用其正常按钮或键盘交互，不解除只读限制来绕过业务校验。操作后回读属性、树或图像验证效果，输入投递回执不等于业务成功。
+
+`screenshot`、`ui-screenshot` 返回框架图像，`native-screenshot` 返回原生图像；核对区域、尺寸和坐标空间。`set-prop` 是临时诊断覆盖，unset 释放覆盖，字符串 null 表示真正 null；不要用临时覆盖代替需要持久化的业务输入。
+
+Windows 文件选择器使用 file-dialogs、file-dialog-wait、file-dialog-set-paths、file-dialog-accept 等；其他系统窗口使用 native-windows/native-tree/native-action。原生节点 ID 与 Avalonia 节点 ID 不混用。pending/dispatched 后继续查状态。对话框关闭后还要验证目标文件实际写入和应用状态。
+
+采集、日志、指标、事件与性能工具按任务需要选择 capture-* 或对应能力域，不把空样本、丢失、未订阅和读取失败混同。最终报告实际完成的动作和证据。`detach {}` 清理本会话临时状态，不终止外部应用；原生 DLL/程序集可能保留到目标进程退出。
+
+## 远端电脑
+
+执行电脑需要插件源码、Windows x64 和 .NET 10 SDK。先在那里执行 Prepare.ps1，再在目标用户交互桌面、`<插件根>/mcp` 目录运行：
+
+```text
+dotnet run --file AvaloniaDevTool.cs --no-build --no-restore --configuration Release -- serve
 ```
 
-默认 HTTP 执行端为 TCP 7443、路径 `/mcp`；可用 `serve --listen IP --port PORT` 指定监听。`select-machine` 只接收 IP；使用非默认端口时，在调用方启动 MCP 前将 `AVDT_EXECUTOR_PORT` 设置为同一个端口。当前 Console 为无 Token 内网模式，需现有网络可达，不能从 URL 自动启动远端进程。
+默认监听 TCP 7443 的 `/mcp`。可加 `--listen IP --port PORT`；非默认端口还要在调用方启动 MCP 前设置相同的 AVDT_EXECUTOR_PORT。当前为无 Token 内网模式，网络需已可达，URL 不会自动启动远端服务。
 
-调用方只使用一个 stdio MCP：`select-machine {"ip":"远端IPv4"}`，再 `attach-to-app {}` 重新发现和附加。后续 tree、属性、交互、截图等都在所选电脑执行。显式 `127.0.0.1` 也走 HTTP，可用于本机验证远端链路。`select-machine {}` 切回本机。
+调用方仍只有一个 stdio MCP。`select-machine {"ip":"远端IPv4"}` 后重新执行发现和附加；原生注入、Agent 构建、UIA、文件路径都属于所选执行电脑。显式 127.0.0.1 也走 HTTP，可用于回环检查；它不能替代真实双机验证。
 
-机器或应用切换后，重新取得应用、节点、弹窗、截图采集和操作 ID；不要复用旧句柄。远端断线不会自动退回本机，超时不代表操作未执行，不能盲目重发点击、输入、保存等动作。
+切换机器、应用或重连后重新取得应用、节点、弹窗和采集句柄。远端断线不会回退本机，超时不表示未执行，不盲目重发注入或业务写操作。完成远端操作后可 `select-machine {}` 切回本机。
 
-文件、项目和文件对话框路径都属于执行电脑；不能把本机路径当远端路径。截图应随 MCP 返回图像，远端磁盘路径不等于图像已传回。
-
-## 原生弹窗与诊断
-
-Windows 系统文件弹窗使用 `native-windows`、`native-tree`、`native-find` 和 `file-dialog-*`，不要拿 Avalonia 节点 ID 当 UIA 节点 ID。原生异步动作返回 pending/dispatched 后，用相应状态工具及实际界面验证完成。
-
-日志、事件、指标与性能采集按任务选择 `capture-*` 或对应域工具；只收集问题所需的范围。采样为空、未订阅、读取失败和数据丢失分别解释。业务断言、硬件结果和视觉判断由调用方依据证据完成。
-
-完整能力及边界见 `../../mcp/docs/mcp.md` 与 `../../mcp/docs/architecture/runtime-contracts.md`。报告时区分已验证的本机、回环 HTTP、真实双机网络和零接入热附加，不能互相替代。
+工具名、枚举和参数以当前 tools/list 为准。完整边界见 `../../mcp/docs/architecture/runtime-contracts.md`。此技能不授权修改目标工程、操作未选进程、自动添加测试业务内容或写回禅道。

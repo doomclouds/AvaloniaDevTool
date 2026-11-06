@@ -30,3 +30,17 @@
 通过范围为 Windows x64、.NET 10、Avalonia 12.1.4，以及显式重新构建的 12.1.1、框架依赖普通目录部署。未验证其他架构、自包含单文件、NativeAOT、Linux/macOS 或真实双机网络。回环 HTTP 不能替代物理双机测试。
 
 最后一次完整本地证据保存在仓库忽略目录 `artifacts/plugin-probe/run-final-2/`：report.json、tree.json、attached.png、注入状态及 MCP/Console 日志。早期失败输出保留，不将其改写为通过。断开后的端点重建可能使发现 ID 在选择前失效；脚本仅在明确的 app_not_found（尚未附加）错误时重新发现，不重发不确定的注入或 UI 动作。
+
+## 0.1.1 正式入口补齐
+
+用户结束示波器业务测试后，转为修复插件入口：
+
+- mcp.json 直接使用 dotnet run --file，提前由唯一技能执行 build；不再通过 PowerShell 包装启动 MCP。
+- attach-to-app 的同一发现／选择合同纳入桌面 CoreCLR 候选和原生热附加，无需临时客户端执行原生实验代码。PID 和启动时间用于核对进程身份。
+- 原生引导随插件提供并核验 SHA-256，文件 130,560 字节；托管引导没有 Avalonia/Agent 编译引用，匹配 Agent 按目标版本缓存构建。
+- 正式 MCP 对无 Agent 引用的受控进程完成附加和只读树调用：启动 1,273 ms；首次附加调用 29,538 ms，其中 Agent 构建 26,439 ms、引导/注入 399 ms；首次树调用 58 ms。这是一次冷缓存测量，不代表所有机器或暖缓存耗时。
+- Codex app-server 的真实插件上下文读取到 avalonia 服务：toolsError=null、89 个工具、89 个工具具有图标，服务版本 0.1.1。证据为 artifacts/plugin-fix-home/status.json。
+- 入口、暴露元数据和网关目标组 48/48 通过。原有网关用例曾把传输 EOF 与 Agent 的异步 UI 清理当作同一时刻；现按真实清理状态作有界等待，仍要求旧连接最终结束及旧句柄失效。
+- 桌面 Avalonia-Native-Attach.cs 使用标准 MCP 请求，可列出进程，或按 PID 找到发现 ID、附加、读树、断开并输出分步耗时；不操作示波器业务项目。
+
+接口特性一直存在，早期失败发生在插件宿主初始化阶段。独立配置的 DLL 和旧包装入口均能读取工具，因此不能把失败归因于缺少 McpServerTool 属性，也不把通用执行工具的图标当作插件图标验证。
