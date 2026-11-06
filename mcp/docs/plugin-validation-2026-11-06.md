@@ -19,12 +19,14 @@
 
 原生引导保留 C++，托管入口使用已有 CoreCLR 的 GetCLRRuntimeHost / ExecuteInDefaultAppDomain，不创建第二套 CLR，不依赖 Harmony。
 
+随后按示波器实际使用的 Avalonia 12.1.1 显式重新构建实验 Agent：同一完整热附加流程及下拉弹层根发现通过，证据位于 `artifacts/plugin-probe/avalonia-12.1.1-final/`。弹层枚举在较新版本使用框架公开目录，旧版本使用会话期间的打开状态观察及逻辑树发现；旧版本在附加前已打开且不在逻辑树中的弹层仍存在发现边界。原有弹层与冻结回归 18/18 通过。
+
 本次源插件暂存为 521 个文件、约 5.81 MiB；这是测试时的源码副本大小，随后文档更新可能改变数字。SDK、NuGet 缓存和构建输出不包含在其中，不应与首次下载总量或本机磁盘占用混同。
 
 ## 边界
 
 热附加在 `experiments/hot-attach/`，未正式整合到 attach-to-app 的自动注入流程。原型采用默认程序集加载上下文及限定依赖解析，不代表跨版本隔离已经完成。
 
-通过范围为 Windows x64、.NET 10、Avalonia 12.1.4、框架依赖普通目录部署。未验证其他架构、自包含单文件、NativeAOT、Linux/macOS 或真实双机网络。回环 HTTP 不能替代物理双机测试。
+通过范围为 Windows x64、.NET 10、Avalonia 12.1.4，以及显式重新构建的 12.1.1、框架依赖普通目录部署。未验证其他架构、自包含单文件、NativeAOT、Linux/macOS 或真实双机网络。回环 HTTP 不能替代物理双机测试。
 
 最后一次完整本地证据保存在仓库忽略目录 `artifacts/plugin-probe/run-final-2/`：report.json、tree.json、attached.png、注入状态及 MCP/Console 日志。早期失败输出保留，不将其改写为通过。断开后的端点重建可能使发现 ID 在选择前失效；脚本仅在明确的 app_not_found（尚未附加）错误时重新发现，不重发不确定的注入或 UI 动作。

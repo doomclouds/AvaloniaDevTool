@@ -9,6 +9,7 @@ namespace AvaloniaDevTool.Agent;
 internal sealed class AgentSession : IDisposable
 {
     private readonly WeakObjectRegistry _objects = new();
+    private readonly OpenedPopupCatalog _openPopups = new();
     private readonly RpcMethodRegistry _routes = new();
     private readonly SessionNotifications _notifications = new();
     private readonly ObjectObservationService _observations;
@@ -34,7 +35,7 @@ internal sealed class AgentSession : IDisposable
     public AgentSession(Application application, DiagnosticsAgentOptions options)
     {
         _observations = new ObjectObservationService(_objects);
-        _roots = new TargetRootCatalog(application, options, _observations.Observe);
+        _roots = new TargetRootCatalog(application, options, _observations.Observe, _openPopups);
         var info = new SessionInfo(Guid.NewGuid().ToString("N"),
             options.ApplicationName,
             Environment.ProcessId,
@@ -51,7 +52,7 @@ internal sealed class AgentSession : IDisposable
         _input = new InputInspectionService(_objects);
         _overlay = new OverlayService(_objects, _observations.Observe);
         _renderer = new RendererDiagnosticsService(_objects);
-        _popups = new PopupFreezeService(_objects);
+        _popups = new PopupFreezeService(_objects, _openPopups);
         _tree = new TreeInspectionService(_objects,
             _observations,
             _roots.Refresh,
@@ -150,6 +151,7 @@ internal sealed class AgentSession : IDisposable
         _overlay.Dispose();
         _renderer.Dispose();
         _popups.Dispose();
+        _openPopups.Dispose();
         _assetExports.Dispose();
         _composition.Dispose();
         _styles.Dispose();

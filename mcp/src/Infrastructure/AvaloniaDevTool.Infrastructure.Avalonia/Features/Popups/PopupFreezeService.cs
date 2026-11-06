@@ -16,12 +16,16 @@ internal sealed class PopupFreezeService : IDisposable
     private readonly HashSet<long> _frozenRoots = [];
     private readonly List<string> _conflicts = [];
     private readonly IDisposable _openedSubscription;
+    private readonly OpenedPopupCatalog _openPopups;
+    private readonly bool _ownsPopupCatalog;
     private bool _allRoots;
     private bool _disposed;
 
-    public PopupFreezeService(WeakObjectRegistry objects)
+    public PopupFreezeService(WeakObjectRegistry objects, OpenedPopupCatalog? popups = null)
     {
         _objects = objects;
+        _ownsPopupCatalog = popups is null;
+        _openPopups = popups ?? new OpenedPopupCatalog();
         _openedSubscription = Popup.IsOpenProperty.Changed.Subscribe(new OpenObserver(this));
     }
 
@@ -122,14 +126,14 @@ internal sealed class PopupFreezeService : IDisposable
         {
             if (!IsFrozen(pair.Key) || !pair.Value.TryGetTarget(out var root))
                 continue;
-            var pending = new Queue<Popup>(root.OpenedPopups);
+            var pending = new Queue<Popup>(_openPopups.GetOpened(root));
             var visited = new HashSet<Popup>();
             while (pending.TryDequeue(out var popup))
             {
                 if (!visited.Add(popup) || !popup.IsOpen)
                     continue;
                 Observe(popup, pair.Key);
-                foreach (var nested in popup.OpenedPopups)
+                foreach (var nested in _openPopups.GetOpened(popup))
                     pending.Enqueue(nested);
             }
         }
@@ -212,6 +216,8 @@ internal sealed class PopupFreezeService : IDisposable
             return;
         Resume();
         _openedSubscription.Dispose();
+        if (_ownsPopupCatalog)
+            _openPopups.Dispose();
         foreach (var id in _roots.Keys.ToArray())
             RemoveRoot(id);
         _disposed = true;

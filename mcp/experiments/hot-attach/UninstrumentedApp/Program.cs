@@ -32,7 +32,8 @@ public sealed class FixtureApp : Application
                     Children =
                     {
                         new TextBlock { Name = "StatusText", Text = "No Agent reference or startup hook" },
-                        counter, button
+                        counter, button,
+                        new ComboBox { Name = "ModeSelector", ItemsSource = new[] { "Sine", "Square" }, SelectedIndex = 0 }
                     }
                 }
             };

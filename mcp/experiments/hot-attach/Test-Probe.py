@@ -33,19 +33,23 @@ class Mcp:
         self.lines = queue.Queue()
         self.sequence = 0
         threading.Thread(target=lambda: [self.lines.put(line) for line in self.process.stdout], daemon=True).start()
-        self.info = self.request("initialize", {
-            "protocolVersion": "2025-11-25", "capabilities": {},
-            "clientInfo": {"name": "avalonia-attach-probe", "version": "0.1.0"}})
+        try:
+            self.info = self.request("initialize", {
+                "protocolVersion": "2025-11-25", "capabilities": {},
+                "clientInfo": {"name": "avalonia-attach-probe", "version": "0.1.0"}}, timeout=120)
+        except Exception:
+            self.close()
+            raise
         self.send({"jsonrpc": "2.0", "method": "notifications/initialized"})
 
     def send(self, value):
         self.process.stdin.write(json.dumps(value) + "\n")
         self.process.stdin.flush()
 
-    def request(self, method, params):
+    def request(self, method, params, timeout=40):
         self.sequence += 1
         self.send({"jsonrpc": "2.0", "id": self.sequence, "method": method, "params": params})
-        deadline = time.monotonic() + 40
+        deadline = time.monotonic() + timeout
         while time.monotonic() < deadline:
             line = self.lines.get(timeout=max(0.1, deadline - time.monotonic()))
             message = json.loads(line)  # Any non-protocol stdout is a test failure.
@@ -228,6 +232,14 @@ def main():
         check_text(local, status_node, "Externally attached")
         local.tool("set-prop", nodeId=status_node, propertyName="Text", value="unset")
         check_text(local, status_node, "No Agent reference or startup hook")
+        combo_node = find(local, "ModeSelector")
+        local.tool("set-prop", nodeId=combo_node, propertyName="IsDropDownOpen", value="true")
+        def popup_tree():
+            snapshot = data(local.tool("tree", depth=2))
+            return snapshot if "PopupRoot" in json.dumps(snapshot) else None
+        wait_until(popup_tree)
+        local.tool("set-prop", nodeId=combo_node, propertyName="IsDropDownOpen", value="unset")
+        record("popup_discovery", observed=True)
         root = next(item for item in dictionaries(tree) if "Window" in str(item.get("type", item.get("typeName", ""))) and ("nodeId" in item or "id" in item))
         image_result = local.tool("screenshot", nodeId=root.get("nodeId", root.get("id")))
         png = base64.b64decode(next(item["data"] for item in image_result["content"] if item["type"] == "image"))
