@@ -1,0 +1,11 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "avalonia": {
+      "type": "stdio",
+      "command": "pwsh",
+      "args": ["-NoProfile", "-NonInteractive", "-File", "${PLUGIN_ROOT}/mcp/Start-Mcp.ps1"],
+      "cwd": "${PLUGIN_ROOT}"
+    }
+  }
+}

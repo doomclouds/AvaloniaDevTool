@@ -3,6 +3,8 @@
         <RootNamespace>AvaloniaDevTool.Cli</RootNamespace>
     </PropertyGroup>
     <ItemGroup>
+        <EmbeddedResource Include="../../../../assets/avalonia.png"
+                          LogicalName="AvaloniaDevTool.Icon.png" />
         <ProjectReference
             Include="../AvaloniaDevTool.Infrastructure.Execution/AvaloniaDevTool.Infrastructure.Execution.csproj" />
         <ProjectReference Include="../../Application/AvaloniaDevTool.Application/AvaloniaDevTool.Application.csproj" />

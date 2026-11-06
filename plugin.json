@@ -1,0 +1,18 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "avalonia-devtool",
+  "version": "0.1.0",
+  "description": "从源码运行的 Avalonia 检查与调试 MCP，包含首次环境检查、构建和最小外部附加验证。",
+  "extensions": {
+    "com.openai": {
+      "requires_local_executor": true,
+      "onboardingSkill": "./skills/avalonia-devtool/SKILL.md",
+      "interface": {
+        "displayName": "Avalonia DevTool",
+        "shortDescription": "Avalonia 界面检查与调试",
+        "composerIcon": "./assets/avalonia.png",
+        "logo": "./assets/avalonia.png"
+      }
+    }
+  }
+}

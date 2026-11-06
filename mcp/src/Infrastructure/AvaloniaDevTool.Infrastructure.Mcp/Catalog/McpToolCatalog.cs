@@ -31,6 +31,19 @@ public static class McpToolCatalog
     {
         ArgumentNullException.ThrowIfNull(options);
         ArgumentNullException.ThrowIfNull(tools);
+        using var icon = typeof(McpToolCatalog).Assembly.GetManifestResourceStream("AvaloniaDevTool.Icon.png")!;
+        using var iconBytes = new MemoryStream();
+        icon.CopyTo(iconBytes);
+        options.ServerInfo = new Implementation
+        {
+            Name = "AvaloniaDevTool",
+            Version = typeof(McpToolCatalog).Assembly.GetName().Version!.ToString(3),
+            Icons = [new Icon
+            {
+                Source = "data:image/png;base64," + Convert.ToBase64String(iconBytes.ToArray()),
+                MimeType = "image/png", Sizes = ["192x192"]
+            }]
+        };
         // A timed-out SDK 2.3 discovery can send initialize after committing the connection to 2026.
         // Offer the verified session-capable contract explicitly before accepting discovery metadata.
         options.ProtocolVersion = ExecutionProtocol.Version;
