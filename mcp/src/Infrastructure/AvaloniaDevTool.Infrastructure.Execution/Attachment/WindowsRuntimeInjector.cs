@@ -8,7 +8,7 @@ namespace AvaloniaDevTool.Client.Attachment;
 internal static class WindowsRuntimeInjector
 {
     internal static void Invoke(int processId, DateTimeOffset expectedStartTime, string nativePath,
-        string assemblyPath, string requestPath)
+        string assemblyPath, string requestJson)
     {
         if (!OperatingSystem.IsWindows() || RuntimeInformation.ProcessArchitecture != Architecture.X64)
             throw new PlatformNotSupportedException("unsupported_platform: Native attachment requires Windows x64.");
@@ -44,7 +44,7 @@ internal static class WindowsRuntimeInjector
             try
             {
                 var entry = module.BaseAddress + (NativeLibrary.GetExport(local, "Bootstrap") - local);
-                CallRemote(entry, assemblyPath + "\nAvaloniaDevTool.Bootstrap.Entry\nRun\n" + requestPath, true);
+                CallRemote(entry, assemblyPath + "\nAvaloniaDevTool.Bootstrap.Entry\nRun\n" + requestJson, true);
             }
             finally { NativeLibrary.Free(local); }
         }
@@ -73,7 +73,7 @@ internal static class WindowsRuntimeInjector
                     if (!Win32.GetExitCodeThread(thread, out var result))
                         throw new Win32Exception();
                     if (checkResult && result != 0)
-                        throw new InvalidOperationException($"native_bootstrap_failed: HRESULT 0x{result:X8}.");
+                        throw new InvalidOperationException($"native_bootstrap_failed: HRESULT 0x{result:X8}; managed bootstrap: {assemblyPath}.");
                 }
                 finally { Win32.CloseHandle(thread); }
             }

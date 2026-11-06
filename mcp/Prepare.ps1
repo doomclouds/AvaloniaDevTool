@@ -15,6 +15,7 @@ if ($LASTEXITCODE -ne 0 -or [version]$sdkVersion -lt [version]'10.0.100') {
 if (-not $CacheRoot) {
     $CacheRoot = Join-Path ([Environment]::GetFolderPath('LocalApplicationData')) 'AvaloniaDevTool/source-builds'
 }
+$CacheRoot = [IO.Path]::GetFullPath($CacheRoot)
 $entry = Join-Path $PSScriptRoot 'AvaloniaDevTool.cs'
 $hash = [Security.Cryptography.IncrementalHash]::CreateHash([Security.Cryptography.HashAlgorithmName]::SHA256)
 try {
@@ -54,6 +55,9 @@ function Invoke-SourceDotnet([string[]]$Arguments, [switch]$Capture) {
     $start.RedirectStandardOutput = $true
     $start.RedirectStandardError = $true
     $start.Environment['DOTNET_NOLOGO'] = '1'
+    if (-not $start.Environment['NUGET_HTTP_CACHE_PATH']) {
+        $start.Environment['NUGET_HTTP_CACHE_PATH'] = Join-Path $CacheRoot 'nuget-http'
+    }
     foreach ($argument in $Arguments) { $start.ArgumentList.Add($argument) }
     $process = [Diagnostics.Process]::Start($start)
     try {
@@ -72,7 +76,7 @@ try {
     if (-not $Force -and (Test-Path -LiteralPath $stamp)) {
         $ready = Get-Content -LiteralPath $stamp -Raw | ConvertFrom-Json
         $cliAssembly = Join-Path $ready.RuntimeRoot 'AvaloniaDevTool.Cli.dll'
-        $bootstrapAssembly = Join-Path $PSScriptRoot 'src/Hosts/AvaloniaDevTool.Bootstrap/bin/Release/net10.0/AvaloniaDevTool.Bootstrap.dll'
+        $bootstrapAssembly = Join-Path $PSScriptRoot 'src/Hosts/AvaloniaDevTool.Bootstrap/bin/Release/net10.0/AvaloniaDevTool.Bootstrap.Pipe.dll'
         if ((Test-Path -LiteralPath $ready.EntryAssembly) -and
             (Test-Path -LiteralPath $cliAssembly) -and (Test-Path -LiteralPath $bootstrapAssembly)) {
             $ready | Add-Member -NotePropertyName Reused -NotePropertyValue $true -Force

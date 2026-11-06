@@ -16,5 +16,7 @@
             Include="../../src/Infrastructure/AvaloniaDevTool.Infrastructure.Rpc/AvaloniaDevTool.Infrastructure.Rpc.csproj" />
         <ProjectReference
             Include="../../src/Infrastructure/AvaloniaDevTool.Infrastructure.Execution/AvaloniaDevTool.Infrastructure.Execution.csproj" />
+        <ProjectReference
+            Include="../../src/Hosts/AvaloniaDevTool.Bootstrap/AvaloniaDevTool.Bootstrap.csproj" />
     </ItemGroup>
 </Project>

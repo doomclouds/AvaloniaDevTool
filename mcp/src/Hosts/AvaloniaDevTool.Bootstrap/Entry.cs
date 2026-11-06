@@ -1,5 +1,7 @@
+using System.IO.Pipes;
 using System.Reflection;
 using System.Runtime.Loader;
+using System.Text;
 using System.Text.Json;
 
 namespace AvaloniaDevTool.Bootstrap;
@@ -12,33 +14,34 @@ public static class Entry
     private static string? _agentDirectory;
     private static bool _resolverRegistered;
 
-    public static int Run(string requestPath)
+    public static int Run(string requestJson)
     {
-        var request = JsonSerializer.Deserialize<Request>(File.ReadAllText(requestPath))!;
-        if (request.Action == "probe")
-        {
-            var application = FindType("Avalonia.Application");
-            Write(request, new
-            {
-                state = application is null ? "not_avalonia" : "probed",
-                processId = Environment.ProcessId,
-                runtimeVersion = Environment.Version.ToString(),
-                avaloniaVersion = application?.Assembly.GetName().Version?.ToString(3)
-            });
-            return 0;
-        }
-        if (Interlocked.CompareExchange(ref _starting, 1, 0) != 0)
+        var request = JsonSerializer.Deserialize<Request>(requestJson)!;
+        var exclusive = request.Action != "probe";
+        if (exclusive && Interlocked.CompareExchange(ref _starting, 1, 0) != 0)
             return 2;
         _ = Task.Run(async () =>
         {
             try
             {
+                if (request.Action == "probe")
+                {
+                    var application = FindType("Avalonia.Application");
+                    await WriteAsync(request, new
+                    {
+                        state = application is null ? "not_avalonia" : "probed",
+                        processId = Environment.ProcessId,
+                        runtimeVersion = Environment.Version.ToString(),
+                        avaloniaVersion = application?.Assembly.GetName().Version?.ToString(3)
+                    });
+                    return;
+                }
                 if (request.Action == "stop")
                 {
                     if (_agent is IAsyncDisposable disposable)
                         await disposable.DisposeAsync();
                     _agent = null;
-                    Write(request, new { state = "stopped", processId = Environment.ProcessId });
+                    await WriteAsync(request, new { state = "stopped", processId = Environment.ProcessId });
                     return;
                 }
                 _agentDirectory = Path.GetDirectoryName(request.AgentPath ?? throw new ArgumentException("AgentPath is required"));
@@ -78,7 +81,7 @@ public static class Entry
                 };
                 post.Invoke(dispatcher, [start, priority]);
                 await completed.Task.WaitAsync(timeout.Token);
-                Write(request, new
+                await WriteAsync(request, new
                 {
                     state = "started", processId = Environment.ProcessId,
                     pipeName = _agent!.GetType().GetProperty("PipeName")!.GetValue(_agent)
@@ -86,9 +89,9 @@ public static class Entry
             }
             catch (Exception error)
             {
-                Write(request, new { state = "failed", processId = Environment.ProcessId, error = error.GetBaseException().Message });
+                await WriteAsync(request, new { state = "failed", processId = Environment.ProcessId, error = error.GetBaseException().Message });
             }
-            finally { Volatile.Write(ref _starting, 0); }
+            finally { if (exclusive) Volatile.Write(ref _starting, 0); }
         });
         return 0;
     }
@@ -105,12 +108,22 @@ public static class Entry
         return File.Exists(path) ? context.LoadFromAssemblyPath(path) : null;
     }
 
-    private static void Write(Request request, object result)
+    private static async Task WriteAsync(Request request, object result)
     {
-        var temporary = request.StatusPath + ".tmp";
-        File.WriteAllText(temporary, JsonSerializer.Serialize(result));
-        File.Move(temporary, request.StatusPath, true);
+        try
+        {
+            await using var pipe = new NamedPipeClientStream(".", request.ReplyPipeName, PipeDirection.Out, PipeOptions.Asynchronous);
+            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            await pipe.ConnectAsync(timeout.Token);
+            await using var writer = new StreamWriter(pipe, new UTF8Encoding(false));
+            await writer.WriteLineAsync(JsonSerializer.Serialize(result).AsMemory(), timeout.Token);
+            await writer.FlushAsync(timeout.Token);
+        }
+        catch (Exception error) when (error is IOException or OperationCanceledException or TimeoutException)
+        {
+            // The requesting host has gone away. Never propagate its IPC failure into the application.
+        }
     }
 
-    private sealed record Request(string Action, string StatusPath, string? AgentPath);
+    private sealed record Request(string Action, string ReplyPipeName, string? AgentPath);
 }

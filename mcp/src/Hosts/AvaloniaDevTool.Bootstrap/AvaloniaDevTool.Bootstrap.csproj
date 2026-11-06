@@ -1,1 +1,6 @@
-<Project Sdk="Microsoft.NET.Sdk" />
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <!-- A new identity permits recovery in processes that already loaded the file-IPC bootstrap. -->
+        <AssemblyName>AvaloniaDevTool.Bootstrap.Pipe</AssemblyName>
+    </PropertyGroup>
+</Project>

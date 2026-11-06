@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.IO.Pipes;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -38,11 +39,9 @@ public static class WindowsAgentAttachment
         var actualHash = Convert.ToHexString(SHA256.HashData(await File.ReadAllBytesAsync(native, cancellationToken))).ToLowerInvariant();
         if (actualHash != manifest.RootElement.GetProperty("sha256").GetString())
             throw new InvalidOperationException("payload_corrupt: The native bootstrap SHA-256 does not match its manifest.");
-        var bootstrap = Path.Combine(sourceRoot, "src", "Hosts", "AvaloniaDevTool.Bootstrap", "bin", "Release", "net10.0", "AvaloniaDevTool.Bootstrap.dll");
+        var bootstrap = Path.Combine(sourceRoot, "src", "Hosts", "AvaloniaDevTool.Bootstrap", "bin", "Release", "net10.0", "AvaloniaDevTool.Bootstrap.Pipe.dll");
         if (!File.Exists(bootstrap))
             throw new InvalidOperationException("setup_required: Run Prepare.ps1 to build the runtime-only bootstrap.");
-        var run = Path.Combine(cache, Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(run);
         var injection = Stopwatch.StartNew();
         using var probe = await InvokeAsync("probe", null);
         injection.Stop();
@@ -64,35 +63,39 @@ public static class WindowsAgentAttachment
         async Task<JsonDocument> InvokeAsync(string action, string? agentPath)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            var requestPath = Path.Combine(run, action + ".request.json");
-            var statusPath = Path.Combine(run, action + ".status.json");
-            await File.WriteAllTextAsync(requestPath, JsonSerializer.Serialize(new
+            var replyName = "avdt-bootstrap-" + Guid.NewGuid().ToString("N");
+            await using var reply = new NamedPipeServerStream(replyName, PipeDirection.In, 1,
+                PipeTransmissionMode.Byte, PipeOptions.Asynchronous | PipeOptions.CurrentUserOnly);
+            var request = JsonSerializer.Serialize(new
             {
-                Action = action, StatusPath = statusPath, AgentPath = agentPath
-            }), cancellationToken);
+                Action = action, ReplyPipeName = replyName, AgentPath = agentPath
+            });
             // Once native execution starts, cancellation does not imply that target work was undone.
-            WindowsRuntimeInjector.Invoke(processId, startTime, native, bootstrap, requestPath);
-            var deadline = DateTime.UtcNow.AddSeconds(20);
-            while (DateTime.UtcNow < deadline)
+            WindowsRuntimeInjector.Invoke(processId, startTime, native, bootstrap, request);
+            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(25));
+            JsonDocument result;
+            try
             {
-                if (File.Exists(statusPath))
-                {
-                    var result = JsonDocument.Parse(await File.ReadAllTextAsync(statusPath, CancellationToken.None));
-                    var state = result.RootElement.GetProperty("state").GetString();
-                    if (result.RootElement.GetProperty("processId").GetInt32() != processId)
-                    {
-                        result.Dispose();
-                        throw new InvalidOperationException("process_mismatch: The bootstrap responded for another process.");
-                    }
-                    if (state is "probed" or "started")
-                        return result;
-                    var message = result.RootElement.TryGetProperty("error", out var error) ? error.GetString() : state;
-                    result.Dispose();
-                    throw new InvalidOperationException("bootstrap_failed: " + message);
-                }
-                await Task.Delay(50, CancellationToken.None);
+                await reply.WaitForConnectionAsync(timeout.Token);
+                using var reader = new StreamReader(reply, Encoding.UTF8);
+                var json = await reader.ReadLineAsync(timeout.Token) ?? throw new EndOfStreamException("The bootstrap closed without a reply.");
+                result = JsonDocument.Parse(json);
             }
-            throw new TimeoutException("attach_outcome_unknown: Bootstrap completion was not confirmed; do not reinject automatically.");
+            catch (Exception error) when (error is OperationCanceledException or IOException)
+            {
+                throw new TimeoutException($"attach_outcome_unknown: Bootstrap {action} completion was not confirmed; do not reinject automatically.", error);
+            }
+            if (result.RootElement.GetProperty("processId").GetInt32() != processId)
+            {
+                result.Dispose();
+                throw new InvalidOperationException("process_mismatch: The bootstrap responded for another process.");
+            }
+            var state = result.RootElement.GetProperty("state").GetString();
+            if (state == (action == "probe" ? "probed" : "started"))
+                return result;
+            var message = result.RootElement.TryGetProperty("error", out var detail) ? detail.GetString() : state;
+            result.Dispose();
+            throw new InvalidOperationException($"bootstrap_failed: {action}: {message}");
         }
     }
 
@@ -122,6 +125,8 @@ public static class WindowsAgentAttachment
             UseShellExecute = false, CreateNoWindow = true, WorkingDirectory = sourceRoot,
             RedirectStandardOutput = true, RedirectStandardError = true
         };
+        if (!start.Environment.TryGetValue("NUGET_HTTP_CACHE_PATH", out var httpCache) || string.IsNullOrWhiteSpace(httpCache))
+            start.Environment["NUGET_HTTP_CACHE_PATH"] = Path.Combine(cache, "nuget-http");
         foreach (var argument in new[] { "build", Path.Combine(sourceRoot, "src", "SDK", "AvaloniaDevTool.Agent", "AvaloniaDevTool.Agent.csproj"),
                      "-c", "Release", "--artifacts-path", output, "--disable-build-servers", "-v:minimal", "-p:AvaloniaVersion=" + avalonia })
             start.ArgumentList.Add(argument);
