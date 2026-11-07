@@ -1,0 +1,3 @@
+# Preserve the exact upstream patch bytes used by the SHA-256 manifest.
+# Patch context includes upstream whitespace and is not source to reformat.
+mcp/native/win-x64/recording/screenrecorderlib.patch -text -whitespace

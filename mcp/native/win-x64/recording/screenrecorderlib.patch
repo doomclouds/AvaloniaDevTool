@@ -1,0 +1,663 @@
+diff --git a/ScreenRecorderLib/Recorder.h b/ScreenRecorderLib/Recorder.h
+index 627348d..468b3d0 100644
+--- a/ScreenRecorderLib/Recorder.h
++++ b/ScreenRecorderLib/Recorder.h
+@@ -92,6 +92,16 @@ namespace ScreenRecorderLib {
+ 		void SetDynamicOptions(DynamicOptions^ options);
+ 
+ 	public:
++		property int EncoderHardwareState { int get() { return m_Rec ? m_Rec->GetEncoderHardwareState() : -1; } }
++		property String^ VideoEncoderName { String^ get() { return m_Rec ? gcnew String(m_Rec->GetVideoEncoderName().c_str()) : String::Empty; } }
++		property bool TexturePoolObserved { bool get() { return m_Rec && m_Rec->GetTexturePoolObserved(); } }
++		property int EncoderTexturePoolCapacity { int get() { return m_Rec ? m_Rec->GetEncoderTexturePoolCapacity() : 0; } }
++		property int EncoderTexturePoolAllocated { int get() { return m_Rec ? m_Rec->GetEncoderTexturePoolAllocated() : 0; } }
++		property int EncoderTexturePoolInUse { int get() { return m_Rec ? m_Rec->GetEncoderTexturePoolInUse() : 0; } }
++		property int EncoderTexturePoolPeakInUse { int get() { return m_Rec ? m_Rec->GetEncoderTexturePoolPeakInUse() : 0; } }
++		property Int64 EncoderTexturePoolReuses { Int64 get() { return m_Rec ? m_Rec->GetEncoderTexturePoolReuses() : 0; } }
++		property Int64 EncoderTexturePoolTimeouts { Int64 get() { return m_Rec ? m_Rec->GetEncoderTexturePoolTimeouts() : 0; } }
++		property Int64 EncoderTexturePoolBytes { Int64 get() { return m_Rec ? m_Rec->GetEncoderTexturePoolBytes() : 0; } }
+ 		property RecorderStatus Status {
+ 			RecorderStatus get() {
+ 				return _status;
+diff --git a/ScreenRecorderLibNative/CommonTypes.h b/ScreenRecorderLibNative/CommonTypes.h
+index 1d61131..52de332 100644
+--- a/ScreenRecorderLibNative/CommonTypes.h
++++ b/ScreenRecorderLibNative/CommonTypes.h
+@@ -473,6 +473,7 @@ struct OVERLAY_THREAD_DATA :THREAD_DATA_BASE
+ 	////Handle to shared overlay texture
+ 	HANDLE OverlayTexSharedHandle{ nullptr };
+ 	RECORDING_OVERLAY_DATA *RecordingOverlay{};
++	bool UsesSharedImageDevice{ false };
+ };
+ 
+ struct CAPTURE_THREAD {
+@@ -759,4 +760,4 @@ public:
+ 			return L".jpg";
+ 		}
+ 	}
+-};
+\ No newline at end of file
++};
+diff --git a/ScreenRecorderLibNative/EncodingTexturePool.h b/ScreenRecorderLibNative/EncodingTexturePool.h
+new file mode 100644
+index 0000000..ac28ccc
+--- /dev/null
++++ b/ScreenRecorderLibNative/EncodingTexturePool.h
+@@ -0,0 +1,205 @@
++#pragma once
++#include <atlbase.h>
++#include <d3d11.h>
++#include <mfidl.h>
++#include <mferror.h>
++#include <atomic>
++#include <algorithm>
++#include <chrono>
++#include <condition_variable>
++#include <memory>
++#include <mutex>
++#include <new>
++#include <vector>
++
++// The pool owns texture storage. A tracked sample lends a slot to Media Foundation;
++// only its final external-reference callback can make that slot reusable again.
++class EncodingTexturePool final
++{
++private:
++	struct Slot
++	{
++		CComPtr<ID3D11Texture2D> Texture;
++		CComPtr<IMFAsyncCallback> Callback;
++		bool InUse = false;
++	};
++	struct State
++	{
++		std::mutex Mutex;
++		std::condition_variable Available;
++		std::vector<Slot> Slots;
++		CComPtr<ID3D11Device> Device;
++		D3D11_TEXTURE2D_DESC Desc{};
++		bool Closed = false;
++		std::atomic<int> Capacity{0};
++		std::atomic<int> Allocated{0};
++		std::atomic<int> InUse{0};
++		std::atomic<int> PeakInUse{0};
++		std::atomic<LONGLONG> Reuses{0};
++		std::atomic<LONGLONG> Timeouts{0};
++		// Nominal pixel bytes at peak; driver allocation padding is not included.
++		std::atomic<LONGLONG> Bytes{0};
++	};
++
++	static void Return(const std::shared_ptr<State>& state, size_t index)
++	{
++		{
++			std::lock_guard<std::mutex> lock(state->Mutex);
++			if (index >= state->Slots.size() || !state->Slots[index].InUse) return;
++			state->Slots[index].InUse = false;
++			--state->InUse;
++		}
++		state->Available.notify_one();
++	}
++
++	class ReturnedSample final : public IMFAsyncCallback
++	{
++	public:
++		ReturnedSample(const std::shared_ptr<State>& state, size_t slot) : m_State(state), m_Slot(slot) {}
++		STDMETHODIMP QueryInterface(REFIID iid, void** result) override
++		{
++			if (!result) return E_POINTER;
++			*result = nullptr;
++			if (iid == __uuidof(IUnknown) || iid == __uuidof(IMFAsyncCallback)) {
++				*result = static_cast<IMFAsyncCallback*>(this);
++				AddRef();
++				return S_OK;
++			}
++			return E_NOINTERFACE;
++		}
++		STDMETHODIMP_(ULONG) AddRef() override { return ++m_References; }
++		STDMETHODIMP_(ULONG) Release() override
++		{
++			const ULONG remaining = --m_References;
++			if (!remaining) delete this;
++			return remaining;
++		}
++		STDMETHODIMP GetParameters(DWORD*, DWORD*) override { return E_NOTIMPL; }
++		STDMETHODIMP Invoke(IMFAsyncResult*) override
++		{
++			if (auto state = m_State.lock()) Return(state, m_Slot);
++			return S_OK;
++		}
++	private:
++		std::atomic<ULONG> m_References{1};
++		std::weak_ptr<State> m_State;
++		size_t m_Slot;
++	};
++
++public:
++	class Lease final
++	{
++		friend class EncodingTexturePool;
++	public:
++		Lease() = default;
++		Lease(const Lease&) = delete;
++		Lease& operator=(const Lease&) = delete;
++		~Lease() { if (m_State && !m_Tracked) Return(m_State, m_Slot); }
++		ID3D11Texture2D* Texture() const { return m_Texture; }
++		IMFAsyncCallback* Callback() const { return m_Callback; }
++		void Tracked() { m_Tracked = true; }
++	private:
++		std::shared_ptr<State> m_State;
++		size_t m_Slot = 0;
++		CComPtr<ID3D11Texture2D> m_Texture;
++		CComPtr<IMFAsyncCallback> m_Callback;
++		bool m_Tracked = false;
++	};
++
++	EncodingTexturePool() : m_State(std::make_shared<State>()) {}
++	~EncodingTexturePool() { Close(); }
++
++	HRESULT Acquire(ID3D11Device* device, const D3D11_TEXTURE2D_DESC& desc, Lease& lease)
++	{
++		const auto state = m_State;
++		std::unique_lock<std::mutex> lock(state->Mutex);
++		if (state->Closed) return MF_E_SHUTDOWN;
++		if (desc.Format != DXGI_FORMAT_B8G8R8A8_UNORM || desc.ArraySize != 1 ||
++			desc.MipLevels != 1 || desc.SampleDesc.Count != 1 || !desc.Width || !desc.Height)
++			return MF_E_INVALIDMEDIATYPE;
++		const LONGLONG bytes = static_cast<LONGLONG>(desc.Width) * desc.Height * 4;
++		if (state->Capacity == 0) {
++			// Eight BGRA frames still fit at the worker's maximum 1920 x 1920 canvas.
++			constexpr LONGLONG Budget = 128LL * 1024 * 1024;
++			const auto capacity = static_cast<int>((std::min)(8LL, Budget / bytes));
++			if (capacity < 2) return E_OUTOFMEMORY;
++			state->Desc = desc;
++			state->Device = device;
++			state->Capacity = capacity;
++		} else if (state->Device != device || state->Desc.Width != desc.Width || state->Desc.Height != desc.Height ||
++			state->Desc.Format != desc.Format || state->Desc.BindFlags != desc.BindFlags ||
++			state->Desc.Usage != desc.Usage || state->Desc.CPUAccessFlags != desc.CPUAccessFlags ||
++			state->Desc.MiscFlags != desc.MiscFlags) {
++			return MF_E_INVALIDMEDIATYPE;
++		}
++
++		const auto deadline = std::chrono::steady_clock::now() + std::chrono::milliseconds(250);
++		for (;;) {
++			if (state->Closed) return MF_E_SHUTDOWN;
++			for (size_t index = 0; index < state->Slots.size(); index++) {
++				if (!state->Slots[index].InUse) {
++					++state->Reuses;
++					Assign(state, index, lease);
++					return S_OK;
++				}
++			}
++			if (state->Slots.size() < static_cast<size_t>(state->Capacity.load())) {
++				Slot slot;
++				HRESULT hr = device->CreateTexture2D(&desc, nullptr, &slot.Texture);
++				if (FAILED(hr)) return hr;
++				slot.Callback.Attach(new (std::nothrow) ReturnedSample(state, state->Slots.size()));
++				if (!slot.Callback) return E_OUTOFMEMORY;
++				state->Slots.push_back(slot);
++				state->Allocated = static_cast<int>(state->Slots.size());
++				state->Bytes = bytes * state->Allocated.load();
++				Assign(state, state->Slots.size() - 1, lease);
++				return S_OK;
++			}
++			if (state->Available.wait_until(lock, deadline) == std::cv_status::timeout) {
++				if (state->Closed) return MF_E_SHUTDOWN;
++				if (std::any_of(state->Slots.begin(), state->Slots.end(),
++					[](const Slot& slot) { return !slot.InUse; })) continue;
++				++state->Timeouts;
++				return HRESULT_FROM_WIN32(ERROR_TIMEOUT);
++			}
++		}
++	}
++
++	void Close()
++	{
++		const auto state = m_State;
++		{
++			std::lock_guard<std::mutex> lock(state->Mutex);
++			state->Closed = true;
++			for (auto& slot : state->Slots) {
++				slot.Texture.Release();
++				slot.Callback.Release();
++			}
++			state->Device.Release();
++		}
++		state->Available.notify_all();
++	}
++
++	bool Observed() const { return m_State->Capacity != 0; }
++	int Capacity() const { return m_State->Capacity; }
++	int Allocated() const { return m_State->Allocated; }
++	int InUse() const { return m_State->InUse; }
++	int PeakInUse() const { return m_State->PeakInUse; }
++	LONGLONG Reuses() const { return m_State->Reuses; }
++	LONGLONG Timeouts() const { return m_State->Timeouts; }
++	LONGLONG Bytes() const { return m_State->Bytes; }
++
++private:
++	static void Assign(const std::shared_ptr<State>& state, size_t index, Lease& lease)
++	{
++		auto& slot = state->Slots[index];
++		slot.InUse = true;
++		const auto inUse = ++state->InUse;
++		if (inUse > state->PeakInUse) state->PeakInUse = inUse;
++		lease.m_State = state;
++		lease.m_Slot = index;
++		lease.m_Texture = slot.Texture;
++		lease.m_Callback = slot.Callback;
++	}
++	std::shared_ptr<State> m_State;
++};
+diff --git a/ScreenRecorderLibNative/ImageReader.cpp b/ScreenRecorderLibNative/ImageReader.cpp
+index 29a6c1f..a7df473 100644
+--- a/ScreenRecorderLibNative/ImageReader.cpp
++++ b/ScreenRecorderLibNative/ImageReader.cpp
+@@ -5,9 +5,10 @@
+ 
+ using namespace std;
+ 
+-ImageReader::ImageReader() :
++ImageReader::ImageReader(bool staticOverlay) :
+ 	m_Texture(nullptr),
+-	m_NativeSize{}
++	m_NativeSize{},
++	m_StaticOverlay(staticOverlay)
+ {
+ }
+ 
+@@ -25,6 +26,10 @@ HRESULT ImageReader::Initialize(_In_ ID3D11DeviceContext *pDeviceContext, _In_ I
+ 	m_Device->AddRef();
+ 	m_DeviceContext->AddRef();
+ 
++	// Static overlays only upload an immutable image. Avoid InitShaders, which
++	// binds input-layout state on the shared immediate context.
++	if (m_StaticOverlay) return S_OK;
++
+ 	m_TextureManager = make_unique<TextureManager>();
+ 	return m_TextureManager->Initialize(pDeviceContext, pDevice);
+ }
+@@ -68,7 +73,19 @@ HRESULT ImageReader::GetNativeSize(_In_ RECORDING_SOURCE_BASE &recordingSource,
+ 
+ HRESULT ImageReader::AcquireNextFrame(_In_ DWORD timeoutMillis, _Outptr_opt_result_maybenull_ ID3D11Texture2D **ppFrame)
+ {
++	// Static image overlays only change when the source is recreated.
++	// Return S_FALSE so the overlay thread waits instead of allocating textures in a busy loop.
++	if (m_LastGrabTimeStamp.QuadPart != 0) {
++		if (ppFrame) *ppFrame = nullptr;
++		return S_FALSE;
++	}
+ 	if (m_Texture && ppFrame) {
++		if (m_StaticOverlay) {
++			*ppFrame = m_Texture;
++			(*ppFrame)->AddRef();
++			QueryPerformanceCounter(&m_LastGrabTimeStamp);
++			return S_OK;
++		}
+ 		CComPtr<ID3D11Texture2D> pStagingTexture = nullptr;
+ 		D3D11_TEXTURE2D_DESC desc;
+ 		m_Texture->GetDesc(&desc);
+@@ -93,6 +110,8 @@ HRESULT ImageReader::AcquireNextFrame(_In_ DWORD timeoutMillis, _Outptr_opt_resu
+ 
+ HRESULT ImageReader::WriteNextFrameToSharedSurface(_In_ DWORD timeoutMillis, _Inout_ ID3D11Texture2D *pSharedSurf, INT offsetX, INT offsetY, _In_ RECT destinationRect, _In_opt_ ID3D11Texture2D *pTexture)
+ {
++	// Overlay frames are composed by ScreenCaptureManager, not this source-only path.
++	if (m_StaticOverlay) return E_NOTIMPL;
+ 	if (!m_RecordingSource) {
+ 		LOG_ERROR("No recording source found in ImageReader");
+ 		return E_FAIL;
+@@ -181,7 +200,23 @@ HRESULT ImageReader::InitializeDecoder(_In_ IWICBitmapSource *pBitmap) {
+ 		return E_OUTOFMEMORY;
+ 	}
+ 	RETURN_ON_BAD_HR(hr = pBitmap->CopyPixels(nullptr, stride, bitmapSize, pFrameBuffer.get()));
+-	RETURN_ON_BAD_HR(m_TextureManager->CreateTextureFromBuffer(pFrameBuffer.get(), stride, width, height, &m_Texture, 0, D3D11_BIND_SHADER_RESOURCE));
++	if (m_StaticOverlay) {
++		D3D11_TEXTURE2D_DESC desc{};
++		desc.Width = width;
++		desc.Height = height;
++		desc.MipLevels = 1;
++		desc.ArraySize = 1;
++		desc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
++		desc.SampleDesc.Count = 1;
++		desc.Usage = D3D11_USAGE_DEFAULT;
++		desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
++		D3D11_SUBRESOURCE_DATA initial{};
++		initial.pSysMem = pFrameBuffer.get();
++		initial.SysMemPitch = stride;
++		RETURN_ON_BAD_HR(hr = m_Device->CreateTexture2D(&desc, &initial, &m_Texture));
++	} else {
++		RETURN_ON_BAD_HR(hr = m_TextureManager->CreateTextureFromBuffer(pFrameBuffer.get(), stride, width, height, &m_Texture, 0, D3D11_BIND_SHADER_RESOURCE));
++	}
+ 	m_NativeSize = SIZE{ static_cast<long>(width),static_cast<long>(height) };
+ 	return hr;
+-}
+\ No newline at end of file
++}
+diff --git a/ScreenRecorderLibNative/ImageReader.h b/ScreenRecorderLibNative/ImageReader.h
+index 37c7e83..f032a2f 100644
+--- a/ScreenRecorderLibNative/ImageReader.h
++++ b/ScreenRecorderLibNative/ImageReader.h
+@@ -8,7 +8,7 @@
+ class ImageReader :public CaptureBase
+ {
+ public:
+-	ImageReader();
++	explicit ImageReader(bool staticOverlay = false);
+ 	~ImageReader();
+ 	virtual HRESULT Initialize(_In_ ID3D11DeviceContext *pDeviceContext, _In_ ID3D11Device *pDevice) override;
+ 	virtual HRESULT StartCapture(_In_ RECORDING_SOURCE_BASE &source) override;
+@@ -20,6 +20,7 @@ public:
+ 		return S_FALSE;
+ 	}
+ 	virtual inline std::wstring Name() override { return L"ImageReader"; };
++	bool IsStaticOverlay() const { return m_StaticOverlay; }
+ 
+ private:
+ 	HRESULT InitializeDecoder(_In_ std::wstring source);
+@@ -28,4 +29,5 @@ private:
+ 
+ 	CComPtr<ID3D11Texture2D> m_Texture;
+ 	SIZE m_NativeSize;
+-};
+\ No newline at end of file
++	bool m_StaticOverlay;
++};
+diff --git a/ScreenRecorderLibNative/OutputManager.cpp b/ScreenRecorderLibNative/OutputManager.cpp
+index 5da70dd..47d5939 100644
+--- a/ScreenRecorderLibNative/OutputManager.cpp
++++ b/ScreenRecorderLibNative/OutputManager.cpp
+@@ -180,6 +180,7 @@ HRESULT OutputManager::FinalizeRecording()
+ 		}
+ 	}
+ 	GetTimelineManager()->StopMediaClock();
++	m_EncodingTextures.Close();
+ 	return finalizeResult;
+ }
+ 
+@@ -465,6 +466,34 @@ HRESULT OutputManager::InitializeVideoSinkWriter(
+ 	// Tell the sink writer to start accepting data.
+ 	RETURN_ON_BAD_HR(pSinkWriter->BeginWriting());
+ 
++	// Verify the encoder actually selected by Sink Writer; an enable flag is not proof.
++	m_EncoderHardwareState = -1;
++	m_VideoEncoderName.clear();
++	CComQIPtr<IMFSinkWriterEx> writerEx(pSinkWriter);
++	if (writerEx) {
++		for (DWORD index = 0; index < 16; index++) {
++			GUID category{};
++			CComPtr<IMFTransform> transform;
++			if (FAILED(writerEx->GetTransformForStream(videoStreamIndex, index, &category, &transform))) break;
++			if (category != MFT_CATEGORY_VIDEO_ENCODER) continue;
++			CComPtr<IMFAttributes> attributes;
++			if (SUCCEEDED(transform->GetAttributes(&attributes))) {
++				UINT32 length = 0;
++				m_EncoderHardwareState = SUCCEEDED(attributes->GetStringLength(MFT_ENUM_HARDWARE_URL_Attribute, &length)) && length > 0 ? 1 : 0;
++				WCHAR* name = nullptr;
++				if (SUCCEEDED(attributes->GetAllocatedString(MFT_FRIENDLY_NAME_Attribute, &name, &length))) {
++					m_VideoEncoderName = name;
++					CoTaskMemFree(name);
++				}
++			}
++		}
++	}
++
++	if (GetEncoderOptions()->IsHardwareEncodingEnabled() && m_EncoderHardwareState != 1) {
++		LOG_ERROR("Hardware recording refused: actual video encoder is not verified hardware");
++		return MF_E_TOPO_CODEC_NOT_FOUND;
++	}
++
+ 	// Return the pointer to the caller.
+ 	*ppWriter = pSinkWriter;
+ 	(*ppWriter)->AddRef();
+@@ -475,47 +504,30 @@ HRESULT OutputManager::InitializeVideoSinkWriter(
+ 
+ HRESULT OutputManager::WriteFrameToVideo(_In_ INT64 frameStartPos, _In_ INT64 frameDuration, _In_ DWORD streamIndex, _In_ ID3D11Texture2D *pAcquiredDesktopImage)
+ {
+-	//The encoder works async, so the input frame has to be copied, else it can be overwritten before the encoder uses it. See issue #277.
+-	CComPtr<ID3D11Texture2D> pFrameCopy;
+ 	D3D11_TEXTURE2D_DESC desc;
+ 	pAcquiredDesktopImage->GetDesc(&desc);
+-	m_Device->CreateTexture2D(&desc, nullptr, &pFrameCopy);
+-	m_DeviceContext->CopyResource(pFrameCopy, pAcquiredDesktopImage);
+-
+-	IMFMediaBuffer *pMediaBuffer;
+-	HRESULT hr = MFCreateDXGISurfaceBuffer(__uuidof(ID3D11Texture2D), pFrameCopy, 0, FALSE, &pMediaBuffer);
+-	IMF2DBuffer *p2DBuffer;
+-	if (SUCCEEDED(hr))
+-	{
+-		hr = pMediaBuffer->QueryInterface(__uuidof(IMF2DBuffer), reinterpret_cast<void **>(&p2DBuffer));
+-	}
+-	DWORD length;
+-	if (SUCCEEDED(hr))
+-	{
+-		hr = p2DBuffer->GetContiguousLength(&length);
+-	}
+-	if (SUCCEEDED(hr))
+-	{
+-		hr = pMediaBuffer->SetCurrentLength(length);
+-	}
+-	IMFSample *pSample;
+-	if (SUCCEEDED(hr))
+-	{
+-		hr = MFCreateSample(&pSample);
+-	}
+-	if (SUCCEEDED(hr))
+-	{
+-		hr = pSample->AddBuffer(pMediaBuffer);
+-	}
+-	if (SUCCEEDED(hr))
+-	{
+-		hr = pSample->SetSampleTime(frameStartPos);
+-	}
+-	if (SUCCEEDED(hr))
+-	{
+-		hr = pSample->SetSampleDuration(frameDuration);
+-	}
+-
++	EncodingTexturePool::Lease lease;
++	RETURN_ON_BAD_HR(m_EncodingTextures.Acquire(m_Device, desc, lease));
++	m_DeviceContext->CopyResource(lease.Texture(), pAcquiredDesktopImage);
++
++	CComPtr<IMFMediaBuffer> pMediaBuffer;
++	RETURN_ON_BAD_HR(MFCreateDXGISurfaceBuffer(__uuidof(ID3D11Texture2D), lease.Texture(), 0, FALSE, &pMediaBuffer));
++	CComQIPtr<IMF2DBuffer> p2DBuffer(pMediaBuffer);
++	if (!p2DBuffer) return E_NOINTERFACE;
++	DWORD length = 0;
++	RETURN_ON_BAD_HR(p2DBuffer->GetContiguousLength(&length));
++	RETURN_ON_BAD_HR(pMediaBuffer->SetCurrentLength(length));
++
++	CComPtr<IMFTrackedSample> tracked;
++	RETURN_ON_BAD_HR(MFCreateTrackedSample(&tracked));
++	CComQIPtr<IMFSample> pSample(tracked);
++	if (!pSample) return E_NOINTERFACE;
++	RETURN_ON_BAD_HR(pSample->AddBuffer(pMediaBuffer));
++	RETURN_ON_BAD_HR(pSample->SetSampleTime(frameStartPos));
++	RETURN_ON_BAD_HR(pSample->SetSampleDuration(frameDuration));
++	RETURN_ON_BAD_HR(tracked->SetAllocator(lease.Callback(), nullptr));
++	lease.Tracked();
++	HRESULT hr = S_OK;
+ 	if (SUCCEEDED(hr))
+ 	{
+ 		if (m_UseManualNV12Converter) {
+@@ -577,9 +589,9 @@ HRESULT OutputManager::WriteFrameToVideo(_In_ INT64 frameStartPos, _In_ INT64 fr
+ 			hr = m_SinkWriter->WriteSample(streamIndex, pSample);
+ 		}
+ 	}
+-	SafeRelease(&pSample);
+-	SafeRelease(&p2DBuffer);
+-	SafeRelease(&pMediaBuffer);
++
++
++
+ 	return hr;
+ }
+ 
+diff --git a/ScreenRecorderLibNative/OutputManager.h b/ScreenRecorderLibNative/OutputManager.h
+index 2198e92..eb91071 100644
+--- a/ScreenRecorderLibNative/OutputManager.h
++++ b/ScreenRecorderLibNative/OutputManager.h
+@@ -10,6 +10,7 @@
+ #include <atlbase.h>
+ #include "TimelineManager.h"
+ #include "AudioDriftCorrector.h"
++#include "EncodingTexturePool.h"
+ 
+ struct FrameWriteModel
+ {
+@@ -57,7 +58,21 @@ public:
+ 			m_SinkWriter->Flush(m_VideoStreamIndex);
+ 		}
+ 	}
++	int GetEncoderHardwareState() const { return m_EncoderHardwareState; }
++	std::wstring GetVideoEncoderName() const { return m_VideoEncoderName; }
++	bool GetTexturePoolObserved() const { return m_EncodingTextures.Observed(); }
++	int GetEncoderTexturePoolCapacity() const { return m_EncodingTextures.Capacity(); }
++	int GetEncoderTexturePoolAllocated() const { return m_EncodingTextures.Allocated(); }
++	int GetEncoderTexturePoolInUse() const { return m_EncodingTextures.InUse(); }
++	int GetEncoderTexturePoolPeakInUse() const { return m_EncodingTextures.PeakInUse(); }
++	LONGLONG GetEncoderTexturePoolReuses() const { return m_EncodingTextures.Reuses(); }
++	LONGLONG GetEncoderTexturePoolTimeouts() const { return m_EncodingTextures.Timeouts(); }
++	LONGLONG GetEncoderTexturePoolBytes() const { return m_EncodingTextures.Bytes(); }
+ private:
++	EncodingTexturePool m_EncodingTextures;
++	int m_EncoderHardwareState = -1;
++	std::wstring m_VideoEncoderName;
++
+ 	ID3D11DeviceContext *m_DeviceContext = nullptr;
+ 	ID3D11Device *m_Device = nullptr;
+ 
+diff --git a/ScreenRecorderLibNative/RecordingManager.h b/ScreenRecorderLibNative/RecordingManager.h
+index 4069947..7ce52cb 100644
+--- a/ScreenRecorderLibNative/RecordingManager.h
++++ b/ScreenRecorderLibNative/RecordingManager.h
+@@ -112,6 +112,16 @@ public:
+ 		return S_OK;
+ 	}
+ 
++	int GetEncoderHardwareState() const { return m_OutputManager ? m_OutputManager->GetEncoderHardwareState() : -1; }
++	std::wstring GetVideoEncoderName() const { return m_OutputManager ? m_OutputManager->GetVideoEncoderName() : L""; }
++	bool GetTexturePoolObserved() const { return (m_OutputManager ? m_OutputManager->GetTexturePoolObserved() : false); }
++	int GetEncoderTexturePoolCapacity() const { return (m_OutputManager ? m_OutputManager->GetEncoderTexturePoolCapacity() : 0); }
++	int GetEncoderTexturePoolAllocated() const { return (m_OutputManager ? m_OutputManager->GetEncoderTexturePoolAllocated() : 0); }
++	int GetEncoderTexturePoolInUse() const { return (m_OutputManager ? m_OutputManager->GetEncoderTexturePoolInUse() : 0); }
++	int GetEncoderTexturePoolPeakInUse() const { return (m_OutputManager ? m_OutputManager->GetEncoderTexturePoolPeakInUse() : 0); }
++	LONGLONG GetEncoderTexturePoolReuses() const { return (m_OutputManager ? m_OutputManager->GetEncoderTexturePoolReuses() : 0); }
++	LONGLONG GetEncoderTexturePoolTimeouts() const { return (m_OutputManager ? m_OutputManager->GetEncoderTexturePoolTimeouts() : 0); }
++	LONGLONG GetEncoderTexturePoolBytes() const { return (m_OutputManager ? m_OutputManager->GetEncoderTexturePoolBytes() : 0); }
+ 	void SetLogEnabled(bool value);
+ 	void SetLogFilePath(std::wstring value);
+ 	void SetLogSeverityLevel(int value);
+diff --git a/ScreenRecorderLibNative/ScreenCaptureManager.cpp b/ScreenRecorderLibNative/ScreenCaptureManager.cpp
+index a4737b8..b01f2c7 100644
+--- a/ScreenRecorderLibNative/ScreenCaptureManager.cpp
++++ b/ScreenRecorderLibNative/ScreenCaptureManager.cpp
+@@ -18,6 +18,50 @@ DWORD WINAPI CaptureThreadProc(_In_ void *Param);
+ DWORD WINAPI OverlayCaptureThreadProc(_In_ void *Param);
+ _Ret_maybenull_ CaptureBase *CreateCaptureInstance(_In_ RECORDING_SOURCE_BASE *pSource);
+ 
++static bool IsStaticPngOverlay(RECORDING_SOURCE_BASE* source)
++{
++	if (source->Type != RecordingSourceType::Picture || !dynamic_cast<RECORDING_OVERLAY*>(source))
++		return false;
++	constexpr char pngSignature[] = "\x89PNG\r\n\x1a\n";
++	if (source->SourceStream) {
++		const auto signature = ReadFileSignature(source->SourceStream);
++		return signature.size() >= 8 && memcmp(signature.data(), pngSignature, 8) == 0;
++	}
++	// The general source sniffing helper opens files in text mode. PNG signatures
++	// contain CR/LF and Ctrl-Z, so this optimization must read them as binary.
++	FILE* file = nullptr;
++	if (_wfopen_s(&file, source->SourcePath.c_str(), L"rb") != 0 || !file) return false;
++	char signature[8]{};
++	const auto length = fread(signature, 1, sizeof(signature), file);
++	fclose(file);
++	return length == sizeof(signature) && memcmp(signature, pngSignature, sizeof(signature)) == 0;
++}
++
++static bool ShareStaticImageDevice(ID3D11Device* device, ID3D11DeviceContext* context, DX_RESOURCES* resources)
++{
++	CComPtr<ID3D10Multithread> protection;
++	if (FAILED(context->QueryInterface(IID_PPV_ARGS(&protection))) || !protection->GetMultithreadProtected())
++		return false;
++	resources->Device = device;
++	resources->Device->AddRef();
++	resources->Context = context;
++	resources->Context->AddRef();
++	// Debug remains null; CleanDx owns exactly these two added references.
++	return true;
++}
++
++static HANDLE GetStaticImageSharedHandle(ID3D11DeviceContext* context, ID3D11Texture2D* texture)
++{
++	CComPtr<ID3D10Multithread> protection;
++	if (FAILED(context->QueryInterface(IID_PPV_ARGS(&protection)))) return nullptr;
++	// DXGI shared-handle access must not race use of this immediate context.
++	// Never hold this guard across a keyed-mutex wait or the overlay thread wait.
++	protection->Enter();
++	const auto handle = GetSharedHandle(texture);
++	protection->Leave();
++	return handle;
++}
++
+ ScreenCaptureManager::ScreenCaptureManager() :
+ 	m_Device(nullptr),
+ 	m_DeviceContext(nullptr),
+@@ -181,7 +225,12 @@ HRESULT ScreenCaptureManager::InitializeOverlays(_In_ const std::vector<RECORDIN
+ 			threadData->TerminateThreadsEvent = m_TerminateThreadsEvent;
+ 			threadData->RecordingOverlay = new RECORDING_OVERLAY_DATA(overlay);
+ 			RtlZeroMemory(&threadData->RecordingOverlay->DxRes, sizeof(DX_RESOURCES));
+-			RETURN_ON_BAD_HR(hr = InitializeDx(nullptr, &threadData->RecordingOverlay->DxRes));
++			threadData->UsesSharedImageDevice = IsStaticPngOverlay(overlay) &&
++				ShareStaticImageDevice(m_Device, m_DeviceContext, &threadData->RecordingOverlay->DxRes);
++			if (threadData->UsesSharedImageDevice)
++				hr = S_OK;
++			else
++				RETURN_ON_BAD_HR(hr = InitializeDx(nullptr, &threadData->RecordingOverlay->DxRes));
+ 			OVERLAY_THREAD *thread = new OVERLAY_THREAD();
+ 			thread->ThreadData = threadData;
+ 			DWORD ThreadId;
+@@ -1135,6 +1184,16 @@ Start:
+ 				goto Exit;
+ 			}
+ 
++			// A dynamic source replacement must not move GIF/video/WGC onto the shared context.
++			auto imageReader = dynamic_cast<ImageReader*>(overlayCapture.get());
++			if (pData->UsesSharedImageDevice && (!imageReader || !imageReader->IsStaticOverlay())) {
++				pData->OverlayTexSharedHandle = nullptr;
++				pSharedTexture.Release();
++				CleanDx(&pOverlayData->DxRes);
++				pData->UsesSharedImageDevice = false;
++				hr = InitializeDx(nullptr, &pOverlayData->DxRes);
++				if (FAILED(hr)) goto Exit;
++			}
+ 			hr = overlayCapture->Initialize(pOverlayData->DxRes.Context, pOverlayData->DxRes.Device);
+ 			hr = overlayCapture->StartCapture(*pOverlay);
+ 			if (FAILED(hr))
+@@ -1219,7 +1278,10 @@ Start:
+ 						desc.CPUAccessFlags = 0;
+ 						desc.MiscFlags = D3D11_RESOURCE_MISC_SHARED;
+ 						pOverlayData->DxRes.Device->CreateTexture2D(&desc, nullptr, &pSharedTexture);
+-						HANDLE sharedHandle = GetSharedHandle(pSharedTexture);
++						HANDLE sharedHandle = pData->UsesSharedImageDevice
++							? GetStaticImageSharedHandle(pOverlayData->DxRes.Context, pSharedTexture)
++							: GetSharedHandle(pSharedTexture);
++						if (pData->UsesSharedImageDevice && !sharedHandle) { hr = E_FAIL; break; }
+ 						pData->OverlayTexSharedHandle = sharedHandle;
+ 						LOG_INFO("Created new overlay shared texture");
+ 					}
+@@ -1344,7 +1406,7 @@ _Ret_maybenull_ CaptureBase *CreateCaptureInstance(_In_ RECORDING_SOURCE_BASE *p
+ 				return new GifReader();
+ 			}
+ 			else {
+-				return new ImageReader();
++				return new ImageReader(IsStaticPngOverlay(pSource));
+ 			}
+ 		}
+ 		case RecordingSourceType::Video: {
+@@ -1419,4 +1481,4 @@ void ProcessCaptureHRESULT(_In_ HRESULT hr, _Inout_ CAPTURE_RESULT *pResult, _In
+ 			pResult->Error = L"Unexpected error, aborting capture";
+ 			break;
+ 	}
+-}
+\ No newline at end of file
++}

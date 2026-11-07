@@ -13,5 +13,7 @@ internal static class InputRpcRoutes
         routes.Map<TextSelectionRequest>(InputMethods.TextSelection, request => input.SelectText(request));
         routes.Map<SelectItemRequest>(InputMethods.SelectItem, request => input.SelectItem(request));
         routes.Map<ControlActionRequest>(InputMethods.ControlAction, request => input.PerformAction(request));
+        routes.MapAsync<RecordingInputEventsRequest>(RecordingInputMethods.Configure,
+            async (request, cancellation) => await input.ConfigureRecordingEventsAsync(request, cancellation));
     }
 }

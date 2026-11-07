@@ -9,7 +9,7 @@ using ModelContextProtocol;
 
 namespace AvaloniaDevTool.Cli;
 
-public sealed class ToolSession : IAsyncDisposable
+public sealed partial class ToolSession : IAsyncDisposable
 {
     private readonly DiagnosticsClient _client = new();
     private readonly SemaphoreSlim _attachment = new(1, 1);
@@ -44,6 +44,15 @@ public sealed class ToolSession : IAsyncDisposable
     public async Task<(SessionInfo Session, ProcessAttachmentInfo? Attachment)> AttachApplicationAsync(
         ApplicationDescriptor target, CancellationToken cancellationToken)
     {
+        await _attachment.WaitAsync(cancellationToken).ConfigureAwait(false);
+        try { return await AttachApplicationCoreAsync(target, cancellationToken).ConfigureAwait(false); }
+        finally { _attachment.Release(); }
+    }
+
+    private async Task<(SessionInfo Session, ProcessAttachmentInfo? Attachment)> AttachApplicationCoreAsync(
+        ApplicationDescriptor target, CancellationToken cancellationToken)
+    {
+        EnsureRecordingAllowsTargetChange();
         var elapsed = Stopwatch.StartNew();
         ProcessAttachmentInfo? attachment = null;
         if (target.RequiresInjection)
@@ -57,7 +66,7 @@ public sealed class ToolSession : IAsyncDisposable
                 throw new McpException(error.Message);
             }
         }
-        var session = await AttachAsync(target.PipeName, cancellationToken);
+        var session = await AttachCoreAsync(target.PipeName, cancellationToken).ConfigureAwait(false);
         var identityMatches = target.ProcessId is not { } expectedPid || session.ProcessId == expectedPid;
         if (identityMatches && target.ProcessId is { } checkedPid && target.StartTimeUtc is { } checkedStart)
         {
@@ -73,7 +82,7 @@ public sealed class ToolSession : IAsyncDisposable
         }
         if (!identityMatches)
         {
-            await DetachAsync();
+            await DetachCoreAsync().ConfigureAwait(false);
             throw new McpException("process_mismatch: The endpoint does not belong to the selected process.");
         }
         if (attachment is not null)
@@ -161,22 +170,21 @@ public sealed class ToolSession : IAsyncDisposable
     public async Task<SessionInfo> AttachAsync(string pipeName, CancellationToken cancellationToken)
     {
         await _attachment.WaitAsync(cancellationToken).ConfigureAwait(false);
-        try
-        {
-            await ConnectLocalAsync(pipeName, cancellationToken).ConfigureAwait(false);
-            _initialPipe = null;
-            if (_preview is { } previous && previous.PipeName != pipeName)
-            {
-                _preview = null;
-                await previous.DisposeAsync().ConfigureAwait(false);
-            }
+        try { return await AttachCoreAsync(pipeName, cancellationToken).ConfigureAwait(false); }
+        finally { _attachment.Release(); }
+    }
 
-            return _client.Session!;
-        }
-        finally
+    private async Task<SessionInfo> AttachCoreAsync(string pipeName, CancellationToken cancellationToken)
+    {
+        EnsureRecordingAllowsTargetChange();
+        await ConnectLocalAsync(pipeName, cancellationToken).ConfigureAwait(false);
+        _initialPipe = null;
+        if (_preview is { } previous && previous.PipeName != pipeName)
         {
-            _attachment.Release();
+            _preview = null;
+            await previous.DisposeAsync().ConfigureAwait(false);
         }
+        return _client.Session!;
     }
 
     private async Task ConnectLocalAsync(string pipeName, CancellationToken cancellationToken)
@@ -185,6 +193,7 @@ public sealed class ToolSession : IAsyncDisposable
         try
         {
             await _client.ConnectAsync(pipeName, cancellationToken).ConfigureAwait(false);
+            RememberRecordingTargetIdentity();
         }
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
@@ -228,6 +237,7 @@ public sealed class ToolSession : IAsyncDisposable
         OwnedPreview? candidate = null;
         try
         {
+            EnsureRecordingAllowsTargetChange();
             using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             timeout.CancelAfter(TimeSpan.FromSeconds(timeoutSeconds));
             candidate = await OwnedPreview.StartAsync(filePath,
@@ -240,6 +250,7 @@ public sealed class ToolSession : IAsyncDisposable
                 timeout.Token).ConfigureAwait(false);
             await ReleaseNativeAsync().ConfigureAwait(false);
             await _client.ConnectAsync(candidate.PipeName, timeout.Token).ConfigureAwait(false);
+            RememberRecordingTargetIdentity();
             var previous = _preview;
             _preview = candidate;
             candidate = null;
@@ -271,20 +282,21 @@ public sealed class ToolSession : IAsyncDisposable
     public async Task DetachAsync()
     {
         await _attachment.WaitAsync().ConfigureAwait(false);
-        try
-        {
-            _initialPipe = null;
-            await ReleaseNativeAsync().ConfigureAwait(false);
-            await _client.DisconnectAsync().ConfigureAwait(false);
-            var preview = _preview;
-            _preview = null;
-            if (preview is not null)
-                await preview.DisposeAsync().ConfigureAwait(false);
-        }
-        finally
-        {
-            _attachment.Release();
-        }
+        try { await DetachCoreAsync().ConfigureAwait(false); }
+        finally { _attachment.Release(); }
+    }
+
+    private async Task DetachCoreAsync()
+    {
+        await ReleaseRecordingAsync().ConfigureAwait(false);
+        _initialPipe = null;
+        await ReleaseNativeAsync().ConfigureAwait(false);
+        await _client.DisconnectAsync().ConfigureAwait(false);
+        _recordingTargetIdentity = null;
+        var preview = _preview;
+        _preview = null;
+        if (preview is not null)
+            await preview.DisposeAsync().ConfigureAwait(false);
     }
 
     public async ValueTask DisposeAsync()

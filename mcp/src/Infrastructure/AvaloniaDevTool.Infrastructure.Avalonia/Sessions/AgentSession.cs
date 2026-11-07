@@ -49,7 +49,7 @@ internal sealed class AgentSession : IDisposable
         var layout = new LayoutInspectionService(_objects, _observations.Observe);
         _composition = new CompositionInspectionService(_objects, _observations.Observe);
         var runtime = new RuntimeInspectionService(_objects);
-        _input = new InputInspectionService(_objects);
+        _input = new InputInspectionService(_objects, _notifications.SendAsync);
         _overlay = new OverlayService(_objects, _observations.Observe);
         _renderer = new RendererDiagnosticsService(_objects);
         _popups = new PopupFreezeService(_objects, _openPopups);
@@ -69,6 +69,7 @@ internal sealed class AgentSession : IDisposable
         var screenshots = new ElementScreenshotService(_objects,
             _overlay,
             id => _tree.GetAncestors(new TreeAncestorsRequest(id, TreeKind.Visual)));
+        var recordingRegions = new ElementRecordingRegionService(_objects, _observations.Observe);
         _roots.ConfiguredRootsRefreshed += _popups.RefreshRoots;
         _roots.PresentationRootsRefreshed += _selection.RefreshRoots;
         _roots.PresentationRootsRefreshed += _renderer.RefreshRoots;
@@ -90,6 +91,7 @@ internal sealed class AgentSession : IDisposable
         OverlaysRpcRoutes.Register(_routes, _overlay);
         PopupsRpcRoutes.Register(_routes, _popups);
         RenderingRpcRoutes.Register(_routes, _renderer);
+        RecordingRegionRpcRoutes.Register(_routes, recordingRegions);
         ResourcesRpcRoutes.Register(_routes, _resources);
         RuntimeRpcRoutes.Register(_routes, runtime);
         ActivityRpcRoutes.Register(_routes, _activity);

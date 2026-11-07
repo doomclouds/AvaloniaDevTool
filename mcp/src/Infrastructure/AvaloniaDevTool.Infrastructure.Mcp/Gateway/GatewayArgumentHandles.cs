@@ -43,7 +43,7 @@ internal static class GatewayArgumentHandles
                 foreach (var point in points.OfType<JsonObject>())
                     MapField(point, "nodeId");
             }
-            else if (field.Key == "nodeIds" && request.Name == "tree-release" && field.Value is JsonArray nodes)
+            else if (field.Key == "nodeIds" && request.Name is "tree-release" or "recording-start" && field.Value is JsonArray nodes)
             {
                 for (var index = 0; index < nodes.Count; index++)
                     if (nodes[index] is { } node)

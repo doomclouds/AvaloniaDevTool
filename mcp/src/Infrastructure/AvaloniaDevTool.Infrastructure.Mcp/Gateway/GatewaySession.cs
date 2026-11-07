@@ -12,7 +12,7 @@ namespace AvaloniaDevTool.Cli.Gateway;
 public sealed record MachineSelection(string Machine, string Mode, long Generation, string State);
 
 /// <summary>One external stdio session. Switching never reconnects or replays a business operation.</summary>
-internal sealed class GatewaySession : IAsyncDisposable
+internal sealed partial class GatewaySession : IAsyncDisposable
 {
     private readonly object _sync = new();
     private readonly SemaphoreSlim _selection = new(1, 1);
@@ -27,6 +27,7 @@ internal sealed class GatewaySession : IAsyncDisposable
     private bool _switching;
     private bool _disconnected;
     private bool _disposed;
+    private bool _recordingActive;
     private long _generation = 1;
 
     internal GatewaySession(string? initialPipe)
@@ -78,9 +79,9 @@ internal sealed class GatewaySession : IAsyncDisposable
             lock (_sync)
             {
                 ThrowIfDisposed();
-                if (_active != 0 || _pendingOperations.HasPending)
+                if (_active != 0 || _pendingOperations.HasPending || _recordingActive && !_disconnected)
                     throw new McpException(
-                        "machine_busy: Finish active calls and pending native actions before switching.");
+                        "machine_busy: Finish active calls, pending native actions and recording before switching.");
                 var wanted = endpoint?.AbsoluteUri ?? "local";
                 if (!_disconnected && _executor.Machine == wanted)
                     return Selection();
@@ -94,7 +95,7 @@ internal sealed class GatewaySession : IAsyncDisposable
             lock (_sync)
             {
                 ThrowIfDisposed();
-                if (_active != 0 || _pendingOperations.HasPending)
+                if (_active != 0 || _pendingOperations.HasPending || _recordingActive && !_disconnected)
                     throw new McpException(
                         "machine_busy: The current machine became busy while preparing the candidate.");
                 _switching = true;
@@ -125,6 +126,7 @@ internal sealed class GatewaySession : IAsyncDisposable
                 _generation++;
                 _handles.RetireMachine();
                 _pendingOperations.Clear();
+                _recordingActive = false;
                 _disconnected = false;
                 _switching = false;
                 return Selection();
@@ -166,7 +168,8 @@ internal sealed class GatewaySession : IAsyncDisposable
         lock (_sync)
         {
             ThrowIfDisposed();
-            if (_switching || _changingTarget || changing && (_active != 0 || _pendingOperations.HasPending))
+            if (_switching || _changingTarget || changing && (_active != 0 || _pendingOperations.HasPending ||
+                    _recordingActive && parameters.Name != "detach"))
                 throw new McpException(
                     "machine_busy: A target or machine transition conflicts with active operations.");
             if (_disconnected)
@@ -181,7 +184,13 @@ internal sealed class GatewaySession : IAsyncDisposable
         try
         {
             mapped = _handles.MapArguments(parameters);
-            var result = await executor.InvokeAsync(request, mapped, token).ConfigureAwait(false);
+            var result = parameters.Name == "recording-export"
+                ? await ExportRecordingAsync(executor, request, mapped, token).ConfigureAwait(false)
+                : await executor.InvokeAsync(request, mapped, token).ConfigureAwait(false);
+            var scope = JsonSerializer.SerializeToNode(result, ExecutionScopeTool.Json)?["_meta"]?["avdtExecutionScope"];
+            if (scope?["recordingActive"] is JsonValue active && active.TryGetValue<bool>(out var recordingActive))
+                lock (_sync)
+                    _recordingActive = recordingActive;
             if (parameters.Name == "native-action-status" && result.IsError == true)
                 ForgetFailedOperation();
             var mappedResult = _handles.MapResult(parameters.Name, result, out var nativeScopeChanged);

@@ -37,7 +37,8 @@ internal sealed class ExecutionScopeTool(McpServerTool inner, ToolSession sessio
             {
                 Session = session.CurrentSession?.SessionId,
                 ContentGeneration = session.CurrentContentGeneration,
-                NativeSession = session.NativeSessionIdentity
+                NativeSession = session.NativeSessionIdentity,
+                RecordingActive = session.HasActiveRecording
             },
             Json);
         return document.Deserialize<CallToolResult>(Json)!;

@@ -14,7 +14,21 @@ public sealed class InputClient
     internal InputClient(DiagnosticsRpcContext context)
     {
         this.context = context;
+        context.Subscribe((method, payload) =>
+        {
+            if (method != RecordingInputMethods.Event)
+                return false;
+            RecordingInputReceived?.Invoke(ProtocolJson.Read<RecordingInputEvent>(payload));
+            return true;
+        });
     }
+
+    public event Action<RecordingInputEvent>? RecordingInputReceived;
+
+    public Task<RecordingInputEventStatus> SetRecordingInputEventsAsync(bool enabled,
+        CancellationToken cancellationToken = default) =>
+        context.InvokeAsync<RecordingInputEventStatus>(RecordingInputMethods.Configure,
+            new RecordingInputEventsRequest(enabled), cancellationToken);
 
     public Task<ElementActionResult> PerformElementActionAsync(long objectId,
         ElementAction action,

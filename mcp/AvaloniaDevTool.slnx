@@ -32,6 +32,7 @@
         <Project
             Path="src/Hosts/AvaloniaDevTool.NativeAutomation.Worker/AvaloniaDevTool.NativeAutomation.Worker.csproj" />
         <Project Path="src/Hosts/AvaloniaDevTool.Previewer/AvaloniaDevTool.Previewer.csproj" />
+        <Project Path="src/Hosts/AvaloniaDevTool.Recording.Worker/AvaloniaDevTool.Recording.Worker.csproj" />
     </Folder>
     <Folder Name="/src/Extensions/">
         <Project Path="src/Extensions/AvaloniaDevTool.Logging/AvaloniaDevTool.Logging.csproj" />

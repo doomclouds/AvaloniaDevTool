@@ -105,7 +105,7 @@ classDiagram
 
 IMcpExecutor是MCP外层适配，不是Application的万能工具名/JSON接口。LocalExecutor调用同一执行目录，HttpExecutor只调用已选择的远端会话；远端不再次选择机器。
 
-ExecutionScopeTool包装执行结果的内部元数据，供网关确认目标/内容/native会话范围；它不增加用户工具。执行目录88项，网关增加select-machine共89项。外部句柄由网关分配，后端ID只作不透明映射。结果映射只处理已知工具的已声明字段，不扫描修改采集记录里的任意业务JSON。
+ExecutionScopeTool包装执行结果的内部元数据，供网关确认目标/内容/native会话范围；它不增加用户工具。执行目录93项，网关增加select-machine共94项。外部句柄由网关分配，后端ID只作不透明映射。结果映射只处理已知工具的已声明字段，不扫描修改采集记录里的任意业务JSON。
 
 图片保持image内容和原元数据，仅身份字段转换。机器切换、断线、目标切换及文档成功重载分别退休对应范围；不能把仅内容重载扩大成废掉整段采集。
 

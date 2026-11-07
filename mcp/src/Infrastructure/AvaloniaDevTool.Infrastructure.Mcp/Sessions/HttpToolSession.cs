@@ -148,6 +148,8 @@ public sealed class HttpToolSession : IAsyncDisposable
 
     private static bool RequiresControl(CallToolRequestParams parameters)
     {
+        if (parameters.Name is "recording-status" or "recording-list" or "recording-export")
+            return false;
         if (parameters.Name == "detach")
             return false;
         if (parameters.Name != "attach-to-app")

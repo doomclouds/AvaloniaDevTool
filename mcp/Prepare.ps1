@@ -77,8 +77,13 @@ try {
         $ready = Get-Content -LiteralPath $stamp -Raw | ConvertFrom-Json
         $cliAssembly = Join-Path $ready.RuntimeRoot 'AvaloniaDevTool.Cli.dll'
         $bootstrapAssembly = Join-Path $PSScriptRoot 'src/Hosts/AvaloniaDevTool.Bootstrap/bin/Release/net10.0/AvaloniaDevTool.Bootstrap.Pipe.dll'
+        $recordingWorker = Join-Path $ready.RuntimeRoot 'recording-worker/AvaloniaDevTool.Recording.Worker.dll'
+        $recordingBackend = Join-Path $ready.RuntimeRoot 'recording-worker/ScreenRecorderLib.dll'
+        $recordingManifest = Get-Content -LiteralPath (Join-Path $PSScriptRoot 'native/win-x64/recording/ScreenRecorderLib.manifest.json') -Raw | ConvertFrom-Json
         if ((Test-Path -LiteralPath $ready.EntryAssembly) -and
-            (Test-Path -LiteralPath $cliAssembly) -and (Test-Path -LiteralPath $bootstrapAssembly)) {
+            (Test-Path -LiteralPath $cliAssembly) -and (Test-Path -LiteralPath $bootstrapAssembly) -and
+            (Test-Path -LiteralPath $recordingWorker) -and (Test-Path -LiteralPath $recordingBackend) -and
+            (Get-FileHash -LiteralPath $recordingBackend -Algorithm SHA256).Hash -eq $recordingManifest.sha256) {
             $ready | Add-Member -NotePropertyName Reused -NotePropertyValue $true -Force
             return $ready
         }

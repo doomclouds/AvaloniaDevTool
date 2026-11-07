@@ -44,4 +44,8 @@ public sealed class RenderingClient
     public Task<ElementScreenshot> CaptureElementAsync(CaptureElementRequest request,
         CancellationToken cancellationToken = default) =>
         context.InvokeAsync<ElementScreenshot>(ExplorationMethods.Screenshot, request, cancellationToken);
+
+    public Task<ElementRecordingRegion> ResolveRecordingRegionAsync(ElementRecordingRegionRequest request,
+        CancellationToken cancellationToken = default) =>
+        context.InvokeAsync<ElementRecordingRegion>(RecordingRegionMethods.Resolve, request, cancellationToken);
 }

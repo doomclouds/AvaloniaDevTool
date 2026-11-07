@@ -1,6 +1,6 @@
 ---
 name: avalonia-devtool
-description: 使用 Avalonia DevTool 的 MCP 工具发现并原生热附加 Windows Avalonia 进程，检查控件、执行交互和截图，支持本机及远程电脑；首次使用先检查 .NET SDK 并构建 C# 单文件入口。
+description: 使用 Avalonia DevTool 的 MCP 工具发现并原生热附加 Windows Avalonia 进程，检查控件、执行交互、截图和录屏，支持本机及远程电脑；首次使用先检查 .NET SDK 并构建 C# 单文件入口。
 ---
 
 本插件提供直接 MCP 工具。正常操作使用这些工具，不要先编写临时 CLI、Node 或 Python 客户端。MCP 工具尚未加载时先修复连接，不把“可通过手工脚本调用”当成宿主连接成功。
@@ -37,6 +37,14 @@ SDK 会生成缓存及工程 bin/obj；这些文件只在执行电脑构建，�
 Windows 文件选择器使用 file-dialogs、file-dialog-wait、file-dialog-set-paths、file-dialog-accept 等；其他系统窗口使用 native-windows/native-tree/native-action。原生节点 ID 与 Avalonia 节点 ID 不混用。pending/dispatched 后继续查状态。对话框关闭后还要验证目标文件实际写入和应用状态。
 
 采集、日志、指标、事件与性能工具按任务需要选择 capture-* 或对应能力域，不把空样本、丢失、未订阅和读取失败混同。最终报告实际完成的动作和证据。`detach {}` 清理本会话临时状态，不终止外部应用；原生 DLL/程序集可能保留到目标进程退出。
+
+## 录屏
+
+附加应用后调用 `recording-start {}` 录制整窗；可传 `nodeIds` 自动取同一窗口内控件的包围范围，或传 `windowHandle` 选择 `native-windows` 返回的已核验窗口。两者互斥。`outputDirectory` 可选，省略时保存到执行电脑的 `%LOCALAPPDATA%/AvaloniaDevTool/recordings`；MP4 在录制时持续写入。
+
+开始后先查询 `recording-status`，等待 `state=recording` 再复现。默认 30 fps、3 Mbps、120 秒、128 MiB 文件预算；长流程开始前调整 `maxDurationSeconds`（最多 1800 秒）和 `maxBytes`（最多 512 MiB），避免自动结束后遗漏证据。默认 `mouseClicks=true`，真人鼠标及 Agent 框架点击、滚动、拖拽由视频内标记显示；检查 `Limitations`，旧 Agent 或暂停中的初始订阅可能缺少框架输入提示。标记不修改目标画面。整窗和局部范围跟随窗口移动；跨 DPI 或局部范围失效时核对结束原因，不把旧坐标当成功取景。
+
+结束用 `recording-stop`，若仍在 finalizing 就继续查询。`recording-list` 找回成片；`recording-export {"artifactId":"..."}` 下载到调用电脑，`destinationPath` 可选。停止成功、文件可播放和 bug 已修复分别确认。实际硬编能力、输入提示损失及错误以返回状态为准。
 
 ## 远端电脑
 

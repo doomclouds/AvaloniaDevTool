@@ -39,6 +39,7 @@ public sealed class HttpMcpIntegrationTests
         "overlay", "overlay-clear", "overlay-set", "popup-freeze", "popup-freeze-resume",
         "popup-freeze-set", "profiler", "profiler-clear", "profiler-start", "profiler-stop",
         "props", "pseudo-class", "renderer-diagnostics", "renderer-diagnostics-set", "renderer-diagnostics-stop",
+        "recording-start", "recording-status", "recording-stop", "recording-list", "recording-export",
         "reset-resource", "resource-entry", "resource-query", "resource-tree", "resources",
         "screenshot", "search", "set-brush", "set-prop", "set-resource",
         "styles", "template-parent-selector", "tree", "tree-children", "tree-release",

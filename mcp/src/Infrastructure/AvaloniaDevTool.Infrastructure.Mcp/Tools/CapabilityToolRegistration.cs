@@ -10,6 +10,7 @@ internal static class CapabilityToolRegistration
         new PreviewTools(session, context), new FrameworkInteractionTools(session, context),
         new NativeAutomationTools(session, context), new VisualCaptureTools(session, context),
         new FileDialogTools(session, context), new CaptureTools(session, context),
+        new RecordingTools(session, context),
         new ObjectInspectionTools(session), new PropertyMutationTools(session),
         new ResourceMutationTools(session), new VisualDiagnosticsTools(session),
         new RuntimeDiagnosticsTools(session)

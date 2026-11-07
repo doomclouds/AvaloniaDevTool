@@ -1,0 +1,35 @@
+{
+  "license": "MIT",
+  "patchSha256": "10336f079435bbf9a3cf54c0377b5c201511c686fe8dfcb107506bf5eb620897",
+  "changes": [
+    "Static image overlays deliver a texture once instead of busy-looping allocation and copy.",
+    "Expose actual selected Sink Writer video encoder hardware attribute and name.",
+    "Refuse unverified or software encoders when hardware encoding is requested.",
+    "Bounded encoder input texture reuse using IMFTrackedSample release callbacks; no blind ring-buffer overwrite.",
+    "Static PNG ImageReader overlays share the main protected D3D11 device/context without shader initialization; GIF/video/WGC paths remain independent."
+  ],
+  "patchVersion": 3,
+  "packageVersion": "7.0.1",
+  "sha256": "8eabe737dba1b6d479c530674a342d305a7e8a3a5a54efa9b352eb1fc410289a",
+  "name": "ScreenRecorderLib",
+  "upstream": "https://github.com/sskodje/ScreenRecorderLib",
+  "architecture": "win-x64",
+  "commit": "7e8703c69dafc3e7c2e38b9de774c72a8e06ffca",
+  "encoderTexturePool": {
+    "ownership": "IMFTrackedSample SetAllocator final-external-reference callback",
+    "bytesMetric": "Peak nominal BGRA pixel bytes; excludes driver padding and other GPU allocations.",
+    "maxTextures": 8,
+    "fullPoolWaitMilliseconds": 250,
+    "nominalPixelByteBudget": 134217728
+  },
+  "patchAddedFiles": [
+    "ScreenRecorderLibNative/EncodingTexturePool.h"
+  ],
+  "staticImageDeviceSharing": {
+    "imageType": "PNG",
+    "context": "Main immediate context with existing multithread protection",
+    "ownership": "Independent AddRef/Release per overlay; non-PNG replacement falls back to original device initialization",
+    "pipelineState": "Device-only upload; no ImageReader shader or input-layout initialization",
+    "sharedSurface": "Existing shared handle, Flush and canvas keyed-mutex notification retained"
+  }
+}

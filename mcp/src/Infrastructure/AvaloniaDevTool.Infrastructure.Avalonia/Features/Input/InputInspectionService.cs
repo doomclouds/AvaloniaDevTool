@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using Avalonia.Automation.Peers;
 using Avalonia.Automation.Provider;
 using Avalonia.Controls.Primitives;
+using System.Diagnostics;
 
 namespace AvaloniaDevTool.Agent;
 
@@ -17,6 +18,7 @@ internal sealed class InputInspectionService : IDisposable
     private readonly WeakObjectRegistry _objects;
 
     private readonly Pointer _pointer;
+    private readonly RecordingInputEventPublisher? _recordingEvents;
 
     private WeakReference<Control>? _pressedTarget;
 
@@ -26,12 +28,15 @@ internal sealed class InputInspectionService : IDisposable
 
     private bool _disposed;
 
-    public InputInspectionService(WeakObjectRegistry objects)
+    public InputInspectionService(WeakObjectRegistry objects,
+        Func<string, object, CancellationToken, Task>? sendRecordingEvent = null)
     {
         Dispatcher.UIThread.VerifyAccess();
         _objects = objects;
         // Pointer's base PlatformCapture is a no-op; no MouseDevice or native device is used.
         _pointer = new Pointer(Pointer.GetNextFreeId(), PointerType.Mouse, isPrimary: true);
+        if (sendRecordingEvent is not null)
+            _recordingEvents = new RecordingInputEventPublisher(sendRecordingEvent);
     }
 
     public InputResult Send(InputRequest request)
@@ -149,6 +154,8 @@ internal sealed class InputInspectionService : IDisposable
                     Properties(modifiers, PointerUpdateKind.Other),
                     modifiers,
                     new Vector(request.DeltaX, request.DeltaY));
+                PublishRecordingEvent(topLevel, position, "Wheel", "None", deltaX: request.DeltaX,
+                    deltaY: request.DeltaY);
                 target.RaiseEvent(wheel);
                 return Delivered(wheel, "PointerWheelChanged");
             case InputKind.Click:
@@ -181,6 +188,7 @@ internal sealed class InputInspectionService : IDisposable
             Timestamp(),
             Properties(modifiers, PointerUpdateKind.Other),
             modifiers);
+        PublishRecordingEvent(topLevel, position, "PointerMove", _pressedButton?.ToString() ?? "None");
         target.RaiseEvent(args);
         return args;
     }
@@ -206,6 +214,7 @@ internal sealed class InputInspectionService : IDisposable
                 Properties(modifiers, UpdateKind(button, pressed: true)),
                 modifiers,
                 clickCount);
+            PublishRecordingEvent(topLevel, position, "PointerDown", button.ToString(), clickCount);
             target.RaiseEvent(args);
             return args;
         }
@@ -233,6 +242,7 @@ internal sealed class InputInspectionService : IDisposable
                 new PointerPointProperties(raw, UpdateKind(button, pressed: false)),
                 modifiers,
                 button);
+            PublishRecordingEvent(topLevel, position, "PointerUp", button.ToString());
             target.RaiseEvent(args);
             return args;
         }
@@ -357,6 +367,40 @@ internal sealed class InputInspectionService : IDisposable
     private static InputResult Delivered(RoutedEventArgs args, string name) =>
         new(true, args.Handled, $"{name} delivered to the selected control; handled reflects routed event state.");
 
+    internal async Task<RecordingInputEventStatus> ConfigureRecordingEventsAsync(
+        RecordingInputEventsRequest request, CancellationToken cancellationToken)
+    {
+        Dispatcher.UIThread.VerifyAccess();
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        if (_recordingEvents is null)
+            throw new RpcException("recording_events_unavailable", "This input service has no notification transport.");
+        _recordingEvents.Configure(request.Enabled);
+        if (!request.Enabled)
+            await _recordingEvents.FlushAsync(cancellationToken).ConfigureAwait(false);
+        return _recordingEvents.Status();
+    }
+
+    private void PublishRecordingEvent(TopLevel root, Point position, string kind, string button,
+        int clickCount = 0, double deltaX = 0, double deltaY = 0)
+    {
+        if (_recordingEvents?.Enabled != true)
+            return;
+        try
+        {
+            var screen = root.PointToScreen(position);
+            var handle = root.TryGetPlatformHandle();
+            var windowHandle = handle is { HandleDescriptor: "HWND" } ? handle.Handle.ToInt64() : 0;
+            var timestamp = Stopwatch.GetTimestamp();
+            var utc = DateTimeOffset.UtcNow;
+            _recordingEvents.Publish((subscription, sequence) => new RecordingInputEvent(subscription, sequence,
+                kind, button, screen.X, screen.Y, windowHandle, utc, timestamp, clickCount, deltaX, deltaY));
+        }
+        catch (Exception error) when (error is ArgumentException or InvalidOperationException)
+        {
+            _recordingEvents.Dropped();
+        }
+    }
+
     public void Dispose()
     {
         if (_disposed)
@@ -366,6 +410,7 @@ internal sealed class InputInspectionService : IDisposable
         _pressedButton = null;
         _pressedTarget = null;
         _pressedRoot = null;
+        _recordingEvents?.Dispose();
         _pointer.Dispose();
     }
 
