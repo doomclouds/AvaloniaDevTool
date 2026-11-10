@@ -4,7 +4,7 @@
   "plugins": [
     {
       "name": "avalonia-devtool",
-      "source": { "source": "local", "path": "./" },
+      "source": { "source": "local", "path": "./plugins/avalonia-devtool" },
       "policy": { "installation": "AVAILABLE", "authentication": "ON_INSTALL" },
       "category": "Productivity"
     }

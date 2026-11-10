@@ -15,5 +15,5 @@ $arguments = @{
     RuntimeIdentifier = $RuntimeIdentifier
     Configuration     = $Configuration
 }
-$arguments.OutputDirectory = if ($OutputDirectory) { $OutputDirectory } else { Join-Path $repository '../mcp' }
+$arguments.OutputDirectory = if ($OutputDirectory) { $OutputDirectory } else { Join-Path $repository '../plugins/avalonia-devtool/mcp' }
 & (Join-Path $repository 'src/Packaging/AvaloniaDevTool.Packaging/Build-Bundle.ps1') @arguments

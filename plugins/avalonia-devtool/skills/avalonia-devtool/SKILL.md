@@ -11,7 +11,7 @@ description: 使用 Avalonia DevTool 自包含 EXE 的 MCP 工具发现并原生
 
 首次安装或版本更新时，直接执行 `<插件根>/mcp/AvaloniaDevTool.exe --bundle-verify`，校验并准备 `%LOCALAPPDATA%/AvaloniaDevTool/bundles` 中的运行缓存，然后刷新 MCP。首次解包可能超过宿主默认握手时限；这一步只运行随包 EXE，不构建源码。可用 `--bundle-info` 查看版本与载荷摘要。初始化失败时核对 EXE 是否存在、版本、启动日志与校验结果；不自动安装 SDK 或修改用户 Codex 配置。
 
-EXE 已包含运行库、原生引导与匹配 Avalonia 12.1.1/12.1.4 的预编译 Agent，热附加不会现场编译。只有评估或构建用户 XAML 工程才需要 .NET SDK。源码与开发打包脚本位于插件的 `source/`。
+EXE 已包含运行库、原生引导与匹配 Avalonia 12.1.1/12.1.4 的预编译 Agent，热附加不会现场编译。只有评估或构建用户 XAML 工程才需要 .NET SDK。开发源码保留在仓库的 `source/`，不随插件安装。
 
 初始化后检查 tools/list、工具图标和 `attach-to-app {}`。空列表只证明发现调用成功，不能证明热附加成功。若宿主提示初始化失败，检查实际启动命令、准备输出和启动日志；工具目录在当前聊天缺失时，不得声称已经通过直接工具调用完成。
 
@@ -60,4 +60,4 @@ AvaloniaDevTool.exe serve
 
 切换机器、应用或重连后重新取得应用、节点、弹窗和采集句柄。远端断线不会回退本机，超时不表示未执行，不盲目重发注入或业务写操作。完成远端操作后可 `select-machine {}` 切回本机。
 
-工具名、枚举和参数以当前 tools/list 为准。完整边界见 `../../source/docs/architecture/runtime-contracts.md`。此技能不授权修改目标工程、操作未选进程、自动添加测试业务内容或写回禅道。
+工具名、枚举和参数以当前 tools/list 为准。此技能不授权修改目标工程、操作未选进程、自动添加测试业务内容或写回禅道。

@@ -126,7 +126,7 @@ def main():
     distribution = output / "distribution"
     distribution.mkdir(exist_ok=True)
     executable = distribution / "AvaloniaDevTool.exe"
-    shutil.copy2(repo / "mcp/AvaloniaDevTool.exe", executable)
+    shutil.copy2(repo / "plugins/avalonia-devtool/mcp/AvaloniaDevTool.exe", executable)
     deps = fixture_path.with_suffix(".deps.json").read_text(encoding="utf-8")
     assert "AvaloniaDevTool.Agent" not in deps and "DiagnosticsSupport" not in deps
     environment = os.environ.copy()

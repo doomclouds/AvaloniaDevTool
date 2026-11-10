@@ -3,9 +3,9 @@
   "mcpServers": {
     "avalonia": {
       "type": "stdio",
-      "command": "${PLUGIN_ROOT}/mcp/AvaloniaDevTool.exe",
+      "command": "./mcp/AvaloniaDevTool.exe",
       "args": ["mcp"],
-      "cwd": "${PLUGIN_ROOT}/mcp"
+      "cwd": "./mcp"
     }
   }
 }

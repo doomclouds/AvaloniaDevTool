@@ -1,5 +1,7 @@
 # 单文件打包与版本安装
 
+当前插件目录为仓库 `plugins/avalonia-devtool/`，完整源码在 `source/`。marketplace 仅安装插件子目录；构建脚本默认输出到该子目录的 `mcp/AvaloniaDevTool.exe`。插件 0.1.5 的安装与宿主验证见 [验证记录](release-0.1.5.md)，下文的 0.1.4 与 0.1.0 路径按各自历史版本保留。
+
 独立的 `AvaloniaDevTool.Packaging` 工程负责生成对外分发的 `AvaloniaDevTool.exe`。它不合并目标应用、预览宿主和 Windows 原生 worker 的进程；它将各角色的完整自包含发布目录嵌入一个启动程序，运行时校验、解包并启动内部控制台。
 
 本页描述打包与安装代码的实际行为。本轮已生成并验证 `0.1.0 / win-x64` 单文件实物；缓存专项、真实 MCP 运行和隔离安装的证据分别记录，不相互替代。

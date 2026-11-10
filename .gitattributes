@@ -1,4 +1,4 @@
 # Preserve the exact upstream patch bytes used by the SHA-256 manifest.
 # Patch context includes upstream whitespace and is not source to reformat.
 source/native/win-x64/recording/screenrecorderlib.patch -text -whitespace
-mcp/*.exe binary
+plugins/avalonia-devtool/mcp/*.exe binary

@@ -1,6 +1,6 @@
 # AvaloniaDevTool 0.1.4
 
-AvaloniaDevTool 为 Avalonia 应用提供控件检查、临时调试修改、界面交互、Windows 原生窗口与文件弹窗、PNG、原始诊断采集和 XAML 文件预览。默认入口和初始化方式见插件根 README。Windows x64/.NET 10 的受支持 Avalonia 进程可以原生热附加，无需目标引用 Agent SDK；主动 SDK 接入仍可用于自定义宿主。调用方负责业务流程、业务判断和测试断言。
+AvaloniaDevTool 为 Avalonia 应用提供控件检查、临时调试修改、界面交互、Windows 原生窗口与文件弹窗、PNG、原始诊断采集和 XAML 文件预览。默认入口和初始化方式见仓库根 README。Windows x64/.NET 10 的受支持 Avalonia 进程可以原生热附加，无需目标引用 Agent SDK；主动 SDK 接入仍可用于自定义宿主。调用方负责业务流程、业务判断和测试断言。
 
 **一个 MCP 配置，默认本机，指定 IP 切换执行电脑。** `mcp` 是 Codex 启动的 stdio 网关；`serve` 是被测电脑运行的 HTTP 执行 Console。两者复用同一套能力和执行工具。普通终端不提供 `tree/click` 等直接业务子命令。
 
@@ -10,7 +10,7 @@ AvaloniaDevTool 为 Avalonia 应用提供控件检查、临时调试修改、界
 
 ```powershell
 pwsh -File build/Build-Bundle.ps1 -Version 0.1.4
-pwsh -File tools/Install-AvaloniaDevTool.ps1 -PackagePath ..\mcp\AvaloniaDevTool.exe -Version 0.1.4
+pwsh -File tools/Install-AvaloniaDevTool.ps1 -PackagePath ..\plugins\avalonia-devtool\mcp\AvaloniaDevTool.exe -Version 0.1.4
 ```
 
 安装目录为 `%USERPROFILE%\.local\share\avalonia-devtool\versions\<版本>`；稳定入口为 `%USERPROFILE%\.local\bin\AvaloniaDevTool.exe`。脚本更新用户级 PATH 和 `AVALONIA_DEVTOOL_HOME`，保留旧版本，校验失败或入口锁定时不会切换到损坏的命令。已有终端或 Codex 可能需要重新启动以读取新环境。
