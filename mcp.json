@@ -3,10 +3,9 @@
   "mcpServers": {
     "avalonia": {
       "type": "stdio",
-      "command": "dotnet",
-      "args": ["run", "--file", "${PLUGIN_ROOT}/mcp/AvaloniaDevTool.cs", "--no-build", "--no-restore", "--configuration", "Release", "--", "mcp"],
-      "cwd": "${PLUGIN_ROOT}/mcp",
-      "env": { "DOTNET_NOLOGO": "1", "DOTNET_SKIP_FIRST_TIME_EXPERIENCE": "1" }
+      "command": "${PLUGIN_ROOT}/mcp/AvaloniaDevTool.exe",
+      "args": ["mcp"],
+      "cwd": "${PLUGIN_ROOT}/mcp"
     }
   }
 }

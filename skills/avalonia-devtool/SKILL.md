@@ -1,17 +1,17 @@
 ---
 name: avalonia-devtool
-description: 使用 Avalonia DevTool 的 MCP 工具发现并原生热附加 Windows Avalonia 进程，检查控件、执行交互、截图和录屏，支持本机及远程电脑；首次使用先检查 .NET SDK 并构建 C# 单文件入口。
+description: 使用 Avalonia DevTool 自包含 EXE 的 MCP 工具发现并原生热附加 Windows Avalonia 进程，检查控件、执行交互、截图和录屏，支持本机及远程电脑，无需首次源码构建。
 ---
 
 本插件提供直接 MCP 工具。正常操作使用这些工具，不要先编写临时 CLI、Node 或 Python 客户端。MCP 工具尚未加载时先修复连接，不把“可通过手工脚本调用”当成宿主连接成功。
 
 ## 首次准备和启动
 
-插件根为本技能目录的上两级。首次安装、版本更新或输出被清理后，执行 `pwsh -NoProfile -File <插件根>/mcp/Prepare.ps1`。它检查 Windows x64 和 .NET 10 SDK，执行 build，不执行自包含 publish。核对 SdkVersion、EntryAssembly、RuntimeRoot 和 Reused；失败时报告真实环境错误，不自动安装 SDK 或修改用户 Codex 配置。排查损坏输出时加 `-Force`。
+插件根为本技能目录的上两级。正式入口是 `<插件根>/mcp/AvaloniaDevTool.exe mcp`，`mcp.json` 已声明直接启动 EXE。要求 Windows x64；正常使用不需要 .NET SDK、NuGet 恢复、PowerShell 初始化或源码构建。不要调用已移除的 C# 文件入口及准备脚本。
 
-MCP 的正式启动命令是 `dotnet run --file <插件根>/mcp/AvaloniaDevTool.cs --no-build --no-restore --configuration Release -- mcp`，工作目录为 `<插件根>/mcp`。`mcp.json` 已声明此命令，无需 PowerShell 包装或手工拼接 DLL 路径。首次 build 属于准备流程，不在 stdio 协议中输出构建日志。
+首次安装或版本更新时，直接执行 `<插件根>/mcp/AvaloniaDevTool.exe --bundle-verify`，校验并准备 `%LOCALAPPDATA%/AvaloniaDevTool/bundles` 中的运行缓存，然后刷新 MCP。首次解包可能超过宿主默认握手时限；这一步只运行随包 EXE，不构建源码。可用 `--bundle-info` 查看版本与载荷摘要。初始化失败时核对 EXE 是否存在、版本、启动日志与校验结果；不自动安装 SDK 或修改用户 Codex 配置。
 
-SDK 会生成缓存及工程 bin/obj；这些文件只在执行电脑构建，不随 Git 分发。Windows x64 原生引导 DLL 随插件提供，正常使用无需安装 C++ 工具链。首次附加某个受支持的 Avalonia 版本时，会在本机缓存中构建匹配的 Agent，可能比后续附加慢。
+EXE 已包含运行库、原生引导与匹配 Avalonia 12.1.1/12.1.4 的预编译 Agent，热附加不会现场编译。只有评估或构建用户 XAML 工程才需要 .NET SDK。源码与开发打包脚本位于插件的 `source/`。
 
 初始化后检查 tools/list、工具图标和 `attach-to-app {}`。空列表只证明发现调用成功，不能证明热附加成功。若宿主提示初始化失败，检查实际启动命令、准备输出和启动日志；工具目录在当前聊天缺失时，不得声称已经通过直接工具调用完成。
 
@@ -20,7 +20,7 @@ SDK 会生成缓存及工程 bin/obj；这些文件只在执行电脑构建，�
 1. `select-machine {}` 选择本机。
 2. `attach-to-app {}` 列出 Agent 端点和 Windows 桌面 CoreCLR 候选。以 processId、名称及 startTimeUtc 核对用户选定的程序。
 3. 将本次返回的 **id** 传给 `attach-to-app {"id": ID}`。id 是发现标识，不能用 PID 替代。`requiresInjection=true` 表示需要原生引导；工具会确认 Avalonia 版本、加载匹配 Agent 并连接管道，不需要目标引用 Agent、修改接入代码、重新编译或重启。
-4. 只有结果 attached=true 且 session 指向预期进程时才开始操作。attachment 返回构建、注入和总耗时；existing-endpoint 表示复用已经存在的端点。
+4. 只有结果 attached=true 且 session 指向预期进程时才开始操作。attachment 返回准备、注入和总耗时；existing-endpoint 表示复用已经存在的端点。
 
 当前原生附加范围是 Windows x64、.NET 10 CoreCLR、Avalonia 12.1.1/12.1.4。候选进程不保证是 Avalonia；不支持的目标会明确失败。其他平台仍可连接已有的 Agent 端点，不能据此宣称支持其原生热附加。NativeAOT、自包含单文件和其他版本没有在本次支持范围内。
 
@@ -48,16 +48,16 @@ Windows 文件选择器使用 file-dialogs、file-dialog-wait、file-dialog-set-
 
 ## 远端电脑
 
-执行电脑需要插件源码、Windows x64 和 .NET 10 SDK。先在那里执行 Prepare.ps1，再在目标用户交互桌面、`<插件根>/mcp` 目录运行：
+执行电脑需要 Windows x64 和同一版本的 `AvaloniaDevTool.exe`，无需复制源码或安装 SDK。在目标用户交互桌面运行：
 
 ```text
-dotnet run --file AvaloniaDevTool.cs --no-build --no-restore --configuration Release -- serve
+AvaloniaDevTool.exe serve
 ```
 
 默认监听 TCP 7443 的 `/mcp`。可加 `--listen IP --port PORT`；非默认端口还要在调用方启动 MCP 前设置相同的 AVDT_EXECUTOR_PORT。当前为无 Token 内网模式，网络需已可达，URL 不会自动启动远端服务。
 
-调用方仍只有一个 stdio MCP。`select-machine {"ip":"远端IPv4"}` 后重新执行发现和附加；原生注入、Agent 构建、UIA、文件路径都属于所选执行电脑。显式 127.0.0.1 也走 HTTP，可用于回环检查；它不能替代真实双机验证。
+调用方仍只有一个 stdio MCP。`select-machine {"ip":"远端IPv4"}` 后重新执行发现和附加；原生注入、Agent 加载、UIA、文件路径都属于所选执行电脑。显式 127.0.0.1 也走 HTTP，可用于回环检查；它不能替代真实双机验证。
 
 切换机器、应用或重连后重新取得应用、节点、弹窗和采集句柄。远端断线不会回退本机，超时不表示未执行，不盲目重发注入或业务写操作。完成远端操作后可 `select-machine {}` 切回本机。
 
-工具名、枚举和参数以当前 tools/list 为准。完整边界见 `../../mcp/docs/architecture/runtime-contracts.md`。此技能不授权修改目标工程、操作未选进程、自动添加测试业务内容或写回禅道。
+工具名、枚举和参数以当前 tools/list 为准。完整边界见 `../../source/docs/architecture/runtime-contracts.md`。此技能不授权修改目标工程、操作未选进程、自动添加测试业务内容或写回禅道。

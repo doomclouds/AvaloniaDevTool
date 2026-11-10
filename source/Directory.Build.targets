@@ -1,0 +1,13 @@
+<Project>
+    <ItemGroup Condition="'$(SelfContained)' == 'true'">
+        <FrameworkReference Update="Microsoft.NETCore.App" RuntimeFrameworkVersion="10.0.14" />
+    </ItemGroup>
+    <Target Name="SelectBundledRuntime" BeforeTargets="ProcessFrameworkReferences"
+            Condition="'$(SelfContained)' == 'true' and '$(PublishAot)' == 'true'">
+        <ItemGroup>
+            <KnownILCompilerPack Update="Microsoft.DotNet.ILCompiler"
+                                 ILCompilerPackVersion="10.0.14"
+                                 Condition="'%(KnownILCompilerPack.Identity)' == 'Microsoft.DotNet.ILCompiler' and '%(KnownILCompilerPack.TargetFramework)' == 'net10.0'" />
+        </ItemGroup>
+    </Target>
+</Project>
