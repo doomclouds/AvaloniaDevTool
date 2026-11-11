@@ -3,11 +3,21 @@ name: avalonia-devtool
 description: 使用 Avalonia DevTool 自包含 EXE 的 MCP 工具发现并原生热附加 Windows Avalonia 进程，检查控件、执行交互、截图和录屏，支持本机及远程电脑，无需首次源码构建。
 ---
 
-本插件提供直接 MCP 工具。正常操作使用这些工具，不要先编写临时 CLI、Node 或 Python 客户端。MCP 工具尚未加载时先修复连接，不把“可通过手工脚本调用”当成宿主连接成功。
+本技能可配合插件内置 MCP 或独立注册的普通 `avalonia` MCP 使用。正常操作使用当前聊天提供的直接 MCP 工具，不要先编写临时 CLI、Node 或 Python 客户端。MCP 工具尚未加载时先修复连接，不把“可通过手工脚本调用”当成宿主连接成功。
+
+## 独立 MCP 安装与维护
+
+插件根为本技能目录的上两级。用户明确要求安装、更新、回退、卸载或核对独立 MCP 时，使用 `<插件根>/scripts/Manage-CodexMcp.ps1`，支持 `-Action Install|Update|Rollback|Uninstall|Status`。独立分发 ZIP 中同名脚本位于 EXE 旁边；源码仓库入口为 `source/tools/Manage-CodexMcp.ps1`。这些维护操作需要 PowerShell 7 和 Codex，不需要编译工具链。
+
+先用 `Status` 核对当前安装和注册；按用户本次授权执行相应操作，不因普通界面检查自动迁移接入方式。安装和更新读取实际 EXE 的内嵌版本、校验载荷，并注册固定用户命令为普通 `avalonia` 服务器；已安装插件继续提供技能，其内置 MCP 单独关闭，避免重复加载。`-PackagePath` 可指定发布程序，`-ExpectedSha256` 可核对可信摘要；程序版本不以插件版本代替。
+
+更新使用新分发 ZIP 解压后的脚本和程序，或提供新的 `-PackagePath`；不会后台更新。回退指定已保留的程序 `-Version`。固定 EXE 被占用时先关闭对应 MCP 连接，不强行结束 Codex 或外部应用。卸载默认只移除普通服务器注册；明确要求清理管理器拥有的程序文件时使用 `-RemoveFiles`，保留录屏、共享运行缓存及其他用户数据，不自动恢复插件内置 MCP。
+
+独立模式使用安装后的固定命令路径，不从 Codex 插件缓存启动程序。维护后分别核对服务器工具目录、Codex 发现目录和当前聊天实际可调用目录；前两者成功不能代替当前聊天的完整加载、实际附加或硬件验证。
 
 ## 首次准备和启动
 
-插件根为本技能目录的上两级。正式入口是 `<插件根>/mcp/AvaloniaDevTool.exe mcp`，`mcp.json` 已声明直接启动 EXE。要求 Windows x64；正常使用不需要 .NET SDK、NuGet 恢复、PowerShell 初始化或源码构建。不要调用已移除的 C# 文件入口及准备脚本。
+插件模式的正式入口是 `<插件根>/mcp/AvaloniaDevTool.exe mcp`，`mcp.json` 已声明直接启动 EXE；独立模式由普通服务器配置启动已安装的固定 EXE。要求 Windows x64；正常使用不需要 .NET SDK、NuGet 恢复、PowerShell 初始化或源码构建。不要调用已移除的 C# 文件入口及准备脚本。
 
 首次安装或版本更新时，直接执行 `<插件根>/mcp/AvaloniaDevTool.exe --bundle-verify`，校验并准备 `%LOCALAPPDATA%/AvaloniaDevTool/bundles` 中的运行缓存，然后刷新 MCP。首次解包可能超过宿主默认握手时限；这一步只运行随包 EXE，不构建源码。可用 `--bundle-info` 查看版本与载荷摘要。初始化失败时核对 EXE 是否存在、版本、启动日志与校验结果；不自动安装 SDK 或修改用户 Codex 配置。
 

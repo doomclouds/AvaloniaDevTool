@@ -1,10 +1,40 @@
 # 单文件打包与版本安装
 
-当前插件目录为仓库 `plugins/avalonia-devtool/`，完整源码在 `source/`。marketplace 仅安装插件子目录；构建脚本默认输出到该子目录的 `mcp/AvaloniaDevTool.exe`。插件 0.1.5 的安装与宿主验证见 [验证记录](release-0.1.5.md)，下文的 0.1.4 与 0.1.0 路径按各自历史版本保留。
+当前插件目录为仓库 `plugins/avalonia-devtool/`，完整源码在 `source/`。marketplace 仅安装插件子目录。0.1.6 新增独立 MCP 管理与分发脚本，继续使用 EXE 0.1.4；插件版本与程序版本分开维护。0.1.5 的安装与宿主验证见 [验证记录](release-0.1.5.md)，下文的 0.1.4 与 0.1.0 路径和结果按各自历史版本保留。
+
+## 0.1.6 独立 MCP 分发
+
+在仓库根运行：
+
+```powershell
+pwsh -NoProfile -File source/build/Build-Distribution.ps1
+```
+
+该脚本读取插件版本和 EXE 的 `--bundle-info`，执行 `--bundle-verify`，同步 `Install-AvaloniaDevTool.ps1`、`Manage-CodexMcp.ps1`、`Codex-Mcp.ps1` 到插件 `scripts/`，再生成 `artifacts/distributions/0.1.6/avalonia-devtool-0.1.6-win-x64.zip` 和对应 `.sha256`。只同步插件脚本时使用 `-SyncOnly`；`-PackagePath`、`-OutputDirectory` 可指定实际程序和输出目录。它不重新编译 EXE，也不注册或更新用户 MCP。
+
+独立 ZIP 根目录包含 EXE、上述三个脚本及 `README.md`。插件包新增同样的三个脚本，其他入口不变，共九个文件。两个分发渠道复用同一份管理脚本源码，`source/tools/` 是维护入口；发布前重新运行打包脚本，避免插件副本与源码漂移。脚本校验复制结果和 ZIP 的 SHA-256，不覆盖已生成的同版本 ZIP。
+
+安装、更新、回退、卸载与状态查询统一从 `Manage-CodexMcp.ps1` 执行：
+
+```powershell
+pwsh -NoProfile -File source/tools/Manage-CodexMcp.ps1 -Action Install
+pwsh -NoProfile -File source/tools/Manage-CodexMcp.ps1 -Action Status
+pwsh -NoProfile -File source/tools/Manage-CodexMcp.ps1 -Action Update -PackagePath ./new-release/AvaloniaDevTool.exe
+pwsh -NoProfile -File source/tools/Manage-CodexMcp.ps1 -Action Rollback -Version 0.1.4
+pwsh -NoProfile -File source/tools/Manage-CodexMcp.ps1 -Action Uninstall
+```
+
+管理器从真实内嵌清单读取程序版本及 RID，执行载荷校验，再复用下述安装器维护版本目录与固定命令。普通 MCP 注册使用固定命令的绝对路径，不依赖用户 PATH，也不指向 Codex 插件安装缓存。若插件已安装，保留技能并单独停用其 MCP，避免相同名称的服务重复加载。
+
+升级使用新版分发包中的脚本和程序，或显式提供 `-PackagePath`；没有后台下载或自动替换。`-ExpectedSha256` 用于核对可信来源提供的 EXE 摘要。历史程序版本保留，回退重新选择历史文件。正在运行的 MCP 锁住固定 EXE 时，切换失败应保留原入口，先关闭对应连接后重试。
+
+卸载默认仅移除普通 `avalonia` 注册，不重新启用插件内置 MCP，不删除程序、历史版本、运行缓存或录屏；`-RemoveFiles` 才清理管理器拥有的安装文件。`-InstallRoot` 和 `-BinDirectory` 改过后，维护与卸载须传入相同位置。`-CodexHome` 供隔离测试使用，只影响管理器启动的 Codex 子进程，不修改父进程的环境。
+
+服务端返回完整目录、Codex 成功发现目录、当前聊天可调用完整目录是三个不同的检查点。普通 MCP 不计入本次发现的 Agent Plugin 共享声明预算，但仍应检查当前聊天的真实工具目录和权限；不能用独立客户端发现成功代替当前聊天的验证。本版验证范围见 [0.1.6 说明](release-0.1.6.md)。
 
 独立的 `AvaloniaDevTool.Packaging` 工程负责生成对外分发的 `AvaloniaDevTool.exe`。它不合并目标应用、预览宿主和 Windows 原生 worker 的进程；它将各角色的完整自包含发布目录嵌入一个启动程序，运行时校验、解包并启动内部控制台。
 
-本页描述打包与安装代码的实际行为。本轮已生成并验证 `0.1.0 / win-x64` 单文件实物；缓存专项、真实 MCP 运行和隔离安装的证据分别记录，不相互替代。
+以下保留单文件包装程序及 `0.1.0 / win-x64` 实物的历史验证记录；缓存专项、真实 MCP 运行和隔离安装的证据分别记录，不相互替代。
 
 ## 0.1.4 插件分发
 

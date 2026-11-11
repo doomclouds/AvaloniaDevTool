@@ -37,11 +37,13 @@ def main():
         'plugin.json', 'mcp.json', 'mcp/AvaloniaDevTool.exe',
         'skills/avalonia-devtool/SKILL.md',
         'assets/avalonia.png', 'assets/README.md',
+        'scripts/Install-AvaloniaDevTool.ps1', 'scripts/Manage-CodexMcp.ps1',
+        'scripts/Codex-Mcp.ps1',
     }
     files = {file.relative_to(installed).as_posix() for file in installed.rglob('*') if file.is_file()}
     assert files == expected, {'unexpected': sorted(files - expected), 'missing': sorted(expected - files)}
     directories = {path.relative_to(installed).as_posix() for path in installed.rglob('*') if path.is_dir()}
-    assert directories == {'assets', 'mcp', 'skills', 'skills/avalonia-devtool'}, directories
+    assert directories == {'assets', 'mcp', 'scripts', 'skills', 'skills/avalonia-devtool'}, directories
     plugin = repo / 'plugins/avalonia-devtool'
     for name in files:
         assert hashlib.sha256((installed / name).read_bytes()).digest() == hashlib.sha256((plugin / name).read_bytes()).digest(), name
